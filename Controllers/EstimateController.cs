@@ -43,7 +43,7 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
           set_alert("success", self.helper.label("clients_estimate_invoiced_successfully"));
           redURL = self.helper.site_url("invoice/" + _invoice.Id + "/" + _invoice.Hash);
         }
-        else if ((is_array(success) && success["invoiced"] == false) || success == true)
+        else if ((is_array(success) && success["invoiced"] == false) || success)
         {
           if (action == 4)
           {

@@ -1,13 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Service.Libraries;
-
-public class ConfigRules
-{
-  public string Group { get; set; } = "default";
-  public string Key { get; set; } = string.Empty;
-  public string Value { get; set; } = string.Empty;
-}
+namespace Service.Libraries.FormValidations;
 
 public partial class FormValidation
 {
@@ -274,16 +267,4 @@ public partial class FormValidation
 
   [GeneratedRegex(@"(.*?)\[(.*)\]")]
   private static partial Regex MyRegex();
-}
-
-public class FieldData
-{
-  public string Field { get; set; }
-  public string Label { get; set; }
-  public List<string> Rules { get; set; }
-  public Dictionary<string, string> Errors { get; set; }
-  public bool IsArray { get; set; }
-  public List<string> Keys { get; set; }
-  public string PostData { get; set; }
-  public string Error { get; set; }
 }

@@ -1,4 +1,3 @@
-using Global.Entities;
 using Service.Framework.Helpers;
 
 namespace Service.Helpers;

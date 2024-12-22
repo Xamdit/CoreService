@@ -1,7 +1,11 @@
 using System.Dynamic;
 using Blazored.LocalStorage;
 using Global.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RestSharp;
+using Service.Core.Extensions;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
@@ -103,7 +107,7 @@ public static class GeneralHelper
     //   $client      = new Client();
     //
     // try {
-    //   $response = $client->request('POST', 'https://api-ssl.bitly.com/v4/bitlinks', [
+    //   response = $client->request('POST', 'https://api-ssl.bitly.com/v4/bitlinks', [
     //     'headers' => [
     //   'Authorization' => "Bearer $accessToken",
     //   'Accept'        => 'application/json',
@@ -115,9 +119,9 @@ public static class GeneralHelper
     //     ],
     //     ]);
     //
-    //   $response = json_decode($response->getBody());
+    //   response = json_decode(response->getBody());
     //
-    //   return $response->link;
+    //   return response->link;
     // } catch (RequestException $e) {
     //   log_activity('Bitly ERROR' . (string) $e->getResponse()->getBody());
 
@@ -336,5 +340,40 @@ public static class GeneralHelper
     // var url = self.helper.site_url(self.uri.uri_string();
     // return $_SERVER['QUERY_STRING'] ? $url. '?'. $_SERVER['QUERY_STRING'] : $url;
     return self.helper.base_url();
+  }
+
+  /**
+ * Function used to validate all recaptcha from google reCAPTCHA feature
+ * @param  string $str
+ * @return boolean
+ */
+  public static async Task<IActionResult> do_recaptcha_validation(this ControllerBase controller, string str = "")
+  {
+    var (self, db) = getInstance();
+    var client = self.helper.rest_client_goole();
+    var request = new RestRequest("/recaptcha/api/siteverify", Method.Post);
+    request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.AddParameter("secret", db.get_option("recaptcha_secret_key")); // Replace with your method for retrieving the secret key
+    request.AddParameter("response", str);
+    request.AddParameter("remoteip", self.ip()); // Assuming this retrieves the user's IP address
+    var response = await client.ExecuteAsync(request);
+    if (!response.IsSuccessful) return controller.NotFound();
+    var jsonResponse = response.Content;
+    var res = JObject.Parse(jsonResponse);
+    // return controller.Content(res["success"] != null && (bool)res["success"]);
+    return controller.Ok();
+  }
+
+  /**
+* Check if user accessed url while not logged in to redirect after login
+* @return null
+*/
+  public static IActionResult maybe_redirect_to_previous_url(this ControllerBase controller)
+  {
+    var (self, db) = getInstance();
+    if (!self.session.has_userdata("red_url")) return controller.Redirect("/");
+    var red_url = self.session.get_userdata("red_url");
+    self.session.unset_userdata("red_url");
+    return controller.Redirect(red_url);
   }
 }

@@ -1,3 +1,4 @@
+using Service.Core.Extensions;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
 using Service.Helpers.Tags;
@@ -236,5 +237,13 @@ public static class ClientHelper
     contact = db.Contacts.FirstOrDefault(x => x.Id == id);
     if (contact == null) return false;
     return !string.IsNullOrEmpty(contact.EmailVerifiedAt);
+  }
+
+  public static void send_customer_registered_email_to_administrators(this HelperBase helper, int client_id)
+  {
+    var (self, db) = getInstance();
+    var staff_model = self.model.staff_model();
+    var admins = staff_model.get(x => x.Active == true && x.IsAdmin == true);
+    admins.ForEach(admin => { self.helper.send_mail_template("customer_new_registration_to_admins", admin.Email, client_id, admin.Id); });
   }
 }

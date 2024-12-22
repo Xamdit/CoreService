@@ -426,7 +426,7 @@ public class Forms(ILogger<ProposalController> logger, MyInstance self) : Client
 
             if (ticket_id) success = true;
 
-            if (success == true) self.hooks.do_action("ticket_form_submitted", new{ ticket_id });
+            if (success) self.hooks.do_action("ticket_form_submitted", new{ ticket_id });
 
             return MakeSuccess(new{ success, message = form.success_submit_msg });
 

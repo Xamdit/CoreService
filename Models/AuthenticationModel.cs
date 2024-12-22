@@ -6,6 +6,7 @@ using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
 using Service.Helpers;
+using Service.Schemas;
 using Task = System.Threading.Tasks.Task;
 
 namespace Service.Models;
@@ -29,13 +30,13 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
    * @param  boolean Is Staff Or Client
    * @return boolean if not redirect url found, if found redirect to the url
    */
-  public dynamic login(string email, string password, bool remember, bool is_staff)
+  public (bool is_success, bool memberinactive, bool two_factor_auth, Contact contact) login(string email, string password, bool remember, bool is_staff)
   {
-    if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) return false;
+    if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+      return (false, false, false, null);
     var jsonString = is_staff
       ? JsonConvert.SerializeObject(db.Staff.FirstOrDefault(x => x.Email == email))
       : JsonConvert.SerializeObject(db.Contacts.FirstOrDefault(x => x.Email == email));
-
 
     var user = JsonConvert.DeserializeObject<Contact>(jsonString);
     if (user != null)
@@ -46,7 +47,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
         self.hooks.do_action("failed_login_attempt", new { user, is_staff_member = is_staff });
         log_activity($"Failed Login Attempt [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
         // Password failed, return
-        return false;
+        return (false, false, false, null);
       }
     }
     else
@@ -58,21 +59,21 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
       });
 
       log_activity($"Non Existing User Tried to Login [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
-      return false;
+      return (false, false, false, null);
     }
 
     if (!user.Active)
     {
       self.hooks.do_action("inactive_user_login_attempt", new { user, is_staff_member = is_staff });
       log_activity($"Inactive User Tried to Login [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
-      return new { memberinactive = true };
+      return (false, true, false, null);
     }
 
     var twoFactorAuth = 0;
     if (is_staff)
     {
       var staff = JsonConvert.DeserializeObject<Staff>(jsonString);
-      if (staff == null) return false;
+      if (staff == null) return (false, false, false, null);
       twoFactorAuth = staff.TwoFactorAuthEnabled;
       if (twoFactorAuth > 0)
       {
@@ -116,10 +117,11 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
     }
     else
     {
-      return new { two_factor_auth = true, user };
+      // return new { two_factor_auth = true, user };
+      return (false, false, true, user);
     }
 
-    return true;
+    return (true, false, false, null);
   }
 
   /**
@@ -298,25 +300,19 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
    * @return boolean
    * Generate new password key for the user to reset the password.
    */
-  public object forgot_password(string email, bool is_staff = false)
+  public (bool is_success, bool memberinactive) forgot_password(string email, bool is_staff = false)
   {
     var jsonString = is_staff
       ? JsonConvert.SerializeObject(db.Staff.FirstOrDefault(x => x.Email == email))
       : JsonConvert.SerializeObject(db.Contacts.FirstOrDefault(x => x.Email == email));
 
-
     var user = JsonConvert.DeserializeObject<Contact>(jsonString);
-
-
     if (user != null)
     {
       if (user.Active)
       {
         log_activity($"Inactive User Tried Password Reset [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
-        return new
-        {
-          memberinactive = true
-        };
+        return (false, true);
       }
 
       var new_pass_key = Guid.NewGuid().ToString();
@@ -329,7 +325,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
           NewPassKeyRequested = today()
         });
       var affected_rows = db.SaveChanges();
-      if (affected_rows <= 0) return false;
+      if (affected_rows <= 0) return (false, false);
       var user_data = CurrentUser;
       // data.NewPassKey = new_pass_key;
       // data.IsStaff = is_staff;
@@ -338,14 +334,14 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
       var sent = is_staff == false
         ? self.helper.send_mail_template("customer_contact_forgot_password", user.Email, user.UserId, user.Id)
         : self.helper.send_mail_template("staff_forgot_password", user.Email, user.Id);
-      if (sent == null) return false;
+      if (sent == null) return (false, false);
       log_activity($"Password Reset Email sent [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
       self.hooks.do_action("forgot_password_email_sent", new { is_staff_member = is_staff, user });
-      return true;
+      return (true, false);
     }
 
     log_activity($"Non Existing User Tried Password Reset [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
-    return false;
+    return (false, false);
   }
 
   /**
@@ -430,9 +426,9 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
    * @return boolean
    * User reset password after successful validation of the key
    */
-  public object reset_password(bool is_staff, int user_id, string new_pass_key, string password)
+  public (bool is_success, bool expired) reset_password(bool is_staff, int user_id, string new_pass_key, string password)
   {
-    if (!can_reset_password(is_staff, user_id, new_pass_key)) return new { expired = true };
+    if (!can_reset_password(is_staff, user_id, new_pass_key)) return (false, true);
     password = self.HashPassword(password);
     if (is_staff)
       db.Staff.Where(x => x.Id == user_id && x.NewPassKey == new_pass_key)
@@ -449,33 +445,33 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
 
     var affected_rows = db.SaveChanges();
 
-    if (affected_rows <= 0) return null;
+    if (affected_rows <= 0) return (false, false);
     log_activity($"User Reseted Password [User ID: {user_id}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
 
     if (is_staff)
     {
       var staff = db.Staff.FirstOrDefault(x => x.Id == user_id && x.NewPassKey == new_pass_key);
-      if (staff == null) return false;
+      if (staff == null) return (false, false);
       staff.NewPassKey = null;
       staff.NewPassKeyRequested = null;
       staff.LastPasswordChange = DateTime.Now;
       GoUpdate(staff);
       var sent = self.helper.send_mail_template("staff_password_resetted", staff.Email, staff.Id);
-      if (sent != null) return true;
+      if (sent != null) return (true, false);
     }
     else
     {
       var contact = db.Contacts.FirstOrDefault(x => x.Id == user_id && x.NewPassKey == new_pass_key);
-      if (contact == null) return false;
+      if (contact == null) return (false, false);
       contact.NewPassKey = null;
       contact.NewPassKeyRequested = null;
       contact.LastPasswordChange = DateTime.Now;
       GoUpdate(contact);
       var sent = self.helper.send_mail_template("customer_contact_password_resetted", contact.Email, contact.UserId, contact.Id);
-      if (sent != null) return true;
+      if (sent != null) return (true, false);
     }
 
-    return false;
+    return (false, false);
   }
 
   /**

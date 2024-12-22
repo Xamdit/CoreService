@@ -43,24 +43,23 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
         && !string.IsNullOrEmpty(db.get_option("recaptcha_secret_key"))
         && !string.IsNullOrEmpty(db.get_option("recaptcha_site_key")))
       form_validation.set_rules("g-recaptcha-response", "Captcha", "callback_recaptcha");
-    if (form_validation.run() != false)
+    if (form_validation.run())
     {
       var authentication_model = self.model.authentication_model();
-
-      var success = authentication_model.login(
+      var result = authentication_model.login(
         self.input.post("email"),
         self.input.post("password"),
         self.input.post<bool>("remember"),
         false
       );
 
-      if (self.helper.is_array(success) && isset(success["memberinactive"]))
+      if (result.is_success && result.memberinactive)
       {
         set_alert("danger", self.helper.label("inactive_account"));
         return Redirect(self.helper.site_url("authentication/login"));
       }
 
-      if (success == false)
+      if (result.is_success)
       {
         set_alert("danger", self.helper.label("client_invalid_username_or_password"));
         return Redirect(self.helper.site_url("authentication/login"));
@@ -68,10 +67,8 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
 
       var announcements_model = self.model.announcements_model();
       announcements_model.set_announcements_as_read_except_last_one(self.helper.get_contact_user_id());
-
       self.hooks.do_action("after_contact_login");
-
-      self.helper.maybe_redirect_to_previous_url();
+      this.maybe_redirect_to_previous_url();
       return Redirect(self.helper.site_url());
     }
 
@@ -103,12 +100,12 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
         "accept_terms_and_conditions",
         self.helper.label("terms_and_conditions"),
         "required",
-        new { required = self.helper.label("terms_and_conditions_validation") }
+        new Dictionary<string, string> { { "required", self.helper.label("terms_and_conditions_validation") } }
       );
 
     form_validation.set_rules("firstname", self.helper.label("client_firstname"), "required");
     form_validation.set_rules("lastname", self.helper.label("client_lastname"), "required");
-    form_validation.set_rules("email", self.helper.label("client_email"), "trim|required|is_unique[" "contacts.email]|valid_email");
+    form_validation.set_rules("email", self.helper.label("client_email"), "trim|required|is_unique[contacts.email]|valid_email");
     form_validation.set_rules("password", self.helper.label("clients_register_password"), "required");
     form_validation.set_rules("passwordr", self.helper.label("clients_register_password_repeat"), "required|matches[password]");
 
@@ -158,7 +155,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
         "accept_terms_and_conditions",
         self.helper.label("terms_and_conditions"),
         "required",
-        new { required = self.helper.label("terms_and_conditions_validation") }
+        new Dictionary<string, string> { { "required", self.helper.label("terms_and_conditions_validation") } }
       );
 
     form_validation.set_rules("firstname", self.helper.label("client_firstname"), "required");
@@ -228,10 +225,10 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
       return Redirect(self.helper.site_url("authentication/login"));
     }
 
-    var logged_in = authentication_model.login(email, password, false, false);
+    var result = authentication_model.login(email, password, false, false);
     var redUrl = self.helper.site_url();
 
-    if (logged_in)
+    if (result.is_success)
     {
       self.hooks.do_action("after_client_register_logged_in", client_id);
       set_alert("success", self.helper.label("clients_successfully_registered"));
@@ -280,9 +277,10 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
     );
 
 
-    var success = authentication_model.forgot_password(email);
-    if (self.helper.is_array(success) && isset(success["memberinactive"])) set_alert("danger", self.helper.label("inactive_account"));
-    else if (success == true)
+    var result = authentication_model.forgot_password(email);
+    if (result.is_success && result.memberinactive)
+      set_alert("danger", self.helper.label("inactive_account"));
+    else if (result.is_success)
       set_alert("success", self.helper.label("check_email_for_resetting_password"));
     else
       set_alert("danger", self.helper.label("error_setting_new_password_key"));
@@ -325,12 +323,13 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
     form_validation.set_rules("password", self.helper.label("customer_reset_password"), "required");
     form_validation.set_rules("passwordr", self.helper.label("customer_reset_password_repeat"), "required|matches[password]");
     self.hooks.do_action("before_user_reset_password", new { is_staff, userid });
-    var success = authentication_model.reset_password(false, userid, new_pass_key, passwordr);
-    if (self.helper.is_array(success) && success["expired"] == true)
+    var staff = new { };
+    var result = authentication_model.reset_password(false, userid, new_pass_key, passwordr);
+    if (result.is_success && result.expired)
     {
       set_alert("danger", self.helper.label("password_reset_key_expired"));
     }
-    else if (success == true)
+    else if (result.is_success)
     {
       self.hooks.do_action("after_user_reset_password", new { staff, userid });
       set_alert("success", self.helper.label("password_reset_message"));
@@ -361,9 +360,9 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
     return false;
   }
 
-  public IActionResult recaptcha(string str = "")
+  public async Task<IActionResult> recaptcha(string str = "")
   {
     var (self, db) = getInstance();
-    return self.helper.do_recaptcha_validation(str);
+    return await this.do_recaptcha_validation(str);
   }
 }

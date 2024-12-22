@@ -1,12 +1,13 @@
 using Global.Entities;
 using Service.Framework;
 using Service.Framework.Core.Engine;
+using Service.Libraries.FormValidations;
 
 namespace Service.Controllers.Core;
 
 public class AppControllerBase(ILogger<MyControllerBase> logger, MyInstance self) : MyControllerBase(logger, self)
 {
-  public Libraries.FormValidation form_validation { get; set; }
+  public FormValidation form_validation { get; set; }
 
   public MyContext db
   {
@@ -19,7 +20,7 @@ public class AppControllerBase(ILogger<MyControllerBase> logger, MyInstance self
 
   public override void Init()
   {
-    form_validation = new Libraries.FormValidation(self.httpContextAccessor);
+    form_validation = new FormValidation(self.httpContextAccessor);
     self.controller = this;
   }
 }
