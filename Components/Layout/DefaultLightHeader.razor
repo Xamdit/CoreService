@@ -1,0 +1,73 @@
+@inherits LayoutComponentBase
+@layout MasterInit
+@using Service.Components.Partials
+@using Service.Libraries.Helpers
+@using Service.Components.Layout.Partials.HeaderLayout
+<!--begin::App-->
+<div class="d-flex flex-column flex-root app-root" id="kt_app_root">
+  <!--begin::Page-->
+  <div class="app-page flex-column flex-column-fluid" id="kt_app_page">
+    <MyHeader></MyHeader>
+    <!--begin::Wrapper-->
+    <div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
+      <!--begin::Main-->
+      <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+        <!--begin::Content wrapper-->
+        <div class="d-flex flex-column flex-column-fluid">
+          <MyToolbar></MyToolbar>
+          <!--begin::Content-->
+          <div id="kt_app_content" class="app-content flex-column-fluid">
+            <!--begin::Content container-->
+            <div id="kt_app_content_container" class="app-container container-xxl">
+              @Body
+            </div>
+            <!--end::Content container-->
+          </div>
+          <!--end::Content-->
+        </div>
+        <!--end::Content wrapper-->
+        <MyFooter></MyFooter>
+      </div>
+      <!--end:::Main-->
+    </div>
+    <!--end::Wrapper-->
+  </div>
+  <!--end::Page-->
+</div>
+<!--end::App-->
+
+<MyDrawers></MyDrawers>
+<MyModalComponents></MyModalComponents>
+<MyScrolltop></MyScrolltop>
+
+@code {
+
+
+  protected override void OnInitialized()
+  {
+    js.addBodyAttribute("data-kt-app-page-loading", "on");
+  }
+
+  protected override void OnAfterRender(bool firstRender)
+  {
+    if (!firstRender) return;
+    js.addBodyAttribute("data-kt-app-reset-transition", "true");
+    js.addBodyAttribute("data-kt-app-layout", "light-header");
+    js.addBodyAttribute("data-kt-app-header-fixed", "true");
+    js.addBodyAttribute("data-kt-app-toolbar-enabled", "true");
+    js.addBodyClass("app-default");
+    js.InvokeVoidAsync("KTModalUpgradePlan.init");
+    js.InvokeVoidAsync("KTCreateApp.init");
+    js.InvokeVoidAsync("KTModalUserSearch.init");
+    js.InvokeVoidAsync("KTModalNewTarget.init");
+    js.InvokeVoidAsync("KTAppSidebar.init");
+  }
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    await Task.Delay(300);
+    await js.InvokeVoidAsync("document.body.removeAttribute", "data-kt-app-reset-transition");
+    await js.InvokeVoidAsync("document.body.removeAttribute", "data-kt-app-page-loading");
+  }
+
+}

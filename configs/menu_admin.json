@@ -1,0 +1,238 @@
+[
+  {
+    "title": "dashboard",
+    "icon": "las la-tachometer-alt",
+    "url": "/admin",
+    "target": "_blank"
+  },
+  {
+    "title": "customer",
+    "icon": "las la-users",
+    "url": "/admin/clients",
+    "target": "_blank"
+  },
+  {
+    "title": "sales",
+    "icon": "las la-users",
+    "submenu": [
+      {
+        "title": "proposals",
+        "url": "/admin/proposals",
+        "active": true
+      },
+      {
+        "title": "estimates",
+        "url": "/admin/estimates"
+      },
+      {
+        "title": "invoices",
+        "url": "/admin/invoices"
+      },
+      {
+        "title": "payments",
+        "url": "/admin/payments"
+      },
+      {
+        "title": "credit-notes",
+        "url": "/admin/credit-notes"
+      },
+      {
+        "title": "items",
+        "url": "/admin/items"
+      }
+    ]
+  },
+  {
+    "title": "subscriptions",
+    "icon": "las la-money-bill-wave",
+    "url": "/admin/subscriptions",
+    "target": "_blank"
+  },
+  {
+    "title": "expenses",
+    "icon": "las la-tags",
+    "url": "/admin/expenses",
+    "target": "_blank"
+  },
+  {
+    "title": "contracts",
+    "icon": "las la-exchange-alt",
+    "url": "/admin/contracts",
+    "target": "_blank"
+  },
+  {
+    "title": "projects",
+    "icon": "las la-receipt",
+    "url": "/admin/projects",
+    "target": "_blank"
+  },
+  {
+    "title": "tasks",
+    "icon": "las la-receipt",
+    "url": "/admin/tasks",
+    "target": "_blank"
+  },
+  {
+    "title": "support",
+    "icon": "las la-receipt",
+    "url": "/admin/support",
+    "target": "_blank"
+  },
+  {
+    "title": "leads",
+    "icon": "las la-receipt",
+    "url": "/admin/leads",
+    "target": "_blank"
+  },
+  {
+    "title": "estimate-request",
+    "icon": "las la-receipt",
+    "url": "/admin/estimate-request",
+    "target": "_blank"
+  },
+  {
+    "title": "knowledge-base",
+    "icon": "las la-receipt",
+    "url": "/admin/knowledge-base",
+    "target": "_blank"
+  },
+  {
+    "title": "utilities",
+    "icon": "las la-university",
+    "submenu": [
+      {
+        "title": "media",
+        "url": "/admin/media",
+        "active": true
+      },
+      {
+        "title": "bulk-pdf-exporter",
+        "url": "/admin/utilities/bulk-pdf-exporter"
+      },
+      {
+        "title": "csv-exports",
+        "url": "/admin/csv-exports"
+      },
+      {
+        "title": "calendar",
+        "url": "/admin/utilities/calendar"
+      },
+      {
+        "title": "announcements",
+        "url": "/admin/announcements"
+      },
+      {
+        "title": "goals",
+        "url": "/admin/goals"
+      },
+      {
+        "title": "activity-log",
+        "url": "/admin/utilities/activity-log"
+      },
+      {
+        "title": "surveys",
+        "url": "/admin/surveys"
+      },
+      {
+        "title": "surveys",
+        "url": "/admin/surveys"
+      },
+      {
+        "title": "database-backup",
+        "url": "/admin/surveys"
+      },
+      {
+        "title": "ticket-pipe-log",
+        "url": "/admin/utilities/ticket-pipe-log"
+      }
+    ]
+  },
+  {
+    "title": "true_wallet",
+    "icon": "las la-wallet",
+    "url": "/admin/true-wallet",
+    "target": "_blank"
+  },
+  {
+    "title": "general_setting",
+    "icon": "las la-cogs",
+    "url": "/admin/general/setting",
+    "target": "_blank"
+  },
+  {
+    "title": "employee",
+    "icon": "las la-user-tie",
+    "url": "/admin/employee",
+    "target": "_blank"
+  },
+  {
+    "title": "topup",
+    "icon": "las la-credit-card",
+    "url": "/admin/topup",
+    "target": "_blank"
+  },
+  {
+    "title": "modify_report",
+    "icon": "las la-file-alt",
+    "url": "/admin/modify-report",
+    "target": "_blank"
+  },
+  {
+    "title": "summary_report",
+    "icon": "las la-chart-bar",
+    "url": "/admin/summary-report",
+    "target": "_blank"
+  },
+  {
+    "title": "game_management",
+    "icon": "las la-gamepad",
+    "submenu": [
+      {
+        "title": "game_tournament",
+        "url": "/admin/game-tournament",
+        "active": true
+      },
+      {
+        "title": "game_tournament_report",
+        "url": "/admin/game-tournament/report"
+      }
+    ]
+  },
+  {
+    "title": "coupon_system",
+    "icon": "las la-ticket-alt",
+    "url": "/admin/coupon-system",
+    "target": "_blank"
+  },
+  {
+    "title": "reports",
+    "icon": "las la-users",
+    "submenu": [
+      {
+        "title": "sales",
+        "url": "/admin/reports/sales",
+        "active": true
+      },
+      {
+        "title": "expenses",
+        "url": "/admin/report/expenses"
+      },
+      {
+        "title": "expense-vs-income",
+        "url": "/admin/reports/expense-vs-income"
+      },
+      {
+        "title": "leads",
+        "url": "/admin/reports/leads"
+      },
+      {
+        "title": "timesheets",
+        "url": "/admin/staff/timesheets"
+      },
+      {
+        "title": "knowledge_base_articles",
+        "url": "/admin/reports/knowledge_base_articles"
+      }
+    ]
+  }
+]

@@ -1,0 +1,2596 @@
+
+<!DOCTYPE html>
+<html lang="en"
+    dir="ltr">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Tillman, Leannon and Effertz    </title>
+
+    <link rel="shortcut icon" id="favicon" href="../../../uploads/company/favicon.ico">
+<link rel="apple-touch-icon”" id="favicon-apple-touch-icon" href="../../../uploads/company/favicon.ico">
+<link rel="stylesheet" type="text/css" id="reset-css" href="../../../assets/css/reset.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="inter-font" href="../../../assets/plugins/inter/inter%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="vendor-css" href="../../../assets/builds/vendor-admin%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-css" href="../../../assets/plugins/font-awesome/css/fontawesome.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-brands" href="../../../assets/plugins/font-awesome/css/brands.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-solid" href="../../../assets/plugins/font-awesome/css/solid.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-regular" href="../../../assets/plugins/font-awesome/css/regular.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="tailwind-css" href="../../../assets/builds/tailwind%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="app-css" href="../../../assets/css/style.min%EF%B9%96v=3.2.0.css">
+    <script>var site_url = "https://perfexcrm.com/demo/";var admin_url = "https://perfexcrm.com/demo/admin/";var app = {};app.version = 320;app.available_tags = ["bug","follow up","important","logo","review","todo","tomorrow","wordpress"];app.available_tags_ids = ["2","7","5","3","6","4","8","1"];app.user_recent_searches = [];app.months_json = ["January","February","March","April","May","June","July","August","September","October","November","December"];app.tinymce_lang = "";app.locale = "en";app.browser = "";app.user_id = "1";app.user_language = "";app.is_mobile = "";app.user_is_staff_member = "1";app.user_is_admin = "1";app.max_php_ini_upload_size_bytes = "104857600";app.calendarIDs = "";app.dtFilters = {};app.options = {};app.lang = {};app.options.date_format = "Y-m-d";app.options.decimal_places = "2";app.options.company_is_required = "1";app.options.default_view_calendar = "dayGridMonth";app.options.calendar_events_limit = "4";app.options.tables_pagination_limit = "25";app.options.time_format = "24";app.options.decimal_separator = ".";app.options.thousand_separator = ",";app.options.timezone = "Europe/Berlin";app.options.calendar_first_day = "0";app.options.allowed_files = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt";app.options.desktop_notifications = "0";app.options.show_table_export_button = "to_all";app.options.has_permission_tasks_checklist_items_delete = "1";app.options.show_setup_menu_item_only_on_hover = "0";app.options.newsfeed_maximum_files_upload = "10";app.options.dismiss_desktop_not_after = "0";app.options.enable_google_picker = "1";app.options.google_client_id = "";app.options.google_api = "";app.options.has_permission_create_task = "1";app.lang. invoice_task_billable_timers_found = "Started timers found";app.lang. validation_extension_not_allowed = "File extension not allowed";app.lang. tag = "Tag";app.lang. options = "Options";app.lang. no_items_warning = "Enter at least one item.";app.lang. item_forgotten_in_preview = "Have you forgotten to add this item?";app.lang. new_notification = "New Notification!";app.lang. estimate_number_exists = "This estimate number exists for the ongoing year.";app.lang. invoice_number_exists = "This invoice number exists for the ongoing year.";app.lang. confirm_action_prompt = "Are you sure you want to perform this action?";app.lang. calendar_expand = "expand";app.lang. media_files = "Files";app.lang. credit_note_number_exists = "Credit note number already exists";app.lang. item_field_not_formatted = "The number in the input field is not formatted while edit/add item and should remain not formatted do not try to format it manually in here.";app.lang. email_exists = "Email already exists";app.lang. phonenumber_exists = "Phone number already exists";app.lang. website_exists = "Website already exists";app.lang. company_exists = "Company already exists";app.lang. filter_by = "Filter by";app.lang. you_can_not_upload_any_more_files = "You can not upload any more files";app.lang. cancel_upload = "Cancel Upload";app.lang. browser_not_support_drag_and_drop = "Your browser does not support drag'n'drop file uploads";app.lang. drop_files_here_to_upload = "Drop files here to upload";app.lang. file_exceeds_max_filesize = "The uploaded file exceeds the upload_max_filesize directive in php.ini (100 MB)";app.lang. file_exceeds_maxfile_size_in_form = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form (100 MB)";app.lang. unit = "Unit";app.lang. dt_length_menu_all = "All";app.lang. dt_button_reload = "Reload";app.lang. dt_button_excel = "Excel";app.lang. dt_button_csv = "CSV";app.lang. dt_button_pdf = "PDF";app.lang. dt_button_print = "Print";app.lang. dt_button_export = "Export";app.lang. search_ajax_empty = "Select and begin typing";app.lang. search_ajax_initialized = "Start typing to search";app.lang. search_ajax_searching = "Searching...";app.lang. not_results_found = "No results found";app.lang. search_ajax_placeholder = "Type to search...";app.lang. currently_selected = "Currently Selected";app.lang. task_stop_timer = "Stop Timer";app.lang. dt_button_column_visibility = "Visibility";app.lang. note = "Note";app.lang. search_tasks = "Search Tasks";app.lang. confirm = "Confirm";app.lang. showing_billable_tasks_from_project = "Showing billable tasks from project";app.lang. invoice_task_item_project_tasks_not_included = "Projects tasks are not included in this list.";app.lang. credit_amount_bigger_then_invoice_balance = "Total credits amount is bigger then invoice balance due";app.lang. credit_amount_bigger_then_credit_note_remaining_credits = "Total credits amount is bigger then remaining credits";app.lang. save = "Save";app.lang. expense = "Expense";app.lang. ticket = "Ticket";app.lang. lead = "Lead";app.lang. create_reminder = "Create Reminder";app.lang. something_went_wrong = "Something went wrong. Try again";app.lang. filters = "Filters";app.lang. filter_boolean_yes = "Yes";app.lang. filter_boolean_no = "No";app.lang. filter_matchtype_and = "and";app.lang. filter_matchtype_or = "or";app.lang. filter_share = "Share with other team members?";app.lang. filter_mark_as_default = "Mark as default";app.lang. filter_unmark_as_default = "Unmark as default";app.lang. default_filter_info = "The filter will be marked as default only for your account.";app.lang. filter_save = "Save Filter";app.lang. filter_name = "Filter name";app.lang. filter_apply = "Apply";app.lang. filter_apply_and_save = "Apply and Save";app.lang. filter_new = "New Filter";app.lang. filter_clear_active = "Clear Filter";app.lang. filter_edit = "Edit";app.lang. filter_create = "Create Filter";app.lang. filter_update = "Update Filter";app.lang. filter_delete = "Delete Filter";app.lang. filter_cannot_be_shared = "This filter cannot be shared with other team members as it contains rules that may not be available for all users.";app.lang. filter_add_rule = "Add Rule";app.lang. filter_operator_is_empty = "is unknown";app.lang. filter_operator_is_not_empty = "is known";app.lang. filter_operator_equal = "equal";app.lang. filter_operator_not_equal = "not equal";app.lang. filter_operator_begins_with = "begins with";app.lang. filter_operator_not_begins_with = "not begins with";app.lang. filter_operator_contains = "contains";app.lang. filter_operator_not_contains = "not contains";app.lang. filter_operator_ends_with = "ends with";app.lang. filter_operator_not_ends_with = "not ends with";app.lang. filter_operator_in = "in";app.lang. filter_operator_not_in = "not in";app.lang. filter_operator_between = "between";app.lang. filter_operator_not_between = "not between";app.lang. filter_operator_dynamic = "dynamic";app.lang. filter_operator_greater = "greater";app.lang. filter_operator_greater_or_equal = "greater or equal";app.lang. filter_operator_less = "less";app.lang. filter_operator_less_or_equal = "less or equal";app.lang. filter_use_dynamic_dates = "Use dynamic dates";app.lang. no_filters_found = "No saved filters, get started by creating a new filter.";app.lang.datatables = {"emptyTable":"No entries found","info":"Showing _START_ to _END_ of _TOTAL_ entries","infoEmpty":"Showing 0 to 0 of 0 entries","infoFiltered":"(filtered from _MAX_ total entries)","lengthMenu":"_MENU_","loadingRecords":"Loading...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Search...","zeroRecords":"No matching records found","paginate":{"first":"First","last":"Last","next":"Next","previous":"Previous"},"aria":{"sortAscending":" activate to sort column ascending","sortDescending":" activate to sort column descending"}};var app_language="",app_is_mobile="",app_user_browser="",app_date_format="Y-m-d",app_decimal_places="2",app_company_is_required="1",app_default_view_calendar="dayGridMonth",app_calendar_events_limit="4",app_tables_pagination_limit="25",app_time_format="24",app_decimal_separator=".",app_thousand_separator=",",app_timezone="Europe/Berlin",app_calendar_first_day="0",app_allowed_files=".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt",app_desktop_notifications="0",max_php_ini_upload_size_bytes="104857600",app_show_table_export_button="to_all",calendarIDs="",is_admin="1",is_staff_member="1",has_permission_tasks_checklist_items_delete="1",app_show_setup_menu_item_only_on_hover="0",app_newsfeed_maximum_files_upload="10",app_dismiss_desktop_not_after="0",app_enable_google_picker="1",app_google_client_id="",google_api="";var appLang = {};appLang["invoice_task_billable_timers_found"] = "Started timers found";appLang["validation_extension_not_allowed"] = "File extension not allowed";appLang["tag"] = "Tag";appLang["options"] = "Options";appLang["no_items_warning"] = "Enter at least one item.";appLang["item_forgotten_in_preview"] = "Have you forgotten to add this item?";appLang["new_notification"] = "New Notification!";appLang["estimate_number_exists"] = "This estimate number exists for the ongoing year.";appLang["invoice_number_exists"] = "This invoice number exists for the ongoing year.";appLang["confirm_action_prompt"] = "Are you sure you want to perform this action?";appLang["calendar_expand"] = "expand";appLang["media_files"] = "Files";appLang["credit_note_number_exists"] = "Credit note number already exists";appLang["item_field_not_formatted"] = "The number in the input field is not formatted while edit/add item and should remain not formatted do not try to format it manually in here.";appLang["email_exists"] = "Email already exists";appLang["phonenumber_exists"] = "Phone number already exists";appLang["website_exists"] = "Website already exists";appLang["company_exists"] = "Company already exists";appLang["filter_by"] = "Filter by";appLang["you_can_not_upload_any_more_files"] = "You can not upload any more files";appLang["cancel_upload"] = "Cancel Upload";appLang["browser_not_support_drag_and_drop"] = "Your browser does not support drag'n'drop file uploads";appLang["drop_files_here_to_upload"] = "Drop files here to upload";appLang["file_exceeds_max_filesize"] = "The uploaded file exceeds the upload_max_filesize directive in php.ini (100 MB)";appLang["file_exceeds_maxfile_size_in_form"] = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form (100 MB)";appLang["unit"] = "Unit";appLang["dt_length_menu_all"] = "All";appLang["dt_button_reload"] = "Reload";appLang["dt_button_excel"] = "Excel";appLang["dt_button_csv"] = "CSV";appLang["dt_button_pdf"] = "PDF";appLang["dt_button_print"] = "Print";appLang["dt_button_export"] = "Export";appLang["search_ajax_empty"] = "Select and begin typing";appLang["search_ajax_initialized"] = "Start typing to search";appLang["search_ajax_searching"] = "Searching...";appLang["not_results_found"] = "No results found";appLang["search_ajax_placeholder"] = "Type to search...";appLang["currently_selected"] = "Currently Selected";appLang["task_stop_timer"] = "Stop Timer";appLang["dt_button_column_visibility"] = "Visibility";appLang["note"] = "Note";appLang["search_tasks"] = "Search Tasks";appLang["confirm"] = "Confirm";appLang["showing_billable_tasks_from_project"] = "Showing billable tasks from project";appLang["invoice_task_item_project_tasks_not_included"] = "Projects tasks are not included in this list.";appLang["credit_amount_bigger_then_invoice_balance"] = "Total credits amount is bigger then invoice balance due";appLang["credit_amount_bigger_then_credit_note_remaining_credits"] = "Total credits amount is bigger then remaining credits";appLang["save"] = "Save";appLang["expense"] = "Expense";appLang["ticket"] = "Ticket";appLang["lead"] = "Lead";appLang["create_reminder"] = "Create Reminder";appLang["something_went_wrong"] = "Something went wrong. Try again";appLang["filters"] = "Filters";appLang["filter_boolean_yes"] = "Yes";appLang["filter_boolean_no"] = "No";appLang["filter_matchtype_and"] = "and";appLang["filter_matchtype_or"] = "or";appLang["filter_share"] = "Share with other team members?";appLang["filter_mark_as_default"] = "Mark as default";appLang["filter_unmark_as_default"] = "Unmark as default";appLang["default_filter_info"] = "The filter will be marked as default only for your account.";appLang["filter_save"] = "Save Filter";appLang["filter_name"] = "Filter name";appLang["filter_apply"] = "Apply";appLang["filter_apply_and_save"] = "Apply and Save";appLang["filter_new"] = "New Filter";appLang["filter_clear_active"] = "Clear Filter";appLang["filter_edit"] = "Edit";appLang["filter_create"] = "Create Filter";appLang["filter_update"] = "Update Filter";appLang["filter_delete"] = "Delete Filter";appLang["filter_cannot_be_shared"] = "This filter cannot be shared with other team members as it contains rules that may not be available for all users.";appLang["filter_add_rule"] = "Add Rule";appLang["filter_operator_is_empty"] = "is unknown";appLang["filter_operator_is_not_empty"] = "is known";appLang["filter_operator_equal"] = "equal";appLang["filter_operator_not_equal"] = "not equal";appLang["filter_operator_begins_with"] = "begins with";appLang["filter_operator_not_begins_with"] = "not begins with";appLang["filter_operator_contains"] = "contains";appLang["filter_operator_not_contains"] = "not contains";appLang["filter_operator_ends_with"] = "ends with";appLang["filter_operator_not_ends_with"] = "not ends with";appLang["filter_operator_in"] = "in";appLang["filter_operator_not_in"] = "not in";appLang["filter_operator_between"] = "between";appLang["filter_operator_not_between"] = "not between";appLang["filter_operator_dynamic"] = "dynamic";appLang["filter_operator_greater"] = "greater";appLang["filter_operator_greater_or_equal"] = "greater or equal";appLang["filter_operator_less"] = "less";appLang["filter_operator_less_or_equal"] = "less or equal";appLang["filter_use_dynamic_dates"] = "Use dynamic dates";appLang["no_filters_found"] = "No saved filters, get started by creating a new filter.";</script>
+    <script>
+        var totalUnreadNotifications = 0 ,
+            proposalsTemplates = [] ,
+            contractsTemplates = [] ,
+            billingAndShippingFields = ['billing_street', 'billing_city', 'billing_state', 'billing_zip',
+                'billing_country',
+                'shipping_street', 'shipping_city', 'shipping_state', 'shipping_zip', 'shipping_country'
+            ],
+            isRTL = 'false',
+            taskid, taskTrackingStatsData, taskAttachmentDropzone, taskCommentAttachmentDropzone, newsFeedDropzone,
+            expensePreviewDropzone, taskTrackingChart, cfh_popover_templates = {},
+            _table_api;
+    </script>
+    <script>
+if (typeof(jQuery) === 'undefined' && !window.deferAfterjQueryLoaded) {
+    window.deferAfterjQueryLoaded = [];
+    Object.defineProperty(window, "$", {
+        set: function(value) {
+            window.setTimeout(function() {
+                $.each(window.deferAfterjQueryLoaded, function(index, fn) {
+                    fn();
+                });
+            }, 0);
+            Object.defineProperty(window, "$", {
+                value: value
+            });
+        },
+        configurable: true
+    });
+}
+
+var csrfData = {"formatted":{"csrf_token_name":"bf0a8ef7a17e35f854421149e1dc6fe5"},"token_name":"csrf_token_name","hash":"bf0a8ef7a17e35f854421149e1dc6fe5"};
+
+if (typeof(jQuery) == 'undefined') {
+    window.deferAfterjQueryLoaded.push(function() {
+        csrf_jquery_ajax_setup();
+    });
+    window.addEventListener('load', function() {
+        csrf_jquery_ajax_setup();
+    }, true);
+} else {
+    csrf_jquery_ajax_setup();
+}
+
+function csrf_jquery_ajax_setup() {
+    $.ajaxSetup({
+        data: csrfData.formatted
+    });
+
+    $(document).ajaxError(function(event, request, settings) {
+        if (request.status === 419) {
+            alert_float('warning', 'Page expired, refresh the page make an action.')
+        }
+    });
+}
+</script>
+    <script>
+        var leadUniqueValidationFields = ["email"];
+        var leadAttachmentsDropzone;
+    </script>
+    <script>
+          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+          n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+          document,'script','https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', '186767841772496'); // Insert your pixel ID here.
+          fbq('track', 'PageView');
+          </script>
+          <noscript><img height="1" width="1" style="display:none"
+          src="https://www.facebook.com/tr?id=186767841772496&amp;ev=PageView&amp;noscript=1"
+          /></noscript></head>
+
+<body class="app admin h-full customer-profile dynamic-create-groups clients client user-id-1 ">
+    <div id="header">
+    <button type="button"
+        class="hide-menu tw-inline-flex tw-bg-transparent tw-border-0 tw-p-1 tw-mt-4 hover:tw-bg-neutral-600/10 tw-text-neutral-600 hover:tw-text-neutral-800 focus:tw-text-neutral-800 focus:tw-outline-none tw-rounded-md tw-mx-4 ltr:md:tw-ml-6 rtl:md:tw-mr-6 ltr:tw-float-left  rtl:tw-float-right">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="tw-h-4 tw-w-4 tw-text-current">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M2.25 18.003h19.5m-19.5-6h19.5m-19.5-6h19.5"></path>
+        </svg>
+    </button>
+    <nav>
+        <div class="tw-flex tw-justify-between">
+            <div class="tw-overflow-hidden tw-shrink-0">
+                <div id="logo"
+                    class="tw-h-[57px] tw-hidden md:tw-flex tw-items-center [&_img]:tw-h-9 [&_img]:tw-w-auto">
+                    <a href="../../index.html" class="logo img-responsive !tw-mt-0">
+        <img src="../../../uploads/company/1f03e41865e3e0d535f6202e5fba391a.png" class="img-responsive" alt="Perfex CRM">
+        </a>                </div>
+            </div>
+            <div class="tw-flex tw-flex-1 sm:tw-flex-initial">
+                <div id="top_search"
+                    class="tw-inline-flex tw-relative dropdown sm:tw-ml-1.5 sm:tw-mr-3 tw-max-w-xl tw-flex-auto tw-group/top-search"
+                    data-toggle="tooltip" data-placement="bottom"
+                    data-title="Use # + tagname to search by tags">
+                    <input type="search" id="search_input"
+                        class="ltr:tw-pr-4 ltr:tw-pl-9 rtl:tw-pr-9 rtl:tw-pl-4 tw-ml-1 tw-mt-2 focus:!tw-ring-0 tw-w-full !tw-placeholder-neutral-500 !tw-shadow-none tw-text-neutral-800 focus:!tw-placeholder-neutral-600 hover:!tw-placeholder-neutral-600 sm:tw-w-[350px] tw-h-[38px] tw-border-0 tw-border-solid !tw-border-white !tw-bg-neutral-100 !tw-rounded-xl"
+                        placeholder="Search..."
+                        autocomplete="off">
+                    <div id="top_search_button" class="tw-absolute rtl:tw-right-2 ltr:tw-left-2 tw-top-2.5">
+                        <button
+                            class="tw-outline-none tw-border-0 tw-p-2 tw-text-neutral-400 group-focus-within/top-search:tw-text-neutral-600 tw-bg-transparent">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <div id="search_results">
+                    </div>
+                    <ul class="dropdown-menu search-results animated fadeIn search-history" id="search-history">
+                    </ul>
+
+                </div>
+                <ul class="nav navbar-nav visible-md visible-lg">
+                                                            <li class="icon tw-relative ltr:tw-mr-1.5 rtl:tw-ml-1.5 -tw-mt-1"
+                        title="Quick Create"
+                        data-toggle="tooltip" data-placement="bottom">
+                        <a href="#" class="!tw-px-0 tw-group !tw-text-white" data-toggle="dropdown">
+                            <span
+                                class="tw-rounded-full tw-bg-primary-600 tw-text-white tw-inline-flex tw-items-center tw-justify-center tw-h-7 tw-w-7 -tw-mt-1 group-hover:!tw-bg-primary-700">
+                                <i class="fa-regular fa-plus fa-lg"></i>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right animated fadeIn tw-text-base">
+                            <li class="dropdown-header tw-mb-1">
+                                Quick Create                            </li>
+                                                        <li>
+                                <a href="../../invoices/invoice.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-file-invoice tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Invoice                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../estimates/estimate.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-file tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Estimate                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../proposals/proposal.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-file-powerpoint tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Proposal                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../credit_notes/credit_note.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-file-lines tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Credit Note                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../client.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-building tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Customer                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../subscriptions/create.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-repeat tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Subscription                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../projects/project.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-chart-gantt tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Project                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="#"
+                                    onclick="new_task();return false;"                                    class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-circle-check tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Task                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="#"
+                                    onclick="init_lead(); return false;"                                    class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-crosshairs tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Lead                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../expenses/expense.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-file-lines tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Expense                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../contracts/contract.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-file-contract tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Contract                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../goals/goal.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-bars-progress tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Goal                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../knowledge_base/article.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-circle-info tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Article                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../tickets/add.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-life-ring tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Ticket                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../surveys/survey.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-circle-question tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Survey                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../staff/member.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-user tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Staff Member                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../../utilities/calendar%EF%B9%96new_event=true&amp;date=2024-11-11.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-calendar tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Event                                    </span>
+                                </a>
+                            </li>
+                                                    </ul>
+                    </li>
+                                    </ul>
+            </div>
+
+            <div class="mobile-menu tw-shrink-0 ltr:tw-ml-4 rtl:tw-mr-4">
+                <button type="button"
+                    class="navbar-toggle visible-md visible-sm visible-xs mobile-menu-toggle collapsed tw-ml-1.5"
+                    data-toggle="collapse" data-target="#mobile-collapse" aria-expanded="false">
+                    <i class="fa fa-chevron-down fa-lg"></i>
+                </button>
+                <ul class="mobile-icon-menu tw-inline-flex tw-mt-5">
+                                    </ul>
+                <div class="mobile-navbar collapse" id="mobile-collapse" aria-expanded="false" style="height: 0px;"
+                    role="navigation">
+                    <ul class="nav navbar-nav">
+                        <li class="header-my-profile"><a
+                                href="../../profile.html">
+                                My Profile                            </a>
+                        </li>
+                        <li class="header-my-timesheets"><a
+                                href="../../staff/timesheets.html">
+                                My Timesheets                            </a>
+                        </li>
+                        <li class="header-edit-profile"><a
+                                href="../../staff/edit_profile.html">
+                                Edit Profile                            </a>
+                        </li>
+                                                <li class="header-newsfeed">
+                            <a href="#" class="open_newsfeed mobile">
+                                Share documents, ideas..                            </a>
+                        </li>
+                                                <li class="header-logout">
+                            <a href="#" onclick="logout(); return false;">
+                                Logout                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <ul class="nav navbar-nav navbar-right -tw-mt-px">
+                                <li><a href="../../../authentication/login.html" target="_blank" data-toggle="tooltip" data-title="Demo Link" data-placement="bottom">Customers area</a></li>                                <li>
+                    <a
+                        href="../../settings.html">
+                        <span class="tw-flex tw-items-center tw-gap-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="tw-size-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                            <span>Settings</span>
+                        </span>
+                    </a>
+                </li>
+                                                <li class="icon header-newsfeed -tw-mr-1.5">
+                    <a href="#" class="open_newsfeed desktop" data-toggle="tooltip"
+                        title="Share documents, ideas.."
+                        data-placement="bottom">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor"
+                            class="tw-w-[calc(theme(spacing.5)-1px)] tw-h-[calc(theme(spacing.5)-1px)]">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                        </svg>
+                    </a>
+                </li>
+                
+                <li class="icon header-todo">
+                    <a href="../../todo.html"
+                        data-toggle="tooltip"
+                        title="Todo items"
+                        data-placement="bottom" class="">
+                        <i class="fa-regular fa-square-check fa-lg tw-shrink-0"></i>
+                        <span
+                            class="tw-leading-none tw-px-1 tw-py-0.5 tw-text-xs bg-warning tw-z-10 tw-absolute tw-rounded-full -tw-right-0.5 tw-top-2 tw-min-w-[18px] tw-min-h-[18px] tw-inline-flex tw-items-center tw-justify-center nav-total-todos">
+                            3                        </span>
+                    </a>
+                </li>
+
+                <li class="icon header-timers timer-button tw-relative ltr:tw-mr-1.5 rtl:tw-ml-1.5"
+                    data-placement="bottom" data-toggle="tooltip"
+                    data-title="My Timesheets">
+                    <a href="#" id="top-timers" class="top-timers !tw-px-0 tw-group" data-toggle="dropdown">
+                        <span class="tw-inline-flex tw-items-center tw-justify-center tw-h-8 tw-w-9 -tw-mt-1.5">
+                            <i
+                                class="fa-regular fa-clock fa-lg tw-text-neutral-400 group-hover:tw-text-neutral-800 tw-shrink-0"></i>
+                        </span>
+                        <span
+                            class="tw-leading-none tw-px-1 tw-py-0.5 tw-text-xs bg-success tw-z-10 tw-absolute tw-rounded-full -tw-right-1.5 tw-top-2 tw-min-w-[18px] tw-min-h-[18px] tw-inline-flex tw-items-center tw-justify-center icon-started-timers hide">
+                            0                        </span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeIn started-timers-top width300" id="started-timers-top">
+                        <li class="text-center inline-block full-width tw-mb-2"><div class="text-center">
+    <svg class="tw-mx-auto tw-h-10 tw-w-10 tw-text-neutral-400 -tw-mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+    </svg>
+    <p class="tw-my-0 tw-text-sm tw-font-medium tw-text-gray-900">No started timers found</p>
+  </div></li><button class="tw-mt-3 text-center btn btn-primary started-timers-button  btn-sm top-dropdown-btn" onclick="timer_action(this,0); return false;"><i class="fa-regular fa-clock"></i> Start Timer</button><div class="text-center tw-mt-1 view-all-timesheets"><a href="../../staff/timesheets%EF%B9%96view=all.html" class="tw-text-sm">View all timesheets</a></div>                    </ul>
+                </li>
+
+                <li class="icon dropdown tw-relative tw-block notifications-wrapper header-notifications rtl:tw-ml-3"
+                    data-toggle="tooltip"
+                    title="Notifications"
+                    data-placement="bottom">
+                    <a href="#" class="dropdown-toggle notifications-icon !tw-px-0 tw-group" data-toggle="dropdown" aria-expanded="false">
+    <span class="sm:tw-inline-flex sm:tw-items-center sm:tw-justify-center sm:tw-h-8 sm:tw-w-9 sm:-tw-mt-1.5">
+        <i class="fa-regular fa-bell fa-lg tw-shrink-0 tw-text-neutral-400 group-hover:tw-text-neutral-800"></i>
+            </span>
+</a>
+<ul class="dropdown-menu notifications animated fadeIn width400"
+    data-total-unread="0">
+    <div class="tw-py-1 tw-px-3 tw-mb-1.5 tw-text-right">
+        <a href="#" class="tw-text-right tw-inline text-muted"
+            onclick="event.stopPropagation(); mark_all_notifications_as_read_inline(this); return false;">
+            Mark all as read        </a>
+    </div>
+    <li class="divider"></li>
+        <div class="tw-text-center tw-p-4 tw-bg-neutral-50">
+                <p class="tw-text-neutral-500 tw-font-medium tw-mb-0 tw-inline-flex tw-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="tw-w-6 tw-h-6 tw-mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            </svg>
+            No notifications found        </p>
+            </div>
+
+</ul>                </li>
+
+
+                            </ul>
+        </div>
+    </nav>
+</div><div id="setup-menu-wrapper"
+    class="sidebar animated">
+    <ul class="nav metis-menu tw-mt-[57px]" id="setup-menu">
+        <div
+            class="tw-flex tw-items-center tw-justify-between tw-space-x-2 rtl:tw-space-x-reverse tw-pl-4 tw-pr-2.5 tw-py-3">
+
+            <span class="text-left tw-font-semibold customizer-heading">
+                Setup            </span>
+            <a
+                class="close-customizer tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700 hover:tw-bg-neutral-200 tw-p-0.5 hover:tw-rounded-md">
+                <i class="fa fa-close fa-fw"></i>
+            </a>
+        </div>
+                <li
+            class="menu-item-staff">
+            <a href="../../staff.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Staff                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-customers">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Customers                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-customer-groups">
+                    <a
+                        href="../groups.html">
+                                                <span class="sub-menu-text">
+                            Groups                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-support">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Support                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-departments">
+                    <a
+                        href="../../departments.html">
+                                                <span class="sub-menu-text">
+                            Departments                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-predefined-replies">
+                    <a
+                        href="../../tickets/predefined_replies.html">
+                                                <span class="sub-menu-text">
+                            Predefined Replies                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-priorities">
+                    <a
+                        href="../../tickets/priorities.html">
+                                                <span class="sub-menu-text">
+                            Ticket Priority                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-statuses">
+                    <a
+                        href="../../tickets/statuses.html">
+                                                <span class="sub-menu-text">
+                            Ticket Statuses                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-services">
+                    <a
+                        href="../../tickets/services.html">
+                                                <span class="sub-menu-text">
+                            Services                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-spam-filters">
+                    <a
+                        href="../../spam_filters/view/tickets.html">
+                                                <span class="sub-menu-text">
+                            Spam Filters                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-leads">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Leads                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-leads-sources">
+                    <a
+                        href="../../leads/sources.html">
+                                                <span class="sub-menu-text">
+                            Sources                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-leads-statuses">
+                    <a
+                        href="../../leads/statuses.html">
+                                                <span class="sub-menu-text">
+                            Statuses                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-leads-email-integration">
+                    <a
+                        href="../../leads/email_integration.html">
+                                                <span class="sub-menu-text">
+                            Email Integration                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-web-to-lead">
+                    <a
+                        href="../../leads/forms.html">
+                                                <span class="sub-menu-text">
+                            Web to Lead                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-finance">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Finance                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-taxes">
+                    <a
+                        href="../../taxes.html">
+                                                <span class="sub-menu-text">
+                            Tax Rates                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-currencies">
+                    <a
+                        href="../../currencies.html">
+                                                <span class="sub-menu-text">
+                            Currencies                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-payment-modes">
+                    <a
+                        href="../../paymentmodes.html">
+                                                <span class="sub-menu-text">
+                            Payment Modes                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-expenses-categories">
+                    <a
+                        href="../../expenses/categories.html">
+                                                <span class="sub-menu-text">
+                            Expenses Categories                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-contracts">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Contracts                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-contracts-types">
+                    <a
+                        href="../../contracts/types.html">
+                                                <span class="sub-menu-text">
+                            Contract Types                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-estimate_request">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Estimate Request                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-estimate-request-forms">
+                    <a
+                        href="../../estimate_request/forms.html">
+                                                <span class="sub-menu-text">
+                            Forms                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-estimate-request-statuses">
+                    <a
+                        href="../../estimate_request/statuses.html">
+                                                <span class="sub-menu-text">
+                            Statuses                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-modules">
+            <a href="../../modules.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Modules                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-email-templates">
+            <a href="../../emails.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Email Templates                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-custom-fields">
+            <a href="../../custom_fields.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Custom Fields                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-gdpr">
+            <a href="../../gdpr.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    GDPR                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-roles">
+            <a href="../../roles.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Roles                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-menu-options">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Menu Setup                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-main-menu-options">
+                    <a
+                        href="../../menu_setup/main_menu.html">
+                                                <span class="sub-menu-text">
+                            Main Menu                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-setup-menu-options">
+                    <a
+                        href="../../menu_setup/setup_menu.html">
+                                                <span class="sub-menu-text">
+                            Setup Menu                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-theme-style">
+            <a href="../../theme_style.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Theme Style                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-settings">
+            <a href="../../settings.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Settings                </span>
+                                            </a>
+                    </li>
+                                <li>
+            <a href="https://help.perfexcrm.com"
+                target="_blank">
+                Help            </a>
+        </li>
+            </ul>
+</div>
+<aside id="menu" class="sidebar">
+    <div class="dropdown sidebar-user-profile tw-mt-[80px] tw-mx-1.5 ">
+        <a href="#"
+            class="dropdown-toggle profile -tw-mt-1 tw-text-neutral-700 tw-font-medium hover:tw-text-neutral-800 tw-border-solid tw-border-neutral-400/40 tw-border tw-rounded-lg tw-bg-white tw-py-2 tw-px-2.5 hover:tw-bg-neutral-100 focus:tw-bg-neutral-100 tw-block tw-shadow-sm focus:tw-text-neutral-800"
+            data-toggle="dropdown" aria-expanded="false">
+            <span class="tw-inline-flex tw-items-center tw-gap-x-3 tw-pt-0.5">
+                <img  src="../../../uploads/staff_profile_images/1/small_1.png" class="img img-responsive staff-profile-image-small" />                <span>
+                    <span
+                        class="tw-truncate tw-block tw-w-[140px] tw-font-semibold">Ethel Hagenes</span>
+                    <span class="tw-font-normal tw-text-neutral-500 tw-truncate tw-block tw-w-[140px] tw-text-sm">
+                        admin@test.com                    </span>
+                </span>
+            </span>
+        </a>
+        <ul class="dropdown-menu tw-w-full">
+            <li class="header-my-profile"><a
+                    href="../../profile.html">My Profile</a>
+            </li>
+            <li class="header-my-timesheets"><a
+                    href="../../staff/timesheets.html">My Timesheets</a>
+            </li>
+            <li class="header-edit-profile"><a
+                    href="../../staff/edit_profile.html">Edit Profile                </a>
+            </li>
+                        <li class="dropdown-submenu pull-left header-languages">
+                <a href="#"
+                    tabindex="-1">Language</a>
+                <ul class="dropdown-menu dropdown-menu">
+                    <li
+                        class="active">
+                        <a
+                            href="../../index.html">
+                            System Default                        </a>
+                    </li>
+                                        <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Slovak                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Ukrainian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Vietnamese                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Finnish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Portuguese_br                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Polish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            German                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            English                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Japanese                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            French                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Czech                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Indonesia                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Persian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Swedish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Chinese                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Russian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Norwegian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Catalan                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Francais_canada                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Spanish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Greek                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Romanian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Italian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Turkish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Bulgarian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Dutch                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../../index.html">
+                            Portuguese                        </a>
+                                        </ul>
+            </li>
+                        <li class="header-logout">
+                <a href="#"
+                    onclick="logout(); return false;">Logout</a>
+            </li>
+        </ul>
+    </div>
+    <ul class="nav metis-menu tw-mt-[15px]" id="side-menu">
+
+                        <li class="menu-item-dashboard"
+            >
+            <a href="../../index.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-object-group menu-icon"></i>
+                <span class="menu-text">
+                    Dashboard                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-customers"
+            >
+            <a href="../../clients.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-user menu-icon"></i>
+                <span class="menu-text">
+                    Customers                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-sales"
+            >
+            <a href="#"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-solid fa-bolt menu-icon"></i>
+                <span class="menu-text">
+                    Sales                </span>
+                                <span class="fa arrow pleft5"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li class="sub-menu-item-proposals"
+                    >
+                    <a href="../../proposals.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Proposals                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-estimates"
+                    >
+                    <a href="../../estimates.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Estimates                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-invoices"
+                    >
+                    <a href="../../invoices.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Invoices                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-payments"
+                    >
+                    <a href="../../payments.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Payments                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-credit_notes"
+                    >
+                    <a href="../../credit_notes.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Credit Notes                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-items"
+                    >
+                    <a href="../../invoice_items.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Items                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li class="menu-item-subscriptions"
+            >
+            <a href="../../subscriptions.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa fa-repeat menu-icon"></i>
+                <span class="menu-text">
+                    Subscriptions                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-expenses"
+            >
+            <a href="../../expenses.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-file-lines menu-icon"></i>
+                <span class="menu-text">
+                    Expenses                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-contracts"
+            >
+            <a href="../../contracts.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-note-sticky menu-icon"></i>
+                <span class="menu-text">
+                    Contracts                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-projects"
+            >
+            <a href="../../projects.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-solid fa-chart-gantt menu-icon"></i>
+                <span class="menu-text">
+                    Projects                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-tasks"
+            >
+            <a href="../../tasks.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-circle-check menu-icon"></i>
+                <span class="menu-text">
+                    Tasks                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-support"
+            >
+            <a href="../../tickets.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-life-ring menu-icon"></i>
+                <span class="menu-text">
+                    Support                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-leads"
+            >
+            <a href="../../leads.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-solid fa-crosshairs menu-icon"></i>
+                <span class="menu-text">
+                    Leads                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-estimate_request"
+            >
+            <a href="../../estimate_request.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-file menu-icon"></i>
+                <span class="menu-text">
+                    Estimate Request                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-knowledge-base"
+            >
+            <a href="../../knowledge_base.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-question-circle menu-icon"></i>
+                <span class="menu-text">
+                    Knowledge Base                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-utilities"
+            >
+            <a href="#"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-circle-dot menu-icon"></i>
+                <span class="menu-text">
+                    Utilities                </span>
+                                <span class="fa arrow pleft5"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li class="sub-menu-item-media"
+                    >
+                    <a href="../../utilities/media.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Media                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-bulk-pdf-exporter"
+                    >
+                    <a href="../../utilities/bulk_pdf_exporter.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Bulk PDF Export                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-csv-export"
+                    >
+                    <a href="../../exports.html"
+                        >
+                                                <span class="sub-menu-text">
+                            CSV Export                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-calendar"
+                    >
+                    <a href="../../utilities/calendar.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Calendar                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-announcements"
+                    >
+                    <a href="../../announcements.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Announcements                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-goals-tracking"
+                    >
+                    <a href="../../goals.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Goals                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-activity-log"
+                    >
+                    <a href="../../utilities/activity_log.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Activity Log                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-surveys"
+                    >
+                    <a href="../../surveys.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Surveys                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-utility_backup"
+                    >
+                    <a href="../../backup.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Database Backup                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-ticket-pipe-log"
+                    >
+                    <a href="../../utilities/pipe_log.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Ticket Pipe Log                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li class="menu-item-reports"
+            >
+            <a href="#"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-solid fa-chart-line menu-icon"></i>
+                <span class="menu-text">
+                    Reports                </span>
+                                <span class="fa arrow pleft5"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li class="sub-menu-item-sales-reports"
+                    >
+                    <a href="../../reports/sales.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Sales                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-expenses-reports"
+                    >
+                    <a href="../../reports/expenses.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Expenses                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-expenses-vs-income-reports"
+                    >
+                    <a href="../../reports/expenses_vs_income.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Expenses vs Income                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-leads-reports"
+                    >
+                    <a href="../../reports/leads.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Leads                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-timesheets-reports"
+                    >
+                    <a href="../../staff/timesheets%EF%B9%96view=all.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Timesheets overview                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-knowledge-base-reports"
+                    >
+                    <a href="../../reports/knowledge_base_articles.html"
+                        >
+                                                <span class="sub-menu-text">
+                            KB Articles                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                                <li id="setup-menu-item">
+            <a href="#" class="open-customizer"><i class="fa fa-cog menu-icon"></i>
+                <span class="menu-text">
+                    Setup                                    </span>
+            </a>
+                        </li>
+                              <li class="pinned-separator tw-border-b tw-border-solid tw-border-neutral-900/10 tw-mt-1"></li>
+      <li class="pinned_project last:tw-border-b last:tw-border-solid last:tw-border-neutral-900/10">
+      <a href="../../projects/view/2.html"
+         data-toggle="tooltip"
+         data-title="Pinned Project">
+         SEO Optimization<br>
+         <small>
+            Hartmann-Towne         </small>
+      </a>
+      <div class="col-md-12">
+         <div class="progress progress-bar-mini">
+            <div class="progress-bar no-percent-text not-dynamic" role="progressbar"
+               data-percent="46.67"
+               style="width: 46.67%;">
+            </div>
+         </div>
+      </div>
+   </li>
+          </ul>
+</aside><div id="wrapper" class="customer_profile">
+    <div class="content">
+                        <div class="row">
+            <div class="col-md-3">
+                                <h4 class="tw-text-lg tw-font-bold tw-text-neutral-800 tw-mt-0">
+                    <div class="tw-space-x-3 tw-flex tw-items-center">
+                        <span class="tw-truncate">
+                            #7 Tillman, Leannon and Effertz                        </span>
+                                                <div class="btn-group">
+                            <a href="#" class="dropdown-toggle btn-link" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                                                <li>
+                                    <a href="../../authentication.html"
+                                        target="_blank">
+                                        <i class="fa-regular fa-share-from-square"></i>
+                                        Login as client                                    </a>
+                                </li>
+                                                                                                <li>
+                                    <a href="../../authentication.html"
+                                        class="text-danger delete-text _delete"><i class="fa fa-remove"></i>
+                                        Delete                                     </a>
+                                </li>
+                                                            </ul>
+                        </div>
+                                            </div>
+                                    </h4>
+                            </div>
+            <div class="clearfix"></div>
+
+                        <div class="col-md-3">
+                <ul class="nav navbar-pills navbar-pills-flat nav-tabs nav-stacked customer-tabs" role="tablist">
+    <li
+    class="active customer_tab_profile">
+    <a data-group="profile"
+      href="../../authentication.html">
+            <i class="fa fa-user-circle menu-icon"
+        aria-hidden="true"></i>
+            Profile          </a>
+  </li>
+    <li
+    class=" customer_tab_contacts">
+    <a data-group="contacts"
+      href="../../authentication.html">
+            <i class="fa-regular fa-user menu-icon"
+        aria-hidden="true"></i>
+            Contacts            <span
+        class="badge pull-right 
+            bg-bg-default"
+        style='background-color: '>
+        1      </span>
+          </a>
+  </li>
+    <li
+    class=" customer_tab_notes">
+    <a data-group="notes"
+      href="../../authentication.html">
+            <i class="fa-regular fa-note-sticky menu-icon"
+        aria-hidden="true"></i>
+            Notes            <span
+        class="badge pull-right 
+            bg-bg-default"
+        style='background-color: '>
+        2      </span>
+          </a>
+  </li>
+    <li
+    class=" customer_tab_statement">
+    <a data-group="statement"
+      href="../../authentication.html">
+            <i class="fa fa-area-chart menu-icon"
+        aria-hidden="true"></i>
+            Statement          </a>
+  </li>
+    <li
+    class=" customer_tab_invoices">
+    <a data-group="invoices"
+      href="../../authentication.html">
+            <i class="fa fa-file-text menu-icon"
+        aria-hidden="true"></i>
+            Invoices            <span
+        class="badge pull-right 
+            bg-bg-default"
+        style='background-color: '>
+        3      </span>
+          </a>
+  </li>
+    <li
+    class=" customer_tab_payments">
+    <a data-group="payments"
+      href="../../authentication.html">
+            <i class="fa fa-line-chart menu-icon"
+        aria-hidden="true"></i>
+            Payments          </a>
+  </li>
+    <li
+    class=" customer_tab_proposals">
+    <a data-group="proposals"
+      href="../../authentication.html">
+            <i class="fa-regular fa-file-powerpoint menu-icon"
+        aria-hidden="true"></i>
+            Proposals          </a>
+  </li>
+    <li
+    class=" customer_tab_credit_notes">
+    <a data-group="credit_notes"
+      href="../../authentication.html">
+            <i class="fa-regular fa-file-lines menu-icon"
+        aria-hidden="true"></i>
+            Credit Notes          </a>
+  </li>
+    <li
+    class=" customer_tab_estimates">
+    <a data-group="estimates"
+      href="../../authentication.html">
+            <i class="fa-regular fa-file menu-icon"
+        aria-hidden="true"></i>
+            Estimates            <span
+        class="badge pull-right 
+            bg-bg-default"
+        style='background-color: '>
+        1      </span>
+          </a>
+  </li>
+    <li
+    class=" customer_tab_subscriptions">
+    <a data-group="subscriptions"
+      href="../../authentication.html">
+            <i class="fa fa-repeat menu-icon"
+        aria-hidden="true"></i>
+            Subscriptions          </a>
+  </li>
+    <li
+    class=" customer_tab_expenses">
+    <a data-group="expenses"
+      href="../../authentication.html">
+            <i class="fa-regular fa-file-lines menu-icon"
+        aria-hidden="true"></i>
+            Expenses          </a>
+  </li>
+    <li
+    class=" customer_tab_contracts">
+    <a data-group="contracts"
+      href="../../authentication.html">
+            <i class="fa-regular fa-note-sticky menu-icon"
+        aria-hidden="true"></i>
+            Contracts            <span
+        class="badge pull-right 
+            bg-bg-default"
+        style='background-color: '>
+        2      </span>
+          </a>
+  </li>
+    <li
+    class=" customer_tab_projects">
+    <a data-group="projects"
+      href="../../authentication.html">
+            <i class="fa-solid fa-chart-gantt menu-icon"
+        aria-hidden="true"></i>
+            Projects            <span
+        class="badge pull-right 
+            bg-bg-default"
+        style='background-color: '>
+        1      </span>
+          </a>
+  </li>
+    <li
+    class=" customer_tab_tasks">
+    <a data-group="tasks"
+      href="../../authentication.html">
+            <i class="fa-regular fa-circle-check menu-icon"
+        aria-hidden="true"></i>
+            Tasks            <span
+        class="badge pull-right 
+            bg-bg-default"
+        style='background-color: '>
+        9      </span>
+          </a>
+  </li>
+    <li
+    class=" customer_tab_tickets">
+    <a data-group="tickets"
+      href="../../authentication.html">
+            <i class="fa-regular fa-life-ring menu-icon"
+        aria-hidden="true"></i>
+            Tickets          </a>
+  </li>
+    <li
+    class=" customer_tab_attachments">
+    <a data-group="attachments"
+      href="../../authentication.html">
+            <i class="fa fa-paperclip menu-icon"
+        aria-hidden="true"></i>
+            Files          </a>
+  </li>
+    <li
+    class=" customer_tab_vault">
+    <a data-group="vault"
+      href="../../authentication.html">
+            <i class="fa fa-lock menu-icon"
+        aria-hidden="true"></i>
+            Vault          </a>
+  </li>
+    <li
+    class=" customer_tab_reminders">
+    <a data-group="reminders"
+      href="../../authentication.html">
+            <i class="fa-regular fa-bell menu-icon"
+        aria-hidden="true"></i>
+            Reminders          </a>
+  </li>
+    <li
+    class=" customer_tab_map">
+    <a data-group="map"
+      href="../../authentication.html">
+            <i class="fa-solid fa-location-dot menu-icon"
+        aria-hidden="true"></i>
+            Map          </a>
+  </li>
+  </ul>            </div>
+            
+            <div
+                class="tw-mt-12 sm:tw-mt-0 col-md-9">
+
+                
+                <div class="panel_s">
+                    <div class="panel-body">
+                                                
+<input type="hidden" name="isedit" value="" />
+                        
+<input type="hidden" name="userid" value="7" />
+                        <div class="clearfix"></div>
+                                                <div>
+                            <div class="tab-content">
+                                
+<h4 class="customer-profile-group-heading">
+    Profile</h4>
+
+<div class="row">
+    <form action="7.html" class="client-form" autocomplete="off" method="post" accept-charset="utf-8">
+<input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />                                      
+    <div class="additional"></div>
+    <div class="col-md-12">
+        <div class="horizontal-scrollable-tabs panel-full-width-tabs">
+            <div class="scroller arrow-left"><i class="fa fa-angle-left"></i></div>
+            <div class="scroller arrow-right"><i class="fa fa-angle-right"></i></div>
+            <div class="horizontal-tabs">
+                <ul class="nav nav-tabs customer-profile-tabs nav-tabs-horizontal" role="tablist">
+                    <li role="presentation"
+                        class="active">
+                        <a href="#contact_info" aria-controls="contact_info" role="tab" data-toggle="tab">
+                            Customer Details                        </a>
+                    </li>
+                                        <li role="presentation">
+                        <a href="#billing_and_shipping" aria-controls="billing_and_shipping" role="tab"
+                            data-toggle="tab">
+                            Billing & Shipping                        </a>
+                    </li>
+                                                            <li role="presentation">
+                        <a href="#customer_admins" aria-controls="customer_admins" role="tab" data-toggle="tab">
+                            Customer Admins                                                    </a>
+                    </li>
+                                                        </ul>
+            </div>
+        </div>
+        <div class="tab-content mtop15">
+                                    <div role="tabpanel"
+                class="tab-pane active"
+                id="contact_info">
+                <div class="row">
+                    <div class="col-md-12"
+                        id="client-show-primary-contact-wrapper">
+                        <div class="checkbox checkbox-info mbot20 no-mtop">
+                            <input type="checkbox" name="show_primary_contact"
+                                                            value="1" id="show_primary_contact">
+                            <label
+                                for="show_primary_contact">Show primary contact full name on Invoices, Estimates, Payments, Credit Notes</label>
+                        </div>
+                    </div>
+                    <div
+                        class="col-md-8">
+                                                                                                <div class="form-group" app-field-wrapper="company"><label for="company" class="control-label">Company</label><input type="text" id="company" name="company" class="form-control"  value="Tillman, Leannon and Effertz"></div>                        <div id="company_exists_info" class="hide"></div>
+                                                <div class="form-group" app-field-wrapper="vat"><label for="vat" class="control-label">VAT Number</label><input type="text" id="vat" name="vat" class="form-control"  value=""></div>                                                                        <div class="form-group" app-field-wrapper="phonenumber"><label for="phonenumber" class="control-label">Phone</label><input type="text" id="phonenumber" name="phonenumber" class="form-control"  value="607.955.5598"></div>                                                                        <div class="form-group">
+                            <label
+                                for="website">Website</label>
+                            <div class="input-group">
+                                <input type="text" name="website" id="website"
+                                    value="veum.com"
+                                    class="form-control">
+                                <span class="input-group-btn">
+                                    <a href="http://veum.com"
+                                        class="btn btn-default" target="_blank" tabindex="-1">
+                                        <i class="fa fa-globe"></i></a>
+                                </span>
+
+                            </div>
+                        </div>
+                        <div class="select-placeholder form-group form-group-select-input-groups_in[] input-group-select"><label for="groups_in[]" class="control-label">Groups</label><div class="input-group input-group-select select-groups_in[]" app-field-wrapper="groups_in[]"><select id="groups_in[]" name="groups_in[]" class="selectpicker  _select_input_group" multiple="1" data-actions-box="1" data-width="100%" data-none-selected-text="Nothing selected" data-live-search="true"><option value="3" selected>High Budget</option><option value="4">Low Budget</option><option value="1">VIP</option><option value="2">Wholesaler</option></select><div class="input-group-btn"><a href="#" class="btn btn-default" data-toggle="modal" data-target="#customer_group_modal"><i class="fa fa-plus"></i></a></div></div></div>                        <div class="row">
+                            <div
+                                class="col-md-6">
+                                <i class="fa-regular fa-circle-question pull-left tw-mt-0.5 tw-mr-1"
+                                    data-toggle="tooltip"
+                                    data-title="If the customer use other currency then the base currency make sure you select the appropriate currency for this customer. Changing the currency is not possible after transactions are recorded."></i>
+                                <div class="select-placeholder form-group" app-field-wrapper="default_currency"><label for="default_currency" class="control-label">Currency</label><select id="default_currency" name="default_currency" class="selectpicker" data-none-selected-text="System Default" disabled="1" data-width="100%" data-live-search="true"><option value=""></option><option value="1" data-subtext="$">USD</option><option value="2" data-subtext="€">EUR</option></select></div>                            </div>
+                                                        <div class="col-md-6">
+                                <div class="form-group select-placeholder">
+                                    <label for="default_language"
+                                        class="control-label">Default Language                                    </label>
+                                    <select name="default_language" id="default_language"
+                                        class="form-control selectpicker"
+                                        data-none-selected-text="Nothing selected">
+                                        <option value="">
+                                            System Default                                        </option>
+                                                                                <option
+                                            value="slovak"
+                                            >
+                                            Slovak                                        </option>
+                                                                                <option
+                                            value="ukrainian"
+                                            >
+                                            Ukrainian                                        </option>
+                                                                                <option
+                                            value="vietnamese"
+                                            >
+                                            Vietnamese                                        </option>
+                                                                                <option
+                                            value="finnish"
+                                            >
+                                            Finnish                                        </option>
+                                                                                <option
+                                            value="portuguese_br"
+                                            >
+                                            Portuguese_br                                        </option>
+                                                                                <option
+                                            value="polish"
+                                            >
+                                            Polish                                        </option>
+                                                                                <option
+                                            value="german"
+                                            >
+                                            German                                        </option>
+                                                                                <option
+                                            value="english"
+                                            >
+                                            English                                        </option>
+                                                                                <option
+                                            value="japanese"
+                                            >
+                                            Japanese                                        </option>
+                                                                                <option
+                                            value="french"
+                                            >
+                                            French                                        </option>
+                                                                                <option
+                                            value="czech"
+                                            >
+                                            Czech                                        </option>
+                                                                                <option
+                                            value="indonesia"
+                                            >
+                                            Indonesia                                        </option>
+                                                                                <option
+                                            value="persian"
+                                            >
+                                            Persian                                        </option>
+                                                                                <option
+                                            value="swedish"
+                                            >
+                                            Swedish                                        </option>
+                                                                                <option
+                                            value="chinese"
+                                            >
+                                            Chinese                                        </option>
+                                                                                <option
+                                            value="russian"
+                                            >
+                                            Russian                                        </option>
+                                                                                <option
+                                            value="norwegian"
+                                            >
+                                            Norwegian                                        </option>
+                                                                                <option
+                                            value="catalan"
+                                            >
+                                            Catalan                                        </option>
+                                                                                <option
+                                            value="francais_canada"
+                                            >
+                                            Francais_canada                                        </option>
+                                                                                <option
+                                            value="spanish"
+                                            >
+                                            Spanish                                        </option>
+                                                                                <option
+                                            value="greek"
+                                            >
+                                            Greek                                        </option>
+                                                                                <option
+                                            value="romanian"
+                                            >
+                                            Romanian                                        </option>
+                                                                                <option
+                                            value="italian"
+                                            >
+                                            Italian                                        </option>
+                                                                                <option
+                                            value="turkish"
+                                            >
+                                            Turkish                                        </option>
+                                                                                <option
+                                            value="bulgarian"
+                                            >
+                                            Bulgarian                                        </option>
+                                                                                <option
+                                            value="dutch"
+                                            >
+                                            Dutch                                        </option>
+                                                                                <option
+                                            value="portuguese"
+                                            >
+                                            Portuguese                                        </option>
+                                                                            </select>
+                                </div>
+                            </div>
+                                                    </div>
+
+                        <hr />
+
+                                                <div class="form-group" app-field-wrapper="address"><label for="address" class="control-label">Address</label><textarea id="address" name="address" class="form-control" rows="4">6260 Senger Mills</textarea></div>                                                <div class="form-group" app-field-wrapper="city"><label for="city" class="control-label">City</label><input type="text" id="city" name="city" class="form-control"  value="Ervinshire"></div>                                                <div class="form-group" app-field-wrapper="state"><label for="state" class="control-label">State</label><input type="text" id="state" name="state" class="form-control"  value="South Carolina"></div>                                                <div class="form-group" app-field-wrapper="zip"><label for="zip" class="control-label">Zip Code</label><input type="text" id="zip" name="zip" class="form-control"  value="13760"></div>                        <div class="select-placeholder form-group" app-field-wrapper="country"><label for="country" class="control-label">Country</label><select id="country" name="country" class="selectpicker" data-none-selected-text="Nothing selected" data-width="100%" data-live-search="true"><option value=""></option><option value="1">Afghanistan</option><option value="2">Aland Islands</option><option value="3">Albania</option><option value="4">Algeria</option><option value="5">American Samoa</option><option value="6">Andorra</option><option value="7">Angola</option><option value="8">Anguilla</option><option value="9">Antarctica</option><option value="10">Antigua and Barbuda</option><option value="11">Argentina</option><option value="12">Armenia</option><option value="13">Aruba</option><option value="14">Australia</option><option value="15">Austria</option><option value="16">Azerbaijan</option><option value="17">Bahamas</option><option value="18">Bahrain</option><option value="19">Bangladesh</option><option value="20">Barbados</option><option value="21">Belarus</option><option value="22">Belgium</option><option value="23">Belize</option><option value="24">Benin</option><option value="25">Bermuda</option><option value="26">Bhutan</option><option value="27" selected>Bolivia</option><option value="28">Bonaire, Sint Eustatius and Saba</option><option value="29">Bosnia and Herzegovina</option><option value="30">Botswana</option><option value="31">Bouvet Island</option><option value="32">Brazil</option><option value="33">British Indian Ocean Territory</option><option value="34">Brunei</option><option value="35">Bulgaria</option><option value="36">Burkina Faso</option><option value="37">Burundi</option><option value="38">Cambodia</option><option value="39">Cameroon</option><option value="40">Canada</option><option value="41">Cape Verde</option><option value="42">Cayman Islands</option><option value="43">Central African Republic</option><option value="44">Chad</option><option value="45">Chile</option><option value="46">China</option><option value="47">Christmas Island</option><option value="48">Cocos (Keeling) Islands</option><option value="49">Colombia</option><option value="50">Comoros</option><option value="51">Congo</option><option value="52">Cook Islands</option><option value="53">Costa Rica</option><option value="54">Cote d'ivoire (Ivory Coast)</option><option value="55">Croatia</option><option value="56">Cuba</option><option value="57">Curacao</option><option value="58">Cyprus</option><option value="59">Czech Republic</option><option value="60">Democratic Republic of the Congo</option><option value="61">Denmark</option><option value="62">Djibouti</option><option value="63">Dominica</option><option value="64">Dominican Republic</option><option value="65">Ecuador</option><option value="66">Egypt</option><option value="67">El Salvador</option><option value="68">Equatorial Guinea</option><option value="69">Eritrea</option><option value="70">Estonia</option><option value="71">Ethiopia</option><option value="72">Falkland Islands (Malvinas)</option><option value="73">Faroe Islands</option><option value="74">Fiji</option><option value="75">Finland</option><option value="76">France</option><option value="77">French Guiana</option><option value="78">French Polynesia</option><option value="79">French Southern Territories</option><option value="80">Gabon</option><option value="81">Gambia</option><option value="82">Georgia</option><option value="83">Germany</option><option value="84">Ghana</option><option value="85">Gibraltar</option><option value="86">Greece</option><option value="87">Greenland</option><option value="88">Grenada</option><option value="89">Guadaloupe</option><option value="90">Guam</option><option value="91">Guatemala</option><option value="92">Guernsey</option><option value="93">Guinea</option><option value="94">Guinea-Bissau</option><option value="95">Guyana</option><option value="96">Haiti</option><option value="97">Heard Island and McDonald Islands</option><option value="98">Honduras</option><option value="99">Hong Kong</option><option value="100">Hungary</option><option value="101">Iceland</option><option value="102">India</option><option value="103">Indonesia</option><option value="104">Iran</option><option value="105">Iraq</option><option value="106">Ireland</option><option value="107">Isle of Man</option><option value="108">Israel</option><option value="109">Italy</option><option value="110">Jamaica</option><option value="111">Japan</option><option value="112">Jersey</option><option value="113">Jordan</option><option value="114">Kazakhstan</option><option value="115">Kenya</option><option value="116">Kiribati</option><option value="117">Kosovo</option><option value="118">Kuwait</option><option value="119">Kyrgyzstan</option><option value="120">Laos</option><option value="121">Latvia</option><option value="122">Lebanon</option><option value="123">Lesotho</option><option value="124">Liberia</option><option value="125">Libya</option><option value="126">Liechtenstein</option><option value="127">Lithuania</option><option value="128">Luxembourg</option><option value="129">Macao</option><option value="131">Madagascar</option><option value="132">Malawi</option><option value="133">Malaysia</option><option value="134">Maldives</option><option value="135">Mali</option><option value="136">Malta</option><option value="137">Marshall Islands</option><option value="138">Martinique</option><option value="139">Mauritania</option><option value="140">Mauritius</option><option value="141">Mayotte</option><option value="142">Mexico</option><option value="143">Micronesia</option><option value="144">Moldava</option><option value="145">Monaco</option><option value="146">Mongolia</option><option value="147">Montenegro</option><option value="148">Montserrat</option><option value="149">Morocco</option><option value="150">Mozambique</option><option value="151">Myanmar (Burma)</option><option value="152">Namibia</option><option value="153">Nauru</option><option value="154">Nepal</option><option value="155">Netherlands</option><option value="156">New Caledonia</option><option value="157">New Zealand</option><option value="158">Nicaragua</option><option value="159">Niger</option><option value="160">Nigeria</option><option value="161">Niue</option><option value="162">Norfolk Island</option><option value="163">North Korea</option><option value="130">North Macedonia</option><option value="164">Northern Mariana Islands</option><option value="165">Norway</option><option value="166">Oman</option><option value="167">Pakistan</option><option value="168">Palau</option><option value="169">Palestine</option><option value="170">Panama</option><option value="171">Papua New Guinea</option><option value="172">Paraguay</option><option value="173">Peru</option><option value="174">Philippines</option><option value="175">Pitcairn</option><option value="176">Poland</option><option value="177">Portugal</option><option value="178">Puerto Rico</option><option value="179">Qatar</option><option value="180">Reunion</option><option value="181">Romania</option><option value="182">Russia</option><option value="183">Rwanda</option><option value="184">Saint Barthelemy</option><option value="185">Saint Helena</option><option value="186">Saint Kitts and Nevis</option><option value="187">Saint Lucia</option><option value="188">Saint Martin</option><option value="189">Saint Pierre and Miquelon</option><option value="190">Saint Vincent and the Grenadines</option><option value="191">Samoa</option><option value="192">San Marino</option><option value="193">Sao Tome and Principe</option><option value="194">Saudi Arabia</option><option value="195">Senegal</option><option value="196">Serbia</option><option value="197">Seychelles</option><option value="198">Sierra Leone</option><option value="199">Singapore</option><option value="200">Sint Maarten</option><option value="201">Slovakia</option><option value="202">Slovenia</option><option value="203">Solomon Islands</option><option value="204">Somalia</option><option value="205">South Africa</option><option value="206">South Georgia and the South Sandwich Islands</option><option value="207">South Korea</option><option value="208">South Sudan</option><option value="209">Spain</option><option value="210">Sri Lanka</option><option value="211">Sudan</option><option value="212">Suriname</option><option value="213">Svalbard and Jan Mayen</option><option value="214">Swaziland</option><option value="215">Sweden</option><option value="216">Switzerland</option><option value="217">Syria</option><option value="218">Taiwan</option><option value="219">Tajikistan</option><option value="220">Tanzania</option><option value="221">Thailand</option><option value="222">Timor-Leste (East Timor)</option><option value="223">Togo</option><option value="224">Tokelau</option><option value="225">Tonga</option><option value="226">Trinidad and Tobago</option><option value="227">Tunisia</option><option value="228">Turkey</option><option value="229">Turkmenistan</option><option value="230">Turks and Caicos Islands</option><option value="231">Tuvalu</option><option value="232">Uganda</option><option value="233">Ukraine</option><option value="234">United Arab Emirates</option><option value="235">United Kingdom</option><option value="236">United States</option><option value="237">United States Minor Outlying Islands</option><option value="238">Uruguay</option><option value="239">Uzbekistan</option><option value="240">Vanuatu</option><option value="241">Vatican City</option><option value="242">Venezuela</option><option value="243">Vietnam</option><option value="244">Virgin Islands, British</option><option value="245">Virgin Islands, US</option><option value="246">Wallis and Futuna</option><option value="247">Western Sahara</option><option value="248">Yemen</option><option value="249">Zambia</option><option value="250">Zimbabwe</option></select></div>                    </div>
+                </div>
+            </div>
+                        <div role="tabpanel" class="tab-pane" id="customer_admins">
+                                <a href="#" data-toggle="modal" data-target="#customer_admins_assign"
+                    class="btn btn-primary mbot30">Assign Admin</a>
+                                <table class="table dt-table">
+                    <thead>
+                        <tr>
+                            <th>Staff Member                            </th>
+                            <th>Date Assigned                            </th>
+                                                        <th>Options                            </th>
+                                                    </tr>
+                    </thead>
+                    <tbody>
+                                            </tbody>
+                </table>
+            </div>
+                        <div role="tabpanel" class="tab-pane" id="billing_and_shipping">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4
+                                    class="tw-font-semibold tw-text-base tw-text-neutral-700 tw-flex tw-justify-between tw-items-center tw-mt-0 tw-mb-6">
+                                    Billing Address                                    <a href="#"
+                                        class="billing-same-as-customer tw-text-sm tw-text-neutral-500 hover:tw-text-neutral-700 active:tw-text-neutral-700">
+                                        Same as Customer Info                                    </a>
+                                </h4>
+
+                                                                <div class="form-group" app-field-wrapper="billing_street"><label for="billing_street" class="control-label">Street</label><textarea id="billing_street" name="billing_street" class="form-control" rows="4">5063 Orlo Forge Apt. 205</textarea></div>                                                                <div class="form-group" app-field-wrapper="billing_city"><label for="billing_city" class="control-label">City</label><input type="text" id="billing_city" name="billing_city" class="form-control"  value="Arturoland"></div>                                                                <div class="form-group" app-field-wrapper="billing_state"><label for="billing_state" class="control-label">State</label><input type="text" id="billing_state" name="billing_state" class="form-control"  value="Alaska"></div>                                                                <div class="form-group" app-field-wrapper="billing_zip"><label for="billing_zip" class="control-label">Zip Code</label><input type="text" id="billing_zip" name="billing_zip" class="form-control"  value="40309-7103"></div>                                                                <div class="select-placeholder form-group" app-field-wrapper="billing_country"><label for="billing_country" class="control-label">Country</label><select id="billing_country" name="billing_country" class="selectpicker" data-none-selected-text="Nothing selected" data-width="100%" data-live-search="true"><option value=""></option><option value="1">Afghanistan</option><option value="2">Aland Islands</option><option value="3">Albania</option><option value="4">Algeria</option><option value="5">American Samoa</option><option value="6">Andorra</option><option value="7">Angola</option><option value="8">Anguilla</option><option value="9">Antarctica</option><option value="10">Antigua and Barbuda</option><option value="11">Argentina</option><option value="12">Armenia</option><option value="13">Aruba</option><option value="14">Australia</option><option value="15">Austria</option><option value="16">Azerbaijan</option><option value="17">Bahamas</option><option value="18">Bahrain</option><option value="19">Bangladesh</option><option value="20">Barbados</option><option value="21">Belarus</option><option value="22">Belgium</option><option value="23">Belize</option><option value="24">Benin</option><option value="25">Bermuda</option><option value="26">Bhutan</option><option value="27" selected>Bolivia</option><option value="28">Bonaire, Sint Eustatius and Saba</option><option value="29">Bosnia and Herzegovina</option><option value="30">Botswana</option><option value="31">Bouvet Island</option><option value="32">Brazil</option><option value="33">British Indian Ocean Territory</option><option value="34">Brunei</option><option value="35">Bulgaria</option><option value="36">Burkina Faso</option><option value="37">Burundi</option><option value="38">Cambodia</option><option value="39">Cameroon</option><option value="40">Canada</option><option value="41">Cape Verde</option><option value="42">Cayman Islands</option><option value="43">Central African Republic</option><option value="44">Chad</option><option value="45">Chile</option><option value="46">China</option><option value="47">Christmas Island</option><option value="48">Cocos (Keeling) Islands</option><option value="49">Colombia</option><option value="50">Comoros</option><option value="51">Congo</option><option value="52">Cook Islands</option><option value="53">Costa Rica</option><option value="54">Cote d'ivoire (Ivory Coast)</option><option value="55">Croatia</option><option value="56">Cuba</option><option value="57">Curacao</option><option value="58">Cyprus</option><option value="59">Czech Republic</option><option value="60">Democratic Republic of the Congo</option><option value="61">Denmark</option><option value="62">Djibouti</option><option value="63">Dominica</option><option value="64">Dominican Republic</option><option value="65">Ecuador</option><option value="66">Egypt</option><option value="67">El Salvador</option><option value="68">Equatorial Guinea</option><option value="69">Eritrea</option><option value="70">Estonia</option><option value="71">Ethiopia</option><option value="72">Falkland Islands (Malvinas)</option><option value="73">Faroe Islands</option><option value="74">Fiji</option><option value="75">Finland</option><option value="76">France</option><option value="77">French Guiana</option><option value="78">French Polynesia</option><option value="79">French Southern Territories</option><option value="80">Gabon</option><option value="81">Gambia</option><option value="82">Georgia</option><option value="83">Germany</option><option value="84">Ghana</option><option value="85">Gibraltar</option><option value="86">Greece</option><option value="87">Greenland</option><option value="88">Grenada</option><option value="89">Guadaloupe</option><option value="90">Guam</option><option value="91">Guatemala</option><option value="92">Guernsey</option><option value="93">Guinea</option><option value="94">Guinea-Bissau</option><option value="95">Guyana</option><option value="96">Haiti</option><option value="97">Heard Island and McDonald Islands</option><option value="98">Honduras</option><option value="99">Hong Kong</option><option value="100">Hungary</option><option value="101">Iceland</option><option value="102">India</option><option value="103">Indonesia</option><option value="104">Iran</option><option value="105">Iraq</option><option value="106">Ireland</option><option value="107">Isle of Man</option><option value="108">Israel</option><option value="109">Italy</option><option value="110">Jamaica</option><option value="111">Japan</option><option value="112">Jersey</option><option value="113">Jordan</option><option value="114">Kazakhstan</option><option value="115">Kenya</option><option value="116">Kiribati</option><option value="117">Kosovo</option><option value="118">Kuwait</option><option value="119">Kyrgyzstan</option><option value="120">Laos</option><option value="121">Latvia</option><option value="122">Lebanon</option><option value="123">Lesotho</option><option value="124">Liberia</option><option value="125">Libya</option><option value="126">Liechtenstein</option><option value="127">Lithuania</option><option value="128">Luxembourg</option><option value="129">Macao</option><option value="131">Madagascar</option><option value="132">Malawi</option><option value="133">Malaysia</option><option value="134">Maldives</option><option value="135">Mali</option><option value="136">Malta</option><option value="137">Marshall Islands</option><option value="138">Martinique</option><option value="139">Mauritania</option><option value="140">Mauritius</option><option value="141">Mayotte</option><option value="142">Mexico</option><option value="143">Micronesia</option><option value="144">Moldava</option><option value="145">Monaco</option><option value="146">Mongolia</option><option value="147">Montenegro</option><option value="148">Montserrat</option><option value="149">Morocco</option><option value="150">Mozambique</option><option value="151">Myanmar (Burma)</option><option value="152">Namibia</option><option value="153">Nauru</option><option value="154">Nepal</option><option value="155">Netherlands</option><option value="156">New Caledonia</option><option value="157">New Zealand</option><option value="158">Nicaragua</option><option value="159">Niger</option><option value="160">Nigeria</option><option value="161">Niue</option><option value="162">Norfolk Island</option><option value="163">North Korea</option><option value="130">North Macedonia</option><option value="164">Northern Mariana Islands</option><option value="165">Norway</option><option value="166">Oman</option><option value="167">Pakistan</option><option value="168">Palau</option><option value="169">Palestine</option><option value="170">Panama</option><option value="171">Papua New Guinea</option><option value="172">Paraguay</option><option value="173">Peru</option><option value="174">Philippines</option><option value="175">Pitcairn</option><option value="176">Poland</option><option value="177">Portugal</option><option value="178">Puerto Rico</option><option value="179">Qatar</option><option value="180">Reunion</option><option value="181">Romania</option><option value="182">Russia</option><option value="183">Rwanda</option><option value="184">Saint Barthelemy</option><option value="185">Saint Helena</option><option value="186">Saint Kitts and Nevis</option><option value="187">Saint Lucia</option><option value="188">Saint Martin</option><option value="189">Saint Pierre and Miquelon</option><option value="190">Saint Vincent and the Grenadines</option><option value="191">Samoa</option><option value="192">San Marino</option><option value="193">Sao Tome and Principe</option><option value="194">Saudi Arabia</option><option value="195">Senegal</option><option value="196">Serbia</option><option value="197">Seychelles</option><option value="198">Sierra Leone</option><option value="199">Singapore</option><option value="200">Sint Maarten</option><option value="201">Slovakia</option><option value="202">Slovenia</option><option value="203">Solomon Islands</option><option value="204">Somalia</option><option value="205">South Africa</option><option value="206">South Georgia and the South Sandwich Islands</option><option value="207">South Korea</option><option value="208">South Sudan</option><option value="209">Spain</option><option value="210">Sri Lanka</option><option value="211">Sudan</option><option value="212">Suriname</option><option value="213">Svalbard and Jan Mayen</option><option value="214">Swaziland</option><option value="215">Sweden</option><option value="216">Switzerland</option><option value="217">Syria</option><option value="218">Taiwan</option><option value="219">Tajikistan</option><option value="220">Tanzania</option><option value="221">Thailand</option><option value="222">Timor-Leste (East Timor)</option><option value="223">Togo</option><option value="224">Tokelau</option><option value="225">Tonga</option><option value="226">Trinidad and Tobago</option><option value="227">Tunisia</option><option value="228">Turkey</option><option value="229">Turkmenistan</option><option value="230">Turks and Caicos Islands</option><option value="231">Tuvalu</option><option value="232">Uganda</option><option value="233">Ukraine</option><option value="234">United Arab Emirates</option><option value="235">United Kingdom</option><option value="236">United States</option><option value="237">United States Minor Outlying Islands</option><option value="238">Uruguay</option><option value="239">Uzbekistan</option><option value="240">Vanuatu</option><option value="241">Vatican City</option><option value="242">Venezuela</option><option value="243">Vietnam</option><option value="244">Virgin Islands, British</option><option value="245">Virgin Islands, US</option><option value="246">Wallis and Futuna</option><option value="247">Western Sahara</option><option value="248">Yemen</option><option value="249">Zambia</option><option value="250">Zimbabwe</option></select></div>                            </div>
+                            <div class="col-md-6">
+                                <h4
+                                    class="tw-font-semibold tw-text-base tw-text-neutral-700 tw-flex tw-justify-between tw-items-center tw-mt-0 tw-mb-6">
+                                    <span>
+                                        <i class="fa-regular fa-circle-question tw-mr-1" data-toggle="tooltip"
+                                            data-title="Do not fill shipping address information if you won't use shipping address on customer invoices"></i>
+
+                                        Shipping Address                                    </span>
+                                    <a href="#"
+                                        class="customer-copy-billing-address tw-text-sm tw-text-neutral-500 hover:tw-text-neutral-700 active:tw-text-neutral-700">
+                                        Copy Billing Address                                    </a>
+                                </h4>
+
+                                                                <div class="form-group" app-field-wrapper="shipping_street"><label for="shipping_street" class="control-label">Street</label><textarea id="shipping_street" name="shipping_street" class="form-control" rows="4"></textarea></div>                                                                <div class="form-group" app-field-wrapper="shipping_city"><label for="shipping_city" class="control-label">City</label><input type="text" id="shipping_city" name="shipping_city" class="form-control"  value=""></div>                                                                <div class="form-group" app-field-wrapper="shipping_state"><label for="shipping_state" class="control-label">State</label><input type="text" id="shipping_state" name="shipping_state" class="form-control"  value=""></div>                                                                <div class="form-group" app-field-wrapper="shipping_zip"><label for="shipping_zip" class="control-label">Zip Code</label><input type="text" id="shipping_zip" name="shipping_zip" class="form-control"  value=""></div>                                                                <div class="select-placeholder form-group" app-field-wrapper="shipping_country"><label for="shipping_country" class="control-label">Country</label><select id="shipping_country" name="shipping_country" class="selectpicker" data-none-selected-text="Nothing selected" data-width="100%" data-live-search="true"><option value=""></option><option value="1">Afghanistan</option><option value="2">Aland Islands</option><option value="3">Albania</option><option value="4">Algeria</option><option value="5">American Samoa</option><option value="6">Andorra</option><option value="7">Angola</option><option value="8">Anguilla</option><option value="9">Antarctica</option><option value="10">Antigua and Barbuda</option><option value="11">Argentina</option><option value="12">Armenia</option><option value="13">Aruba</option><option value="14">Australia</option><option value="15">Austria</option><option value="16">Azerbaijan</option><option value="17">Bahamas</option><option value="18">Bahrain</option><option value="19">Bangladesh</option><option value="20">Barbados</option><option value="21">Belarus</option><option value="22">Belgium</option><option value="23">Belize</option><option value="24">Benin</option><option value="25">Bermuda</option><option value="26">Bhutan</option><option value="27">Bolivia</option><option value="28">Bonaire, Sint Eustatius and Saba</option><option value="29">Bosnia and Herzegovina</option><option value="30">Botswana</option><option value="31">Bouvet Island</option><option value="32">Brazil</option><option value="33">British Indian Ocean Territory</option><option value="34">Brunei</option><option value="35">Bulgaria</option><option value="36">Burkina Faso</option><option value="37">Burundi</option><option value="38">Cambodia</option><option value="39">Cameroon</option><option value="40">Canada</option><option value="41">Cape Verde</option><option value="42">Cayman Islands</option><option value="43">Central African Republic</option><option value="44">Chad</option><option value="45">Chile</option><option value="46">China</option><option value="47">Christmas Island</option><option value="48">Cocos (Keeling) Islands</option><option value="49">Colombia</option><option value="50">Comoros</option><option value="51">Congo</option><option value="52">Cook Islands</option><option value="53">Costa Rica</option><option value="54">Cote d'ivoire (Ivory Coast)</option><option value="55">Croatia</option><option value="56">Cuba</option><option value="57">Curacao</option><option value="58">Cyprus</option><option value="59">Czech Republic</option><option value="60">Democratic Republic of the Congo</option><option value="61">Denmark</option><option value="62">Djibouti</option><option value="63">Dominica</option><option value="64">Dominican Republic</option><option value="65">Ecuador</option><option value="66">Egypt</option><option value="67">El Salvador</option><option value="68">Equatorial Guinea</option><option value="69">Eritrea</option><option value="70">Estonia</option><option value="71">Ethiopia</option><option value="72">Falkland Islands (Malvinas)</option><option value="73">Faroe Islands</option><option value="74">Fiji</option><option value="75">Finland</option><option value="76">France</option><option value="77">French Guiana</option><option value="78">French Polynesia</option><option value="79">French Southern Territories</option><option value="80">Gabon</option><option value="81">Gambia</option><option value="82">Georgia</option><option value="83">Germany</option><option value="84">Ghana</option><option value="85">Gibraltar</option><option value="86">Greece</option><option value="87">Greenland</option><option value="88">Grenada</option><option value="89">Guadaloupe</option><option value="90">Guam</option><option value="91">Guatemala</option><option value="92">Guernsey</option><option value="93">Guinea</option><option value="94">Guinea-Bissau</option><option value="95">Guyana</option><option value="96">Haiti</option><option value="97">Heard Island and McDonald Islands</option><option value="98">Honduras</option><option value="99">Hong Kong</option><option value="100">Hungary</option><option value="101">Iceland</option><option value="102">India</option><option value="103">Indonesia</option><option value="104">Iran</option><option value="105">Iraq</option><option value="106">Ireland</option><option value="107">Isle of Man</option><option value="108">Israel</option><option value="109">Italy</option><option value="110">Jamaica</option><option value="111">Japan</option><option value="112">Jersey</option><option value="113">Jordan</option><option value="114">Kazakhstan</option><option value="115">Kenya</option><option value="116">Kiribati</option><option value="117">Kosovo</option><option value="118">Kuwait</option><option value="119">Kyrgyzstan</option><option value="120">Laos</option><option value="121">Latvia</option><option value="122">Lebanon</option><option value="123">Lesotho</option><option value="124">Liberia</option><option value="125">Libya</option><option value="126">Liechtenstein</option><option value="127">Lithuania</option><option value="128">Luxembourg</option><option value="129">Macao</option><option value="131">Madagascar</option><option value="132">Malawi</option><option value="133">Malaysia</option><option value="134">Maldives</option><option value="135">Mali</option><option value="136">Malta</option><option value="137">Marshall Islands</option><option value="138">Martinique</option><option value="139">Mauritania</option><option value="140">Mauritius</option><option value="141">Mayotte</option><option value="142">Mexico</option><option value="143">Micronesia</option><option value="144">Moldava</option><option value="145">Monaco</option><option value="146">Mongolia</option><option value="147">Montenegro</option><option value="148">Montserrat</option><option value="149">Morocco</option><option value="150">Mozambique</option><option value="151">Myanmar (Burma)</option><option value="152">Namibia</option><option value="153">Nauru</option><option value="154">Nepal</option><option value="155">Netherlands</option><option value="156">New Caledonia</option><option value="157">New Zealand</option><option value="158">Nicaragua</option><option value="159">Niger</option><option value="160">Nigeria</option><option value="161">Niue</option><option value="162">Norfolk Island</option><option value="163">North Korea</option><option value="130">North Macedonia</option><option value="164">Northern Mariana Islands</option><option value="165">Norway</option><option value="166">Oman</option><option value="167">Pakistan</option><option value="168">Palau</option><option value="169">Palestine</option><option value="170">Panama</option><option value="171">Papua New Guinea</option><option value="172">Paraguay</option><option value="173">Peru</option><option value="174">Philippines</option><option value="175">Pitcairn</option><option value="176">Poland</option><option value="177">Portugal</option><option value="178">Puerto Rico</option><option value="179">Qatar</option><option value="180">Reunion</option><option value="181">Romania</option><option value="182">Russia</option><option value="183">Rwanda</option><option value="184">Saint Barthelemy</option><option value="185">Saint Helena</option><option value="186">Saint Kitts and Nevis</option><option value="187">Saint Lucia</option><option value="188">Saint Martin</option><option value="189">Saint Pierre and Miquelon</option><option value="190">Saint Vincent and the Grenadines</option><option value="191">Samoa</option><option value="192">San Marino</option><option value="193">Sao Tome and Principe</option><option value="194">Saudi Arabia</option><option value="195">Senegal</option><option value="196">Serbia</option><option value="197">Seychelles</option><option value="198">Sierra Leone</option><option value="199">Singapore</option><option value="200">Sint Maarten</option><option value="201">Slovakia</option><option value="202">Slovenia</option><option value="203">Solomon Islands</option><option value="204">Somalia</option><option value="205">South Africa</option><option value="206">South Georgia and the South Sandwich Islands</option><option value="207">South Korea</option><option value="208">South Sudan</option><option value="209">Spain</option><option value="210">Sri Lanka</option><option value="211">Sudan</option><option value="212">Suriname</option><option value="213">Svalbard and Jan Mayen</option><option value="214">Swaziland</option><option value="215">Sweden</option><option value="216">Switzerland</option><option value="217">Syria</option><option value="218">Taiwan</option><option value="219">Tajikistan</option><option value="220">Tanzania</option><option value="221">Thailand</option><option value="222">Timor-Leste (East Timor)</option><option value="223">Togo</option><option value="224">Tokelau</option><option value="225">Tonga</option><option value="226">Trinidad and Tobago</option><option value="227">Tunisia</option><option value="228">Turkey</option><option value="229">Turkmenistan</option><option value="230">Turks and Caicos Islands</option><option value="231">Tuvalu</option><option value="232">Uganda</option><option value="233">Ukraine</option><option value="234">United Arab Emirates</option><option value="235">United Kingdom</option><option value="236">United States</option><option value="237">United States Minor Outlying Islands</option><option value="238">Uruguay</option><option value="239">Uzbekistan</option><option value="240">Vanuatu</option><option value="241">Vatican City</option><option value="242">Venezuela</option><option value="243">Vietnam</option><option value="244">Virgin Islands, British</option><option value="245">Virgin Islands, US</option><option value="246">Wallis and Futuna</option><option value="247">Western Sahara</option><option value="248">Yemen</option><option value="249">Zambia</option><option value="250">Zimbabwe</option></select></div>                            </div>
+                                                        <div class="col-md-12">
+                                <div
+                                    class="tw-bg-neutral-50 tw-py-3 tw-px-4 tw-rounded-lg tw-border tw-border-solid tw-border-neutral-200">
+                                    <div class="checkbox checkbox-primary -tw-mb-0.5">
+                                        <input type="checkbox" name="update_all_other_transactions"
+                                            id="update_all_other_transactions">
+                                        <label for="update_all_other_transactions">
+                                            Update the shipping/billing info on all previous invoices/estimates<br />
+                                        </label>
+                                    </div>
+                                    <p class="tw-ml-7 tw-mb-0">
+                                        If you check this field shipping and billing info will be updated to all invoices and estimates. Note: Invoices with status paid won't be affected.                                    </p>
+                                    <div class="checkbox checkbox-primary">
+                                        <input type="checkbox" name="update_credit_notes" id="update_credit_notes">
+                                        <label for="update_credit_notes">
+                                            Update the shipping/billing info on all previous credit notes (Closed credit notes not affected)                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form></div>
+<div class="modal fade" id="customer_admins_assign" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <form action="../../authentication.html" method="post" accept-charset="utf-8">
+                                                                                                <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">
+                    Assign Admin                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="select-placeholder form-group" app-field-wrapper="customer_admins[]"><select id="customer_admins[]" name="customer_admins[]" class="selectpicker" multiple="1" data-width="100%" data-none-selected-text="Nothing selected" data-live-search="true"><option value="5">Ray Walsh</option><option value="10">Monserrat Bruen</option><option value="9">Leonel Casper</option><option value="2">Kian Heller</option><option value="7">Jedediah Steuber</option><option value="3">Jasmin Quitzon</option><option value="4">Jaime Klein</option><option value="1">Ethel Hagenes</option><option value="6">Domingo Bernhard</option><option value="8">Antonio Gottlieb</option></select></div>            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"
+                    data-dismiss="modal">Close</button>
+                <button type="submit"
+                    class="btn btn-primary">Save</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+        </form>    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="customer_group_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button group="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="edit-title">Edit Customer Group</span>
+                    <span class="add-title">Add New Customer Group</span>
+                </h4>
+            </div>
+            <form action="../../authentication.html" id="customer-group-modal" method="post" accept-charset="utf-8">
+                <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group" app-field-wrapper="name"><label for="name" class="control-label">Name</label><input type="text" id="name" name="name" class="form-control"  value=""></div>                        
+<input type="hidden" name="id" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button group="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button group="submit" class="btn btn-primary">Save</button>
+                </form>            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.addEventListener('load',function(){
+       appValidateForm($('#customer-group-modal'), {
+        name: 'required'
+    }, manage_customer_groups);
+
+       $('#customer_group_modal').on('show.bs.modal', function(e) {
+        var invoker = $(e.relatedTarget);
+        var group_id = $(invoker).data('id');
+        $('#customer_group_modal .add-title').removeClass('hide');
+        $('#customer_group_modal .edit-title').addClass('hide');
+        $('#customer_group_modal input[name="id"]').val('');
+        $('#customer_group_modal input[name="name"]').val('');
+        // is from the edit button
+        if (typeof(group_id) !== 'undefined') {
+            $('#customer_group_modal input[name="id"]').val(group_id);
+            $('#customer_group_modal .add-title').addClass('hide');
+            $('#customer_group_modal .edit-title').removeClass('hide');
+            $('#customer_group_modal input[name="name"]').val($(invoker).parents('tr').find('td').eq(0).text());
+        }
+    });
+   });
+    function manage_customer_groups(form) {
+        var data = $(form).serialize();
+        var url = form.action;
+        $.post(url, data).done(function(response) {
+            response = JSON.parse(response);
+            if (response.success == true) {
+                if($.fn.DataTable.isDataTable('.table-customer-groups')){
+                    $('.table-customer-groups').DataTable().ajax.reload();
+                }
+                if($('body').hasClass('dynamic-create-groups') && typeof(response.id) != 'undefined') {
+                    var groups = $('select[name="groups_in[]"]');
+                    groups.prepend('<option value="'+response.id+'">'+response.name+'</option>');
+                    groups.selectpicker('refresh');
+                }
+                alert_float('success', response.message);
+            }
+            $('#customer_group_modal').modal('hide');
+        });
+        return false;
+    }
+
+</script>
+                            </div>
+                        </div>
+                    </div>
+                                        <div class="panel-footer text-right tw-space-x-1" id="profile-save-section">
+                                                <button class="btn btn-primary only-save customer-form-submiter">
+                            Save                        </button>
+                    </div>
+                                    </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Likes -->
+<div class="modal likes_modal fade" id="modal_post_likes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">
+          Colleagues who like this post        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div id="modal_post_likes_wrapper">
+
+          </div>
+
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <a href="#"
+          class="btn btn-primary load_more_post_likes">Load More</a>
+      </div>
+    </div>
+  </div>
+</div><!-- Likes -->
+<div class="modal likes_modal animated fadeIn" id="modal_post_comment_likes" tabindex="-1" role="dialog"
+  aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">
+          Colleagues who like this comment        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div id="modal_comment_likes_wrapper">
+
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#"
+          class="btn btn-primary load_more_post_comment_likes">Load More</a>
+      </div>
+    </div>
+  </div>
+</div><div id="event"></div>
+<div id="newsfeed" class="animated fadeIn hide" >
+</div>
+<!-- Task modal view -->
+<div class="modal fade task-modal-single" id="task-modal" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel">
+  <div
+    class="modal-dialog modal-lg">
+    <div class="modal-content data">
+
+    </div>
+  </div>
+</div>
+
+<!--Add/edit task modal-->
+<div id="_task"></div>
+
+<!-- Lead Data Add/Edit-->
+<div class="modal fade lead-modal" id="lead-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div
+    class="modal-dialog modal-lg">
+    <div class="modal-content data">
+
+    </div>
+  </div>
+</div>
+
+<div id="timers-logout-template-warning" class="hide">
+  <h3 class="bold">
+    Started tasks timers found!<br />Are you sure you want to logout without stopping the timers?  </h3>
+  <hr />
+  <a href="../../authentication.html"
+    class="btn btn-danger">
+    Logout  </a>
+</div>
+
+<!--Lead convert to customer modal-->
+<div id="lead_convert_to_customer"></div>
+
+<!--Lead reminder modal-->
+<div id="lead_reminder_modal"></div>
+
+<script type="text/javascript" id="vendor-js" src="../../../assets/builds/vendor-admin%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-migrate-js" src="../../../assets/plugins/jquery/jquery-migrate.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datatables-js" src="../../../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="moment-js" src="../../../assets/builds/moment.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="bootstrap-select-js" src="../../../assets/builds/bootstrap-select.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="tinymce-js" src="../../../assets/plugins/tinymce/tinymce.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-validation-js" src="../../../assets/plugins/jquery-validation/jquery.validate.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="pusher-js" src="https://js.pusher.com/5.0/pusher.min.js"></script>
+<script type="text/javascript" id="dropboxjs" src="https://www.dropbox.com/static/api/2/dropins.js" data-app-key="z0aqtiz98vctw4o"></script>
+<script type="text/javascript" id="google-gsi-js" src="https://accounts.google.com/gsi/client" defer></script>
+<script type="text/javascript" id="google-js" src="https://apis.google.com/js/api.js?onload=onGoogleApiLoad" defer></script>
+<script type="text/javascript" id="common-js" src="../../../assets/builds/common%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="app-js" src="../../../assets/js/main.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="app-v3" src="../../../assets/builds/app%EF%B9%96v=3.2.0.js"></script>
+<script>
+function custom_fields_hyperlink() {
+    var cf_hyperlink = $('body').find('.cf-hyperlink');
+    if (cf_hyperlink.length) {
+        $.each(cf_hyperlink, function() {
+            var cfh_wrapper = $(this);
+            if (!cfh_wrapper.hasClass('cfh-initialized')) {
+                var cfh_field_to = cfh_wrapper.attr('data-fieldto');
+                var cfh_field_id = cfh_wrapper.attr('data-field-id');
+                var textEl = $('body').find('#custom_fields_' + cfh_field_to + '_' + cfh_field_id + '_popover');
+                var hiddenField = $("#custom_fields\\\[" + cfh_field_to + "\\\]\\\[" + cfh_field_id + "\\\]");
+                var cfh_value = cfh_wrapper.attr('data-value');
+                hiddenField.val(cfh_value);
+
+                if ($(hiddenField.val()).html() != '') {
+                    textEl.html($(hiddenField.val()).html());
+                }
+                var cfh_field_name = cfh_wrapper.attr('data-field-name');
+
+                textEl.popover({
+                    html: true,
+                    trigger: "manual",
+                    placement: "top",
+                    title: cfh_field_name,
+                    content: function() {
+                        return $(cfh_popover_templates[cfh_field_id]).html();
+                    }
+                }).on("click", function(e) {
+                    var $popup = $(this);
+                    $popup.popover("toggle");
+                    var titleField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id +
+                        "_title");
+                    var urlField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_link");
+                    var ttl = $(hiddenField.val()).html();
+                    var cfUrl = $(hiddenField.val()).attr("href");
+                    if (cfUrl) {
+                        $('#cf_hyperlink_open_' + cfh_field_id).attr('href', (cfUrl.indexOf('://') === -
+                            1 ? 'http://' + cfUrl : cfUrl));
+                    }
+                    titleField.val(ttl);
+                    urlField.val(cfUrl);
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-save").click(
+                        function() {
+                            hiddenField.val((urlField.val() != '' ? '<a href="' + urlField.val() +
+                                '" target="_blank">' + (titleField.val() != "" ? titleField
+                                    .val() : urlField.val()) + '</a>' : ''));
+                            textEl.html(titleField.val() !== "" ? titleField.val() : (urlField
+                                .val() != '' ? urlField.val() :
+                                "Click here to add link"));
+                            $popup.popover("toggle");
+                        });
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-cancel").click(
+                        function() {
+                            if (urlField.val() == '') {
+                                hiddenField.val('');
+                            }
+                            $popup.popover("toggle");
+                        });
+                });
+                cfh_wrapper.addClass('cfh-initialized')
+            }
+        });
+    }
+}
+</script>
+<script type="text/javascript">
+    $(function() {
+        // Enable pusher logging - don't include this in production
+        // Pusher.logToConsole = true;
+                var
+            pusher_options = {"0":{"disableStats":true},"cluster":"eu"} ;
+        var pusher = new Pusher(
+            "a399ff4c2ea56c6f3ec1",
+            pusher_options);
+        var channel = pusher.subscribe(
+            'notifications-channel-1'
+        );
+        channel.bind('notification', function(data) {
+            fetch_notifications();
+        });
+    });
+</script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71585538-1', 'auto');
+  ga('send', 'pageview');
+
+</script><script>
+    $(function() {
+        init_rel_tasks_table( 7 ,
+            'customer');
+    });
+</script>
+<script>
+Dropzone.options.clientAttachmentsUpload = false;
+var customer_id = $('input[name="userid"]').val();
+$(function() {
+
+    if ($('#client-attachments-upload').length > 0) {
+        new Dropzone('#client-attachments-upload', appCreateDropzoneOptions({
+            paramName: "file",
+            accept: function(file, done) {
+                done();
+            },
+            success: function(file, response) {
+                if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length ===
+                    0) {
+                    window.location.reload();
+                }
+            }
+        }));
+    }
+
+    // Save button not hidden if passed from url ?tab= we need to re-click again
+    if (tab_active) {
+        $('body').find('.nav-tabs [href="#' + tab_active + '"]').click();
+    }
+
+    if(tab_active === 'customer_admins') {
+        $('#profile-save-section').addClass('hide');
+    }
+
+    $('a[href="#customer_admins"]').on('click', function() {
+        $('#profile-save-section').addClass('hide');
+    });
+
+    $('.customer-profile-tabs  a').not('a[href="#customer_admins"]').on('click', function() {
+        $('#profile-save-section').removeClass('hide');
+    });
+
+    $("input[name='tasks_related_to[]']").on('change', function() {
+        var tasks_related_values = []
+        $('#tasks_related_filter :checkbox:checked').each(function(i) {
+            tasks_related_values[i] = $(this).val();
+        });
+        $('input[name="tasks_related_to"]').val(tasks_related_values.join());
+        $('.table-rel-tasks').DataTable().ajax.reload();
+    });
+
+    var contact_id = get_url_param('contactid');
+    if (contact_id) {
+        contact(customer_id, contact_id);
+    }
+
+    // consents=CONTACT_ID
+    var consents = get_url_param('consents');
+    if (consents) {
+        view_contact_consent(consents);
+    }
+
+    // If user clicked save and add new contact
+    if (get_url_param('new_contact')) {
+        contact(customer_id);
+    }
+
+    $('body').on('change', '.onoffswitch input.customer_file', function(event, state) {
+        var invoker = $(this);
+        var checked_visibility = invoker.prop('checked');
+        var share_file_modal = $('#customer_file_share_file_with');
+        setTimeout(function() {
+            $('input[name="file_id"]').val(invoker.attr('data-id'));
+            if (checked_visibility && share_file_modal.attr('data-total-contacts') > 1) {
+                share_file_modal.modal('show');
+            } else {
+                do_share_file_contacts();
+            }
+        }, 200);
+    });
+
+    $('.customer-form-submiter').on('click', function() {
+        var form = $('.client-form');
+        if (form.valid()) {
+            if ($(this).hasClass('save-and-add-contact')) {
+                form.find('.additional').html(hidden_input('save_and_add_contact', 'true'));
+            } else {
+                form.find('.additional').html('');
+            }
+            form.submit();
+        }
+    });
+
+    if (typeof(Dropbox) != 'undefined' && $('#dropbox-chooser').length > 0) {
+        document.getElementById("dropbox-chooser").appendChild(Dropbox.createChooseButton({
+            success: function(files) {
+                saveCustomerProfileExternalFile(files, 'dropbox');
+            },
+            linkType: "preview",
+            extensions: app.options.allowed_files.split(','),
+        }));
+    }
+
+    /* Customer profile tickets table */
+    $('.table-tickets-single').find('#th-submitter').removeClass('toggleable');
+
+    initDataTable('.table-tickets-single', admin_url + 'tickets/index/false/' + customer_id, undefined,
+        undefined, 'undefined', [$('table thead .ticket_created_column').index(), 'desc']);
+
+    /* Customer profile contracts table */
+    initDataTable('.table-contracts-single-client', admin_url + 'contracts/table/' + customer_id, undefined,
+        undefined, 'undefined', [6, 'desc']);
+
+    /* Custome profile contacts table */
+    var contactsNotSortable = [];
+        _table_api = initDataTable('.table-contacts', admin_url + 'clients/contacts/' + customer_id,
+        contactsNotSortable, contactsNotSortable);
+    if (_table_api) {
+            }
+    /* Customer profile invoices table */
+    initDataTable('.table-invoices-single-client',
+        admin_url + 'invoices/table/' + customer_id,
+        'undefined',
+        'undefined',
+        'undefined', [
+            [3, 'desc'],
+            [0, 'desc']
+        ]);
+
+    initDataTable('.table-credit-notes', admin_url + 'credit_notes/table/' + customer_id, ['undefined'], [
+        'undefined'
+    ], undefined, [0, 'desc']);
+
+    /* Customer profile Estimates table */
+    initDataTable('.table-estimates-single-client',
+        admin_url + 'estimates/table/' + customer_id,
+        'undefined',
+        'undefined',
+        'undefined', [
+            [3, 'desc'],
+            [0, 'desc']
+        ]);
+
+    /* Customer profile payments table */
+    initDataTable('.table-payments-single-client',
+        admin_url + 'payments/table/' + customer_id, undefined, undefined,
+        'undefined', [0, 'desc']);
+
+    /* Customer profile reminders table */
+    initDataTable('.table-reminders', admin_url + 'misc/get_reminders/' + customer_id + '/' + 'customer',
+        undefined, undefined, undefined, [1, 'asc']);
+
+    /* Customer profile expenses table */
+    initDataTable('.table-expenses-single-client',
+        admin_url + 'expenses/table/' + customer_id,
+        'undefined',
+        'undefined',
+        'undefined', [6, 'desc']);
+
+    /* Customer profile proposals table */
+    initDataTable('.table-proposals-client-profile',
+        admin_url + 'proposals/proposal_relations/' + customer_id + '/customer',
+        'undefined',
+        'undefined',
+        'undefined', [6, 'desc']);
+
+    /* Custome profile projects table */
+    initDataTable('.table-projects-single-client', admin_url + 'projects/table/' + customer_id, undefined,
+        undefined, 'undefined',
+        [5,"asc"]);
+
+    var vRules = {};
+    if (app.options.company_is_required == 1) {
+        vRules = {
+            company: 'required',
+        }
+    }
+
+    appValidateForm($('.client-form'), vRules);
+
+    if (typeof(customer_id) == 'undefined') {
+        $('#company').on('blur', function() {
+            var company = $(this).val();
+            var $companyExistsDiv = $('#company_exists_info');
+
+            if (company == '') {
+                $companyExistsDiv.addClass('hide');
+                return;
+            }
+
+            $.post(admin_url + 'clients/check_duplicate_customer_name', {
+                    company: company
+                })
+                .done(function(response) {
+                    if (response) {
+                        response = JSON.parse(response);
+                        if (response.exists == true) {
+                            $companyExistsDiv.removeClass('hide');
+                            $companyExistsDiv.html('<div class="alert alert-info">' + response
+                                .message + '</div>');
+                        } else {
+                            $companyExistsDiv.addClass('hide');
+                        }
+                    }
+                });
+        });
+    }
+
+    $('.billing-same-as-customer').on('click', function(e) {
+        e.preventDefault();
+        $('textarea[name="billing_street"]').val($('textarea[name="address"]').val());
+        $('input[name="billing_city"]').val($('input[name="city"]').val());
+        $('input[name="billing_state"]').val($('input[name="state"]').val());
+        $('input[name="billing_zip"]').val($('input[name="zip"]').val());
+        $('select[name="billing_country"]').selectpicker('val', $('select[name="country"]')
+            .selectpicker('val'));
+    });
+
+    $('.customer-copy-billing-address').on('click', function(e) {
+        e.preventDefault();
+        $('textarea[name="shipping_street"]').val($('textarea[name="billing_street"]').val());
+        $('input[name="shipping_city"]').val($('input[name="billing_city"]').val());
+        $('input[name="shipping_state"]').val($('input[name="billing_state"]').val());
+        $('input[name="shipping_zip"]').val($('input[name="billing_zip"]').val());
+        $('select[name="shipping_country"]').selectpicker('val', $('select[name="billing_country"]')
+            .selectpicker('val'));
+    });
+
+    $('body').on('hidden.bs.modal', '#contact', function() {
+        $('#contact_data').empty();
+    });
+
+    $('.client-form').on('submit', function() {
+        $('select[name="default_currency"]').prop('disabled', false);
+    });
+
+});
+
+function delete_contact_profile_image(contact_id) {
+    requestGet('clients/delete_contact_profile_image/' + contact_id).done(function() {
+        $('body').find('#contact-profile-image').removeClass('hide');
+        $('body').find('#contact-remove-img').addClass('hide');
+        $('body').find('#contact-img').attr('src',
+            'https://perfexcrm.com/demo/assets/images/user-placeholder.jpg');
+    });
+}
+
+function customerGoogleDriveSave(pickData) {
+    saveCustomerProfileExternalFile(pickData, 'gdrive');
+}
+
+function saveCustomerProfileExternalFile(files, externalType) {
+    $.post(admin_url + 'clients/add_external_attachment', {
+        files: files,
+        clientid: customer_id,
+        external: externalType
+    }).done(function() {
+        window.location.reload();
+    });
+}
+
+function validate_contact_form() {
+    appValidateForm('#contact-form', {
+        firstname: 'required',
+        lastname: 'required',
+        password: {
+            required: {
+                depends: function(element) {
+
+                    var $sentSetPassword = $('input[name="send_set_password_email"]');
+
+                    if ($('#contact input[name="contactid"]').val() == '' && $sentSetPassword.prop(
+                            'checked') == false) {
+                        return true;
+                    }
+                }
+            }
+        },
+        email: {
+                        required: true,
+                        email: true,
+            // Use this hook only if the contacts are not logging into the customers area and you are not using support tickets piping.
+                        remote: {
+                url: admin_url + "misc/contact_email_exists",
+                type: 'post',
+                data: {
+                    email: function() {
+                        return $('#contact input[name="email"]').val();
+                    },
+                    userid: function() {
+                        return $('body').find('input[name="contactid"]').val();
+                    }
+                }
+            }
+                    }
+    }, contactFormHandler);
+}
+
+function contactFormHandler(form) {
+    $('#contact input[name="is_primary"]').prop('disabled', false);
+
+    $("#contact input[type=file]").each(function() {
+        if ($(this).val() === "") {
+            $(this).prop('disabled', true);
+        }
+    });
+
+    var formURL = $(form).attr("action");
+    var formData = new FormData($(form)[0]);
+
+    $.ajax({
+        type: 'POST',
+        data: formData,
+        mimeType: "multipart/form-data",
+        contentType: false,
+        cache: false,
+        processData: false,
+        url: formURL
+    }).done(function(response) {
+        response = JSON.parse(response);
+        if (response.success) {
+            alert_float('success', response.message);
+            if (typeof(response.is_individual) != 'undefined' && response.is_individual) {
+                $('.new-contact').addClass('disabled');
+                if (!$('.new-contact-wrapper')[0].hasAttribute('data-toggle')) {
+                    $('.new-contact-wrapper').attr('data-toggle', 'tooltip');
+                }
+            }
+        }
+
+        if ($.fn.DataTable.isDataTable('.table-contacts')) {
+            $('.table-contacts').DataTable().ajax.reload(null, false);
+        } else if ($.fn.DataTable.isDataTable('.table-all-contacts')) {
+            $('.table-all-contacts').DataTable().ajax.reload(null, false);
+        }
+
+        if (response.proposal_warning && response.proposal_warning != false) {
+            $('body').find('#contact_proposal_warning').removeClass('hide');
+            $('body').find('#contact_update_proposals_emails').attr('data-original-email', response
+                .original_email);
+            $('#contact').animate({
+                scrollTop: 0
+            }, 800);
+        } else {
+            $('#contact').modal('hide');
+        }
+    }).fail(function(error) {
+        alert_float('danger', JSON.parse(error.responseText));
+    });
+    return false;
+}
+
+function contact(client_id, contact_id) {
+    if (typeof(contact_id) == 'undefined') {
+        contact_id = '';
+    }
+    requestGet('clients/form_contact/' + client_id + '/' + contact_id).done(function(response) {
+        $('#contact_data').html(response);
+        $('#contact').modal({
+            show: true,
+            backdrop: 'static'
+        });
+        $('body').off('shown.bs.modal', '#contact');
+        $('body').on('shown.bs.modal', '#contact', function() {
+            if (contact_id == '') {
+                $('#contact').find('input[name="firstname"]').focus();
+            }
+        });
+        init_selectpicker();
+        init_datepicker();
+        custom_fields_hyperlink();
+        validate_contact_form();
+    }).fail(function(error) {
+        var response = JSON.parse(error.responseText);
+        alert_float('danger', response.message);
+    });
+}
+
+
+function update_all_proposal_emails_linked_to_contact(contact_id) {
+    var data = {};
+    data.update = true;
+    data.original_email = $('body').find('#contact_update_proposals_emails').data('original-email');
+    $.post(admin_url + 'clients/update_all_proposal_emails_linked_to_customer/' + contact_id, data).done(function(
+        response) {
+        response = JSON.parse(response);
+        if (response.success) {
+            alert_float('success', response.message);
+        }
+        $('#contact').modal('hide');
+    });
+}
+
+function do_share_file_contacts(edit_contacts, file_id) {
+    var contacts_shared_ids = $('select[name="share_contacts_id[]"]');
+    if (typeof(edit_contacts) == 'undefined' && typeof(file_id) == 'undefined') {
+        var contacts_shared_ids_selected = $('select[name="share_contacts_id[]"]').val();
+    } else {
+        var _temp = edit_contacts.toString().split(',');
+        for (var cshare_id in _temp) {
+            contacts_shared_ids.find('option[value="' + _temp[cshare_id] + '"]').attr('selected', true);
+        }
+        contacts_shared_ids.selectpicker('refresh');
+        $('input[name="file_id"]').val(file_id);
+        $('#customer_file_share_file_with').modal('show');
+        return;
+    }
+    var file_id = $('input[name="file_id"]').val();
+    $.post(admin_url + 'clients/update_file_share_visibility', {
+        file_id: file_id,
+        share_contacts_id: contacts_shared_ids_selected,
+        customer_id: $('input[name="userid"]').val()
+    }).done(function() {
+        window.location.reload();
+    });
+}
+
+function save_longitude_and_latitude(clientid) {
+    var data = {};
+    data.latitude = $('#latitude').val();
+    data.longitude = $('#longitude').val();
+    $.post(admin_url + 'clients/save_longitude_and_latitude/' + clientid, data).done(function(response) {
+        if (response == 'success') {
+            alert_float('success', "Customer updated successfully.");
+        }
+        setTimeout(function() {
+            window.location.reload();
+        }, 1200);
+    }).fail(function(error) {
+        alert_float('danger', error.responseText);
+    });
+}
+
+function fetch_lat_long_from_google_cprofile() {
+    var data = {};
+    data.address = $('#long_lat_wrapper').data('address');
+    data.city = $('#long_lat_wrapper').data('city');
+    data.country = $('#long_lat_wrapper').data('country');
+    $('#gmaps-search-icon').removeClass('fa-google').addClass('fa-spinner fa-spin');
+    $.post(admin_url + 'misc/fetch_address_info_gmaps', data).done(function(data) {
+        data = JSON.parse(data);
+        $('#gmaps-search-icon').removeClass('fa-spinner fa-spin').addClass('fa-google');
+        if (data.response.status == 'OK') {
+            $('input[name="latitude"]').val(data.lat);
+            $('input[name="longitude"]').val(data.lng);
+        } else {
+            if (data.response.status == 'ZERO_RESULTS') {
+                alert_float('warning', "The address couldn't be found, please try again");
+            } else {
+                alert_float('danger', data.response.status + ' - ' + data.response.error_message);
+            }
+        }
+    });
+}
+</script></body>
+
+</html>

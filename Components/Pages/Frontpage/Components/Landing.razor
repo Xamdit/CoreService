@@ -1,0 +1,25 @@
+<div class="d-flex flex-column flex-center w-100 min-h-350px min-h-lg-500px px-9">
+  <div class="text-center mb-5 mb-lg-10 py-10 py-lg-20">
+    <h1 class="text-white lh-base fw-bold fs-2x fs-lg-3x mb-15">
+      Build An Outstanding Solutions
+      <br/>with
+      <span style="background: linear-gradient(to right, #12CE5D 0%, #FFD80C 100%);-webkit-background-clip: text;-webkit-text-fill-color: transparent;">
+        <span id="kt_landing_hero_text">The Best Theme Ever</span>
+      </span>
+    </h1>
+    @* <a href="../../demo5/dist/index.html" class="btn btn-primary">Try Metronic</a> *@
+  </div>
+  <div class="d-flex flex-center flex-wrap position-relative px-5">
+    @foreach (var brand in Brands)
+    {
+      <div class="d-flex flex-center m-3 m-md-6" data-bs-toggle="tooltip" title="@brand">
+        <img src="assets/media/svg/brand-logos/@(brand).svg" class="mh-30px mh-lg-40px" alt=""/>
+      </div>
+    }
+  </div>
+</div>
+
+@code{
+  // private string[] Brands = new[] { "fujifilm", "vodafone", "kpmg", "nasa", "aspnetzero", "aon", "hp-3", "truman" };
+  private List<string> Brands = new();
+}

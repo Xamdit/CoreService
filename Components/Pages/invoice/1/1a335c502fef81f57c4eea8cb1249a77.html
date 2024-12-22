@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>INV-000001</title>
+	<link rel="shortcut icon" id="favicon" href="../../uploads/company/favicon.ico">
+<link rel="apple-touch-icon”" id="favicon-apple-touch-icon" href="../../uploads/company/favicon.ico">
+<link rel="stylesheet" type="text/css" id="reset-css" href="../../assets/css/reset.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="bootstrap-css" href="../../assets/plugins/bootstrap/css/bootstrap.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="inter-font" href="../../assets/plugins/inter/inter%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="datatables-css" href="../../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-css" href="../../assets/plugins/font-awesome/css/fontawesome.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-brands" href="../../assets/plugins/font-awesome/css/brands.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-solid" href="../../assets/plugins/font-awesome/css/solid.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-regular" href="../../assets/plugins/font-awesome/css/regular.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="datetimepicker-css" href="../../assets/plugins/datetimepicker/jquery.datetimepicker.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="bootstrap-select-css" href="../../assets/plugins/bootstrap-select/css/bootstrap-select.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="lightbox-css" href="../../assets/plugins/lightbox/css/lightbox.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="colorpicker-css" href="../../assets/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="tailwind-css" href="../../assets/builds/tailwind%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="theme-css" href="../../assets/themes/perfex/css/style.min%EF%B9%96v=3.2.0.css">
+	<script
+		src="../../assets/plugins/jquery/jquery.min.js">
+	</script>
+	<script>
+if (typeof(jQuery) === 'undefined' && !window.deferAfterjQueryLoaded) {
+    window.deferAfterjQueryLoaded = [];
+    Object.defineProperty(window, "$", {
+        set: function(value) {
+            window.setTimeout(function() {
+                $.each(window.deferAfterjQueryLoaded, function(index, fn) {
+                    fn();
+                });
+            }, 0);
+            Object.defineProperty(window, "$", {
+                value: value
+            });
+        },
+        configurable: true
+    });
+}
+
+var csrfData = {"formatted":{"csrf_token_name":"bf0a8ef7a17e35f854421149e1dc6fe5"},"token_name":"csrf_token_name","hash":"bf0a8ef7a17e35f854421149e1dc6fe5"};
+
+if (typeof(jQuery) == 'undefined') {
+    window.deferAfterjQueryLoaded.push(function() {
+        csrf_jquery_ajax_setup();
+    });
+    window.addEventListener('load', function() {
+        csrf_jquery_ajax_setup();
+    }, true);
+} else {
+    csrf_jquery_ajax_setup();
+}
+
+function csrf_jquery_ajax_setup() {
+    $.ajaxSetup({
+        data: csrfData.formatted
+    });
+
+    $(document).ajaxError(function(event, request, settings) {
+        if (request.status === 419) {
+            alert_float('warning', 'Page expired, refresh the page make an action.')
+        }
+    });
+}
+</script>
+<script>
+function custom_fields_hyperlink() {
+    var cf_hyperlink = $('body').find('.cf-hyperlink');
+    if (cf_hyperlink.length) {
+        $.each(cf_hyperlink, function() {
+            var cfh_wrapper = $(this);
+            if (!cfh_wrapper.hasClass('cfh-initialized')) {
+                var cfh_field_to = cfh_wrapper.attr('data-fieldto');
+                var cfh_field_id = cfh_wrapper.attr('data-field-id');
+                var textEl = $('body').find('#custom_fields_' + cfh_field_to + '_' + cfh_field_id + '_popover');
+                var hiddenField = $("#custom_fields\\\[" + cfh_field_to + "\\\]\\\[" + cfh_field_id + "\\\]");
+                var cfh_value = cfh_wrapper.attr('data-value');
+                hiddenField.val(cfh_value);
+
+                if ($(hiddenField.val()).html() != '') {
+                    textEl.html($(hiddenField.val()).html());
+                }
+                var cfh_field_name = cfh_wrapper.attr('data-field-name');
+
+                textEl.popover({
+                    html: true,
+                    trigger: "manual",
+                    placement: "top",
+                    title: cfh_field_name,
+                    content: function() {
+                        return $(cfh_popover_templates[cfh_field_id]).html();
+                    }
+                }).on("click", function(e) {
+                    var $popup = $(this);
+                    $popup.popover("toggle");
+                    var titleField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id +
+                        "_title");
+                    var urlField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_link");
+                    var ttl = $(hiddenField.val()).html();
+                    var cfUrl = $(hiddenField.val()).attr("href");
+                    if (cfUrl) {
+                        $('#cf_hyperlink_open_' + cfh_field_id).attr('href', (cfUrl.indexOf('://') === -
+                            1 ? 'http://' + cfUrl : cfUrl));
+                    }
+                    titleField.val(ttl);
+                    urlField.val(cfUrl);
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-save").click(
+                        function() {
+                            hiddenField.val((urlField.val() != '' ? '<a href="' + urlField.val() +
+                                '" target="_blank">' + (titleField.val() != "" ? titleField
+                                    .val() : urlField.val()) + '</a>' : ''));
+                            textEl.html(titleField.val() !== "" ? titleField.val() : (urlField
+                                .val() != '' ? urlField.val() :
+                                "Clique aqui para adicionar o link"));
+                            $popup.popover("toggle");
+                        });
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-cancel").click(
+                        function() {
+                            if (urlField.val() == '') {
+                                hiddenField.val('');
+                            }
+                            $popup.popover("toggle");
+                        });
+                });
+                cfh_wrapper.addClass('cfh-initialized')
+            }
+        });
+    }
+}
+</script>
+<script src='https://www.google.com/recaptcha/api.js'></script><script>
+
+var site_url = 'https://perfexcrm.com/demo/',
+    app = {},
+    cfh_popover_templates = {};
+
+app.isRTL = 'false';
+app.is_mobile = '';
+app.months_json =
+    '["Janeiro","Fevereiro","Mar\u00e7o","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"]';
+
+app.browser = "";
+app.max_php_ini_upload_size_bytes = "104857600";
+app.locale = "pt";
+
+app.options = {
+    calendar_events_limit: "4",
+    calendar_first_day: "0",
+    tables_pagination_limit: "25",
+    enable_google_picker: "1",
+    google_client_id: "",
+    google_api: "",
+    default_view_calendar: "dayGridMonth",
+    timezone: "Europe/Berlin",
+    allowed_files: ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt",
+    date_format: "Y-m-d",
+    time_format: "24",
+};
+
+app.lang = {
+    file_exceeds_maxfile_size_in_form: "O arquivo enviado excede a diretiva MAX_FILE_SIZE que foi especificada no formulário HTML" +
+        ' (100 MB)',
+    file_exceeds_max_filesize: "O arquivo enviado excede a diretiva upload_max_filesize em php.ini" +
+        ' (100 MB)',
+    validation_extension_not_allowed: "extensão de arquivo não permitida",
+    sign_document_validation: "Por favor, assine o documento.",
+    dt_length_menu_all: "Todos",
+    drop_files_here_to_upload: "Solte os ficheiros aqui para carregar",
+    browser_not_support_drag_and_drop: "Seu navegador não suporta carregar os ficheiros por arrastar'e'soltar",
+    confirm_action_prompt: "Tem certeza de que deseja executar esta ação?",
+    datatables: {"emptyTable":"Nenhum entradas o encontrado","info":"Mostrar _START_ a _END_ de _TOTAL_ entradas","infoEmpty":"Mostrar 0a a 0 de 0 entradas","infoFiltered":"(filtradoa do _MAX_ total entradas)","lengthMenu":"_MENU_","loadingRecords":"A carregar...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Procurar:","zeroRecords":"Nenhum registo compat\u00edvel encontrado","paginate":{"first":"Primeiro","last":"\u00daltimo","next":"Pr\u00f3ximo","previous":"Anterior"},"aria":{"sortAscending":"ativar a classifica\u00e7\u00e3o ascendente da coluna","sortDescending":"ativar a classifica\u00e7\u00e3o descendente da coluna"}},
+    discussions_lang: {"discussion_add_comment":"Adicionar coment\u00e1rio","discussion_newest":"Mais novos","discussion_oldest":"Mais antigos","discussion_attachments":"Anexos","discussion_send":"Enviar","discussion_reply":"Responder","discussion_edit":"Editar","discussion_edited":"Modificado","discussion_you":"Voc\u00ea","discussion_save":"Guardar","discussion_delete":"Apagar","discussion_view_all_replies":"Mostrar todos as respostas","discussion_hide_replies":"Esconder Respostas","discussion_no_comments":"Nenhum coment\u00e1rio","discussion_no_attachments":"Nenhum anexo","discussion_attachments_drop":"Arraste e solte para carregar os ficheiros"},
+};
+window.addEventListener('load', function() {
+    custom_fields_hyperlink();
+});
+</script>
+<script>
+/**
+ * @deprecated 2.3.2
+ * Do not use any of these below as will be removed in future updates.
+ */
+var isRTL = 'false';
+
+var calendar_events_limit = "4";
+var maximum_allowed_ticket_attachments = "4";
+
+var max_php_ini_upload_size_bytes = "104857600";
+
+var file_exceeds_maxfile_size_in_form = "O arquivo enviado excede a diretiva MAX_FILE_SIZE que foi especificada no formulário HTML" +
+    ' (100 MB)';
+var file_exceeds_max_filesize = "O arquivo enviado excede a diretiva upload_max_filesize em php.ini" +
+    ' (100 MB)';
+
+var validation_extension_not_allowed = "extensão de arquivo não permitida";
+var sign_document_validation = "Por favor, assine o documento.";
+var dt_length_menu_all = "Todos";
+
+var drop_files_here_to_upload = "Solte os ficheiros aqui para carregar";
+var browser_not_support_drag_and_drop = "Seu navegador não suporta carregar os ficheiros por arrastar'e'soltar";
+var remove_file = "Remover arquivo";
+var tables_pagination_limit = "25";
+var enable_google_picker = "1";
+var google_client_id = "";
+var google_api = "";
+var acceptable_mimes = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt, image/png, image/jpeg, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/x-zip, application/x-rar, text/plain";
+var date_format = "Y-m-d";
+var time_format = "24";
+var default_view_calendar = "dayGridMonth";
+var dt_lang = {"emptyTable":"Nenhum entradas o encontrado","info":"Mostrar _START_ a _END_ de _TOTAL_ entradas","infoEmpty":"Mostrar 0a a 0 de 0 entradas","infoFiltered":"(filtradoa do _MAX_ total entradas)","lengthMenu":"_MENU_","loadingRecords":"A carregar...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Procurar:","zeroRecords":"Nenhum registo compat\u00edvel encontrado","paginate":{"first":"Primeiro","last":"\u00daltimo","next":"Pr\u00f3ximo","previous":"Anterior"},"aria":{"sortAscending":"ativar a classifica\u00e7\u00e3o ascendente da coluna","sortDescending":"ativar a classifica\u00e7\u00e3o descendente da coluna"}};
+var discussions_lang = {"discussion_add_comment":"Adicionar coment\u00e1rio","discussion_newest":"Mais novos","discussion_oldest":"Mais antigos","discussion_attachments":"Anexos","discussion_send":"Enviar","discussion_reply":"Responder","discussion_edit":"Editar","discussion_edited":"Modificado","discussion_you":"Voc\u00ea","discussion_save":"Guardar","discussion_delete":"Apagar","discussion_view_all_replies":"Mostrar todos as respostas","discussion_hide_replies":"Esconder Respostas","discussion_no_comments":"Nenhum coment\u00e1rio","discussion_no_attachments":"Nenhum anexo","discussion_attachments_drop":"Arraste e solte para carregar os ficheiros"};
+var confirm_action_prompt = "Tem certeza de que deseja executar esta ação?";
+var cf_translate_input_link_tip = "Clique aqui para adicionar o link";
+
+var locale = 'pt';
+var timezone = "Europe/Berlin";
+var allowed_files = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt";
+var calendar_first_day = '0';
+var months_json =
+    '["Janeiro","Fevereiro","Mar\u00e7o","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"]';
+</script>
+<meta name="robots" content="noindex">
+</head>
+
+<body
+	class="customers  viewinvoice"
+	>
+
+	<div id="wrapper">
+    <div id="content">
+        <div class="container">
+            <div class="row">
+                            </div>
+        </div>
+                <div class="container">
+                        <div class="row">
+                                
+<div class="mtop15 preview-top-wrapper">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="mbot30">
+                <div class="invoice-html-logo">
+                    <a href="../../index.html" class="logo img-responsive">
+        <img src="../../uploads/company/1f03e41865e3e0d535f6202e5fba391a.png" class="img-responsive" alt="Perfex CRM">
+        </a>                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="top" data-sticky data-sticky-class="preview-sticky-header">
+        <div class="container preview-sticky-container">
+            <div class="sm:tw-flex tw-justify-between -tw-mx-4">
+                <div class="sm:tw-self-end">
+                    <h3 class="bold tw-my-0 invoice-html-number">
+                        <span class="sticky-visible hide tw-mb-2">
+                            INV-000001                        </span>
+                    </h3>
+                    <span class="invoice-html-status">
+                        <span class="label label-danger  s-status invoice-status-1">Não pago</span>                    </span>
+                </div>
+                <div class="tw-flex tw-items-end tw-space-x-2 tw-mt-3 sm:tw-mt-0">
+                                        <form action="1a335c502fef81f57c4eea8cb1249a77.html" method="post" accept-charset="utf-8">
+                                        <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+                    <button type="submit" name="invoicepdf" value="invoicepdf" class="btn btn-default action-button">
+                        <i class='fa-regular fa-file-pdf'></i>
+                        Descarregar                    </button>
+                    </form>
+                    <a href="#" class="btn btn-success action-button invoice-html-pay-now-top hide sticky-hidden
+                   pay-now-top">
+                        Pagar agora                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="clearfix"></div>
+
+<div class="panel_s tw-mt-6">
+    <div class="panel-body">
+                <div class="col-md-10 col-md-offset-1">
+            <div class="row mtop20">
+                <div class="col-md-6 col-sm-6 transaction-html-info-col-left">
+                    <h4 class="tw-font-semibold tw-text-neutral-700 invoice-html-number">
+                        INV-000001                    </h4>
+                    <address class="invoice-html-company-info tw-text-neutral-500 tw-text-normal">
+                        <b style="color:black" class="company-name-formatted">Perfex INC</b><br /> 172 Ivy Club Gottliebfurt<br /> New Heaven<br /> Canada [CA] 2364                    </address>
+                                    </div>
+                <div class="col-sm-6 text-right transaction-html-info-col-right">
+                    <span class="tw-font-medium tw-text-neutral-700 invoice-html-bill-to">
+                        Faturar a                    </span>
+                    <address class="invoice-html-customer-billing-info tw-text-neutral-500 tw-text-normal">
+                        <b>Terry-Swift</b><br /> 5017 Kendrick Alley Apt. 566<br /> South Llewellyn Massachusetts<br /> GB 51290                    </address>
+                    <!-- shipping details -->
+                                        <p class="invoice-html-date tw-mb-0 tw-text-normal">
+                        <span class="tw-font-medium tw-text-neutral-700">
+                            Data da Fatura:                        </span>
+                        2024-11-10                    </p>
+                                        <p class="invoice-html-duedate tw-mb-0 tw-text-normal">
+                        <span class="tw-font-medium tw-text-neutral-700">
+                            Data de Vencimento:                        </span>
+                        2024-12-10                    </p>
+                                                            <p class="invoice-html-sale-agent tw-mb-0 tw-text-normal">
+                        <span
+                            class="tw-font-medium tw-text-neutral-700">Vendedor:</span>
+                        Leonel Casper                    </p>
+                                                                                                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table items items-preview invoice-items-preview" data-type="invoice"><thead><tr><th align="center">#</th><th class="description" width="38%" align="left">Item</th><th align="right">Qtd</th><th align="right">Valor</th><th align="right">Imposto</th><th align="right">Valor</th></tr></thead><tbody><tr><td align="center" width="5%">1</td><td class="description" align="left;" width="33%"><span style="font-size:px;"><strong>Web Design</strong></span><br /><span style="color:#424242;">Dormouse is asleep again,' said the cook. The King laid his hand upon her arm, and timidly said.</span></td><td align="right" width="9%">1</td><td align="right" width="9%">1,200.00</td><td align="right" width="9%">0%</td><td class="amount" align="right" width="9%">1,200.00</td></tr><tr><td align="center" width="5%">2</td><td class="description" align="left;" width="33%"><span style="font-size:px;"><strong>LCD TV</strong></span><br /><span style="color:#424242;">Alice ventured to remark. 'Tut, tut, child!' said the Hatter, 'you wouldn't talk about trouble!'.</span></td><td align="right" width="9%">2</td><td align="right" width="9%">250.00</td><td align="right" width="9%">TAX1 18.00%<br /></td><td class="amount" align="right" width="9%">500.00</td></tr></tbody></table>                    </div>
+                </div>
+                <div class="col-md-6 col-md-offset-6">
+                    <table class="table text-right tw-text-normal">
+                        <tbody>
+                            <tr id="subtotal">
+                                <td>
+                                    <span
+                                        class="bold tw-text-neutral-700">Subtotal</span>
+                                </td>
+                                <td class="subtotal">
+                                    $1,700.00                                </td>
+                            </tr>
+                                                        <tr class="tax-area"><td class="bold !tw-text-neutral-700">TAX1 (18.00%)</td><td>$90.00</td></tr>                                                        <tr>
+                                <td>
+                                    <span
+                                        class="bold tw-text-neutral-700">Total</span>
+                                </td>
+                                <td class="total">
+                                    $1,790.00                                </td>
+                            </tr>
+                                                                                                                <tr>
+                                <td>
+                                    <span
+                                        class="text-danger  bold">
+                                        Valor devido                                    </span>
+                                </td>
+                                <td>
+                                    <span
+                                        class="text-danger">
+                                        $1,790.00                                    </span>
+                                </td>
+                            </tr>
+                                                    </tbody>
+                    </table>
+                </div>
+                                                                                                <div class="col-md-12 invoice-html-terms-and-conditions">
+                    <hr />
+                    <p>
+                        <b>
+                            Termos e Condições                        </b>
+                    </p>
+                    <div class="tw-text-neutral-500 tw-mt-2.5">
+                        English, who wanted leaders, and had been to a day-school, too,&#039; said Alice; &#039;I must be shutting up like a thunderstorm. &#039;A fine day, your Majesty!&#039; the Duchess and the soldiers did. After these came the guests, mostly Kings and Queens, and among them Alice recognised the White Rabbit, who was.                    </div>
+                </div>
+                                <div class="col-md-12">
+                    <hr />
+                </div>
+                <div class="col-md-12 invoice-html-payments">
+                    <p>
+                        <b>Transações</b>
+                    </p>
+                                        <h5 class="tw-font-medium tw-mt-0 tw-text-neutral-500">
+                        Nenhum Pagamento encontrado para essa fatura                    </h5>
+                    <div class="clearfix"></div>
+                    <hr />
+                                    </div>
+                                <div class="col-md-12">
+                    <div class="row">
+                                                <div class="col-md-6 text-left">
+                            <p class="tw-mb-2.5 tw-font-medium">
+                                Pagamento Online                            </p>
+                            <form action="1a335c502fef81f57c4eea8cb1249a77.html" id="online_payment_form" novalidate="1" method="post" accept-charset="utf-8">
+<input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />                                                                                      
+                                                        <div class="radio radio-success online-payment-radio">
+                                <input type="radio"
+                                    value="stripe"
+                                    id="pm_stripe"
+                                    name="paymentmode">
+                                <label
+                                    for="pm_stripe">Stripe Checkout</label>
+                            </div>
+                                                        <div class="form-group mtop25">
+                                                                <label for="amount"
+                                    class="control-label">Valor</label>
+                                <div class="input-group">
+                                    <input type="number" required
+                                        max="1790.00"
+                                        data-total="1790.00"
+                                        name="amount" class="form-control"
+                                        value="1790.00">
+                                    <span class="input-group-addon">
+                                        $                                    </span>
+                                </div>
+                                                            </div>
+                            <div id="pay_button">
+                                <input id="pay_now" type="submit" name="make_payment" class="btn btn-success"
+                                    value="Pagar agora">
+                            </div>
+                            <input type="hidden" name="hash"
+                                value="1a335c502fef81f57c4eea8cb1249a77">
+                            </form>                        </div>
+                                                                        <div class="invoice-html-offline-payments col-md-6 text-right">
+                            <p class="tw-mb-2.5 tw-font-medium">
+                                Pagamento Offline                            </p>
+                                                        <p class="bold">
+                                Bank                            </p>
+                                                    </div>
+                                            </div>
+                </div>
+                            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function() {
+        new Sticky('[data-sticky]');
+        var $payNowTop = $('.pay-now-top');
+        if ($payNowTop.length && !$('#pay_now').isInViewport()) {
+            $payNowTop.removeClass('hide');
+            $('.pay-now-top').on('click', function(e) {
+                e.preventDefault();
+                $('html,body').animate({
+                        scrollTop: $("#online_payment_form").offset().top
+                    },
+                    'slow');
+            });
+        }
+
+        $('#online_payment_form').appFormValidator();
+
+        var online_payments = $('.online-payment-radio');
+        if (online_payments.length == 1) {
+            online_payments.find('input').prop('checked', true);
+        }
+    });
+</script>            </div>
+        </div>
+    </div>
+</div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <span
+                    class="copyright-footer">2024                    Copyright Perfex CRM                </span>
+                                            </div>
+        </div>
+    </div>
+</footer><script type="text/javascript" id="bootstrap-js" src="../../assets/plugins/bootstrap/js/bootstrap.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datatables-js" src="../../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-validation-js" src="../../assets/plugins/jquery-validation/jquery.validate.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-validation-lang-js" src="../../assets/plugins/jquery-validation/localization/messages_pt_PT.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="bootstrap-select-js" src="../../assets/builds/bootstrap-select.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="bootstrap-select-lang-js" src="../../assets/plugins/bootstrap-select/js/i18n/defaults-pt_PT.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datetimepicker-js" src="../../assets/plugins/datetimepicker/jquery.datetimepicker.full.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="chart-js" src="../../assets/plugins/Chart.js/Chart.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="colorpicker-js" src="../../assets/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="lightbox-js" src="../../assets/plugins/lightbox/js/lightbox.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="common-js" src="../../assets/builds/common%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="theme-global-js" src="../../assets/themes/perfex/js/global.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="sticky-js" src="../../assets/plugins/sticky/sticky%EF%B9%96v=3.2.0.js"></script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71585538-1', 'auto');
+  ga('send', 'pageview');
+
+</script></body>
+
+</html>

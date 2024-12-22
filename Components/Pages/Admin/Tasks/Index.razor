@@ -1,0 +1,14 @@
+@page "/admin/tasks"
+@inherits IndexRazor
+
+<HeaderCard>
+
+  @if (!string.IsNullOrEmpty(GetFragment()))
+  {
+    <List Type="@GetFragment()"></List>
+  }
+  else
+  {
+    <List Type="all"></List>
+  }
+</HeaderCard>

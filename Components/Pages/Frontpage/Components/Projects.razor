@@ -1,0 +1,30 @@
+<div class="mb-lg-n15 position-relative z-index-2">
+  <div class="container">
+    <div class="card" style="filter: drop-shadow(0px 0px 40px rgba(68, 81, 96, 0.08))">
+      <div class="card-body p-lg-20">
+        <div class="text-center mb-5 mb-lg-10">
+          <h3 class="fs-2hx text-dark mb-5" id="portfolio" data-kt-scroll-offset="{default: 100, lg: 250}">
+            Our Product
+          </h3>
+        </div>
+        <div class="d-flex flex-center mb-5 mb-lg-15">
+          <ul class="nav border-transparent flex-center fs-5 fw-bold">
+            @foreach (var (title, target) in new[] { ("Latest", "#kt_landing_projects_latest"), ("Web Design", "#kt_landing_projects_web_design"), ("Mobile Apps", "#kt_landing_projects_mobile_apps"), ("Development", "#kt_landing_projects_development") })
+            {
+              <li class="nav-item">
+                <a class="nav-link text-gray-500 text-active-primary px-3 px-lg-6 @(title == "Latest" ? "active" : "")"
+                   href="#" data-bs-toggle="tab" data-bs-target="@target">
+                  @title
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+        <div class="tab-content">
+          <TabContentLeft></TabContentLeft>
+          <TabContentRight></TabContentRight>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

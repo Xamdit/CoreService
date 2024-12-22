@@ -1,0 +1,47 @@
+@using Service.Components.Layout.Partials.HeaderLayout.Header.Menu
+@using Service.Components.Layout.Partials.HeaderLayout.Header
+<!--begin::Header-->
+<div id="kt_app_header" class="app-header" data-kt-sticky="true" data-kt-sticky-activate="{default: true, lg: true}" data-kt-sticky-name="app-header-minimize" data-kt-sticky-offset="{default: '200px', lg: '0'}" data-kt-sticky-animation="false">
+  <!--begin::Header container-->
+  <div class="app-container container-xxl d-flex align-items-stretch justify-content-between" id="kt_app_header_container">
+    <!--begin::Logo-->
+    <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0 me-lg-15">
+      <a href="?page=index">
+        @switch (header)
+        {
+          case "dark-header":
+            <img alt="Logo" src='@Theme.GetAssetPath("media/logos/default-dark.svg")' class="h-20px h-lg-30px"/>
+            break;
+          case "light-header":
+            <img alt="Logo" src='@Theme.GetAssetPath("media/logos/default.svg")' class="theme-light-show h-25px h-lg-30px"/>
+            <img alt="Logo" src='@Theme.GetAssetPath("media/logos/default-dark.svg")' class="theme-dark-show h-25px h-lg-30px"/>
+            break;
+        }
+      </a>
+    </div>
+    <!--end::Logo-->
+    <!--begin::Header wrapper-->
+    <div class="d-flex align-items-stretch justify-content-between flex-lg-grow-1" id="kt_app_header_wrapper">
+      <MyMenu></MyMenu>
+      <MyNavbar></MyNavbar>
+    </div>
+    <!--end::Header wrapper-->
+  </div>
+  <!--end::Header container-->
+</div>
+<!--end::Header-->
+
+@code {
+
+  public string header = string.Empty;
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender)
+    {
+      header = await js.InvokeAsync<string>("document.body.getAttribute", "data-kt-app-layout");
+      StateHasChanged();
+    }
+  }
+
+}

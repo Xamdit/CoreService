@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Web Design Proposal</title>
+	<link rel="shortcut icon" id="favicon" href="../../uploads/company/favicon.ico">
+<link rel="apple-touch-icon”" id="favicon-apple-touch-icon" href="../../uploads/company/favicon.ico">
+<link rel="stylesheet" type="text/css" id="bootstrap-css" href="../../assets/plugins/bootstrap/css/bootstrap.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="inter-font" href="../../assets/plugins/inter/inter%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="datatables-css" href="../../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-css" href="../../assets/plugins/font-awesome/css/fontawesome.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-brands" href="../../assets/plugins/font-awesome/css/brands.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-solid" href="../../assets/plugins/font-awesome/css/solid.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-regular" href="../../assets/plugins/font-awesome/css/regular.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="datetimepicker-css" href="../../assets/plugins/datetimepicker/jquery.datetimepicker.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="bootstrap-select-css" href="../../assets/plugins/bootstrap-select/css/bootstrap-select.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="lightbox-css" href="../../assets/plugins/lightbox/css/lightbox.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="colorpicker-css" href="../../assets/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="tailwind-css" href="../../assets/builds/tailwind%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="theme-css" href="../../assets/themes/perfex/css/style.min%EF%B9%96v=3.2.0.css">
+	<script
+		src="../../assets/plugins/jquery/jquery.min.js">
+	</script>
+	<script>
+if (typeof(jQuery) === 'undefined' && !window.deferAfterjQueryLoaded) {
+    window.deferAfterjQueryLoaded = [];
+    Object.defineProperty(window, "$", {
+        set: function(value) {
+            window.setTimeout(function() {
+                $.each(window.deferAfterjQueryLoaded, function(index, fn) {
+                    fn();
+                });
+            }, 0);
+            Object.defineProperty(window, "$", {
+                value: value
+            });
+        },
+        configurable: true
+    });
+}
+
+var csrfData = {"formatted":{"csrf_token_name":"bf0a8ef7a17e35f854421149e1dc6fe5"},"token_name":"csrf_token_name","hash":"bf0a8ef7a17e35f854421149e1dc6fe5"};
+
+if (typeof(jQuery) == 'undefined') {
+    window.deferAfterjQueryLoaded.push(function() {
+        csrf_jquery_ajax_setup();
+    });
+    window.addEventListener('load', function() {
+        csrf_jquery_ajax_setup();
+    }, true);
+} else {
+    csrf_jquery_ajax_setup();
+}
+
+function csrf_jquery_ajax_setup() {
+    $.ajaxSetup({
+        data: csrfData.formatted
+    });
+
+    $(document).ajaxError(function(event, request, settings) {
+        if (request.status === 419) {
+            alert_float('warning', 'Page expired, refresh the page make an action.')
+        }
+    });
+}
+</script>
+<script>
+function custom_fields_hyperlink() {
+    var cf_hyperlink = $('body').find('.cf-hyperlink');
+    if (cf_hyperlink.length) {
+        $.each(cf_hyperlink, function() {
+            var cfh_wrapper = $(this);
+            if (!cfh_wrapper.hasClass('cfh-initialized')) {
+                var cfh_field_to = cfh_wrapper.attr('data-fieldto');
+                var cfh_field_id = cfh_wrapper.attr('data-field-id');
+                var textEl = $('body').find('#custom_fields_' + cfh_field_to + '_' + cfh_field_id + '_popover');
+                var hiddenField = $("#custom_fields\\\[" + cfh_field_to + "\\\]\\\[" + cfh_field_id + "\\\]");
+                var cfh_value = cfh_wrapper.attr('data-value');
+                hiddenField.val(cfh_value);
+
+                if ($(hiddenField.val()).html() != '') {
+                    textEl.html($(hiddenField.val()).html());
+                }
+                var cfh_field_name = cfh_wrapper.attr('data-field-name');
+
+                textEl.popover({
+                    html: true,
+                    trigger: "manual",
+                    placement: "top",
+                    title: cfh_field_name,
+                    content: function() {
+                        return $(cfh_popover_templates[cfh_field_id]).html();
+                    }
+                }).on("click", function(e) {
+                    var $popup = $(this);
+                    $popup.popover("toggle");
+                    var titleField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id +
+                        "_title");
+                    var urlField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_link");
+                    var ttl = $(hiddenField.val()).html();
+                    var cfUrl = $(hiddenField.val()).attr("href");
+                    if (cfUrl) {
+                        $('#cf_hyperlink_open_' + cfh_field_id).attr('href', (cfUrl.indexOf('://') === -
+                            1 ? 'http://' + cfUrl : cfUrl));
+                    }
+                    titleField.val(ttl);
+                    urlField.val(cfUrl);
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-save").click(
+                        function() {
+                            hiddenField.val((urlField.val() != '' ? '<a href="' + urlField.val() +
+                                '" target="_blank">' + (titleField.val() != "" ? titleField
+                                    .val() : urlField.val()) + '</a>' : ''));
+                            textEl.html(titleField.val() !== "" ? titleField.val() : (urlField
+                                .val() != '' ? urlField.val() :
+                                "Clique aqui para adicionar o link"));
+                            $popup.popover("toggle");
+                        });
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-cancel").click(
+                        function() {
+                            if (urlField.val() == '') {
+                                hiddenField.val('');
+                            }
+                            $popup.popover("toggle");
+                        });
+                });
+                cfh_wrapper.addClass('cfh-initialized')
+            }
+        });
+    }
+}
+</script>
+<script src='https://www.google.com/recaptcha/api.js'></script><script>
+
+var site_url = 'https://perfexcrm.com/demo/',
+    app = {},
+    cfh_popover_templates = {};
+
+app.isRTL = 'false';
+app.is_mobile = '';
+app.months_json =
+    '["Janeiro","Fevereiro","Mar\u00e7o","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"]';
+
+app.browser = "";
+app.max_php_ini_upload_size_bytes = "104857600";
+app.locale = "pt";
+
+app.options = {
+    calendar_events_limit: "4",
+    calendar_first_day: "0",
+    tables_pagination_limit: "25",
+    enable_google_picker: "1",
+    google_client_id: "",
+    google_api: "",
+    default_view_calendar: "dayGridMonth",
+    timezone: "Europe/Berlin",
+    allowed_files: ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt",
+    date_format: "Y-m-d",
+    time_format: "24",
+};
+
+app.lang = {
+    file_exceeds_maxfile_size_in_form: "O arquivo enviado excede a diretiva MAX_FILE_SIZE que foi especificada no formulário HTML" +
+        ' (100 MB)',
+    file_exceeds_max_filesize: "O arquivo enviado excede a diretiva upload_max_filesize em php.ini" +
+        ' (100 MB)',
+    validation_extension_not_allowed: "extensão de arquivo não permitida",
+    sign_document_validation: "Por favor, assine o documento.",
+    dt_length_menu_all: "Todos",
+    drop_files_here_to_upload: "Solte os ficheiros aqui para carregar",
+    browser_not_support_drag_and_drop: "Seu navegador não suporta carregar os ficheiros por arrastar'e'soltar",
+    confirm_action_prompt: "Tem certeza de que deseja executar esta ação?",
+    datatables: {"emptyTable":"Nenhum entradas o encontrado","info":"Mostrar _START_ a _END_ de _TOTAL_ entradas","infoEmpty":"Mostrar 0a a 0 de 0 entradas","infoFiltered":"(filtradoa do _MAX_ total entradas)","lengthMenu":"_MENU_","loadingRecords":"A carregar...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Procurar:","zeroRecords":"Nenhum registo compat\u00edvel encontrado","paginate":{"first":"Primeiro","last":"\u00daltimo","next":"Pr\u00f3ximo","previous":"Anterior"},"aria":{"sortAscending":"ativar a classifica\u00e7\u00e3o ascendente da coluna","sortDescending":"ativar a classifica\u00e7\u00e3o descendente da coluna"}},
+    discussions_lang: {"discussion_add_comment":"Adicionar coment\u00e1rio","discussion_newest":"Mais novos","discussion_oldest":"Mais antigos","discussion_attachments":"Anexos","discussion_send":"Enviar","discussion_reply":"Responder","discussion_edit":"Editar","discussion_edited":"Modificado","discussion_you":"Voc\u00ea","discussion_save":"Guardar","discussion_delete":"Apagar","discussion_view_all_replies":"Mostrar todos as respostas","discussion_hide_replies":"Esconder Respostas","discussion_no_comments":"Nenhum coment\u00e1rio","discussion_no_attachments":"Nenhum anexo","discussion_attachments_drop":"Arraste e solte para carregar os ficheiros"},
+};
+window.addEventListener('load', function() {
+    custom_fields_hyperlink();
+});
+</script>
+<script>
+/**
+ * @deprecated 2.3.2
+ * Do not use any of these below as will be removed in future updates.
+ */
+var isRTL = 'false';
+
+var calendar_events_limit = "4";
+var maximum_allowed_ticket_attachments = "4";
+
+var max_php_ini_upload_size_bytes = "104857600";
+
+var file_exceeds_maxfile_size_in_form = "O arquivo enviado excede a diretiva MAX_FILE_SIZE que foi especificada no formulário HTML" +
+    ' (100 MB)';
+var file_exceeds_max_filesize = "O arquivo enviado excede a diretiva upload_max_filesize em php.ini" +
+    ' (100 MB)';
+
+var validation_extension_not_allowed = "extensão de arquivo não permitida";
+var sign_document_validation = "Por favor, assine o documento.";
+var dt_length_menu_all = "Todos";
+
+var drop_files_here_to_upload = "Solte os ficheiros aqui para carregar";
+var browser_not_support_drag_and_drop = "Seu navegador não suporta carregar os ficheiros por arrastar'e'soltar";
+var remove_file = "Remover arquivo";
+var tables_pagination_limit = "25";
+var enable_google_picker = "1";
+var google_client_id = "";
+var google_api = "";
+var acceptable_mimes = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt, image/png, image/jpeg, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/x-zip, application/x-rar, text/plain";
+var date_format = "Y-m-d";
+var time_format = "24";
+var default_view_calendar = "dayGridMonth";
+var dt_lang = {"emptyTable":"Nenhum entradas o encontrado","info":"Mostrar _START_ a _END_ de _TOTAL_ entradas","infoEmpty":"Mostrar 0a a 0 de 0 entradas","infoFiltered":"(filtradoa do _MAX_ total entradas)","lengthMenu":"_MENU_","loadingRecords":"A carregar...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Procurar:","zeroRecords":"Nenhum registo compat\u00edvel encontrado","paginate":{"first":"Primeiro","last":"\u00daltimo","next":"Pr\u00f3ximo","previous":"Anterior"},"aria":{"sortAscending":"ativar a classifica\u00e7\u00e3o ascendente da coluna","sortDescending":"ativar a classifica\u00e7\u00e3o descendente da coluna"}};
+var discussions_lang = {"discussion_add_comment":"Adicionar coment\u00e1rio","discussion_newest":"Mais novos","discussion_oldest":"Mais antigos","discussion_attachments":"Anexos","discussion_send":"Enviar","discussion_reply":"Responder","discussion_edit":"Editar","discussion_edited":"Modificado","discussion_you":"Voc\u00ea","discussion_save":"Guardar","discussion_delete":"Apagar","discussion_view_all_replies":"Mostrar todos as respostas","discussion_hide_replies":"Esconder Respostas","discussion_no_comments":"Nenhum coment\u00e1rio","discussion_no_attachments":"Nenhum anexo","discussion_attachments_drop":"Arraste e solte para carregar os ficheiros"};
+var confirm_action_prompt = "Tem certeza de que deseja executar esta ação?";
+var cf_translate_input_link_tip = "Clique aqui para adicionar o link";
+
+var locale = 'pt';
+var timezone = "Europe/Berlin";
+var allowed_files = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt";
+var calendar_first_day = '0';
+var months_json =
+    '["Janeiro","Fevereiro","Mar\u00e7o","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"]';
+</script>
+<meta name="robots" content="noindex">
+</head>
+
+<body
+	class="customers  proposal proposal-view identity-confirmation"
+	>
+
+	<div id="wrapper">
+    <div id="content">
+        <div class="container">
+            <div class="row">
+                            </div>
+        </div>
+                <div class="container">
+                        <div class="row">
+                                <div id="proposal-wrapper">
+        <div class="mtop15 preview-top-wrapper">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="mbot30">
+                    <div class="proposal-html-logo">
+                        <a href="../../index.html" class="logo img-responsive">
+        <img src="../../uploads/company/1f03e41865e3e0d535f6202e5fba391a.png" class="img-responsive" alt="Perfex CRM">
+        </a>                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="top" data-sticky data-sticky-class="preview-sticky-header">
+            <div class="container preview-sticky-container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="pull-left">
+                            <h4 class="tw-font-semibold tw-my-0 proposal-html-number">#
+                                PRO-000002<br />
+                                <small
+                                    class="proposal-html-subject">Web Design Proposal</small>
+                            </h4>
+                        </div>
+                        <div class="visible-xs">
+                            <div class="clearfix"></div>
+                        </div>
+                                                                        <button type="button" id="accept_action"
+                            class="btn btn-success pull-right action-button mleft5">
+                            <i class="fa fa-check"></i>
+                            Aceitar                        </button>
+                                                <form action="27cf70e281f7bca614cd907809cac988.html" method="post" accept-charset="utf-8">
+                                 <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+                        <button type="submit"
+                            data-loading-text="Por favor, aguarde ..."
+                            autocomplete="off" class="btn btn-default pull-right action-button mleft5"><i
+                                class="fa fa-remove"></i>
+                            Declinar</button>
+                        
+<input type="hidden" name="action" value="decline_proposal" />
+                        </form>                                                <!-- end expired proposal -->
+                                                <form action="27cf70e281f7bca614cd907809cac988.html" method="post" accept-charset="utf-8">
+                            <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+                        <button type="submit" class="btn btn-default pull-right action-button mleft5"><i
+                                class="fa-regular fa-file-pdf"></i>
+                            Descarregar</button>
+                        
+<input type="hidden" name="action" value="proposal_pdf" />
+                        </form>                                                <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 proposal-left">
+            <div class="panel_s mtop20">
+                <div class="panel-body proposal-content tc-content">
+                    <p><table class="table items items-preview no-margin proposal-items-preview" data-type="proposal"><thead><tr><th align="center">#</th><th class="description" width="38%" align="left">Item</th><th align="right">Qtd</th><th align="right">Valor</th><th align="right">Imposto</th><th align="right">Valor</th></tr></thead><tbody><tr><td align="center" width="5%">1</td><td class="description" align="left;" width="33%"><span style="font-size:px;"><strong>Web Design</strong></span><br /><span style="color:#424242;">Enim amet quas ducimus commodi reprehenderit et. Et non numquam aut optio. </span></td><td align="right" width="9%">1</td><td align="right" width="9%">5,400.00</td><td align="right" width="9%">0%</td><td class="amount" align="right" width="9%">5,400.00</td></tr><tr><td align="center" width="5%">2</td><td class="description" align="left;" width="33%"><span style="font-size:px;"><strong>Consultant Services</strong></span><br /><span style="color:#424242;">Dolor laboriosam suscipit eius consequatur. Aliquid unde sit dolorem velit magnam quos et. </span></td><td align="right" width="9%">1</td><td align="right" width="9%">500.00</td><td align="right" width="9%">0%</td><td class="amount" align="right" width="9%">500.00</td></tr></tbody></table>    <div class="row mtop15">
+        <div class="col-md-6 col-md-offset-6">
+            <table class="table text-right">
+                <tbody>
+                    <tr id="subtotal">
+                        <td>
+                            <span class="bold tw-text-neutral-700">
+                                Subtotal                            </span>
+                        </td>
+                        <td class="subtotal">
+                            $5,900.00                        </td>
+                    </tr>
+                                                                                <tr>
+                        <td>
+                            <span class="bold tw-text-neutral-700">
+                                Total                            </span>
+                        </td>
+                        <td class="total">
+                            $5,900.00                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </p>
+<h2><strong>Company info</strong></h2>
+<p>Caterpillar, just as well. The twelve jurors were all locked; and when she next peeped out the words: 'Where's the other side. The further off from England the nearer is to find my way into a tree. By the use of a well--' 'What did they draw?' said Alice, in a sorrowful tone, 'I'm afraid I've offended it again!' For the Mouse with a<strong>n M?' said Alice. 'Oh, don't bother ME,' said the Mock Turtle is.' 'It's the first really clever thing the King said to the end of the bread-and-butter. Just at this corner--No, tie 'em together first--the</strong>y don't reach half high enough yet--Oh! they'll do next! As for pulling me out of the evening, beautiful Soup! 'Beautiful Soup! Who cares for fish, Game, or any other dish? Who would not join the dance? Will you, won't you, will you join the dance? Will you, won't you, will.</p>
+<h2><strong>What we do</strong></h2>
+<p>And then a voice sometimes choked with sobs, to sing you a song?' 'Oh, a song, please, if the Mock Turtle. 'And how many miles I've fallen by this time?' she said to the fifth bend, I think?' 'I had NOT!' cried the Mock Turtle went on, 'What HAVE you been doing here?' 'May it please your Majesty,' said the Caterpillar. 'I'm afraid I am, sir,' said Alice; 'but when you come to an end! 'I wonder what I get" is the use of this was his first speech. 'You should learn not to her, And mentioned me to him: <strong>She gave me a good opportunity for croqueting one o</strong>f the sort!' said Alice. 'Why, SHE,' said the Cat. 'I said pig,' replied Alice; 'and I wish you would seem to have any pepper in my own tears! That WILL be a lesson to you never tasted an egg!' 'I HAVE tasted eggs, certainly,' said Alice, whose thoughts were still running on the same words as before, 'and things are "much of a treacle-well--eh, stupid?' 'But they were.</p>
+<p><img src="../../media/demo-infographic.jpg" width="851" height="315" /></p>
+<h2 class="text-success"><strong>Services offered</strong></h2>
+<table class="proposal-items table">
+<thead>
+<tr>
+<th width="15%">Item</th>
+<th width="39%">Description</th>
+<th width="6%">Qty</th>
+<th width="10%">Rate</th>
+<th width="15%">Tax</th>
+<th width="15%">Amount</th>
+</tr>
+</thead>
+<tbody>
+<tr class="item">
+<td width="15%">Web Design</td>
+<td width="40%">Voluptatem adipisci nostrum maxime qui. Voluptas et necessitatibus sit sit. Et esse dicta suscipit distinctio nemo quae quia magnam.</td>
+<td width="5%">1</td>
+<td width="10%">1,200.00</td>
+<td width="15%" data-taxid="0">0%</td>
+<td width="15%">1,200.00</td>
+</tr>
+<tr class="item">
+<td width="15%">SEO Optimization</td>
+<td width="40%">Voluptatem nemo vitae enim nulla ut voluptatibus cumque. Dolorem commodi perferendis soluta. Eius labore enim nesciunt commodi in id.</td>
+<td width="5%">1</td>
+<td width="10%">500.00</td>
+<td width="15%" data-taxid="1">18.00%</td>
+<td width="15%">500.00</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Hatter, who turned pale and fidgeted. 'Give your evidence,' said the Queen, and Alice, were in custody and under sentence of execution.' 'What for?' said Alice. 'Come on, then!' roared the Queen, 'Really, my dear, I think?'</strong></p>
+<h2><strong>Other Services</strong></h2>
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Custom Service 1</th>
+<th>Voluptatem adipisci nostrum maxime qui. Voluptas et necessitatibus sit sit.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Custom Service 2</td>
+<td>Voluptatem adipisci nostrum maxime qui. Voluptas et necessitatibus sit sit.</td>
+</tr>
+</tbody>
+</table>
+<h2><strong>Billing and Payment</strong></h2>
+<p>Hatter, who turned pale and fidgeted. 'Give your evidence,' said the Queen, and Alice, were in custody and under sentence of execution.' 'What for?' said Alice. 'Come on, then!' roared the Queen, 'Really, my dear, I think?' 'I had NOT!' cried the Gryphon. 'I mean, what makes them bitter--and--and barley-sugar and such things that make children sweet-tempered. I only wish it was,' the March Hare said--' 'I didn't!' the March Hare moved into the wood to listen. 'Mary Ann! Mary Ann!' said the Queen.</p>
+<p>'It proves nothing of the words came very queer to ME.' 'You!' said the King, the Queen, stamping on the same as they came nearer, Alice could hear the very middle of her sharp little chin into Alice's head. 'Is that the reason so many lessons to learn! No, I've made up my mind about it; if I'm Mabel, I'll stay down here with me! There are no mice in the night? Let me see: four times seven is--oh dear! I wish I could not help bursting out laughing: and when she had known them all her life. Indeed, she had found her way through the door, she found to be rude, so she went on, 'you see, a dog growls when it's pleased. Now I growl when I'm.</p>
+<p class="text-danger">* Voluptatem adipisci nostrum maxime qui. Voluptas et necessitatibus sit sit. Et esse dicta suscipit distinctio nemo quae quia magnam.</p>
+<h2><strong>Conclussion</strong></h2>
+<p>Mouse, sharply and very soon came to the Gryphon. 'Turn a somersault in the kitchen that did not wish to offend the Dormouse denied nothing, being fast asleep. 'After that,' continued the Pigeon, raising its voice to a mouse: she had accidentally upset the milk-jug into his plate. Alice did not like to hear his history. <strong>I must go back and see how he did not much larger than a real nose; also its eyes were looking over his shoulder as he said to itself 'Then I'll go round a deal too flustered to tell me your history, you</strong> know,' Alice gently remarked; 'they'd have been that,' said the Queen.</p>
+<p>An invitation for the next witness.' And he got up and down, and felt quite unhappy at the flowers and the poor little juror (it was exactly one a-piece all round. (It was this last remark. 'Of course they were', said the Hatter, and he says it's so useful, it's worth a hundred pounds! He says it kills all the while, and fighting for the rest waited in silence. At last the Mock Turtle. 'She.</p>                </div>
+            </div>
+        </div>
+        <div class="col-md-4 proposal-right">
+            <div class="inner mtop20 proposal-html-tabs">
+                <ul class="nav nav-tabs nav-tabs-flat mbot15" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#summary" aria-controls="summary" role="tab" data-toggle="tab"
+                            class="tw-flex tw-justify-center tw-space-x-1">
+                            <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                            <span>Resumo</span>
+                        </a>
+                    </li>
+                                        <li role="presentation" class="">
+                        <a href="#discussion" aria-controls="discussion" role="tab" data-toggle="tab"
+                            class="tw-flex tw-justify-center tw-space-x-1">
+                            <i class="fa-regular fa-comment" aria-hidden="true"></i>
+                            <span>Discussão</span>
+                        </a>
+                    </li>
+                                    </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="summary">
+                        <address class="proposal-html-company-info tw-text-neutral-500 tw-text-normal">
+                            <b style="color:black" class="company-name-formatted">Perfex INC</b><br /> 172 Ivy Club Gottliebfurt<br /> New Heaven<br /> Canada [CA] 2364                        </address>
+                        <hr />
+                        <p class="bold proposal-html-information tw-text-neutral-700">
+                            Informações sobre a proposta                        </p>
+                        <address class="tw-mb-0 proposal-html-info tw-text-neutral-500 tw-text-normal">
+                            <b>Schaden-Watsica</b><br /> 46756 Hermiston Square Apt. 314<br /> New Ezequielville Wisconsin<br /> US 26250<br /> <a href="tel:207-858-2043 x6555">207-858-2043 x6555</a><br /> <a href="mailto:pullrich@example.net">pullrich@example.net</a>                        </address>
+                        <div class="row mtop20">
+                                                        <div class="tw-text-normal col-md-12 proposal-html-total">
+                                <h4 class="bold tw-mb-3">
+                                    Total $5,900.00                                </h4>
+                            </div>
+                                                        <div class="tw-text-normal col-md-4 text-muted proposal-status">
+                                Estado                            </div>
+                            <div class="tw-text-normal col-md-8 proposal-status tw-text-neutral-700">
+                                Enviada                            </div>
+                            <div class="tw-text-normal col-md-4 text-muted proposal-date">
+                                Data                            </div>
+                            <div class="tw-text-normal col-md-8 proposal-date tw-text-neutral-700">
+                                2024-11-10                            </div>
+                                                        <div class="tw-text-normal col-md-4 text-muted proposal-open-till">
+                                Válida até                            </div>
+                            <div class="tw-text-normal col-md-8 proposal-open-till tw-text-neutral-700">
+                                2024-11-17                            </div>
+                                                                                </div>
+                                            </div>
+                                        <div role="tabpanel" class="tab-pane" id="discussion">
+                        <form action="27cf70e281f7bca614cd907809cac988.html" method="post" accept-charset="utf-8">
+<input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />                                                                                      
+                        <div class="proposal-comment">
+                            <textarea name="content" rows="4" class="form-control"></textarea>
+                            <button type="submit" class="btn btn-primary mtop10 pull-right"
+                                data-loading-text="Por favor, aguarde ...">Adicionar comentário</button>
+                            
+<input type="hidden" name="action" value="proposal_comment" />
+                        </div>
+                        </form>                        <div class="clearfix"></div>
+                                            </div>
+                                    </div>
+
+                                <div style="margin-top:80px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="identityConfirmationModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form action="27cf70e281f7bca614cd907809cac988.html" id="identityConfirmationForm" class="form-horizontal" method="post" accept-charset="utf-8">
+<input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />                                                                                             
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">
+          Assinatura &amp;
+          Confirmação de identidade        </h4>
+      </div>
+      <div class="modal-body">
+                
+<input type="hidden" name="action" value="accept_proposal" />
+        <div id="identity_fields">
+          <div class="form-group">
+            <label for="acceptance_firstname" class="control-label col-sm-2">
+              <span class="text-left inline-block full-width">
+                Nome              </span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="acceptance_firstname" id="acceptance_firstname" class="form-control"
+                required="true"
+                value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="acceptance_lastname" class="control-label col-sm-2">
+              <span class="text-left inline-block full-width">
+                Sobrenome              </span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="acceptance_lastname" id="acceptance_lastname" class="form-control"
+                required="true"
+                value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="acceptance_email" class="control-label col-sm-2">
+              <span class="text-left inline-block full-width">
+                E-mail              </span>
+            </label>
+            <div class="col-sm-10">
+              <input type="email" name="acceptance_email" id="acceptance_email" class="form-control" required="true"
+                value="">
+            </div>
+          </div>
+          <p class="bold" id="signatureLabel">
+            Assinatura          </p>
+          <div class="signature-pad--body">
+            <canvas id="signature" height="130" width="550"></canvas>
+          </div>
+          <input type="text" style="width:1px; height:1px; border:0px;" tabindex="-1" name="signature"
+            id="signatureInput">
+          <div class="dispay-block">
+            <button type="button" class="btn btn-default btn-xs clear" tabindex="-1"
+              data-action="clear">Limpar</button>
+            <button type="button" class="btn btn-default btn-xs" tabindex="-1"
+              data-action="undo">Anular</button>
+          </div>
+        </div>
+              </div>
+      <div class="modal-footer">
+        <p class="text-left text-muted e-sign-legal-text">
+          By clicking on "Sign", I consent to be legally bound by this electronic representation of my signature.        </p>
+        <hr />
+        <button type="button" class="btn btn-default"
+          data-dismiss="modal">Cancelar</button>
+        <button type="submit"
+          data-loading-text="Por favor, aguarde ..."
+          autocomplete="off" data-form="#identityConfirmationForm"
+          class="btn btn-success">Assinar</button>
+      </div>
+      </form>    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<script>
+  $(function() {
+    SignaturePad.prototype.toDataURLAndRemoveBlanks = function() {
+      var canvas = this._ctx.canvas;
+      // First duplicate the canvas to not alter the original
+      var croppedCanvas = document.createElement('canvas'),
+        croppedCtx = croppedCanvas.getContext('2d');
+
+      croppedCanvas.width = canvas.width;
+      croppedCanvas.height = canvas.height;
+      croppedCtx.drawImage(canvas, 0, 0);
+
+      // Next do the actual cropping
+      var w = croppedCanvas.width,
+        h = croppedCanvas.height,
+        pix = {
+          x: [],
+          y: []
+        },
+        imageData = croppedCtx.getImageData(0, 0, croppedCanvas.width, croppedCanvas.height),
+        x, y, index;
+
+      for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+          index = (y * w + x) * 4;
+          if (imageData.data[index + 3] > 0) {
+            pix.x.push(x);
+            pix.y.push(y);
+
+          }
+        }
+      }
+      pix.x.sort(function(a, b) {
+        return a - b
+      });
+      pix.y.sort(function(a, b) {
+        return a - b
+      });
+      var n = pix.x.length - 1;
+
+      w = pix.x[n] - pix.x[0];
+      h = pix.y[n] - pix.y[0];
+      var cut = croppedCtx.getImageData(pix.x[0], pix.y[0], w, h);
+
+      croppedCanvas.width = w;
+      croppedCanvas.height = h;
+      croppedCtx.putImageData(cut, 0, 0);
+
+      return croppedCanvas.toDataURL();
+    };
+
+
+    function signaturePadChanged() {
+
+      var input = document.getElementById('signatureInput');
+      var $signatureLabel = $('#signatureLabel');
+      $signatureLabel.removeClass('text-danger');
+
+      if (signaturePad.isEmpty()) {
+        $signatureLabel.addClass('text-danger');
+        input.value = '';
+        return false;
+      }
+
+      $('#signatureInput-error').remove();
+      var partBase64 = signaturePad.toDataURLAndRemoveBlanks();
+      partBase64 = partBase64.split(',')[1];
+      input.value = partBase64;
+    }
+
+    var canvas = document.getElementById("signature");
+    var clearButton = wrapper.querySelector("[data-action=clear]");
+    var undoButton = wrapper.querySelector("[data-action=undo]");
+    var identityFormSubmit = document.getElementById('identityConfirmationForm');
+
+    var signaturePad = new SignaturePad(canvas, {
+      maxWidth: 2,
+      onEnd: function() {
+        signaturePadChanged();
+      }
+    });
+
+    clearButton.addEventListener("click", function(event) {
+      signaturePad.clear();
+      signaturePadChanged();
+    });
+
+    undoButton.addEventListener("click", function(event) {
+      var data = signaturePad.toData();
+      if (data) {
+        data.pop(); // remove the last dot or line
+        signaturePad.fromData(data);
+        signaturePadChanged();
+      }
+    });
+
+    $('#identityConfirmationForm').submit(function() {
+      signaturePadChanged();
+    });
+  });
+</script><script>
+    $(function() {
+        new Sticky('[data-sticky]');
+        $(".proposal-left table").wrap("<div class='table-responsive'></div>");
+        // Create lightbox for proposal content images
+        $('.proposal-content img').wrap(function() {
+            return '<a href="' + $(this).attr('src') + '" data-lightbox="proposal"></a>';
+        });
+    });
+</script>
+</div>            </div>
+        </div>
+    </div>
+</div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <span
+                    class="copyright-footer">2024                    Copyright Perfex CRM                </span>
+                                            </div>
+        </div>
+    </div>
+</footer><script type="text/javascript" id="bootstrap-js" src="../../assets/plugins/bootstrap/js/bootstrap.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datatables-js" src="../../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-validation-js" src="../../assets/plugins/jquery-validation/jquery.validate.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-validation-lang-js" src="../../assets/plugins/jquery-validation/localization/messages_pt_PT.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="bootstrap-select-js" src="../../assets/builds/bootstrap-select.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="bootstrap-select-lang-js" src="../../assets/plugins/bootstrap-select/js/i18n/defaults-pt_PT.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datetimepicker-js" src="../../assets/plugins/datetimepicker/jquery.datetimepicker.full.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="chart-js" src="../../assets/plugins/Chart.js/Chart.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="colorpicker-js" src="../../assets/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="lightbox-js" src="../../assets/plugins/lightbox/js/lightbox.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="common-js" src="../../assets/builds/common%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="theme-global-js" src="../../assets/themes/perfex/js/global.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="sticky-js" src="../../assets/plugins/sticky/sticky%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="signature-pad" src="../../assets/plugins/signature-pad/signature_pad.min%EF%B9%96v=3.2.0.js"></script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71585538-1', 'auto');
+  ga('send', 'pageview');
+
+</script></body>
+
+</html>

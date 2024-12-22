@@ -1,0 +1,295 @@
+﻿@namespace Service.Components.Pages.Admin.Clients.Components
+
+
+<!--begin::Card-->
+<div class="card">
+  <!--begin::Card body-->
+  <div class="card-body p-0">
+    <!--begin::Wrapper-->
+    <div class="card-px text-center py-20 my-10">
+      <!--begin::Title-->
+      <h2 class="fs-2x fw-bold mb-10">Welcome to Customers App</h2>
+      <!--end::Title-->
+      <!--begin::Description-->
+      <p class="text-gray-400 fs-4 fw-semibold mb-10">
+        There are no customers added yet.
+        <br>Kickstart your CRM by adding a your first customer
+      </p>
+      <!--end::Description-->
+      <!--begin::Action-->
+      <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_customer">
+        Add Customer
+      </a>
+      <!--end::Action-->
+    </div>
+    <!--end::Wrapper-->
+    <!--begin::Illustration-->
+    <div class="text-center px-4">
+      <img class="mw-100 mh-300px" alt="" src="assets/media/illustrations/sketchy-1/2.png">
+    </div>
+    <!--end::Illustration-->
+  </div>
+  <!--end::Card body-->
+</div>
+<!--end::Card-->
+<!--begin::Modals-->
+<!--begin::Modal - Customers - Add-->
+<div class="modal fade" id="kt_modal_add_customer" tabindex="-1" aria-hidden="true">
+<!--begin::Modal dialog-->
+<div class="modal-dialog modal-dialog-centered mw-650px">
+<!--begin::Modal content-->
+<div class="modal-content">
+<!--begin::Form-->
+<form class="form fv-plugins-bootstrap5 fv-plugins-framework" action="#" id="kt_modal_add_customer_form"
+      data-kt-redirect="../../demo1/dist/apps/customers/list.html">
+<!--begin::Modal header-->
+<div class="modal-header" id="kt_modal_add_customer_header">
+  <!--begin::Modal title-->
+  <h2 class="fw-bold">Add a Customer</h2>
+  <!--end::Modal title-->
+  <!--begin::Close-->
+  <div id="kt_modal_add_customer_close" class="btn btn-icon btn-sm btn-active-icon-primary">
+    <i class="ki-duotone ki-cross fs-1">
+      <span class="path1"></span>
+      <span class="path2"></span>
+    </i>
+  </div>
+  <!--end::Close-->
+</div>
+<!--end::Modal header-->
+<!--begin::Modal body-->
+<div class="modal-body py-10 px-lg-17">
+<!--begin::Scroll-->
+<div class="scroll-y me-n7 pe-7" id="kt_modal_add_customer_scroll" data-kt-scroll="true"
+     data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto"
+     data-kt-scroll-dependencies="#kt_modal_add_customer_header"
+     data-kt-scroll-wrappers="#kt_modal_add_customer_scroll" data-kt-scroll-offset="300px"
+     style="max-height: 663px;">
+<!--begin::Input group-->
+<div class="fv-row mb-7 fv-plugins-icon-container">
+  <!--begin::Label-->
+  <label class="required fs-6 fw-semibold mb-2">Name</label>
+  <!--end::Label-->
+  <!--begin::Input-->
+  <input type="text" class="form-control form-control-solid" placeholder="" name="name" value="Sean Bean">
+  <!--end::Input-->
+  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+  </div>
+</div>
+<!--end::Input group-->
+<!--begin::Input group-->
+<div class="fv-row mb-7 fv-plugins-icon-container">
+  <!--begin::Label-->
+  <label class="fs-6 fw-semibold mb-2">
+    <span class="required">Email</span>
+    <span class="ms-1" data-bs-toggle="tooltip" aria-label="Email address must be active"
+          data-bs-original-title="Email address must be active" data-kt-initialized="1">
+      <i class="ki-duotone ki-information fs-7">
+        <span class="path1"></span>
+        <span class="path2"></span>
+        <span class="path3"></span>
+      </i>
+    </span>
+  </label>
+  <!--end::Label-->
+  <!--begin::Input-->
+  <input type="email" class="form-control form-control-solid" placeholder="" name="email"
+         value="sean@dellito.com">
+  <!--end::Input-->
+  <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+  </div>
+</div>
+<!--end::Input group-->
+<!--begin::Input group-->
+<div class="fv-row mb-15">
+  <!--begin::Label-->
+  <label class="fs-6 fw-semibold mb-2">Description</label>
+  <!--end::Label-->
+  <!--begin::Input-->
+  <input type="text" class="form-control form-control-solid" placeholder="" name="description">
+  <!--end::Input-->
+</div>
+<!--end::Input group-->
+<!--begin::Billing toggle-->
+<div class="fw-bold fs-3 rotate collapsible mb-7" data-bs-toggle="collapse"
+     href="#kt_modal_add_customer_billing_info" role="button" aria-expanded="false"
+     aria-controls="kt_customer_view_details">
+  Shipping Information
+  <span class="ms-2 rotate-180">
+    <i class="ki-duotone ki-down fs-3"></i>
+  </span>
+</div>
+<!--end::Billing toggle-->
+<!--begin::Billing form-->
+<div id="kt_modal_add_customer_billing_info" class="collapse show">
+  <!--begin::Input group-->
+  <div class="d-flex flex-column mb-7 fv-row fv-plugins-icon-container">
+    <!--begin::Label-->
+    <label class="required fs-6 fw-semibold mb-2">Address Line 1</label>
+    <!--end::Label-->
+    <!--begin::Input-->
+    <input class="form-control form-control-solid" placeholder="" name="address1"
+           value="101, Collins Street">
+    <!--end::Input-->
+    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+    </div>
+  </div>
+  <!--end::Input group-->
+  <!--begin::Input group-->
+  <div class="d-flex flex-column mb-7 fv-row">
+    <!--begin::Label-->
+    <label class="fs-6 fw-semibold mb-2">Address Line 2</label>
+    <!--end::Label-->
+    <!--begin::Input-->
+    <input class="form-control form-control-solid" placeholder="" name="address2" value="">
+    <!--end::Input-->
+  </div>
+  <!--end::Input group-->
+  <!--begin::Input group-->
+  <div class="d-flex flex-column mb-7 fv-row fv-plugins-icon-container">
+    <!--begin::Label-->
+    <label class="required fs-6 fw-semibold mb-2">Town</label>
+    <!--end::Label-->
+    <!--begin::Input-->
+    <input class="form-control form-control-solid" placeholder="" name="city" value="Melbourne">
+    <!--end::Input-->
+    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+    </div>
+  </div>
+  <!--end::Input group-->
+  <!--begin::Input group-->
+  <div class="row g-9 mb-7">
+    <!--begin::Col-->
+    <div class="col-md-6 fv-row fv-plugins-icon-container">
+      <!--begin::Label-->
+      <label class="required fs-6 fw-semibold mb-2">State / Province</label>
+      <!--end::Label-->
+      <!--begin::Input-->
+      <input class="form-control form-control-solid" placeholder="" name="state" value="Victoria">
+      <!--end::Input-->
+      <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+      </div>
+    </div>
+    <!--end::Col-->
+    <!--begin::Col-->
+    <div class="col-md-6 fv-row fv-plugins-icon-container">
+      <!--begin::Label-->
+      <label class="required fs-6 fw-semibold mb-2">Post Code</label>
+      <!--end::Label-->
+      <!--begin::Input-->
+      <input class="form-control form-control-solid" placeholder="" name="postcode" value="3000">
+      <!--end::Input-->
+      <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+      </div>
+    </div>
+    <!--end::Col-->
+  </div>
+  <!--end::Input group-->
+  <!--begin::Input group-->
+  <div class="d-flex flex-column mb-7 fv-row fv-plugins-icon-container">
+    <!--begin::Label-->
+    <label class="fs-6 fw-semibold mb-2">
+      <span class="required">Country</span>
+      <span class="ms-1" data-bs-toggle="tooltip" aria-label="Country of origination"
+            data-bs-original-title="Country of origination" data-kt-initialized="1">
+        <i class="ki-duotone ki-information fs-7">
+          <span class="path1"></span>
+          <span class="path2"></span>
+          <span class="path3"></span>
+        </i>
+      </span>
+    </label>
+    <!--end::Label-->
+    <!--begin::Input-->
+    <select name="country" aria-label="Select a Country" data-control="select2"
+            data-placeholder="Select a Country..." data-dropdown-parent="#kt_modal_add_customer"
+            class="form-select form-select-solid fw-bold select2-hidden-accessible"
+            data-select2-id="select2-data-9-s41k" tabindex="-1" aria-hidden="true" data-kt-initialized="1">
+      <option value="">Select a Country...</option>
+      <option value="AF">Afghanistan</option>
+
+      <option value="ZM">Zambia</option>
+      <option value="ZW">Zimbabwe</option>
+    </select>
+    <span class="select2 select2-container select2-container--bootstrap5" dir="ltr"
+          data-select2-id="select2-data-10-03sd" style="width: 100%;">
+      <span class="selection">
+        <span class="select2-selection select2-selection--single form-select form-select-solid fw-bold"
+              role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-disabled="false"
+              aria-labelledby="select2-country-7c-container" aria-controls="select2-country-7c-container">
+          <span class="select2-selection__rendered" id="select2-country-7c-container" role="textbox"
+                aria-readonly="true" title="United States">
+            United States
+          </span>
+          <span class="select2-selection__arrow" role="presentation">
+            <b role="presentation"></b>
+          </span>
+        </span>
+      </span><span class="dropdown-wrapper" aria-hidden="true"></span>
+    </span>
+    <!--end::Input-->
+    <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+    </div>
+  </div>
+  <!--end::Input group-->
+  <!--begin::Input group-->
+  <div class="fv-row mb-7">
+    <!--begin::Wrapper-->
+    <div class="d-flex flex-stack">
+      <!--begin::Label-->
+      <div class="me-5">
+        <!--begin::Label-->
+        <label class="fs-6 fw-semibold">Use as a billing adderess?</label>
+        <!--end::Label-->
+        <!--begin::Input-->
+        <div class="fs-7 fw-semibold text-muted">
+          If you need more info, please check budget planning
+        </div>
+        <!--end::Input-->
+      </div>
+      <!--end::Label-->
+      <!--begin::Switch-->
+      <label class="form-check form-switch form-check-custom form-check-solid">
+        <!--begin::Input-->
+        <input class="form-check-input" name="billing" type="checkbox" value="1"
+               id="kt_modal_add_customer_billing" checked="checked">
+        <!--end::Input-->
+        <!--begin::Label-->
+        <span class="form-check-label fw-semibold text-muted" for="kt_modal_add_customer_billing">
+          Yes
+        </span>
+        <!--end::Label-->
+      </label>
+      <!--end::Switch-->
+    </div>
+    <!--begin::Wrapper-->
+  </div>
+  <!--end::Input group-->
+</div>
+<!--end::Billing form-->
+</div>
+<!--end::Scroll-->
+</div>
+<!--end::Modal body-->
+<!--begin::Modal footer-->
+<div class="modal-footer flex-center">
+  <!--begin::Button-->
+  <button type="reset" id="kt_modal_add_customer_cancel" class="btn btn-light me-3">Discard</button>
+  <!--end::Button-->
+  <!--begin::Button-->
+  <button type="submit" id="kt_modal_add_customer_submit" class="btn btn-primary">
+    <span class="indicator-label">Submit</span>
+    <span class="indicator-progress">
+      Please wait...
+      <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+    </span>
+  </button>
+  <!--end::Button-->
+</div>
+<!--end::Modal footer-->
+</form>
+<!--end::Form-->
+</div>
+</div>
+</div>
+<!--end::Modal - Customers - Add-->
