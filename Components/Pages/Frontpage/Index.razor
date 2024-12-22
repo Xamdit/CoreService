@@ -1,0 +1,32 @@
+﻿@page "/"
+@using Service.Components.Layout
+@* @using Service.Shared.Layout *@
+@layout FrontendLayout
+<div class="d-flex flex-column flex-root">
+  <div class="mb-0" id="home">
+    <div class="bgi-no-repeat bgi-size-contain bgi-position-x-center bgi-position-y-bottom landing-dark-bg"
+         style="background-image: url(assets/media/svg/illustrations/landing.svg)">
+      <Header></Header>
+      <Landing></Landing>
+    </div>
+    <CurveBottom></CurveBottom>
+  </div>
+  <How/>
+  <Archievements></Archievements>
+  <Team/>
+  <Projects/>
+  <div class="mt-sm-n20">
+    <CurveTop/>
+    <div class="py-20 landing-dark-bg">
+      <Pricing/>
+    </div>
+    <CurveBottom/>
+  </div>
+  <Testimonials/>
+  <div class="mb-0">
+    <CurveTop/>
+    <PageBottom/>
+  </div>
+  <Scrolltop/>
+</div>
+<Scrolltop/>

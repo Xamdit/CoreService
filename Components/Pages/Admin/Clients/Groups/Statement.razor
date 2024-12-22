@@ -1,0 +1,154 @@
+﻿@namespace Service.Components.Pages.Admin.Clients.Groups
+@inherits StatementRazor;
+
+<div class="col-md-5">
+  <div class="text-right">
+    <h4 class="no-margin bold">@label["account_summary"]</h4>
+    @* <p class="text-muted">@label.get(localizer["statement_from_to"], new { from = From, to = To })</p> *@
+    <hr/>
+    <table class="table statement-account-summary">
+      <tbody>
+      <tr>
+        <td class="text-left">@label["statement_beginning_balance"]:</td>
+        <td>app_format_money( statement['beginning_balance'], statement['currency']);</td>
+      </tr>
+      <tr>
+        <td class="text-left">@label["invoiced_amount"]; ?>:</td>
+        <td>app_format_money( statement['invoiced_amount'], statement['currency']);</td>
+      </tr>
+      <tr>
+        <td class="text-left">@label["amount_paid"]; ?>:</td>
+        <td>app_format_money( statement['amount_paid'], statement['currency']);</td>
+      </tr>
+      </tbody>
+      <tfoot>
+      <tr>
+        <td class="text-left"><b>@label["balance_due"]; ?></b>:</td>
+        <td>app_format_money( statement['balance_due'], statement['currency']);</td>
+      </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+<div class="col-md-12">
+  <div class="text-center bold padding-10">
+    @* @label.get("customer_statement_info", new { from = From, to = To }) *@
+  </div>
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead>
+      <tr>
+        <th>
+          <b>@label["statement_heading_date"]</b>
+        </th>
+        <th>
+          <b>@label["statement_heading_details"]</b>
+        </th>
+        <th class="text-right">
+          <b>@label["statement_heading_amount"]</b>
+        </th>
+        <th class="text-right">
+          <b>@label["statement_heading_payments"]</b>
+        </th>
+        <th class="text-right">
+          <b>@label["statement_heading_balance"]</b>
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>@From</td>
+        <td>@label["statement_beginning_balance"]; ?></td>
+        <td class="text-right">app_format_money( statement['beginning_balance'], statement['currency'], true);</td>
+        <td></td>
+        <td class="text-right">app_format_money( statement['beginning_balance'], statement['currency'], true);</td>
+      </tr>
+
+      tmpBeginningBalance = statement['beginning_balance'];
+      @foreach (var data in statement["result"])
+      {
+        <tr>
+          <td>_d(data['date']); ?></td>
+          <td>
+
+            @* @if (isset(data['invoice_id'])) *@
+            @* { *@
+            @* @label.get("statement_invoice_details", array('<a href="' + @admin_url('invoices/list_invoices/' +
+            data['invoice_id']) + '" target="_blank">' + format_invoice_number(data['invoice_id']) + '</a>',
+            _d(data['duedate']))) *@
+            @* } *@
+            @* else if (isset(data['payment_id'])) *@
+            @* { *@
+            @* @label.get("statement_payment_details", array('<a href="' +
+            admin_url('payments/payment/'+data['payment_id']).'" target="_blank">'+'#'+data['payment_id']+'</a>',
+            format_invoice_number(data['payment_invoice_id']))) *@
+            @* } *@
+            @* else if (isset(data['credit_note_id'])) *@
+            @* { *@
+            @* @label.get("statement_credit_note_details", array('<a
+            href="'+admin_url('credit_notes/list_credit_notes/'+data['credit_note_id'])+'"
+            target="_blank">'+format_credit_note_number(data['credit_note_id'])+'</a>')) *@
+            @* *@
+            @* } *@
+            @* else if (isset(data['credit_id'])) *@
+            @* { *@
+            @* @label.get("statement_credits_applied_details", array( *@
+            @* '<a href="'+admin_url('credit_notes/list_credit_notes/'+data['credit_applied_credit_note_id'])+'"
+            target="_blank">'+format_credit_note_number(data['credit_applied_credit_note_id'])+'</a>', *@
+            @* app_format_money(data['credit_amount'], statement['currency'], true), *@
+            @* format_invoice_number(data['credit_invoice_id']) *@
+            @* ) *@
+            @* ) *@
+            @* ; *@
+            @* } *@
+            @* else if (isset(data['credit_note_refund_id'])) *@
+            @* { *@
+            @* @label.get("statement_credit_note_refund", format_credit_note_number(data['refund_credit_note_id'])) *@
+            @* } *@
+
+          </td>
+          <td class="text-right">
+
+            @* @if (isset(data['invoice_id'])) *@
+            @* { *@
+            @* @app_format_money(data['invoice_amount'], statement['currency'], true) *@
+            @* *@
+            @* } *@
+            @* else if (isset(data['credit_note_id'])) *@
+            @* { *@
+            @* @app_format_money(data['credit_note_amount'], statement['currency'], true) *@
+            @* *@
+            @* } *@
+
+          </td>
+          <td class="text-right">
+
+            @* @if (isset(data['payment_id'])) *@
+            @* { *@
+            @* app_format_money(data['payment_total'], statement['currency'], true); *@
+            @* } *@
+            @* else if (isset(data['credit_note_refund_id'])) *@
+            @* { *@
+            @* app_format_money(data['refund_amount'], statement['currency'], true); *@
+            @* } *@
+
+          </td>
+          <td class="text-right">
+            @TmpBeginningBalance
+          </td>
+        </tr>
+      }
+      </tbody>
+      <tfoot class="statement_tfoot">
+      <tr>
+        <td colspan="3" class="text-right">
+          <b>@label["balance_due"]; ?></b>
+        </td>
+        <td class="text-right" colspan="2">
+          <b>app_format_money( statement['balance_due'], statement['currency']);</b>
+        </td>
+      </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

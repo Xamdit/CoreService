@@ -1,0 +1,10 @@
+@using Service.Framework.Library.Themes
+@using Service.Framework.Library.Themes.Partials
+@inject IJSRuntime js
+@inject IBootstrapBase BootstrapBase
+@inject ITheme Theme
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!--begin::Scrolltop-->
+<div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">@((MarkupString)Theme.GetIcon("arrow-up"))</div>
+<!--end::Scrolltop-->

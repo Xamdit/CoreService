@@ -1,0 +1,15 @@
+@page "/admin/subscriptions"
+@inherits IndexRazor
+@using Service.Components.Pages.Admin.Subscriptions.Partials
+
+<HeaderCard>
+
+  @if (!string.IsNullOrEmpty(GetFragment()))
+  {
+    @* <List Type="@GetFragment()"></List> *@
+  }
+  else
+  {
+    <List Type="all"></List>
+  }
+</HeaderCard>

@@ -1,0 +1,22 @@
+﻿@using System.Net.Http
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using static Service.Core.Generals
+
+@using Service
+
+@using Service.Components
+@using Service.Framework.Library.Locales
+@using Service.Framework.Library.Themes
+@using Service.Framework.Library.Themes.Partials
+
+@inject IJSRuntime js
+@inject IBootstrapBase BootstrapBase
+@inject ILocale label
+@inject ITheme Theme
+@inject IHttpContextAccessor HttpContextAccessor

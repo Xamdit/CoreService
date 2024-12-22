@@ -1,0 +1,49 @@
+@inject NavigationManager NavigationManager
+@inherits LayoutComponentBase
+@using Service.Components.Layout
+
+@inject IJSRuntime js
+
+@Body
+
+<LayoutScripts></LayoutScripts>
+<script suppress-error="BL9992">
+window.emptyBody = function(){
+    document.body.className = '';
+}
+</script>
+
+@code {
+
+  protected override void OnAfterRender(bool firstRender)
+  {
+    js.InvokeVoidAsync("KTThemeMode.init");
+    js.InvokeVoidAsync("emptyBody");
+    if (firstRender)
+    {
+      js.InvokeVoidAsync("scrollTo", 0, 0);
+      js.InvokeVoidAsync("KTComponents.init");
+      js.InvokeVoidAsync("KTMenu.updateByLinkAttribute", $"/{NavigationManager.ToBaseRelativePath(NavigationManager.Uri)}");
+    }
+    js.InvokeVoidAsync("KTLayoutSearch.init");
+  }
+
+
+  protected override void OnInitialized()
+  {
+    NavigationManager.LocationChanged += OnLocationChanged;
+  }
+
+  async void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+  {
+    await js.InvokeVoidAsync("scrollTo", 0, 0);
+    await js.InvokeVoidAsync("KTComponents.init");
+    await js.InvokeVoidAsync("KTMenu.updateByLinkAttribute", $"/{NavigationManager.ToBaseRelativePath(args.Location)}");
+  }
+
+  public void Dispose()
+  {
+    NavigationManager.LocationChanged -= OnLocationChanged;
+  }
+
+}

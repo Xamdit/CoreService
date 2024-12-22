@@ -1,0 +1,89 @@
+@using Newtonsoft.Json
+@using Service.Core.Constants
+
+<div class="container pt-lg-20 d-flex flex-column">
+  <div class="mb-13 text-center">
+    <h1 class="fs-2hx fw-bold text-white mb-5" id="pricing" data-kt-scroll-offset="{default: 100, lg: 150}">Clear Pricing Makes it Easy</h1>
+    <div class="text-gray-600 fw-semibold fs-5">
+      Save thousands to millions of bucks by using a single tool for different
+      <br/>amazing and outstanding cool and great useful admin
+    </div>
+  </div>
+  <div class="text-center" id="kt_pricing">
+    <div class="nav-group landing-dark-bg d-inline-flex mb-15" data-kt-buttons="true" style="border: 1px dashed #2B4666;">
+      <a @onclick="Toggle" class="btn btn-color-gray-600 btn-active btn-active-success px-6 py-3 me-2 active" data-kt-plan="month">Monthly</a>
+      <a @onclick="Toggle" class="btn btn-color-gray-600 btn-active btn-active-success px-6 py-3" data-kt-plan="annual">Annual</a>
+    </div>
+    <div class="row g-10">
+      @foreach (var plan in CurrentPlans)
+      {
+        <div class="col-xl-4">
+          <div class="d-flex h-100 align-items-center">
+            <div class="w-100 d-flex flex-column flex-center rounded-3 bg-@(plan.BackgroundColor) py-15 px-10">
+              <div class="mb-7 text-center">
+                <h1 class="text-@(plan.TitleColor) mb-5 fw-boldest">@plan.Title</h1>
+                <div class="@(plan.DescriptionColor) fw-semibold mb-5">@plan.Description</div>
+                <div class="text-center">
+                  <span class="mb-2 text-@(plan.PriceColor)">$</span>
+                  <span class="fs-3x fw-bold text-@(plan.PriceColor)" data-kt-plan-price-month="@plan.MonthlyPrice" data-kt-plan-price-annual="@plan.AnnualPrice">@plan.Price</span>
+                  <span class="fs-7 fw-semibold @(plan.PriceColor)" data-kt-plan-price-month="/ Monthly" data-kt-plan-price-annual="/ Ann">/ @Segment</span>
+                </div>
+              </div>
+              <div class="w-100 mb-10">
+                @foreach (var feature in plan.Features)
+                {
+                  <div class="d-flex flex-stack mb-5">
+                    <span class="fw-semibold fs-6 text-@(feature.Color) text-start pe-3">@feature.Description</span>
+                    <i class="ki-duotone ki-check-circle fs-1 text-success">
+                      <span class="path1"></span>
+                      <span class="path2"></span>
+                    </i>
+                  </div>
+                }
+              </div>
+              <a @onclick="Select" class="btn btn-@(plan.ButtonColor)">@plan.ButtonText</a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@code {
+  private List<Plan> CurrentPlans = JsonConvert.DeserializeObject<List<Plan>>(json("configs/frontend/plans.json"));
+  private List<Plan> Monthly = new();
+  private List<Plan> Yearly = new();
+  private string Segment = "";
+
+  protected void Select()
+  {
+  }
+
+  protected void Toggle()
+  {
+    if (CurrentPlans == Monthly)
+    {
+      Segment = "Year";
+      CurrentPlans = Yearly;
+    }
+    else if (CurrentPlans == Yearly)
+    {
+      Segment = "Month";
+      CurrentPlans = Monthly;
+    }
+    Console.WriteLine(Segment);
+    StateHasChanged();
+  }
+
+  protected override async Task OnInitializedAsync()
+  {
+  // Monthly = JsonConvert.DeserializeObject<List<Plan>>(File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "json","en", "plans.json")));
+  }
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+  // if (!firstRender) return;
+  }
+
+}

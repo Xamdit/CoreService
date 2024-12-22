@@ -1,0 +1,15 @@
+@inherits TabsRazor
+<ul class="nav navbar-pills navbar-pills-flat nav-tabs nav-stacked customer-tabs" role="tablist">
+  @foreach (var (key, tab) in filter_client_visible_tabs())
+  {
+    <li class="@GetClassName(key)">
+      <a data-group="@key" href='@CreateUrl(key)'>
+        @if (!string.IsNullOrEmpty(tab.Icon))
+        {
+          <i class="@tab.Icon menu-icon" aria-hidden="true"></i>
+        }
+        @tab.Name
+      </a>
+    </li>
+  }
+</ul>

@@ -1,0 +1,2381 @@
+
+<!DOCTYPE html>
+<html lang="en"
+    dir="ltr">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Create New Invoice    </title>
+
+    <link rel="shortcut icon" id="favicon" href="../../uploads/company/favicon.ico">
+<link rel="apple-touch-icon”" id="favicon-apple-touch-icon" href="../../uploads/company/favicon.ico">
+<link rel="stylesheet" type="text/css" id="reset-css" href="../../assets/css/reset.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="inter-font" href="../../assets/plugins/inter/inter%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="vendor-css" href="../../assets/builds/vendor-admin%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-css" href="../../assets/plugins/font-awesome/css/fontawesome.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-brands" href="../../assets/plugins/font-awesome/css/brands.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-solid" href="../../assets/plugins/font-awesome/css/solid.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-regular" href="../../assets/plugins/font-awesome/css/regular.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="tailwind-css" href="../../assets/builds/tailwind%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="app-css" href="../../assets/css/style.min%EF%B9%96v=3.2.0.css">
+    <script>var site_url = "https://perfexcrm.com/demo/";var admin_url = "https://perfexcrm.com/demo/admin/";var app = {};app.version = 320;app.available_tags = ["bug","follow up","important","logo","review","todo","tomorrow","wordpress"];app.available_tags_ids = ["2","7","5","3","6","4","8","1"];app.user_recent_searches = [];app.months_json = ["January","February","March","April","May","June","July","August","September","October","November","December"];app.tinymce_lang = "";app.locale = "en";app.browser = "";app.user_id = "1";app.user_language = "";app.is_mobile = "";app.user_is_staff_member = "1";app.user_is_admin = "1";app.max_php_ini_upload_size_bytes = "104857600";app.calendarIDs = "";app.dtFilters = {};app.options = {};app.lang = {};app.options.date_format = "Y-m-d";app.options.decimal_places = "2";app.options.company_is_required = "1";app.options.default_view_calendar = "dayGridMonth";app.options.calendar_events_limit = "4";app.options.tables_pagination_limit = "25";app.options.time_format = "24";app.options.decimal_separator = ".";app.options.thousand_separator = ",";app.options.timezone = "Europe/Berlin";app.options.calendar_first_day = "0";app.options.allowed_files = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt";app.options.desktop_notifications = "0";app.options.show_table_export_button = "to_all";app.options.has_permission_tasks_checklist_items_delete = "1";app.options.show_setup_menu_item_only_on_hover = "0";app.options.newsfeed_maximum_files_upload = "10";app.options.dismiss_desktop_not_after = "0";app.options.enable_google_picker = "1";app.options.google_client_id = "";app.options.google_api = "";app.options.has_permission_create_task = "1";app.lang. invoice_task_billable_timers_found = "Started timers found";app.lang. validation_extension_not_allowed = "File extension not allowed";app.lang. tag = "Tag";app.lang. options = "Options";app.lang. no_items_warning = "Enter at least one item.";app.lang. item_forgotten_in_preview = "Have you forgotten to add this item?";app.lang. new_notification = "New Notification!";app.lang. estimate_number_exists = "This estimate number exists for the ongoing year.";app.lang. invoice_number_exists = "This invoice number exists for the ongoing year.";app.lang. confirm_action_prompt = "Are you sure you want to perform this action?";app.lang. calendar_expand = "expand";app.lang. media_files = "Files";app.lang. credit_note_number_exists = "Credit note number already exists";app.lang. item_field_not_formatted = "The number in the input field is not formatted while edit/add item and should remain not formatted do not try to format it manually in here.";app.lang. email_exists = "Email already exists";app.lang. phonenumber_exists = "Phone number already exists";app.lang. website_exists = "Website already exists";app.lang. company_exists = "Company already exists";app.lang. filter_by = "Filter by";app.lang. you_can_not_upload_any_more_files = "You can not upload any more files";app.lang. cancel_upload = "Cancel Upload";app.lang. browser_not_support_drag_and_drop = "Your browser does not support drag'n'drop file uploads";app.lang. drop_files_here_to_upload = "Drop files here to upload";app.lang. file_exceeds_max_filesize = "The uploaded file exceeds the upload_max_filesize directive in php.ini (100 MB)";app.lang. file_exceeds_maxfile_size_in_form = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form (100 MB)";app.lang. unit = "Unit";app.lang. dt_length_menu_all = "All";app.lang. dt_button_reload = "Reload";app.lang. dt_button_excel = "Excel";app.lang. dt_button_csv = "CSV";app.lang. dt_button_pdf = "PDF";app.lang. dt_button_print = "Print";app.lang. dt_button_export = "Export";app.lang. search_ajax_empty = "Select and begin typing";app.lang. search_ajax_initialized = "Start typing to search";app.lang. search_ajax_searching = "Searching...";app.lang. not_results_found = "No results found";app.lang. search_ajax_placeholder = "Type to search...";app.lang. currently_selected = "Currently Selected";app.lang. task_stop_timer = "Stop Timer";app.lang. dt_button_column_visibility = "Visibility";app.lang. note = "Note";app.lang. search_tasks = "Search Tasks";app.lang. confirm = "Confirm";app.lang. showing_billable_tasks_from_project = "Showing billable tasks from project";app.lang. invoice_task_item_project_tasks_not_included = "Projects tasks are not included in this list.";app.lang. credit_amount_bigger_then_invoice_balance = "Total credits amount is bigger then invoice balance due";app.lang. credit_amount_bigger_then_credit_note_remaining_credits = "Total credits amount is bigger then remaining credits";app.lang. save = "Save";app.lang. expense = "Expense";app.lang. ticket = "Ticket";app.lang. lead = "Lead";app.lang. create_reminder = "Create Reminder";app.lang. something_went_wrong = "Something went wrong. Try again";app.lang. filters = "Filters";app.lang. filter_boolean_yes = "Yes";app.lang. filter_boolean_no = "No";app.lang. filter_matchtype_and = "and";app.lang. filter_matchtype_or = "or";app.lang. filter_share = "Share with other team members?";app.lang. filter_mark_as_default = "Mark as default";app.lang. filter_unmark_as_default = "Unmark as default";app.lang. default_filter_info = "The filter will be marked as default only for your account.";app.lang. filter_save = "Save Filter";app.lang. filter_name = "Filter name";app.lang. filter_apply = "Apply";app.lang. filter_apply_and_save = "Apply and Save";app.lang. filter_new = "New Filter";app.lang. filter_clear_active = "Clear Filter";app.lang. filter_edit = "Edit";app.lang. filter_create = "Create Filter";app.lang. filter_update = "Update Filter";app.lang. filter_delete = "Delete Filter";app.lang. filter_cannot_be_shared = "This filter cannot be shared with other team members as it contains rules that may not be available for all users.";app.lang. filter_add_rule = "Add Rule";app.lang. filter_operator_is_empty = "is unknown";app.lang. filter_operator_is_not_empty = "is known";app.lang. filter_operator_equal = "equal";app.lang. filter_operator_not_equal = "not equal";app.lang. filter_operator_begins_with = "begins with";app.lang. filter_operator_not_begins_with = "not begins with";app.lang. filter_operator_contains = "contains";app.lang. filter_operator_not_contains = "not contains";app.lang. filter_operator_ends_with = "ends with";app.lang. filter_operator_not_ends_with = "not ends with";app.lang. filter_operator_in = "in";app.lang. filter_operator_not_in = "not in";app.lang. filter_operator_between = "between";app.lang. filter_operator_not_between = "not between";app.lang. filter_operator_dynamic = "dynamic";app.lang. filter_operator_greater = "greater";app.lang. filter_operator_greater_or_equal = "greater or equal";app.lang. filter_operator_less = "less";app.lang. filter_operator_less_or_equal = "less or equal";app.lang. filter_use_dynamic_dates = "Use dynamic dates";app.lang. no_filters_found = "No saved filters, get started by creating a new filter.";app.lang.datatables = {"emptyTable":"No entries found","info":"Showing _START_ to _END_ of _TOTAL_ entries","infoEmpty":"Showing 0 to 0 of 0 entries","infoFiltered":"(filtered from _MAX_ total entries)","lengthMenu":"_MENU_","loadingRecords":"Loading...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Search...","zeroRecords":"No matching records found","paginate":{"first":"First","last":"Last","next":"Next","previous":"Previous"},"aria":{"sortAscending":" activate to sort column ascending","sortDescending":" activate to sort column descending"}};var app_language="",app_is_mobile="",app_user_browser="",app_date_format="Y-m-d",app_decimal_places="2",app_company_is_required="1",app_default_view_calendar="dayGridMonth",app_calendar_events_limit="4",app_tables_pagination_limit="25",app_time_format="24",app_decimal_separator=".",app_thousand_separator=",",app_timezone="Europe/Berlin",app_calendar_first_day="0",app_allowed_files=".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt",app_desktop_notifications="0",max_php_ini_upload_size_bytes="104857600",app_show_table_export_button="to_all",calendarIDs="",is_admin="1",is_staff_member="1",has_permission_tasks_checklist_items_delete="1",app_show_setup_menu_item_only_on_hover="0",app_newsfeed_maximum_files_upload="10",app_dismiss_desktop_not_after="0",app_enable_google_picker="1",app_google_client_id="",google_api="";var appLang = {};appLang["invoice_task_billable_timers_found"] = "Started timers found";appLang["validation_extension_not_allowed"] = "File extension not allowed";appLang["tag"] = "Tag";appLang["options"] = "Options";appLang["no_items_warning"] = "Enter at least one item.";appLang["item_forgotten_in_preview"] = "Have you forgotten to add this item?";appLang["new_notification"] = "New Notification!";appLang["estimate_number_exists"] = "This estimate number exists for the ongoing year.";appLang["invoice_number_exists"] = "This invoice number exists for the ongoing year.";appLang["confirm_action_prompt"] = "Are you sure you want to perform this action?";appLang["calendar_expand"] = "expand";appLang["media_files"] = "Files";appLang["credit_note_number_exists"] = "Credit note number already exists";appLang["item_field_not_formatted"] = "The number in the input field is not formatted while edit/add item and should remain not formatted do not try to format it manually in here.";appLang["email_exists"] = "Email already exists";appLang["phonenumber_exists"] = "Phone number already exists";appLang["website_exists"] = "Website already exists";appLang["company_exists"] = "Company already exists";appLang["filter_by"] = "Filter by";appLang["you_can_not_upload_any_more_files"] = "You can not upload any more files";appLang["cancel_upload"] = "Cancel Upload";appLang["browser_not_support_drag_and_drop"] = "Your browser does not support drag'n'drop file uploads";appLang["drop_files_here_to_upload"] = "Drop files here to upload";appLang["file_exceeds_max_filesize"] = "The uploaded file exceeds the upload_max_filesize directive in php.ini (100 MB)";appLang["file_exceeds_maxfile_size_in_form"] = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form (100 MB)";appLang["unit"] = "Unit";appLang["dt_length_menu_all"] = "All";appLang["dt_button_reload"] = "Reload";appLang["dt_button_excel"] = "Excel";appLang["dt_button_csv"] = "CSV";appLang["dt_button_pdf"] = "PDF";appLang["dt_button_print"] = "Print";appLang["dt_button_export"] = "Export";appLang["search_ajax_empty"] = "Select and begin typing";appLang["search_ajax_initialized"] = "Start typing to search";appLang["search_ajax_searching"] = "Searching...";appLang["not_results_found"] = "No results found";appLang["search_ajax_placeholder"] = "Type to search...";appLang["currently_selected"] = "Currently Selected";appLang["task_stop_timer"] = "Stop Timer";appLang["dt_button_column_visibility"] = "Visibility";appLang["note"] = "Note";appLang["search_tasks"] = "Search Tasks";appLang["confirm"] = "Confirm";appLang["showing_billable_tasks_from_project"] = "Showing billable tasks from project";appLang["invoice_task_item_project_tasks_not_included"] = "Projects tasks are not included in this list.";appLang["credit_amount_bigger_then_invoice_balance"] = "Total credits amount is bigger then invoice balance due";appLang["credit_amount_bigger_then_credit_note_remaining_credits"] = "Total credits amount is bigger then remaining credits";appLang["save"] = "Save";appLang["expense"] = "Expense";appLang["ticket"] = "Ticket";appLang["lead"] = "Lead";appLang["create_reminder"] = "Create Reminder";appLang["something_went_wrong"] = "Something went wrong. Try again";appLang["filters"] = "Filters";appLang["filter_boolean_yes"] = "Yes";appLang["filter_boolean_no"] = "No";appLang["filter_matchtype_and"] = "and";appLang["filter_matchtype_or"] = "or";appLang["filter_share"] = "Share with other team members?";appLang["filter_mark_as_default"] = "Mark as default";appLang["filter_unmark_as_default"] = "Unmark as default";appLang["default_filter_info"] = "The filter will be marked as default only for your account.";appLang["filter_save"] = "Save Filter";appLang["filter_name"] = "Filter name";appLang["filter_apply"] = "Apply";appLang["filter_apply_and_save"] = "Apply and Save";appLang["filter_new"] = "New Filter";appLang["filter_clear_active"] = "Clear Filter";appLang["filter_edit"] = "Edit";appLang["filter_create"] = "Create Filter";appLang["filter_update"] = "Update Filter";appLang["filter_delete"] = "Delete Filter";appLang["filter_cannot_be_shared"] = "This filter cannot be shared with other team members as it contains rules that may not be available for all users.";appLang["filter_add_rule"] = "Add Rule";appLang["filter_operator_is_empty"] = "is unknown";appLang["filter_operator_is_not_empty"] = "is known";appLang["filter_operator_equal"] = "equal";appLang["filter_operator_not_equal"] = "not equal";appLang["filter_operator_begins_with"] = "begins with";appLang["filter_operator_not_begins_with"] = "not begins with";appLang["filter_operator_contains"] = "contains";appLang["filter_operator_not_contains"] = "not contains";appLang["filter_operator_ends_with"] = "ends with";appLang["filter_operator_not_ends_with"] = "not ends with";appLang["filter_operator_in"] = "in";appLang["filter_operator_not_in"] = "not in";appLang["filter_operator_between"] = "between";appLang["filter_operator_not_between"] = "not between";appLang["filter_operator_dynamic"] = "dynamic";appLang["filter_operator_greater"] = "greater";appLang["filter_operator_greater_or_equal"] = "greater or equal";appLang["filter_operator_less"] = "less";appLang["filter_operator_less_or_equal"] = "less or equal";appLang["filter_use_dynamic_dates"] = "Use dynamic dates";appLang["no_filters_found"] = "No saved filters, get started by creating a new filter.";</script>
+    <script>
+        var totalUnreadNotifications = 0 ,
+            proposalsTemplates = [] ,
+            contractsTemplates = [] ,
+            billingAndShippingFields = ['billing_street', 'billing_city', 'billing_state', 'billing_zip',
+                'billing_country',
+                'shipping_street', 'shipping_city', 'shipping_state', 'shipping_zip', 'shipping_country'
+            ],
+            isRTL = 'false',
+            taskid, taskTrackingStatsData, taskAttachmentDropzone, taskCommentAttachmentDropzone, newsFeedDropzone,
+            expensePreviewDropzone, taskTrackingChart, cfh_popover_templates = {},
+            _table_api;
+    </script>
+    <script>
+if (typeof(jQuery) === 'undefined' && !window.deferAfterjQueryLoaded) {
+    window.deferAfterjQueryLoaded = [];
+    Object.defineProperty(window, "$", {
+        set: function(value) {
+            window.setTimeout(function() {
+                $.each(window.deferAfterjQueryLoaded, function(index, fn) {
+                    fn();
+                });
+            }, 0);
+            Object.defineProperty(window, "$", {
+                value: value
+            });
+        },
+        configurable: true
+    });
+}
+
+var csrfData = {"formatted":{"csrf_token_name":"bf0a8ef7a17e35f854421149e1dc6fe5"},"token_name":"csrf_token_name","hash":"bf0a8ef7a17e35f854421149e1dc6fe5"};
+
+if (typeof(jQuery) == 'undefined') {
+    window.deferAfterjQueryLoaded.push(function() {
+        csrf_jquery_ajax_setup();
+    });
+    window.addEventListener('load', function() {
+        csrf_jquery_ajax_setup();
+    }, true);
+} else {
+    csrf_jquery_ajax_setup();
+}
+
+function csrf_jquery_ajax_setup() {
+    $.ajaxSetup({
+        data: csrfData.formatted
+    });
+
+    $(document).ajaxError(function(event, request, settings) {
+        if (request.status === 419) {
+            alert_float('warning', 'Page expired, refresh the page make an action.')
+        }
+    });
+}
+</script>
+    <script>
+        var leadUniqueValidationFields = ["email"];
+        var leadAttachmentsDropzone;
+    </script>
+    <script>
+          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+          n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+          document,'script','https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', '186767841772496'); // Insert your pixel ID here.
+          fbq('track', 'PageView');
+          </script>
+          <noscript><img height="1" width="1" style="display:none"
+          src="https://www.facebook.com/tr?id=186767841772496&amp;ev=PageView&amp;noscript=1"
+          /></noscript></head>
+
+<body class="app admin h-full invoice invoices user-id-1 ">
+    <div id="header">
+    <button type="button"
+        class="hide-menu tw-inline-flex tw-bg-transparent tw-border-0 tw-p-1 tw-mt-4 hover:tw-bg-neutral-600/10 tw-text-neutral-600 hover:tw-text-neutral-800 focus:tw-text-neutral-800 focus:tw-outline-none tw-rounded-md tw-mx-4 ltr:md:tw-ml-6 rtl:md:tw-mr-6 ltr:tw-float-left  rtl:tw-float-right">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="tw-h-4 tw-w-4 tw-text-current">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M2.25 18.003h19.5m-19.5-6h19.5m-19.5-6h19.5"></path>
+        </svg>
+    </button>
+    <nav>
+        <div class="tw-flex tw-justify-between">
+            <div class="tw-overflow-hidden tw-shrink-0">
+                <div id="logo"
+                    class="tw-h-[57px] tw-hidden md:tw-flex tw-items-center [&_img]:tw-h-9 [&_img]:tw-w-auto">
+                    <a href="../index.html" class="logo img-responsive !tw-mt-0">
+        <img src="../../uploads/company/1f03e41865e3e0d535f6202e5fba391a.png" class="img-responsive" alt="Perfex CRM">
+        </a>                </div>
+            </div>
+            <div class="tw-flex tw-flex-1 sm:tw-flex-initial">
+                <div id="top_search"
+                    class="tw-inline-flex tw-relative dropdown sm:tw-ml-1.5 sm:tw-mr-3 tw-max-w-xl tw-flex-auto tw-group/top-search"
+                    data-toggle="tooltip" data-placement="bottom"
+                    data-title="Use # + tagname to search by tags">
+                    <input type="search" id="search_input"
+                        class="ltr:tw-pr-4 ltr:tw-pl-9 rtl:tw-pr-9 rtl:tw-pl-4 tw-ml-1 tw-mt-2 focus:!tw-ring-0 tw-w-full !tw-placeholder-neutral-500 !tw-shadow-none tw-text-neutral-800 focus:!tw-placeholder-neutral-600 hover:!tw-placeholder-neutral-600 sm:tw-w-[350px] tw-h-[38px] tw-border-0 tw-border-solid !tw-border-white !tw-bg-neutral-100 !tw-rounded-xl"
+                        placeholder="Search..."
+                        autocomplete="off">
+                    <div id="top_search_button" class="tw-absolute rtl:tw-right-2 ltr:tw-left-2 tw-top-2.5">
+                        <button
+                            class="tw-outline-none tw-border-0 tw-p-2 tw-text-neutral-400 group-focus-within/top-search:tw-text-neutral-600 tw-bg-transparent">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <div id="search_results">
+                    </div>
+                    <ul class="dropdown-menu search-results animated fadeIn search-history" id="search-history">
+                    </ul>
+
+                </div>
+                <ul class="nav navbar-nav visible-md visible-lg">
+                                                            <li class="icon tw-relative ltr:tw-mr-1.5 rtl:tw-ml-1.5 -tw-mt-1"
+                        title="Quick Create"
+                        data-toggle="tooltip" data-placement="bottom">
+                        <a href="#" class="!tw-px-0 tw-group !tw-text-white" data-toggle="dropdown">
+                            <span
+                                class="tw-rounded-full tw-bg-primary-600 tw-text-white tw-inline-flex tw-items-center tw-justify-center tw-h-7 tw-w-7 -tw-mt-1 group-hover:!tw-bg-primary-700">
+                                <i class="fa-regular fa-plus fa-lg"></i>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right animated fadeIn tw-text-base">
+                            <li class="dropdown-header tw-mb-1">
+                                Quick Create                            </li>
+                                                        <li>
+                                <a href="invoice.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-file-invoice tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Invoice                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../estimates/estimate.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-file tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Estimate                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../proposals/proposal.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-file-powerpoint tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Proposal                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../credit_notes/credit_note.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-file-lines tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Credit Note                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../clients/client.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-building tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Customer                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../subscriptions/create.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-repeat tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Subscription                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../projects/project.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-chart-gantt tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Project                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="#"
+                                    onclick="new_task();return false;"                                    class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-circle-check tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Task                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="#"
+                                    onclick="init_lead(); return false;"                                    class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-crosshairs tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Lead                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../expenses/expense.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-file-lines tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Expense                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../contracts/contract.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-file-contract tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Contract                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../goals/goal.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-bars-progress tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Goal                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../knowledge_base/article.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-circle-info tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Article                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../tickets/add.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-solid fa-life-ring tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Ticket                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../surveys/survey.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-circle-question tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Survey                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../staff/member.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-user tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Staff Member                                    </span>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="../utilities/calendar%EF%B9%96new_event=true&amp;date=2024-11-11.html"
+                                                                        class="tw-group tw-inline-flex tw-space-x-0.5 tw-text-neutral-700">
+                                                                        <i
+                                        class="fa-regular fa-calendar tw-text-neutral-400 group-hover:tw-text-neutral-600 tw-h-5 tw-w-5"></i>
+                                                                        <span>
+                                        Event                                    </span>
+                                </a>
+                            </li>
+                                                    </ul>
+                    </li>
+                                    </ul>
+            </div>
+
+            <div class="mobile-menu tw-shrink-0 ltr:tw-ml-4 rtl:tw-mr-4">
+                <button type="button"
+                    class="navbar-toggle visible-md visible-sm visible-xs mobile-menu-toggle collapsed tw-ml-1.5"
+                    data-toggle="collapse" data-target="#mobile-collapse" aria-expanded="false">
+                    <i class="fa fa-chevron-down fa-lg"></i>
+                </button>
+                <ul class="mobile-icon-menu tw-inline-flex tw-mt-5">
+                                    </ul>
+                <div class="mobile-navbar collapse" id="mobile-collapse" aria-expanded="false" style="height: 0px;"
+                    role="navigation">
+                    <ul class="nav navbar-nav">
+                        <li class="header-my-profile"><a
+                                href="../profile.html">
+                                My Profile                            </a>
+                        </li>
+                        <li class="header-my-timesheets"><a
+                                href="../staff/timesheets.html">
+                                My Timesheets                            </a>
+                        </li>
+                        <li class="header-edit-profile"><a
+                                href="../staff/edit_profile.html">
+                                Edit Profile                            </a>
+                        </li>
+                                                <li class="header-newsfeed">
+                            <a href="#" class="open_newsfeed mobile">
+                                Share documents, ideas..                            </a>
+                        </li>
+                                                <li class="header-logout">
+                            <a href="#" onclick="logout(); return false;">
+                                Logout                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <ul class="nav navbar-nav navbar-right -tw-mt-px">
+                                <li><a href="../../authentication/login.html" target="_blank" data-toggle="tooltip" data-title="Demo Link" data-placement="bottom">Customers area</a></li>                                <li>
+                    <a
+                        href="../settings.html">
+                        <span class="tw-flex tw-items-center tw-gap-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="tw-size-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                            <span>Settings</span>
+                        </span>
+                    </a>
+                </li>
+                                                <li class="icon header-newsfeed -tw-mr-1.5">
+                    <a href="#" class="open_newsfeed desktop" data-toggle="tooltip"
+                        title="Share documents, ideas.."
+                        data-placement="bottom">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor"
+                            class="tw-w-[calc(theme(spacing.5)-1px)] tw-h-[calc(theme(spacing.5)-1px)]">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                        </svg>
+                    </a>
+                </li>
+                
+                <li class="icon header-todo">
+                    <a href="../todo.html"
+                        data-toggle="tooltip"
+                        title="Todo items"
+                        data-placement="bottom" class="">
+                        <i class="fa-regular fa-square-check fa-lg tw-shrink-0"></i>
+                        <span
+                            class="tw-leading-none tw-px-1 tw-py-0.5 tw-text-xs bg-warning tw-z-10 tw-absolute tw-rounded-full -tw-right-0.5 tw-top-2 tw-min-w-[18px] tw-min-h-[18px] tw-inline-flex tw-items-center tw-justify-center nav-total-todos">
+                            3                        </span>
+                    </a>
+                </li>
+
+                <li class="icon header-timers timer-button tw-relative ltr:tw-mr-1.5 rtl:tw-ml-1.5"
+                    data-placement="bottom" data-toggle="tooltip"
+                    data-title="My Timesheets">
+                    <a href="#" id="top-timers" class="top-timers !tw-px-0 tw-group" data-toggle="dropdown">
+                        <span class="tw-inline-flex tw-items-center tw-justify-center tw-h-8 tw-w-9 -tw-mt-1.5">
+                            <i
+                                class="fa-regular fa-clock fa-lg tw-text-neutral-400 group-hover:tw-text-neutral-800 tw-shrink-0"></i>
+                        </span>
+                        <span
+                            class="tw-leading-none tw-px-1 tw-py-0.5 tw-text-xs bg-success tw-z-10 tw-absolute tw-rounded-full -tw-right-1.5 tw-top-2 tw-min-w-[18px] tw-min-h-[18px] tw-inline-flex tw-items-center tw-justify-center icon-started-timers hide">
+                            0                        </span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeIn started-timers-top width300" id="started-timers-top">
+                        <li class="text-center inline-block full-width tw-mb-2"><div class="text-center">
+    <svg class="tw-mx-auto tw-h-10 tw-w-10 tw-text-neutral-400 -tw-mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+    </svg>
+    <p class="tw-my-0 tw-text-sm tw-font-medium tw-text-gray-900">No started timers found</p>
+  </div></li><button class="tw-mt-3 text-center btn btn-primary started-timers-button  btn-sm top-dropdown-btn" onclick="timer_action(this,0); return false;"><i class="fa-regular fa-clock"></i> Start Timer</button><div class="text-center tw-mt-1 view-all-timesheets"><a href="../staff/timesheets%EF%B9%96view=all.html" class="tw-text-sm">View all timesheets</a></div>                    </ul>
+                </li>
+
+                <li class="icon dropdown tw-relative tw-block notifications-wrapper header-notifications rtl:tw-ml-3"
+                    data-toggle="tooltip"
+                    title="Notifications"
+                    data-placement="bottom">
+                    <a href="#" class="dropdown-toggle notifications-icon !tw-px-0 tw-group" data-toggle="dropdown" aria-expanded="false">
+    <span class="sm:tw-inline-flex sm:tw-items-center sm:tw-justify-center sm:tw-h-8 sm:tw-w-9 sm:-tw-mt-1.5">
+        <i class="fa-regular fa-bell fa-lg tw-shrink-0 tw-text-neutral-400 group-hover:tw-text-neutral-800"></i>
+            </span>
+</a>
+<ul class="dropdown-menu notifications animated fadeIn width400"
+    data-total-unread="0">
+    <div class="tw-py-1 tw-px-3 tw-mb-1.5 tw-text-right">
+        <a href="#" class="tw-text-right tw-inline text-muted"
+            onclick="event.stopPropagation(); mark_all_notifications_as_read_inline(this); return false;">
+            Mark all as read        </a>
+    </div>
+    <li class="divider"></li>
+        <div class="tw-text-center tw-p-4 tw-bg-neutral-50">
+                <p class="tw-text-neutral-500 tw-font-medium tw-mb-0 tw-inline-flex tw-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="tw-w-6 tw-h-6 tw-mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            </svg>
+            No notifications found        </p>
+            </div>
+
+</ul>                </li>
+
+
+                            </ul>
+        </div>
+    </nav>
+</div><div id="setup-menu-wrapper"
+    class="sidebar animated">
+    <ul class="nav metis-menu tw-mt-[57px]" id="setup-menu">
+        <div
+            class="tw-flex tw-items-center tw-justify-between tw-space-x-2 rtl:tw-space-x-reverse tw-pl-4 tw-pr-2.5 tw-py-3">
+
+            <span class="text-left tw-font-semibold customizer-heading">
+                Setup            </span>
+            <a
+                class="close-customizer tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700 hover:tw-bg-neutral-200 tw-p-0.5 hover:tw-rounded-md">
+                <i class="fa fa-close fa-fw"></i>
+            </a>
+        </div>
+                <li
+            class="menu-item-staff">
+            <a href="../staff.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Staff                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-customers">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Customers                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-customer-groups">
+                    <a
+                        href="../clients/groups.html">
+                                                <span class="sub-menu-text">
+                            Groups                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-support">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Support                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-departments">
+                    <a
+                        href="../departments.html">
+                                                <span class="sub-menu-text">
+                            Departments                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-predefined-replies">
+                    <a
+                        href="../tickets/predefined_replies.html">
+                                                <span class="sub-menu-text">
+                            Predefined Replies                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-priorities">
+                    <a
+                        href="../tickets/priorities.html">
+                                                <span class="sub-menu-text">
+                            Ticket Priority                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-statuses">
+                    <a
+                        href="../tickets/statuses.html">
+                                                <span class="sub-menu-text">
+                            Ticket Statuses                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-services">
+                    <a
+                        href="../tickets/services.html">
+                                                <span class="sub-menu-text">
+                            Services                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-tickets-spam-filters">
+                    <a
+                        href="../spam_filters/view/tickets.html">
+                                                <span class="sub-menu-text">
+                            Spam Filters                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-leads">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Leads                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-leads-sources">
+                    <a
+                        href="../leads/sources.html">
+                                                <span class="sub-menu-text">
+                            Sources                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-leads-statuses">
+                    <a
+                        href="../leads/statuses.html">
+                                                <span class="sub-menu-text">
+                            Statuses                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-leads-email-integration">
+                    <a
+                        href="../leads/email_integration.html">
+                                                <span class="sub-menu-text">
+                            Email Integration                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-web-to-lead">
+                    <a
+                        href="../leads/forms.html">
+                                                <span class="sub-menu-text">
+                            Web to Lead                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-finance">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Finance                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-taxes">
+                    <a
+                        href="../taxes.html">
+                                                <span class="sub-menu-text">
+                            Tax Rates                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-currencies">
+                    <a
+                        href="../currencies.html">
+                                                <span class="sub-menu-text">
+                            Currencies                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-payment-modes">
+                    <a
+                        href="../paymentmodes.html">
+                                                <span class="sub-menu-text">
+                            Payment Modes                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-expenses-categories">
+                    <a
+                        href="../expenses/categories.html">
+                                                <span class="sub-menu-text">
+                            Expenses Categories                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-contracts">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Contracts                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-contracts-types">
+                    <a
+                        href="../contracts/types.html">
+                                                <span class="sub-menu-text">
+                            Contract Types                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-estimate_request">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Estimate Request                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-estimate-request-forms">
+                    <a
+                        href="../estimate_request/forms.html">
+                                                <span class="sub-menu-text">
+                            Forms                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-estimate-request-statuses">
+                    <a
+                        href="../estimate_request/statuses.html">
+                                                <span class="sub-menu-text">
+                            Statuses                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-modules">
+            <a href="../modules.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Modules                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-email-templates">
+            <a href="../emails.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Email Templates                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-custom-fields">
+            <a href="../custom_fields.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Custom Fields                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-gdpr">
+            <a href="../gdpr.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    GDPR                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-roles">
+            <a href="../roles.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Roles                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-menu-options">
+            <a href="#"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Menu Setup                </span>
+                                <span class="fa arrow"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li
+                    class="sub-menu-item-main-menu-options">
+                    <a
+                        href="../menu_setup/main_menu.html">
+                                                <span class="sub-menu-text">
+                            Main Menu                        </span>
+                    </a>
+                                    </li>
+                                <li
+                    class="sub-menu-item-setup-menu-options">
+                    <a
+                        href="../menu_setup/setup_menu.html">
+                                                <span class="sub-menu-text">
+                            Setup Menu                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li
+            class="menu-item-theme-style">
+            <a href="../theme_style.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Theme Style                </span>
+                                            </a>
+                    </li>
+                        <li
+            class="menu-item-settings">
+            <a href="../settings.html"
+                aria-expanded="false">
+                <i
+                    class=" menu-icon"></i>
+                <span class="menu-text">
+                    Settings                </span>
+                                            </a>
+                    </li>
+                                <li>
+            <a href="https://help.perfexcrm.com"
+                target="_blank">
+                Help            </a>
+        </li>
+            </ul>
+</div>
+<aside id="menu" class="sidebar">
+    <div class="dropdown sidebar-user-profile tw-mt-[80px] tw-mx-1.5 ">
+        <a href="#"
+            class="dropdown-toggle profile -tw-mt-1 tw-text-neutral-700 tw-font-medium hover:tw-text-neutral-800 tw-border-solid tw-border-neutral-400/40 tw-border tw-rounded-lg tw-bg-white tw-py-2 tw-px-2.5 hover:tw-bg-neutral-100 focus:tw-bg-neutral-100 tw-block tw-shadow-sm focus:tw-text-neutral-800"
+            data-toggle="dropdown" aria-expanded="false">
+            <span class="tw-inline-flex tw-items-center tw-gap-x-3 tw-pt-0.5">
+                <img  src="../../uploads/staff_profile_images/1/small_1.png" class="img img-responsive staff-profile-image-small" />                <span>
+                    <span
+                        class="tw-truncate tw-block tw-w-[140px] tw-font-semibold">Ethel Hagenes</span>
+                    <span class="tw-font-normal tw-text-neutral-500 tw-truncate tw-block tw-w-[140px] tw-text-sm">
+                        admin@test.com                    </span>
+                </span>
+            </span>
+        </a>
+        <ul class="dropdown-menu tw-w-full">
+            <li class="header-my-profile"><a
+                    href="../profile.html">My Profile</a>
+            </li>
+            <li class="header-my-timesheets"><a
+                    href="../staff/timesheets.html">My Timesheets</a>
+            </li>
+            <li class="header-edit-profile"><a
+                    href="../staff/edit_profile.html">Edit Profile                </a>
+            </li>
+                        <li class="dropdown-submenu pull-left header-languages">
+                <a href="#"
+                    tabindex="-1">Language</a>
+                <ul class="dropdown-menu dropdown-menu">
+                    <li
+                        class="active">
+                        <a
+                            href="../index.html">
+                            System Default                        </a>
+                    </li>
+                                        <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Slovak                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Ukrainian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Vietnamese                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Finnish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Portuguese_br                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Polish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            German                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            English                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Japanese                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            French                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Czech                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Indonesia                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Persian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Swedish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Chinese                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Russian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Norwegian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Catalan                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Francais_canada                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Spanish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Greek                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Romanian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Italian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Turkish                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Bulgarian                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Dutch                        </a>
+                                            <li
+                        class="">
+                        <a
+                            href="../index.html">
+                            Portuguese                        </a>
+                                        </ul>
+            </li>
+                        <li class="header-logout">
+                <a href="#"
+                    onclick="logout(); return false;">Logout</a>
+            </li>
+        </ul>
+    </div>
+    <ul class="nav metis-menu tw-mt-[15px]" id="side-menu">
+
+                        <li class="menu-item-dashboard"
+            >
+            <a href="../index.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-object-group menu-icon"></i>
+                <span class="menu-text">
+                    Dashboard                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-customers"
+            >
+            <a href="../clients.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-user menu-icon"></i>
+                <span class="menu-text">
+                    Customers                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-sales"
+            >
+            <a href="#"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-solid fa-bolt menu-icon"></i>
+                <span class="menu-text">
+                    Sales                </span>
+                                <span class="fa arrow pleft5"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li class="sub-menu-item-proposals"
+                    >
+                    <a href="../proposals.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Proposals                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-estimates"
+                    >
+                    <a href="../estimates.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Estimates                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-invoices"
+                    >
+                    <a href="../invoices.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Invoices                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-payments"
+                    >
+                    <a href="../payments.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Payments                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-credit_notes"
+                    >
+                    <a href="../credit_notes.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Credit Notes                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-items"
+                    >
+                    <a href="../invoice_items.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Items                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li class="menu-item-subscriptions"
+            >
+            <a href="../subscriptions.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa fa-repeat menu-icon"></i>
+                <span class="menu-text">
+                    Subscriptions                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-expenses"
+            >
+            <a href="../expenses.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-file-lines menu-icon"></i>
+                <span class="menu-text">
+                    Expenses                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-contracts"
+            >
+            <a href="../contracts.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-note-sticky menu-icon"></i>
+                <span class="menu-text">
+                    Contracts                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-projects"
+            >
+            <a href="../projects.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-solid fa-chart-gantt menu-icon"></i>
+                <span class="menu-text">
+                    Projects                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-tasks"
+            >
+            <a href="../tasks.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-circle-check menu-icon"></i>
+                <span class="menu-text">
+                    Tasks                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-support"
+            >
+            <a href="../tickets.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-life-ring menu-icon"></i>
+                <span class="menu-text">
+                    Support                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-leads"
+            >
+            <a href="../leads.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-solid fa-crosshairs menu-icon"></i>
+                <span class="menu-text">
+                    Leads                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-estimate_request"
+            >
+            <a href="../estimate_request.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-file menu-icon"></i>
+                <span class="menu-text">
+                    Estimate Request                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-knowledge-base"
+            >
+            <a href="../knowledge_base.html"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-question-circle menu-icon"></i>
+                <span class="menu-text">
+                    Knowledge Base                </span>
+                                            </a>
+                    </li>
+                        <li class="menu-item-utilities"
+            >
+            <a href="#"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-regular fa-circle-dot menu-icon"></i>
+                <span class="menu-text">
+                    Utilities                </span>
+                                <span class="fa arrow pleft5"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li class="sub-menu-item-media"
+                    >
+                    <a href="../utilities/media.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Media                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-bulk-pdf-exporter"
+                    >
+                    <a href="../utilities/bulk_pdf_exporter.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Bulk PDF Export                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-csv-export"
+                    >
+                    <a href="../exports.html"
+                        >
+                                                <span class="sub-menu-text">
+                            CSV Export                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-calendar"
+                    >
+                    <a href="../utilities/calendar.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Calendar                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-announcements"
+                    >
+                    <a href="../announcements.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Announcements                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-goals-tracking"
+                    >
+                    <a href="../goals.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Goals                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-activity-log"
+                    >
+                    <a href="../utilities/activity_log.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Activity Log                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-surveys"
+                    >
+                    <a href="../surveys.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Surveys                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-utility_backup"
+                    >
+                    <a href="../backup.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Database Backup                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-ticket-pipe-log"
+                    >
+                    <a href="../utilities/pipe_log.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Ticket Pipe Log                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                        <li class="menu-item-reports"
+            >
+            <a href="#"
+                aria-expanded="false"
+                >
+                <i
+                    class="fa-solid fa-chart-line menu-icon"></i>
+                <span class="menu-text">
+                    Reports                </span>
+                                <span class="fa arrow pleft5"></span>
+                                            </a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                                <li class="sub-menu-item-sales-reports"
+                    >
+                    <a href="../reports/sales.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Sales                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-expenses-reports"
+                    >
+                    <a href="../reports/expenses.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Expenses                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-expenses-vs-income-reports"
+                    >
+                    <a href="../reports/expenses_vs_income.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Expenses vs Income                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-leads-reports"
+                    >
+                    <a href="../reports/leads.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Leads                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-timesheets-reports"
+                    >
+                    <a href="../staff/timesheets%EF%B9%96view=all.html"
+                        >
+                                                <span class="sub-menu-text">
+                            Timesheets overview                        </span>
+                    </a>
+                                    </li>
+                                <li class="sub-menu-item-knowledge-base-reports"
+                    >
+                    <a href="../reports/knowledge_base_articles.html"
+                        >
+                                                <span class="sub-menu-text">
+                            KB Articles                        </span>
+                    </a>
+                                    </li>
+                            </ul>
+                    </li>
+                                <li id="setup-menu-item">
+            <a href="#" class="open-customizer"><i class="fa fa-cog menu-icon"></i>
+                <span class="menu-text">
+                    Setup                                    </span>
+            </a>
+                        </li>
+                              <li class="pinned-separator tw-border-b tw-border-solid tw-border-neutral-900/10 tw-mt-1"></li>
+      <li class="pinned_project last:tw-border-b last:tw-border-solid last:tw-border-neutral-900/10">
+      <a href="../projects/view/2.html"
+         data-toggle="tooltip"
+         data-title="Pinned Project">
+         SEO Optimization<br>
+         <small>
+            Hartmann-Towne         </small>
+      </a>
+      <div class="col-md-12">
+         <div class="progress progress-bar-mini">
+            <div class="progress-bar no-percent-text not-dynamic" role="progressbar"
+               data-percent="46.67"
+               style="width: 46.67%;">
+            </div>
+         </div>
+      </div>
+   </li>
+          </ul>
+</aside><div id="wrapper">
+    <div class="content">
+        <div class="row">
+            <form action="invoice.html" id="invoice-form" class="_transaction_form invoice-form" method="post" accept-charset="utf-8">
+                    <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+                        <div class="col-md-12">
+                <h4 class="tw-mt-0 tw-font-bold tw-text-lg tw-text-neutral-700 tw-flex tw-items-center tw-space-x-2">
+                    <span>
+                        Create New Invoice                    </span>
+                                    </h4>
+                <div class="hide"
+    id="invoice_top_info">
+    <div class="panel_s">
+        <div class="panel-body tw-bg-gradient-to-l tw-from-transparent tw-to-neutral-50">
+            <div class="row">
+                <div id="merge" class="col-md-6">
+                                    </div>
+                <!--  When invoicing from project area the expenses are not visible here because you can select to bill expenses while trying to invoice project -->
+                                <div id="expenses_to_bill" class="col-md-6">
+                                    </div>
+                            </div>
+        </div>
+    </div>
+</div>
+<div class="panel_s invoice accounting-template">
+    <div class="additional"></div>
+    <div class="panel-body">
+        <p><a href="https://help.perfexcrm.com/how-totals-are-calculated/" target="_blank" data-toggle="tooltip" data-title="Demo Link" data-placement="bottom">How total is calculated?</a></p>                <div class="row">
+            <div class="col-md-6">
+                <div class="f_client_id">
+                    <div class="form-group select-placeholder">
+                        <label for="clientid"
+                            class="control-label">Customer</label>
+                        <select id="clientid" name="clientid" data-live-search="true" data-width="100%"
+                            class="ajax-search"
+                            data-none-selected-text="Nothing selected">
+                                                                                </select>
+                    </div>
+                </div>
+                                <div class="form-group select-placeholder projects-wrapper">
+                    <label
+                        for="project_id">Project</label>
+                    <div id="project_ajax_search_wrapper">
+                        <select name="project_id" id="project_id" class="projects ajax-search" data-live-search="true"
+                            data-width="100%"
+                            data-none-selected-text="Nothing selected">
+                            
+                                                    </select>
+                    </div>
+                </div>
+                                <div class="row">
+                    <div class="col-md-12">
+                        <hr class="hr-10" />
+                        <a href="#" class="edit_shipping_billing_info" data-toggle="modal"
+                            data-target="#billing_and_shipping_details"><i class="fa-regular fa-pen-to-square"></i></a>
+                        <div class="modal fade" id="billing_and_shipping_details" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                                        <div class="col-md-12">
+                        <div id="billing_details">
+                                                        <div class="form-group" app-field-wrapper="billing_street"><label for="billing_street" class="control-label">Street</label><textarea id="billing_street" name="billing_street" class="form-control" rows="4"></textarea></div>                                                        <div class="form-group" app-field-wrapper="billing_city"><label for="billing_city" class="control-label">City</label><input type="text" id="billing_city" name="billing_city" class="form-control"  value=""></div>                                                        <div class="form-group" app-field-wrapper="billing_state"><label for="billing_state" class="control-label">State</label><input type="text" id="billing_state" name="billing_state" class="form-control"  value=""></div>                                                        <div class="form-group" app-field-wrapper="billing_zip"><label for="billing_zip" class="control-label">Zip Code</label><input type="text" id="billing_zip" name="billing_zip" class="form-control"  value=""></div>                                                        <div class="select-placeholder form-group" app-field-wrapper="billing_country"><label for="billing_country" class="control-label">Country</label><select id="billing_country" name="billing_country" class="selectpicker" data-width="100%" data-none-selected-text="Nothing selected" data-live-search="true"><option value=""></option><option value="1" data-subtext="AF">Afghanistan</option><option value="2" data-subtext="AX">Aland Islands</option><option value="3" data-subtext="AL">Albania</option><option value="4" data-subtext="DZ">Algeria</option><option value="5" data-subtext="AS">American Samoa</option><option value="6" data-subtext="AD">Andorra</option><option value="7" data-subtext="AO">Angola</option><option value="8" data-subtext="AI">Anguilla</option><option value="9" data-subtext="AQ">Antarctica</option><option value="10" data-subtext="AG">Antigua and Barbuda</option><option value="11" data-subtext="AR">Argentina</option><option value="12" data-subtext="AM">Armenia</option><option value="13" data-subtext="AW">Aruba</option><option value="14" data-subtext="AU">Australia</option><option value="15" data-subtext="AT">Austria</option><option value="16" data-subtext="AZ">Azerbaijan</option><option value="17" data-subtext="BS">Bahamas</option><option value="18" data-subtext="BH">Bahrain</option><option value="19" data-subtext="BD">Bangladesh</option><option value="20" data-subtext="BB">Barbados</option><option value="21" data-subtext="BY">Belarus</option><option value="22" data-subtext="BE">Belgium</option><option value="23" data-subtext="BZ">Belize</option><option value="24" data-subtext="BJ">Benin</option><option value="25" data-subtext="BM">Bermuda</option><option value="26" data-subtext="BT">Bhutan</option><option value="27" data-subtext="BO">Bolivia</option><option value="28" data-subtext="BQ">Bonaire, Sint Eustatius and Saba</option><option value="29" data-subtext="BA">Bosnia and Herzegovina</option><option value="30" data-subtext="BW">Botswana</option><option value="31" data-subtext="BV">Bouvet Island</option><option value="32" data-subtext="BR">Brazil</option><option value="33" data-subtext="IO">British Indian Ocean Territory</option><option value="34" data-subtext="BN">Brunei</option><option value="35" data-subtext="BG">Bulgaria</option><option value="36" data-subtext="BF">Burkina Faso</option><option value="37" data-subtext="BI">Burundi</option><option value="38" data-subtext="KH">Cambodia</option><option value="39" data-subtext="CM">Cameroon</option><option value="40" data-subtext="CA">Canada</option><option value="41" data-subtext="CV">Cape Verde</option><option value="42" data-subtext="KY">Cayman Islands</option><option value="43" data-subtext="CF">Central African Republic</option><option value="44" data-subtext="TD">Chad</option><option value="45" data-subtext="CL">Chile</option><option value="46" data-subtext="CN">China</option><option value="47" data-subtext="CX">Christmas Island</option><option value="48" data-subtext="CC">Cocos (Keeling) Islands</option><option value="49" data-subtext="CO">Colombia</option><option value="50" data-subtext="KM">Comoros</option><option value="51" data-subtext="CG">Congo</option><option value="52" data-subtext="CK">Cook Islands</option><option value="53" data-subtext="CR">Costa Rica</option><option value="54" data-subtext="CI">Cote d'ivoire (Ivory Coast)</option><option value="55" data-subtext="HR">Croatia</option><option value="56" data-subtext="CU">Cuba</option><option value="57" data-subtext="CW">Curacao</option><option value="58" data-subtext="CY">Cyprus</option><option value="59" data-subtext="CZ">Czech Republic</option><option value="60" data-subtext="CD">Democratic Republic of the Congo</option><option value="61" data-subtext="DK">Denmark</option><option value="62" data-subtext="DJ">Djibouti</option><option value="63" data-subtext="DM">Dominica</option><option value="64" data-subtext="DO">Dominican Republic</option><option value="65" data-subtext="EC">Ecuador</option><option value="66" data-subtext="EG">Egypt</option><option value="67" data-subtext="SV">El Salvador</option><option value="68" data-subtext="GQ">Equatorial Guinea</option><option value="69" data-subtext="ER">Eritrea</option><option value="70" data-subtext="EE">Estonia</option><option value="71" data-subtext="ET">Ethiopia</option><option value="72" data-subtext="FK">Falkland Islands (Malvinas)</option><option value="73" data-subtext="FO">Faroe Islands</option><option value="74" data-subtext="FJ">Fiji</option><option value="75" data-subtext="FI">Finland</option><option value="76" data-subtext="FR">France</option><option value="77" data-subtext="GF">French Guiana</option><option value="78" data-subtext="PF">French Polynesia</option><option value="79" data-subtext="TF">French Southern Territories</option><option value="80" data-subtext="GA">Gabon</option><option value="81" data-subtext="GM">Gambia</option><option value="82" data-subtext="GE">Georgia</option><option value="83" data-subtext="DE">Germany</option><option value="84" data-subtext="GH">Ghana</option><option value="85" data-subtext="GI">Gibraltar</option><option value="86" data-subtext="GR">Greece</option><option value="87" data-subtext="GL">Greenland</option><option value="88" data-subtext="GD">Grenada</option><option value="89" data-subtext="GP">Guadaloupe</option><option value="90" data-subtext="GU">Guam</option><option value="91" data-subtext="GT">Guatemala</option><option value="92" data-subtext="GG">Guernsey</option><option value="93" data-subtext="GN">Guinea</option><option value="94" data-subtext="GW">Guinea-Bissau</option><option value="95" data-subtext="GY">Guyana</option><option value="96" data-subtext="HT">Haiti</option><option value="97" data-subtext="HM">Heard Island and McDonald Islands</option><option value="98" data-subtext="HN">Honduras</option><option value="99" data-subtext="HK">Hong Kong</option><option value="100" data-subtext="HU">Hungary</option><option value="101" data-subtext="IS">Iceland</option><option value="102" data-subtext="IN">India</option><option value="103" data-subtext="ID">Indonesia</option><option value="104" data-subtext="IR">Iran</option><option value="105" data-subtext="IQ">Iraq</option><option value="106" data-subtext="IE">Ireland</option><option value="107" data-subtext="IM">Isle of Man</option><option value="108" data-subtext="IL">Israel</option><option value="109" data-subtext="IT">Italy</option><option value="110" data-subtext="JM">Jamaica</option><option value="111" data-subtext="JP">Japan</option><option value="112" data-subtext="JE">Jersey</option><option value="113" data-subtext="JO">Jordan</option><option value="114" data-subtext="KZ">Kazakhstan</option><option value="115" data-subtext="KE">Kenya</option><option value="116" data-subtext="KI">Kiribati</option><option value="117" data-subtext="XK">Kosovo</option><option value="118" data-subtext="KW">Kuwait</option><option value="119" data-subtext="KG">Kyrgyzstan</option><option value="120" data-subtext="LA">Laos</option><option value="121" data-subtext="LV">Latvia</option><option value="122" data-subtext="LB">Lebanon</option><option value="123" data-subtext="LS">Lesotho</option><option value="124" data-subtext="LR">Liberia</option><option value="125" data-subtext="LY">Libya</option><option value="126" data-subtext="LI">Liechtenstein</option><option value="127" data-subtext="LT">Lithuania</option><option value="128" data-subtext="LU">Luxembourg</option><option value="129" data-subtext="MO">Macao</option><option value="131" data-subtext="MG">Madagascar</option><option value="132" data-subtext="MW">Malawi</option><option value="133" data-subtext="MY">Malaysia</option><option value="134" data-subtext="MV">Maldives</option><option value="135" data-subtext="ML">Mali</option><option value="136" data-subtext="MT">Malta</option><option value="137" data-subtext="MH">Marshall Islands</option><option value="138" data-subtext="MQ">Martinique</option><option value="139" data-subtext="MR">Mauritania</option><option value="140" data-subtext="MU">Mauritius</option><option value="141" data-subtext="YT">Mayotte</option><option value="142" data-subtext="MX">Mexico</option><option value="143" data-subtext="FM">Micronesia</option><option value="144" data-subtext="MD">Moldava</option><option value="145" data-subtext="MC">Monaco</option><option value="146" data-subtext="MN">Mongolia</option><option value="147" data-subtext="ME">Montenegro</option><option value="148" data-subtext="MS">Montserrat</option><option value="149" data-subtext="MA">Morocco</option><option value="150" data-subtext="MZ">Mozambique</option><option value="151" data-subtext="MM">Myanmar (Burma)</option><option value="152" data-subtext="NA">Namibia</option><option value="153" data-subtext="NR">Nauru</option><option value="154" data-subtext="NP">Nepal</option><option value="155" data-subtext="NL">Netherlands</option><option value="156" data-subtext="NC">New Caledonia</option><option value="157" data-subtext="NZ">New Zealand</option><option value="158" data-subtext="NI">Nicaragua</option><option value="159" data-subtext="NE">Niger</option><option value="160" data-subtext="NG">Nigeria</option><option value="161" data-subtext="NU">Niue</option><option value="162" data-subtext="NF">Norfolk Island</option><option value="163" data-subtext="KP">North Korea</option><option value="130" data-subtext="MK">North Macedonia</option><option value="164" data-subtext="MP">Northern Mariana Islands</option><option value="165" data-subtext="NO">Norway</option><option value="166" data-subtext="OM">Oman</option><option value="167" data-subtext="PK">Pakistan</option><option value="168" data-subtext="PW">Palau</option><option value="169" data-subtext="PS">Palestine</option><option value="170" data-subtext="PA">Panama</option><option value="171" data-subtext="PG">Papua New Guinea</option><option value="172" data-subtext="PY">Paraguay</option><option value="173" data-subtext="PE">Peru</option><option value="174" data-subtext="PH">Philippines</option><option value="175" data-subtext="PN">Pitcairn</option><option value="176" data-subtext="PL">Poland</option><option value="177" data-subtext="PT">Portugal</option><option value="178" data-subtext="PR">Puerto Rico</option><option value="179" data-subtext="QA">Qatar</option><option value="180" data-subtext="RE">Reunion</option><option value="181" data-subtext="RO">Romania</option><option value="182" data-subtext="RU">Russia</option><option value="183" data-subtext="RW">Rwanda</option><option value="184" data-subtext="BL">Saint Barthelemy</option><option value="185" data-subtext="SH">Saint Helena</option><option value="186" data-subtext="KN">Saint Kitts and Nevis</option><option value="187" data-subtext="LC">Saint Lucia</option><option value="188" data-subtext="MF">Saint Martin</option><option value="189" data-subtext="PM">Saint Pierre and Miquelon</option><option value="190" data-subtext="VC">Saint Vincent and the Grenadines</option><option value="191" data-subtext="WS">Samoa</option><option value="192" data-subtext="SM">San Marino</option><option value="193" data-subtext="ST">Sao Tome and Principe</option><option value="194" data-subtext="SA">Saudi Arabia</option><option value="195" data-subtext="SN">Senegal</option><option value="196" data-subtext="RS">Serbia</option><option value="197" data-subtext="SC">Seychelles</option><option value="198" data-subtext="SL">Sierra Leone</option><option value="199" data-subtext="SG">Singapore</option><option value="200" data-subtext="SX">Sint Maarten</option><option value="201" data-subtext="SK">Slovakia</option><option value="202" data-subtext="SI">Slovenia</option><option value="203" data-subtext="SB">Solomon Islands</option><option value="204" data-subtext="SO">Somalia</option><option value="205" data-subtext="ZA">South Africa</option><option value="206" data-subtext="GS">South Georgia and the South Sandwich Islands</option><option value="207" data-subtext="KR">South Korea</option><option value="208" data-subtext="SS">South Sudan</option><option value="209" data-subtext="ES">Spain</option><option value="210" data-subtext="LK">Sri Lanka</option><option value="211" data-subtext="SD">Sudan</option><option value="212" data-subtext="SR">Suriname</option><option value="213" data-subtext="SJ">Svalbard and Jan Mayen</option><option value="214" data-subtext="SZ">Swaziland</option><option value="215" data-subtext="SE">Sweden</option><option value="216" data-subtext="CH">Switzerland</option><option value="217" data-subtext="SY">Syria</option><option value="218" data-subtext="TW">Taiwan</option><option value="219" data-subtext="TJ">Tajikistan</option><option value="220" data-subtext="TZ">Tanzania</option><option value="221" data-subtext="TH">Thailand</option><option value="222" data-subtext="TL">Timor-Leste (East Timor)</option><option value="223" data-subtext="TG">Togo</option><option value="224" data-subtext="TK">Tokelau</option><option value="225" data-subtext="TO">Tonga</option><option value="226" data-subtext="TT">Trinidad and Tobago</option><option value="227" data-subtext="TN">Tunisia</option><option value="228" data-subtext="TR">Turkey</option><option value="229" data-subtext="TM">Turkmenistan</option><option value="230" data-subtext="TC">Turks and Caicos Islands</option><option value="231" data-subtext="TV">Tuvalu</option><option value="232" data-subtext="UG">Uganda</option><option value="233" data-subtext="UA">Ukraine</option><option value="234" data-subtext="AE">United Arab Emirates</option><option value="235" data-subtext="GB">United Kingdom</option><option value="236" data-subtext="US">United States</option><option value="237" data-subtext="UM">United States Minor Outlying Islands</option><option value="238" data-subtext="UY">Uruguay</option><option value="239" data-subtext="UZ">Uzbekistan</option><option value="240" data-subtext="VU">Vanuatu</option><option value="241" data-subtext="VA">Vatican City</option><option value="242" data-subtext="VE">Venezuela</option><option value="243" data-subtext="VN">Vietnam</option><option value="244" data-subtext="VG">Virgin Islands, British</option><option value="245" data-subtext="VI">Virgin Islands, US</option><option value="246" data-subtext="WF">Wallis and Futuna</option><option value="247" data-subtext="EH">Western Sahara</option><option value="248" data-subtext="YE">Yemen</option><option value="249" data-subtext="ZM">Zambia</option><option value="250" data-subtext="ZW">Zimbabwe</option></select></div>                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <hr />
+                        <a href="#" class="pull-right" id="get_shipping_from_customer_profile" data-placement="left" data-toggle="tooltip" title="Get shipping details from customer profile"><i class="fa fa-user"></i></a>
+                        <div class="clearfix"></div>
+                      <div class="form-group no-mbot">
+                            <div class="checkbox checkbox-primary checkbox-inline">
+                            <input type="checkbox" id="include_shipping" name="include_shipping" >
+                            <label for="include_shipping">Shipping Address</label>
+                        </div>
+                      </div>
+                        <div id="shipping_details" class="hide">
+                          <div class="form-group">
+                                <div class="checkbox checkbox-primary checkbox-inline">
+                                <input type="checkbox" id="show_shipping_on_invoice" name="show_shipping_on_invoice" checked>
+                                <label for="show_shipping_on_invoice">Show shipping details in invoice</label>
+                            </div>
+                          </div>
+                                                        <div class="form-group" app-field-wrapper="shipping_street"><label for="shipping_street" class="control-label">Street</label><textarea id="shipping_street" name="shipping_street" class="form-control" rows="4"></textarea></div>                                                        <div class="form-group" app-field-wrapper="shipping_city"><label for="shipping_city" class="control-label">City</label><input type="text" id="shipping_city" name="shipping_city" class="form-control"  value=""></div>                                                        <div class="form-group" app-field-wrapper="shipping_state"><label for="shipping_state" class="control-label">State</label><input type="text" id="shipping_state" name="shipping_state" class="form-control"  value=""></div>                                                        <div class="form-group" app-field-wrapper="shipping_zip"><label for="shipping_zip" class="control-label">Zip Code</label><input type="text" id="shipping_zip" name="shipping_zip" class="form-control"  value=""></div>                                                        <div class="select-placeholder form-group" app-field-wrapper="shipping_country"><label for="shipping_country" class="control-label">Country</label><select id="shipping_country" name="shipping_country" class="selectpicker" data-width="100%" data-none-selected-text="Nothing selected" data-live-search="true"><option value=""></option><option value="1" data-subtext="AF">Afghanistan</option><option value="2" data-subtext="AX">Aland Islands</option><option value="3" data-subtext="AL">Albania</option><option value="4" data-subtext="DZ">Algeria</option><option value="5" data-subtext="AS">American Samoa</option><option value="6" data-subtext="AD">Andorra</option><option value="7" data-subtext="AO">Angola</option><option value="8" data-subtext="AI">Anguilla</option><option value="9" data-subtext="AQ">Antarctica</option><option value="10" data-subtext="AG">Antigua and Barbuda</option><option value="11" data-subtext="AR">Argentina</option><option value="12" data-subtext="AM">Armenia</option><option value="13" data-subtext="AW">Aruba</option><option value="14" data-subtext="AU">Australia</option><option value="15" data-subtext="AT">Austria</option><option value="16" data-subtext="AZ">Azerbaijan</option><option value="17" data-subtext="BS">Bahamas</option><option value="18" data-subtext="BH">Bahrain</option><option value="19" data-subtext="BD">Bangladesh</option><option value="20" data-subtext="BB">Barbados</option><option value="21" data-subtext="BY">Belarus</option><option value="22" data-subtext="BE">Belgium</option><option value="23" data-subtext="BZ">Belize</option><option value="24" data-subtext="BJ">Benin</option><option value="25" data-subtext="BM">Bermuda</option><option value="26" data-subtext="BT">Bhutan</option><option value="27" data-subtext="BO">Bolivia</option><option value="28" data-subtext="BQ">Bonaire, Sint Eustatius and Saba</option><option value="29" data-subtext="BA">Bosnia and Herzegovina</option><option value="30" data-subtext="BW">Botswana</option><option value="31" data-subtext="BV">Bouvet Island</option><option value="32" data-subtext="BR">Brazil</option><option value="33" data-subtext="IO">British Indian Ocean Territory</option><option value="34" data-subtext="BN">Brunei</option><option value="35" data-subtext="BG">Bulgaria</option><option value="36" data-subtext="BF">Burkina Faso</option><option value="37" data-subtext="BI">Burundi</option><option value="38" data-subtext="KH">Cambodia</option><option value="39" data-subtext="CM">Cameroon</option><option value="40" data-subtext="CA">Canada</option><option value="41" data-subtext="CV">Cape Verde</option><option value="42" data-subtext="KY">Cayman Islands</option><option value="43" data-subtext="CF">Central African Republic</option><option value="44" data-subtext="TD">Chad</option><option value="45" data-subtext="CL">Chile</option><option value="46" data-subtext="CN">China</option><option value="47" data-subtext="CX">Christmas Island</option><option value="48" data-subtext="CC">Cocos (Keeling) Islands</option><option value="49" data-subtext="CO">Colombia</option><option value="50" data-subtext="KM">Comoros</option><option value="51" data-subtext="CG">Congo</option><option value="52" data-subtext="CK">Cook Islands</option><option value="53" data-subtext="CR">Costa Rica</option><option value="54" data-subtext="CI">Cote d'ivoire (Ivory Coast)</option><option value="55" data-subtext="HR">Croatia</option><option value="56" data-subtext="CU">Cuba</option><option value="57" data-subtext="CW">Curacao</option><option value="58" data-subtext="CY">Cyprus</option><option value="59" data-subtext="CZ">Czech Republic</option><option value="60" data-subtext="CD">Democratic Republic of the Congo</option><option value="61" data-subtext="DK">Denmark</option><option value="62" data-subtext="DJ">Djibouti</option><option value="63" data-subtext="DM">Dominica</option><option value="64" data-subtext="DO">Dominican Republic</option><option value="65" data-subtext="EC">Ecuador</option><option value="66" data-subtext="EG">Egypt</option><option value="67" data-subtext="SV">El Salvador</option><option value="68" data-subtext="GQ">Equatorial Guinea</option><option value="69" data-subtext="ER">Eritrea</option><option value="70" data-subtext="EE">Estonia</option><option value="71" data-subtext="ET">Ethiopia</option><option value="72" data-subtext="FK">Falkland Islands (Malvinas)</option><option value="73" data-subtext="FO">Faroe Islands</option><option value="74" data-subtext="FJ">Fiji</option><option value="75" data-subtext="FI">Finland</option><option value="76" data-subtext="FR">France</option><option value="77" data-subtext="GF">French Guiana</option><option value="78" data-subtext="PF">French Polynesia</option><option value="79" data-subtext="TF">French Southern Territories</option><option value="80" data-subtext="GA">Gabon</option><option value="81" data-subtext="GM">Gambia</option><option value="82" data-subtext="GE">Georgia</option><option value="83" data-subtext="DE">Germany</option><option value="84" data-subtext="GH">Ghana</option><option value="85" data-subtext="GI">Gibraltar</option><option value="86" data-subtext="GR">Greece</option><option value="87" data-subtext="GL">Greenland</option><option value="88" data-subtext="GD">Grenada</option><option value="89" data-subtext="GP">Guadaloupe</option><option value="90" data-subtext="GU">Guam</option><option value="91" data-subtext="GT">Guatemala</option><option value="92" data-subtext="GG">Guernsey</option><option value="93" data-subtext="GN">Guinea</option><option value="94" data-subtext="GW">Guinea-Bissau</option><option value="95" data-subtext="GY">Guyana</option><option value="96" data-subtext="HT">Haiti</option><option value="97" data-subtext="HM">Heard Island and McDonald Islands</option><option value="98" data-subtext="HN">Honduras</option><option value="99" data-subtext="HK">Hong Kong</option><option value="100" data-subtext="HU">Hungary</option><option value="101" data-subtext="IS">Iceland</option><option value="102" data-subtext="IN">India</option><option value="103" data-subtext="ID">Indonesia</option><option value="104" data-subtext="IR">Iran</option><option value="105" data-subtext="IQ">Iraq</option><option value="106" data-subtext="IE">Ireland</option><option value="107" data-subtext="IM">Isle of Man</option><option value="108" data-subtext="IL">Israel</option><option value="109" data-subtext="IT">Italy</option><option value="110" data-subtext="JM">Jamaica</option><option value="111" data-subtext="JP">Japan</option><option value="112" data-subtext="JE">Jersey</option><option value="113" data-subtext="JO">Jordan</option><option value="114" data-subtext="KZ">Kazakhstan</option><option value="115" data-subtext="KE">Kenya</option><option value="116" data-subtext="KI">Kiribati</option><option value="117" data-subtext="XK">Kosovo</option><option value="118" data-subtext="KW">Kuwait</option><option value="119" data-subtext="KG">Kyrgyzstan</option><option value="120" data-subtext="LA">Laos</option><option value="121" data-subtext="LV">Latvia</option><option value="122" data-subtext="LB">Lebanon</option><option value="123" data-subtext="LS">Lesotho</option><option value="124" data-subtext="LR">Liberia</option><option value="125" data-subtext="LY">Libya</option><option value="126" data-subtext="LI">Liechtenstein</option><option value="127" data-subtext="LT">Lithuania</option><option value="128" data-subtext="LU">Luxembourg</option><option value="129" data-subtext="MO">Macao</option><option value="131" data-subtext="MG">Madagascar</option><option value="132" data-subtext="MW">Malawi</option><option value="133" data-subtext="MY">Malaysia</option><option value="134" data-subtext="MV">Maldives</option><option value="135" data-subtext="ML">Mali</option><option value="136" data-subtext="MT">Malta</option><option value="137" data-subtext="MH">Marshall Islands</option><option value="138" data-subtext="MQ">Martinique</option><option value="139" data-subtext="MR">Mauritania</option><option value="140" data-subtext="MU">Mauritius</option><option value="141" data-subtext="YT">Mayotte</option><option value="142" data-subtext="MX">Mexico</option><option value="143" data-subtext="FM">Micronesia</option><option value="144" data-subtext="MD">Moldava</option><option value="145" data-subtext="MC">Monaco</option><option value="146" data-subtext="MN">Mongolia</option><option value="147" data-subtext="ME">Montenegro</option><option value="148" data-subtext="MS">Montserrat</option><option value="149" data-subtext="MA">Morocco</option><option value="150" data-subtext="MZ">Mozambique</option><option value="151" data-subtext="MM">Myanmar (Burma)</option><option value="152" data-subtext="NA">Namibia</option><option value="153" data-subtext="NR">Nauru</option><option value="154" data-subtext="NP">Nepal</option><option value="155" data-subtext="NL">Netherlands</option><option value="156" data-subtext="NC">New Caledonia</option><option value="157" data-subtext="NZ">New Zealand</option><option value="158" data-subtext="NI">Nicaragua</option><option value="159" data-subtext="NE">Niger</option><option value="160" data-subtext="NG">Nigeria</option><option value="161" data-subtext="NU">Niue</option><option value="162" data-subtext="NF">Norfolk Island</option><option value="163" data-subtext="KP">North Korea</option><option value="130" data-subtext="MK">North Macedonia</option><option value="164" data-subtext="MP">Northern Mariana Islands</option><option value="165" data-subtext="NO">Norway</option><option value="166" data-subtext="OM">Oman</option><option value="167" data-subtext="PK">Pakistan</option><option value="168" data-subtext="PW">Palau</option><option value="169" data-subtext="PS">Palestine</option><option value="170" data-subtext="PA">Panama</option><option value="171" data-subtext="PG">Papua New Guinea</option><option value="172" data-subtext="PY">Paraguay</option><option value="173" data-subtext="PE">Peru</option><option value="174" data-subtext="PH">Philippines</option><option value="175" data-subtext="PN">Pitcairn</option><option value="176" data-subtext="PL">Poland</option><option value="177" data-subtext="PT">Portugal</option><option value="178" data-subtext="PR">Puerto Rico</option><option value="179" data-subtext="QA">Qatar</option><option value="180" data-subtext="RE">Reunion</option><option value="181" data-subtext="RO">Romania</option><option value="182" data-subtext="RU">Russia</option><option value="183" data-subtext="RW">Rwanda</option><option value="184" data-subtext="BL">Saint Barthelemy</option><option value="185" data-subtext="SH">Saint Helena</option><option value="186" data-subtext="KN">Saint Kitts and Nevis</option><option value="187" data-subtext="LC">Saint Lucia</option><option value="188" data-subtext="MF">Saint Martin</option><option value="189" data-subtext="PM">Saint Pierre and Miquelon</option><option value="190" data-subtext="VC">Saint Vincent and the Grenadines</option><option value="191" data-subtext="WS">Samoa</option><option value="192" data-subtext="SM">San Marino</option><option value="193" data-subtext="ST">Sao Tome and Principe</option><option value="194" data-subtext="SA">Saudi Arabia</option><option value="195" data-subtext="SN">Senegal</option><option value="196" data-subtext="RS">Serbia</option><option value="197" data-subtext="SC">Seychelles</option><option value="198" data-subtext="SL">Sierra Leone</option><option value="199" data-subtext="SG">Singapore</option><option value="200" data-subtext="SX">Sint Maarten</option><option value="201" data-subtext="SK">Slovakia</option><option value="202" data-subtext="SI">Slovenia</option><option value="203" data-subtext="SB">Solomon Islands</option><option value="204" data-subtext="SO">Somalia</option><option value="205" data-subtext="ZA">South Africa</option><option value="206" data-subtext="GS">South Georgia and the South Sandwich Islands</option><option value="207" data-subtext="KR">South Korea</option><option value="208" data-subtext="SS">South Sudan</option><option value="209" data-subtext="ES">Spain</option><option value="210" data-subtext="LK">Sri Lanka</option><option value="211" data-subtext="SD">Sudan</option><option value="212" data-subtext="SR">Suriname</option><option value="213" data-subtext="SJ">Svalbard and Jan Mayen</option><option value="214" data-subtext="SZ">Swaziland</option><option value="215" data-subtext="SE">Sweden</option><option value="216" data-subtext="CH">Switzerland</option><option value="217" data-subtext="SY">Syria</option><option value="218" data-subtext="TW">Taiwan</option><option value="219" data-subtext="TJ">Tajikistan</option><option value="220" data-subtext="TZ">Tanzania</option><option value="221" data-subtext="TH">Thailand</option><option value="222" data-subtext="TL">Timor-Leste (East Timor)</option><option value="223" data-subtext="TG">Togo</option><option value="224" data-subtext="TK">Tokelau</option><option value="225" data-subtext="TO">Tonga</option><option value="226" data-subtext="TT">Trinidad and Tobago</option><option value="227" data-subtext="TN">Tunisia</option><option value="228" data-subtext="TR">Turkey</option><option value="229" data-subtext="TM">Turkmenistan</option><option value="230" data-subtext="TC">Turks and Caicos Islands</option><option value="231" data-subtext="TV">Tuvalu</option><option value="232" data-subtext="UG">Uganda</option><option value="233" data-subtext="UA">Ukraine</option><option value="234" data-subtext="AE">United Arab Emirates</option><option value="235" data-subtext="GB">United Kingdom</option><option value="236" data-subtext="US">United States</option><option value="237" data-subtext="UM">United States Minor Outlying Islands</option><option value="238" data-subtext="UY">Uruguay</option><option value="239" data-subtext="UZ">Uzbekistan</option><option value="240" data-subtext="VU">Vanuatu</option><option value="241" data-subtext="VA">Vatican City</option><option value="242" data-subtext="VE">Venezuela</option><option value="243" data-subtext="VN">Vietnam</option><option value="244" data-subtext="VG">Virgin Islands, British</option><option value="245" data-subtext="VI">Virgin Islands, US</option><option value="246" data-subtext="WF">Wallis and Futuna</option><option value="247" data-subtext="EH">Western Sahara</option><option value="248" data-subtext="YE">Yemen</option><option value="249" data-subtext="ZM">Zambia</option><option value="250" data-subtext="ZW">Zimbabwe</option></select></div>                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer modal-not-full-width">
+                <a href="#" class="btn btn-primary save-shipping-billing">Apply</a>
+            </div>
+        </div>
+    </div>
+</div>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="bold">
+                            Bill To                        </p>
+                        <address>
+                            <span class="billing_street">
+                                                                                                --</span><br>
+                            <span class="billing_city">
+                                                                                                --</span>,
+                            <span class="billing_state">
+                                                                                                --</span>
+                            <br />
+                            <span class="billing_country">
+                                                                                                --</span>,
+                            <span class="billing_zip">
+                                                                                                --</span>
+                        </address>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="bold">
+                            Ship to                        </p>
+                        <address>
+                            <span class="shipping_street">
+                                                                                                --</span><br>
+                            <span class="shipping_city">
+                                                                                                --</span>,
+                            <span class="shipping_state">
+                                                                                                --</span>
+                            <br />
+                            <span class="shipping_country">
+                                                                                                --</span>,
+                            <span class="shipping_zip">
+                                                                                                --</span>
+                        </address>
+                    </div>
+                </div>
+                                                                <div class="form-group">
+                    <label for="number">
+                        Invoice Number                        <i class="fa-regular fa-circle-question" data-toggle="tooltip"
+                            data-title="If the invoice is saved as draft, the number won't be applied, instead, the next invoice number will be given when the invoice is sent to the customer or is marked as sent."
+                            data-placement="top"></i>
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                                                        INV-                        </span>
+                        <input type="text" name="number" class="form-control"
+                            value="000023"
+                            data-isedit="false"
+                            data-original-number="false"
+                            >
+                                            </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                                                                        <div class="form-group" app-field-wrapper="date"><label for="date" class="control-label">Invoice Date</label><div class="input-group date"><input type="text" id="date" name="date" class="form-control datepicker"  value="2024-11-11" autocomplete="off"><div class="input-group-addon">
+    <i class="fa-regular fa-calendar calendar-icon"></i>
+</div></div></div>                    </div>
+                    <div class="col-md-6">
+                                                <div class="form-group" app-field-wrapper="duedate"><label for="duedate" class="control-label">Due Date</label><div class="input-group date"><input type="text" id="duedate" name="duedate" class="form-control datepicker"  value="2024-12-11" autocomplete="off"><div class="input-group-addon">
+    <i class="fa-regular fa-calendar calendar-icon"></i>
+</div></div></div>                    </div>
+                </div>
+                                <div class="form-group">
+                    <div class="checkbox checkbox-danger">
+                        <input type="checkbox"
+                                                    id="cancel_overdue_reminders" name="cancel_overdue_reminders">
+                        <label
+                            for="cancel_overdue_reminders">Prevent sending overdue reminders for this invoice</label>
+                    </div>
+                </div>
+                                                                            </div>
+            <div class="col-md-6">
+                <div class="tw-ml-3">
+                    <div class="form-group">
+                        <label for="tags" class="control-label"><i class="fa fa-tag" aria-hidden="true"></i>
+                            Tags</label>
+                        <input type="text" class="tagsinput" id="tags" name="tags"
+                            value=""
+                            data-role="tagsinput">
+                    </div>
+                    <div
+                        class="form-group mbot15 select-placeholder">
+                        <label for="allowed_payment_modes"
+                            class="control-label">Allowed payment modes for this invoice</label>
+                        <br />
+                                                <select class="selectpicker"
+                            data-toggle=""
+                            name="allowed_payment_modes[]" data-actions-box="true" multiple="true" data-width="100%"
+                            data-title="Nothing selected">
+                                                        <option
+                                value="1"
+                                 selected>
+                                Bank                            </option>
+                                                        <option
+                                value="stripe"
+                                 selected>
+                                Stripe Checkout                            </option>
+                                                    </select>
+                                            </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                                                        <div class="select-placeholder form-group" app-field-wrapper="currency"><label for="currency" class="control-label">Currency</label><select id="currency" name="currency" class="selectpicker" disabled="1" data-show-subtext="1" data-base="1" data-width="100%" data-none-selected-text="Nothing selected" data-live-search="true"><option value=""></option><option value="1" selected data-subtext="$">USD</option><option value="2" data-subtext="€">EUR</option></select></div>                        </div>
+                        <div class="col-md-6">
+                            <div class="select-placeholder form-group" app-field-wrapper="sale_agent"><label for="sale_agent" class="control-label">Sale Agent</label><select id="sale_agent" name="sale_agent" class="selectpicker" data-width="100%" data-none-selected-text="Nothing selected" data-live-search="true"><option value=""></option><option value="5">Ray Walsh</option><option value="10">Monserrat Bruen</option><option value="9">Leonel Casper</option><option value="2">Kian Heller</option><option value="7">Jedediah Steuber</option><option value="3">Jasmin Quitzon</option><option value="4">Jaime Klein</option><option value="1" selected>Ethel Hagenes</option><option value="6">Domingo Bernhard</option><option value="8">Antonio Gottlieb</option></select></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group select-placeholder" >
+                                <label for="recurring" class="control-label">
+                                    Recurring Invoice?                                </label>
+                                <select class="selectpicker" data-width="100%" name="recurring"
+                                    data-none-selected-text="Nothing selected"
+                                    >
+                                                                                                            <option value="0" >
+                                        No                                    </option>
+                                                                                                            <option value="1" >
+                                        Every 1 month                                    </option>
+                                                                                                            <option value="2" >
+                                        Every 2 months                                    </option>
+                                                                                                            <option value="3" >
+                                        Every 3 months                                    </option>
+                                                                                                            <option value="4" >
+                                        Every 4 months                                    </option>
+                                                                                                            <option value="5" >
+                                        Every 5 months                                    </option>
+                                                                                                            <option value="6" >
+                                        Every 6 months                                    </option>
+                                                                                                            <option value="7" >
+                                        Every 7 months                                    </option>
+                                                                                                            <option value="8" >
+                                        Every 8 months                                    </option>
+                                                                                                            <option value="9" >
+                                        Every 9 months                                    </option>
+                                                                                                            <option value="10" >
+                                        Every 10 months                                    </option>
+                                                                                                            <option value="11" >
+                                        Every 11 months                                    </option>
+                                                                                                            <option value="12" >
+                                        Every 12 months                                    </option>
+                                                                        <option value="custom" >
+                                        Custom                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group select-placeholder">
+                                <label for="discount_type"
+                                    class="control-label">Discount Type</label>
+                                <select name="discount_type" class="selectpicker" data-width="100%"
+                                    data-none-selected-text="Nothing selected">
+                                    <option value="" selected>
+                                        No discount                                    </option>
+                                    <option value="before_tax" >
+                                        Before Tax                                    </option>
+                                    <option value="after_tax" >
+                                        After Tax                                    </option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div
+                            class="recurring_custom hide">
+                            <div class="col-md-6">
+                                                                <div class="form-group" app-field-wrapper="repeat_every_custom"><input type="number" id="repeat_every_custom" name="repeat_every_custom" class="form-control" min="1" value="1"></div>                            </div>
+                            <div class="col-md-6">
+                                <select name="repeat_type_custom" id="repeat_type_custom" class="selectpicker"
+                                    data-width="100%"
+                                    data-none-selected-text="Nothing selected">
+                                                                        <option value="day" >Day(s)                                    </option>
+                                    <option value="week" >Week(s)                                    </option>
+                                    <option value="month" >Month(s)                                    </option>
+                                    <option value="year" >Years(s)                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="cycles_wrapper"
+                            class="hide">
+                            <div class="col-md-12">
+                                                                <div class="form-group recurring-cycles">
+                                    <label
+                                        for="cycles">Total Cycles                                                                            </label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control"
+                                            disabled                                        name="cycles" id="cycles"
+                                        value="0"
+                                        >
+                                        <div class="input-group-addon">
+                                            <div class="checkbox">
+                                                <input type="checkbox"
+                                                    checked                                                id="unlimited_cycles">
+                                                <label
+                                                    for="unlimited_cycles">Infinity</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                        <div class="form-group" app-field-wrapper="adminnote"><label for="adminnote" class="control-label">Admin Note</label><textarea id="adminnote" name="adminnote" class="form-control" rows="4"></textarea></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="hr-panel-separator" />
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div
+    class="form-group mbot25 items-wrapper select-placeholder input-group-select">
+    <div
+        class="input-group input-group-select">
+        <div class="items-select-wrapper">
+            <select name="item_select"
+                class="selectpicker no-margin _select_input_group"
+                data-width="false" id="item_select"
+                data-none-selected-text="Add Item"
+                data-live-search="true">
+                <option value=""></option>
+                                <optgroup data-group-id="1"
+                    label="Products">
+                                        <option
+                        value="1"
+                        data-subtext="Alice ventured to remark. 'Tut, tut, child!' said the Hatter, 'you wouldn't talk about trouble!'....">
+                        (250.00)
+                        LCD TV                    </option>
+                                        <option
+                        value="7"
+                        data-subtext="Dinah, tell me the truth: did you manage on the trumpet, and then Alice put down yet, before the....">
+                        (2,150.00)
+                        MacBook Pro                    </option>
+                                        <option
+                        value="4"
+                        data-subtext="The Mouse only shook its head impatiently, and said, 'So you think you might do very well....">
+                        (30.00)
+                        USB Stick                    </option>
+                                        <option
+                        value="2"
+                        data-subtext="Dormouse is asleep again,' said the cook. The King laid his hand upon her arm, and timidly said....">
+                        (1,200.00)
+                        Web Design                    </option>
+                                    </optgroup>
+                                <optgroup data-group-id="2"
+                    label="Services">
+                                        <option
+                        value="6"
+                        data-subtext="Alice hastily replied; 'at least--at least I mean what I say--that's the same thing as "I get what....">
+                        (350.00)
+                        Consultant Services                    </option>
+                                        <option
+                        value="3"
+                        data-subtext="Queen shrieked out. 'Behead that Dormouse! Turn that Dormouse out of the teacups as the rest of it....">
+                        (300.00)
+                        Marketing Services                    </option>
+                                        <option
+                        value="5"
+                        data-subtext="Alice soon came to the dance. Will you, won't you, will you, won't you, will you join the dance?....">
+                        (500.00)
+                        SEO Optimization                    </option>
+                                    </optgroup>
+                            </select>
+        </div>
+                <div class="input-group-btn">
+            <a href="#" data-toggle="modal" class="btn btn-default" data-target="#sales_item_modal">
+                <i class="fa fa-plus"></i>
+            </a>
+        </div>
+            </div>
+</div>            </div>
+                        <div class="col-md-3">
+                <div class="form-group select-placeholder input-group-select form-group-select-task_select popover-250">
+                    <div class="input-group input-group-select">
+                        <select name="task_select" data-live-search="true" id="task_select"
+                            class="selectpicker no-margin _select_input_group" data-width="100%"
+                            data-none-selected-text="Bill Tasks">
+                            <option value=""></option>
+                                                    </select>
+                        <div class="input-group-addon input-group-addon-bill-tasks-help">
+                            <span class="pointer popover-invoker" data-container=".form-group-select-task_select"
+                      data-trigger="click" data-placement="top" data-toggle="popover" data-content="Projects tasks are not included in this list.">
+                      <i class="fa-regular fa-circle-question"></i></span>                        </div>
+                    </div>
+                </div>
+            </div>
+                        <div
+                class="col-md-5 text-right show_quantity_as_wrapper">
+                <div class="mtop10">
+                    <span>Show quantity as:                    </span>
+                    <div class="radio radio-primary radio-inline">
+                        <input type="radio" value="1" id="sq_1" name="show_quantity_as"
+                            data-text="Qty"
+                            checked>
+                        <label
+                            for="sq_1">Qty</label>
+                    </div>
+
+                    <div class="radio radio-primary radio-inline">
+                        <input type="radio" value="2" id="sq_2" name="show_quantity_as"
+                            data-text="Hours"
+                            >
+                        <label
+                            for="sq_2">Hours</label>
+                    </div>
+
+                    <div class="radio radio-primary radio-inline">
+                        <input type="radio" value="3" id="sq_3" name="show_quantity_as"
+                            data-text="Qty/Hours"
+                            >
+                        <label
+                            for="sq_3">Qty/Hours</label>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+                <div class="table-responsive s_table">
+            <table class="table invoice-items-table items table-main-invoice-edit has-calculations no-mtop">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th width="20%" align="left"><i class="fa-solid fa-circle-exclamation tw-mr-1"
+                                aria-hidden="true" data-toggle="tooltip"
+                                data-title="New lines are not supported for item description. Use the item long description instead."></i>
+                            Item                        </th>
+                        <th width="25%" align="left">
+                            Description                        </th>
+                                                <th width="10%" align="right" class="qty">
+                            Qty                        </th>
+                        <th width="15%" align="right">
+                            Rate                        </th>
+                        <th width="20%" align="right">
+                            Tax                        </th>
+                        <th width="10%" align="right">
+                            Amount                        </th>
+                        <th align="center"><i class="fa fa-cog"></i></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="main">
+                        <td></td>
+                        <td>
+                            <textarea name="description" class="form-control" rows="4"
+                                placeholder="Description"></textarea>
+                        </td>
+                        <td>
+                            <textarea name="long_description" rows="4" class="form-control"
+                                placeholder="Long description"></textarea>
+                        </td>
+                                                <td>
+                            <input type="number" name="quantity" min="0" value="1" class="form-control"
+                                placeholder="Quantity">
+                            <input type="text"
+                                placeholder="Unit"
+                                data-toggle="tooltip" data-title="e.q kg, lots, packs" name="unit"
+                                class="form-control input-transparent text-right">
+                        </td>
+                        <td>
+                            <input type="number" name="rate" class="form-control"
+                                placeholder="Rate">
+                        </td>
+                        <td>
+                            <select class="selectpicker display-block tax main-tax" data-width="100%" name="taxname" multiple data-none-selected-text="No Tax"><option value="TAX3|5.00"data-taxrate="5.00" data-taxname="TAX3" data-subtext="TAX3">5.00%</option><option value="TAX2|10.00"data-taxrate="10.00" data-taxname="TAX2" data-subtext="TAX2">10.00%</option><option value="TAX1|18.00"data-taxrate="18.00" data-taxname="TAX1" data-subtext="TAX1">18.00%</option></select>                        </td>
+                        <td></td>
+                        <td>
+                                                        <button type="button"
+                                onclick="add_item_to_table('undefined','undefined',undefined); return false;"
+                                class="btn pull-right btn-primary"><i class="fa fa-check"></i></button>
+                        </td>
+                    </tr>
+                                    </tbody>
+            </table>
+        </div>
+        <div class="col-md-8 col-md-offset-4">
+            <table class="table text-right">
+                <tbody>
+                    <tr id="subtotal">
+                        <td>
+                            <span
+                                class="bold tw-text-neutral-700">Sub Total                                :</span>
+                        </td>
+                        <td class="subtotal">
+                        </td>
+                    </tr>
+                    <tr id="discount_area">
+                        <td>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <span class="bold tw-text-neutral-700">
+                                        Discount                                    </span>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="input-group" id="discount-total">
+
+                                        <input type="number"
+                                            value="0"
+                                            class="form-control pull-left input-discount-percent"
+                                            min="0" max="100" name="discount_percent">
+
+                                        <input type="number" data-toggle="tooltip"
+                                            data-title="The number in the input field is not formatted while edit/add item and should remain not formatted do not try to format it manually in here."
+                                            value="0"
+                                            class="form-control pull-left input-discount-fixed hide"
+                                            min="0" name="discount_total">
+
+                                        <div class="input-group-addon">
+                                            <div class="dropdown">
+                                                <a class="dropdown-toggle" href="#" id="dropdown_menu_tax_total_type"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                    <span class="discount-total-type-selected">
+                                                        %                                                    </span>
+                                                    <span class="caret"></span>
+                                                </a>
+                                                <ul class="dropdown-menu" id="discount-total-type-dropdown"
+                                                    aria-labelledby="dropdown_menu_tax_total_type">
+                                                    <li>
+                                                        <a href="#"
+                                                            class="discount-total-type discount-type-percent selected">%</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#"
+                                                            class="discount-total-type discount-type-fixed">
+                                                            Fixed Amount                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="discount-total"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <span
+                                        class="bold tw-text-neutral-700">Adjustment</span>
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="number" data-toggle="tooltip"
+                                        data-title="The number in the input field is not formatted while edit/add item and should remain not formatted do not try to format it manually in here."
+                                        value="0"
+                                        class="form-control pull-left" name="adjustment">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="adjustment"></td>
+                    </tr>
+                    <tr>
+                        <td><span
+                                class="bold tw-text-neutral-700">Total                                :</span>
+                        </td>
+                        <td class="total">
+                        </td>
+                    </tr>
+                                    </tbody>
+            </table>
+        </div>
+        <div id="removed-items"></div>
+        <div id="billed-tasks"></div>
+        <div id="billed-expenses"></div>
+        
+<input type="hidden" name="task_id" value="" />
+        
+<input type="hidden" name="expense_id" value="" />
+
+    </div>
+
+    <hr class="hr-panel-separator" />
+
+    <div class="panel-body">
+                <div class="form-group" app-field-wrapper="clientnote"><label for="clientnote" class="control-label">Client Note</label><textarea id="clientnote" name="clientnote" class="form-control" rows="4"></textarea></div>                <div class="form-group mtop15" app-field-wrapper="terms"><label for="terms" class="control-label">Terms & Conditions</label><textarea id="terms" name="terms" class="form-control" rows="4">Gryphon. &#039;They can&#039;t have anything to put the Dormouse crossed the court, &#039;Bring me the list of singers. &#039;You may not have lived much under the hedge. In another moment down went Alice after it, never once considering how in the trial one way of expecting nothing but out-of-the-way things had.</textarea></div>    </div>
+
+    </div>
+
+<div class="btn-bottom-pusher"></div>
+<div class="btn-bottom-toolbar text-right">
+        <button class="btn-tr btn btn-default mright5 text-right invoice-form-submit save-as-draft transaction-submit">
+        Save as Draft    </button>
+        <div class="btn-group dropup">
+        <button type="button"
+            class="btn-tr btn btn-primary invoice-form-submit transaction-submit">Save</button>
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right width200">
+            <li>
+                <a href="#" class="invoice-form-submit save-and-send transaction-submit">
+                    Save & Send                </a>
+            </li>
+                        <li>
+                <a href="#" class="invoice-form-submit save-and-send-later transaction-submit">
+                    Save and Send Later                </a>
+            </li>
+            <li>
+                <a href="#" class="invoice-form-submit save-and-record-payment transaction-submit">
+                    Save & Record Payment                </a>
+            </li>
+                    </ul>
+    </div>
+</div>            </div>
+            </form>            <div class="modal fade" id="sales_item_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span
+                        class="edit-title">Edit Item</span>
+                    <span
+                        class="add-title">Add New Item</span>
+                </h4>
+            </div>
+            <form action="../authentication.html" id="invoice_item_form" method="post" accept-charset="utf-8">
+             <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+            
+<input type="hidden" name="itemid" value="" />
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-warning affect-warning hide">
+                            Changing item info won't affect on the created invoices/estimates/proposals/credit notes.                        </div>
+                        <div class="form-group" app-field-wrapper="description"><label for="description" class="control-label">Description</label><input type="text" id="description" name="description" class="form-control"  value=""></div>                        <div class="form-group" app-field-wrapper="long_description"><label for="long_description" class="control-label">Long Description</label><textarea id="long_description" name="long_description" class="form-control" rows="4"></textarea></div>                        <div class="form-group">
+                            <label for="rate" class="control-label">
+                                Rate - USD <small>(Base Currency)</small></label>
+                            <input type="number" id="rate" name="rate" class="form-control" value="">
+                        </div>
+                                                <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label"
+                                        for="tax">Tax 1</label>
+                                    <select class="selectpicker display-block" data-width="100%" name="tax"
+                                        data-none-selected-text="No Tax">
+                                        <option value=""></option>
+                                                                                <option
+                                            value="3"
+                                            data-subtext="TAX3">
+                                            5.00%
+                                        </option>
+                                                                                <option
+                                            value="2"
+                                            data-subtext="TAX2">
+                                            10.00%
+                                        </option>
+                                                                                <option
+                                            value="1"
+                                            data-subtext="TAX1">
+                                            18.00%
+                                        </option>
+                                                                            </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label"
+                                        for="tax2">Tax 2</label>
+                                    <select class="selectpicker display-block" disabled data-width="100%" name="tax2"
+                                        data-none-selected-text="No Tax">
+                                        <option value=""></option>
+                                                                                <option
+                                            value="3"
+                                            data-subtext="TAX3">
+                                            5.00%
+                                        </option>
+                                                                                <option
+                                            value="2"
+                                            data-subtext="TAX2">
+                                            10.00%
+                                        </option>
+                                                                                <option
+                                            value="1"
+                                            data-subtext="TAX1">
+                                            18.00%
+                                        </option>
+                                                                            </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix mbot15"></div>
+                        <div class="form-group" app-field-wrapper="unit"><label for="unit" class="control-label">Unit</label><input type="text" id="unit" name="unit" class="form-control"  value=""></div>                        <div id="custom_fields_items">
+                                                    </div>
+                        <div class="select-placeholder form-group" app-field-wrapper="group_id"><label for="group_id" class="control-label">Item Group</label><select id="group_id" name="group_id" class="selectpicker" data-width="100%" data-none-selected-text="Nothing selected" data-live-search="true"><option value=""></option><option value="1">Products</option><option value="2">Services</option></select></div>                                            </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"
+                    data-dismiss="modal">Close</button>
+                <button type="submit"
+                    class="btn btn-primary">Save</button>
+                </form>            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Maybe in modal? Eq convert to invoice or convert proposal to estimate/invoice
+    if (typeof(jQuery) != 'undefined') {
+        init_item_js();
+    } else {
+        window.addEventListener('load', function() {
+            var initItemsJsInterval = setInterval(function() {
+                if (typeof(jQuery) != 'undefined') {
+                    init_item_js();
+                    clearInterval(initItemsJsInterval);
+                }
+            }, 1000);
+        });
+    }
+    // Items add/edit
+    function manage_invoice_items(form) {
+        var data = $(form).serialize();
+
+        var url = form.action;
+        $.post(url, data).done(function(response) {
+            response = JSON.parse(response);
+            if (response.success == true) {
+                var item_select = $('#item_select');
+                if ($("body").find('.accounting-template').length > 0) {
+                    if (!item_select.hasClass('ajax-search')) {
+                        var group = item_select.find('[data-group-id="' + response.item.group_id + '"]');
+                        if (group.length == 0) {
+                            var _option = '<optgroup label="' + (response.item.group_name == null ? '' :
+                                    response.item.group_name) + '" data-group-id="' + response.item.group_id +
+                                '">' + _option + '</optgroup>';
+                            if (item_select.find('[data-group-id="0"]').length == 0) {
+                                item_select.find('option:first-child').after(_option);
+                            } else {
+                                item_select.find('[data-group-id="0"]').after(_option);
+                            }
+                        } else {
+                            group.prepend('<option data-subtext="' + response.item.long_description +
+                                '" value="' + response.item.itemid + '">(' + accounting.formatNumber(
+                                    response.item.rate) + ') ' + response.item.description + '</option>');
+                        }
+                    }
+                    if (!item_select.hasClass('ajax-search')) {
+                        item_select.selectpicker('refresh');
+                    } else {
+
+                        item_select.contents().filter(function() {
+                            return !$(this).is('.newitem') && !$(this).is('.newitem-divider');
+                        }).remove();
+
+                        var clonedItemsAjaxSearchSelect = item_select.clone();
+                        item_select.selectpicker('destroy').remove();
+                        $("body").find('.items-select-wrapper').append(clonedItemsAjaxSearchSelect);
+                        init_ajax_search('items', '#item_select.ajax-search', undefined, admin_url +
+                            'items/search');
+                    }
+
+                    add_item_to_preview(response.item.itemid);
+                } else {
+                    // Is general items view
+                    $('.table-invoice-items').DataTable().ajax.reload(null, false);
+                }
+                alert_float('success', response.message);
+            }
+            $('#sales_item_modal').modal('hide');
+        }).fail(function(data) {
+            alert_float('danger', data.responseText);
+        });
+        return false;
+    }
+
+    function init_item_js() {
+        // Add item to preview from the dropdown for invoices estimates
+        $("body").on('change', 'select[name="item_select"]', function() {
+            var itemid = $(this).selectpicker('val');
+            if (itemid != '') {
+                add_item_to_preview(itemid);
+            }
+        });
+
+        // Items modal show action
+        $("body").on('show.bs.modal', '#sales_item_modal', function(event) {
+
+            $('.affect-warning').addClass('hide');
+
+            var $itemModal = $('#sales_item_modal');
+            $('input[name="itemid"]').val('');
+            $itemModal.find('input').not('input[type="hidden"]').val('');
+            $itemModal.find('textarea').val('');
+            $itemModal.find('select').selectpicker('val', '').selectpicker('refresh');
+            $('select[name="tax2"]').selectpicker('val', '').change();
+            $('select[name="tax"]').selectpicker('val', '').change();
+            $itemModal.find('.add-title').removeClass('hide');
+            $itemModal.find('.edit-title').addClass('hide');
+
+            var id = $(event.relatedTarget).data('id');
+            // If id found get the text from the datatable
+            if (typeof(id) !== 'undefined') {
+
+                $('.affect-warning').removeClass('hide');
+                $('input[name="itemid"]').val(id);
+
+                requestGetJSON('invoice_items/get_item_by_id/' + id).done(function(response) {
+                    $itemModal.find('input[name="description"]').val(response.description);
+                    $itemModal.find('textarea[name="long_description"]').val(response.long_description
+                        .replace(/(<|<)br\s*\/*(>|>)/g, " "));
+                    $itemModal.find('input[name="rate"]').val(response.rate);
+                    $itemModal.find('input[name="unit"]').val(response.unit);
+                    $('select[name="tax"]').selectpicker('val', response.taxid).change();
+                    $('select[name="tax2"]').selectpicker('val', response.taxid_2).change();
+                    $itemModal.find('#group_id').selectpicker('val', response.group_id);
+                    $.each(response, function(column, value) {
+                        if (column.indexOf('rate_currency_') > -1) {
+                            $itemModal.find('input[name="' + column + '"]').val(value);
+                        }
+                    });
+
+                    $('#custom_fields_items').html(response.custom_fields_html);
+
+                    init_selectpicker();
+                    init_color_pickers();
+                    init_datepicker();
+
+                    $itemModal.find('.add-title').addClass('hide');
+                    $itemModal.find('.edit-title').removeClass('hide');
+                    validate_item_form();
+                });
+
+            }
+        });
+
+        $("body").on("hidden.bs.modal", '#sales_item_modal', function(event) {
+            $('#item_select').selectpicker('val', '');
+        });
+
+        validate_item_form();
+    }
+
+    function validate_item_form() {
+        // Set validation for invoice item form
+        appValidateForm($('#invoice_item_form'), {
+            description: 'required',
+            rate: {
+                required: true,
+            }
+        }, manage_invoice_items);
+    }
+</script>        </div>
+    </div>
+</div>
+<!-- Likes -->
+<div class="modal likes_modal fade" id="modal_post_likes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">
+          Colleagues who like this post        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div id="modal_post_likes_wrapper">
+
+          </div>
+
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <a href="#"
+          class="btn btn-primary load_more_post_likes">Load More</a>
+      </div>
+    </div>
+  </div>
+</div><!-- Likes -->
+<div class="modal likes_modal animated fadeIn" id="modal_post_comment_likes" tabindex="-1" role="dialog"
+  aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">
+          Colleagues who like this comment        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div id="modal_comment_likes_wrapper">
+
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#"
+          class="btn btn-primary load_more_post_comment_likes">Load More</a>
+      </div>
+    </div>
+  </div>
+</div><div id="event"></div>
+<div id="newsfeed" class="animated fadeIn hide" >
+</div>
+<!-- Task modal view -->
+<div class="modal fade task-modal-single" id="task-modal" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel">
+  <div
+    class="modal-dialog modal-lg">
+    <div class="modal-content data">
+
+    </div>
+  </div>
+</div>
+
+<!--Add/edit task modal-->
+<div id="_task"></div>
+
+<!-- Lead Data Add/Edit-->
+<div class="modal fade lead-modal" id="lead-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div
+    class="modal-dialog modal-lg">
+    <div class="modal-content data">
+
+    </div>
+  </div>
+</div>
+
+<div id="timers-logout-template-warning" class="hide">
+  <h3 class="bold">
+    Started tasks timers found!<br />Are you sure you want to logout without stopping the timers?  </h3>
+  <hr />
+  <a href="../authentication.html"
+    class="btn btn-danger">
+    Logout  </a>
+</div>
+
+<!--Lead convert to customer modal-->
+<div id="lead_convert_to_customer"></div>
+
+<!--Lead reminder modal-->
+<div id="lead_reminder_modal"></div>
+
+<script type="text/javascript" id="vendor-js" src="../../assets/builds/vendor-admin%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-migrate-js" src="../../assets/plugins/jquery/jquery-migrate.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datatables-js" src="../../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="moment-js" src="../../assets/builds/moment.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="bootstrap-select-js" src="../../assets/builds/bootstrap-select.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="tinymce-js" src="../../assets/plugins/tinymce/tinymce.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-validation-js" src="../../assets/plugins/jquery-validation/jquery.validate.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="pusher-js" src="https://js.pusher.com/5.0/pusher.min.js"></script>
+<script type="text/javascript" id="dropboxjs" src="https://www.dropbox.com/static/api/2/dropins.js" data-app-key="z0aqtiz98vctw4o"></script>
+<script type="text/javascript" id="google-gsi-js" src="https://accounts.google.com/gsi/client" defer></script>
+<script type="text/javascript" id="google-js" src="https://apis.google.com/js/api.js?onload=onGoogleApiLoad" defer></script>
+<script type="text/javascript" id="common-js" src="../../assets/builds/common%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="app-js" src="../../assets/js/main.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="app-v3" src="../../assets/builds/app%EF%B9%96v=3.2.0.js"></script>
+<script>
+function custom_fields_hyperlink() {
+    var cf_hyperlink = $('body').find('.cf-hyperlink');
+    if (cf_hyperlink.length) {
+        $.each(cf_hyperlink, function() {
+            var cfh_wrapper = $(this);
+            if (!cfh_wrapper.hasClass('cfh-initialized')) {
+                var cfh_field_to = cfh_wrapper.attr('data-fieldto');
+                var cfh_field_id = cfh_wrapper.attr('data-field-id');
+                var textEl = $('body').find('#custom_fields_' + cfh_field_to + '_' + cfh_field_id + '_popover');
+                var hiddenField = $("#custom_fields\\\[" + cfh_field_to + "\\\]\\\[" + cfh_field_id + "\\\]");
+                var cfh_value = cfh_wrapper.attr('data-value');
+                hiddenField.val(cfh_value);
+
+                if ($(hiddenField.val()).html() != '') {
+                    textEl.html($(hiddenField.val()).html());
+                }
+                var cfh_field_name = cfh_wrapper.attr('data-field-name');
+
+                textEl.popover({
+                    html: true,
+                    trigger: "manual",
+                    placement: "top",
+                    title: cfh_field_name,
+                    content: function() {
+                        return $(cfh_popover_templates[cfh_field_id]).html();
+                    }
+                }).on("click", function(e) {
+                    var $popup = $(this);
+                    $popup.popover("toggle");
+                    var titleField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id +
+                        "_title");
+                    var urlField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_link");
+                    var ttl = $(hiddenField.val()).html();
+                    var cfUrl = $(hiddenField.val()).attr("href");
+                    if (cfUrl) {
+                        $('#cf_hyperlink_open_' + cfh_field_id).attr('href', (cfUrl.indexOf('://') === -
+                            1 ? 'http://' + cfUrl : cfUrl));
+                    }
+                    titleField.val(ttl);
+                    urlField.val(cfUrl);
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-save").click(
+                        function() {
+                            hiddenField.val((urlField.val() != '' ? '<a href="' + urlField.val() +
+                                '" target="_blank">' + (titleField.val() != "" ? titleField
+                                    .val() : urlField.val()) + '</a>' : ''));
+                            textEl.html(titleField.val() !== "" ? titleField.val() : (urlField
+                                .val() != '' ? urlField.val() :
+                                "Click here to add link"));
+                            $popup.popover("toggle");
+                        });
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-cancel").click(
+                        function() {
+                            if (urlField.val() == '') {
+                                hiddenField.val('');
+                            }
+                            $popup.popover("toggle");
+                        });
+                });
+                cfh_wrapper.addClass('cfh-initialized')
+            }
+        });
+    }
+}
+</script>
+<script type="text/javascript">
+    $(function() {
+        // Enable pusher logging - don't include this in production
+        // Pusher.logToConsole = true;
+                var
+            pusher_options = {"0":{"disableStats":true},"cluster":"eu"} ;
+        var pusher = new Pusher(
+            "a399ff4c2ea56c6f3ec1",
+            pusher_options);
+        var channel = pusher.subscribe(
+            'notifications-channel-1'
+        );
+        channel.bind('notification', function(data) {
+            fetch_notifications();
+        });
+    });
+</script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71585538-1', 'auto');
+  ga('send', 'pageview');
+
+</script><script>
+    $(function() {
+        validate_invoice_form();
+        // Init accountacy currency symbol
+        init_currency();
+        // Project ajax search
+        init_ajax_project_search_by_customer_id();
+        // Maybe items ajax search
+        init_ajax_search('items', '#item_select.ajax-search', undefined, admin_url + 'items/search');
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Showing search results for: </title>
+	<link rel="shortcut icon" id="favicon" href="../uploads/company/favicon.ico">
+<link rel="apple-touch-icon”" id="favicon-apple-touch-icon" href="../uploads/company/favicon.ico">
+<link rel="stylesheet" type="text/css" id="reset-css" href="../assets/css/reset.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="bootstrap-css" href="../assets/plugins/bootstrap/css/bootstrap.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="inter-font" href="../assets/plugins/inter/inter%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="datatables-css" href="../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-css" href="../assets/plugins/font-awesome/css/fontawesome.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-brands" href="../assets/plugins/font-awesome/css/brands.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-solid" href="../assets/plugins/font-awesome/css/solid.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-regular" href="../assets/plugins/font-awesome/css/regular.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="datetimepicker-css" href="../assets/plugins/datetimepicker/jquery.datetimepicker.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="bootstrap-select-css" href="../assets/plugins/bootstrap-select/css/bootstrap-select.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="lightbox-css" href="../assets/plugins/lightbox/css/lightbox.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="colorpicker-css" href="../assets/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="tailwind-css" href="../assets/builds/tailwind%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="theme-css" href="../assets/themes/perfex/css/style.min%EF%B9%96v=3.2.0.css">
+	<script
+		src="../assets/plugins/jquery/jquery.min.js">
+	</script>
+	<script>
+if (typeof(jQuery) === 'undefined' && !window.deferAfterjQueryLoaded) {
+    window.deferAfterjQueryLoaded = [];
+    Object.defineProperty(window, "$", {
+        set: function(value) {
+            window.setTimeout(function() {
+                $.each(window.deferAfterjQueryLoaded, function(index, fn) {
+                    fn();
+                });
+            }, 0);
+            Object.defineProperty(window, "$", {
+                value: value
+            });
+        },
+        configurable: true
+    });
+}
+
+var csrfData = {"formatted":{"csrf_token_name":"bf0a8ef7a17e35f854421149e1dc6fe5"},"token_name":"csrf_token_name","hash":"bf0a8ef7a17e35f854421149e1dc6fe5"};
+
+if (typeof(jQuery) == 'undefined') {
+    window.deferAfterjQueryLoaded.push(function() {
+        csrf_jquery_ajax_setup();
+    });
+    window.addEventListener('load', function() {
+        csrf_jquery_ajax_setup();
+    }, true);
+} else {
+    csrf_jquery_ajax_setup();
+}
+
+function csrf_jquery_ajax_setup() {
+    $.ajaxSetup({
+        data: csrfData.formatted
+    });
+
+    $(document).ajaxError(function(event, request, settings) {
+        if (request.status === 419) {
+            alert_float('warning', 'Page expired, refresh the page make an action.')
+        }
+    });
+}
+</script>
+<script>
+function custom_fields_hyperlink() {
+    var cf_hyperlink = $('body').find('.cf-hyperlink');
+    if (cf_hyperlink.length) {
+        $.each(cf_hyperlink, function() {
+            var cfh_wrapper = $(this);
+            if (!cfh_wrapper.hasClass('cfh-initialized')) {
+                var cfh_field_to = cfh_wrapper.attr('data-fieldto');
+                var cfh_field_id = cfh_wrapper.attr('data-field-id');
+                var textEl = $('body').find('#custom_fields_' + cfh_field_to + '_' + cfh_field_id + '_popover');
+                var hiddenField = $("#custom_fields\\\[" + cfh_field_to + "\\\]\\\[" + cfh_field_id + "\\\]");
+                var cfh_value = cfh_wrapper.attr('data-value');
+                hiddenField.val(cfh_value);
+
+                if ($(hiddenField.val()).html() != '') {
+                    textEl.html($(hiddenField.val()).html());
+                }
+                var cfh_field_name = cfh_wrapper.attr('data-field-name');
+
+                textEl.popover({
+                    html: true,
+                    trigger: "manual",
+                    placement: "top",
+                    title: cfh_field_name,
+                    content: function() {
+                        return $(cfh_popover_templates[cfh_field_id]).html();
+                    }
+                }).on("click", function(e) {
+                    var $popup = $(this);
+                    $popup.popover("toggle");
+                    var titleField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id +
+                        "_title");
+                    var urlField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_link");
+                    var ttl = $(hiddenField.val()).html();
+                    var cfUrl = $(hiddenField.val()).attr("href");
+                    if (cfUrl) {
+                        $('#cf_hyperlink_open_' + cfh_field_id).attr('href', (cfUrl.indexOf('://') === -
+                            1 ? 'http://' + cfUrl : cfUrl));
+                    }
+                    titleField.val(ttl);
+                    urlField.val(cfUrl);
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-save").click(
+                        function() {
+                            hiddenField.val((urlField.val() != '' ? '<a href="' + urlField.val() +
+                                '" target="_blank">' + (titleField.val() != "" ? titleField
+                                    .val() : urlField.val()) + '</a>' : ''));
+                            textEl.html(titleField.val() !== "" ? titleField.val() : (urlField
+                                .val() != '' ? urlField.val() :
+                                "Click here to add link"));
+                            $popup.popover("toggle");
+                        });
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-cancel").click(
+                        function() {
+                            if (urlField.val() == '') {
+                                hiddenField.val('');
+                            }
+                            $popup.popover("toggle");
+                        });
+                });
+                cfh_wrapper.addClass('cfh-initialized')
+            }
+        });
+    }
+}
+</script>
+<script src='https://www.google.com/recaptcha/api.js'></script><script>
+
+var site_url = 'https://perfexcrm.com/demo/',
+    app = {},
+    cfh_popover_templates = {};
+
+app.isRTL = 'false';
+app.is_mobile = '';
+app.months_json =
+    '["January","February","March","April","May","June","July","August","September","October","November","December"]';
+
+app.browser = "";
+app.max_php_ini_upload_size_bytes = "104857600";
+app.locale = "en";
+
+app.options = {
+    calendar_events_limit: "4",
+    calendar_first_day: "0",
+    tables_pagination_limit: "25",
+    enable_google_picker: "1",
+    google_client_id: "",
+    google_api: "",
+    default_view_calendar: "dayGridMonth",
+    timezone: "Europe/Berlin",
+    allowed_files: ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt",
+    date_format: "Y-m-d",
+    time_format: "24",
+};
+
+app.lang = {
+    file_exceeds_maxfile_size_in_form: "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" +
+        ' (100 MB)',
+    file_exceeds_max_filesize: "The uploaded file exceeds the upload_max_filesize directive in php.ini" +
+        ' (100 MB)',
+    validation_extension_not_allowed: "File extension not allowed",
+    sign_document_validation: "Please sign the document.",
+    dt_length_menu_all: "All",
+    drop_files_here_to_upload: "Drop files here to upload",
+    browser_not_support_drag_and_drop: "Your browser does not support drag'n'drop file uploads",
+    confirm_action_prompt: "Are you sure you want to perform this action?",
+    datatables: {"emptyTable":"No entries found","info":"Showing _START_ to _END_ of _TOTAL_ entries","infoEmpty":"Showing 0 to 0 of 0 entries","infoFiltered":"(filtered from _MAX_ total entries)","lengthMenu":"_MENU_","loadingRecords":"Loading...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Search...","zeroRecords":"No matching records found","paginate":{"first":"First","last":"Last","next":"Next","previous":"Previous"},"aria":{"sortAscending":" activate to sort column ascending","sortDescending":" activate to sort column descending"}},
+    discussions_lang: {"discussion_add_comment":"Add comment","discussion_newest":"Newest","discussion_oldest":"Oldest","discussion_attachments":"Attachments","discussion_send":"Send","discussion_reply":"Answer","discussion_edit":"Edit","discussion_edited":"Modified","discussion_you":"You","discussion_save":"Save","discussion_delete":"Delete","discussion_view_all_replies":"Show all replies","discussion_hide_replies":"Hide replies","discussion_no_comments":"No comments","discussion_no_attachments":"No attachments","discussion_attachments_drop":"Drag and drop to upload file"},
+};
+window.addEventListener('load', function() {
+    custom_fields_hyperlink();
+});
+</script>
+<script>
+/**
+ * @deprecated 2.3.2
+ * Do not use any of these below as will be removed in future updates.
+ */
+var isRTL = 'false';
+
+var calendar_events_limit = "4";
+var maximum_allowed_ticket_attachments = "4";
+
+var max_php_ini_upload_size_bytes = "104857600";
+
+var file_exceeds_maxfile_size_in_form = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" +
+    ' (100 MB)';
+var file_exceeds_max_filesize = "The uploaded file exceeds the upload_max_filesize directive in php.ini" +
+    ' (100 MB)';
+
+var validation_extension_not_allowed = "File extension not allowed";
+var sign_document_validation = "Please sign the document.";
+var dt_length_menu_all = "All";
+
+var drop_files_here_to_upload = "Drop files here to upload";
+var browser_not_support_drag_and_drop = "Your browser does not support drag'n'drop file uploads";
+var remove_file = "Remove file";
+var tables_pagination_limit = "25";
+var enable_google_picker = "1";
+var google_client_id = "";
+var google_api = "";
+var acceptable_mimes = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt, image/png, image/jpeg, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/x-zip, application/x-rar, text/plain";
+var date_format = "Y-m-d";
+var time_format = "24";
+var default_view_calendar = "dayGridMonth";
+var dt_lang = {"emptyTable":"No entries found","info":"Showing _START_ to _END_ of _TOTAL_ entries","infoEmpty":"Showing 0 to 0 of 0 entries","infoFiltered":"(filtered from _MAX_ total entries)","lengthMenu":"_MENU_","loadingRecords":"Loading...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Search...","zeroRecords":"No matching records found","paginate":{"first":"First","last":"Last","next":"Next","previous":"Previous"},"aria":{"sortAscending":" activate to sort column ascending","sortDescending":" activate to sort column descending"}};
+var discussions_lang = {"discussion_add_comment":"Add comment","discussion_newest":"Newest","discussion_oldest":"Oldest","discussion_attachments":"Attachments","discussion_send":"Send","discussion_reply":"Answer","discussion_edit":"Edit","discussion_edited":"Modified","discussion_you":"You","discussion_save":"Save","discussion_delete":"Delete","discussion_view_all_replies":"Show all replies","discussion_hide_replies":"Hide replies","discussion_no_comments":"No comments","discussion_no_attachments":"No attachments","discussion_attachments_drop":"Drag and drop to upload file"};
+var confirm_action_prompt = "Are you sure you want to perform this action?";
+var cf_translate_input_link_tip = "Click here to add link";
+
+var locale = 'en';
+var timezone = "Europe/Berlin";
+var allowed_files = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt";
+var calendar_first_day = '0';
+var months_json =
+    '["January","February","March","April","May","June","July","August","September","October","November","December"]';
+</script>
+<meta name="robots" content="noindex">
+</head>
+
+<body
+	class="customers "
+	>
+
+	<nav class="navbar navbar-default header">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                data-target="#theme-navbar-collapse" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../authentication/login.html" class="logo img-responsive navbar-brand logo">
+        <img src="../uploads/company/1f03e41865e3e0d535f6202e5fba391a.png" class="img-responsive" alt="Perfex CRM">
+        </a>        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="theme-navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                                                <li class="customers-nav-item-knowledge-base"
+                    >
+                    <a href="../knowledge-base.html"
+                        >
+                        Knowledge Base                    </a>
+                </li>
+                                <li class="customers-nav-item-register"
+                    >
+                    <a href="../authentication/register.html"
+                        >
+                        Register                    </a>
+                </li>
+                                <li class="customers-nav-item-login"
+                    >
+                    <a href="../authentication/login.html"
+                        >
+                        <i class="fa-regular fa-user"></i> Login                    </a>
+                </li>
+                                                                            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
+</nav><div id="wrapper">
+    <div id="content">
+        <div class="container">
+            <div class="row">
+                            </div>
+        </div>
+                <div class="jumbotron kb-search-jumbotron">
+    <div class="kb-search">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="text-center">
+                        <h2 class="mbot30 kb-search-heading tw-font-semibold">
+                            Search Knowledge Base Articles                        </h2>
+                        <form action="search.html" method="GET" id="kb-search-form" accept-charset="utf-8">
+                        <div class="form-group has-feedback has-feedback-left">
+                            <div class="input-group">
+                                <input type="search" name="q"
+                                    placeholder="Have a question?"
+                                    class="form-control kb-search-input"
+                                    value="">
+                                <span class="input-group-btn">
+                                    <button type="submit"
+                                        class="btn btn-primary kb-search-button">Search</button>
+                                </span>
+                                <i class="fa-solid fa-magnifying-glass form-control-feedback kb-search-icon"></i>
+                            </div>
+                        </div>
+                        </form>                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                <div class="container">
+                        <div class="row">
+                                <div class="panel_s">
+	<div class="panel-body">
+				<div class="col-md-12 kb-search-results">
+    <h2 class="tw-font-medium tw-text-lg tw-mt-0">
+        Showing search results for:     </h2>
+</div>
+<div class="col-md-12">
+    <div class="tw-divide-y tw-divide-neutral-200 tw-divide-solid">
+                <div class="tw-pt-5 first:tw-pt-0 tw-block">
+            <ul class="list-unstyled articles_list tw-space-y-5">
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/alice-heard-it-say-to-this-so-she-went-on-yawning.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Alice heard it say to this: so she went on, yawning.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Alice&#039;s, and they all quarrel so dreadfully one can&#039;t hear oneself speak--and they don&#039;t give birthday presents like that!&#039; By this time with one elbow against the door, and the sound of many.Hatter. Alice felt so desperate that she still held...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/she-did-it-at-last-more-calmly.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                She did it at last, more calmly.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Alice, surprised at this, she was now about a foot high: then she walked down the hall. After a minute or two, they began solemnly dancing round and look up in a trembling voice:-- &#039;I passed by his.Alice remarked. &#039;Right, as usual,&#039; said the C...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/hatter-added-as-an-explanation-i-ve-none-of.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Hatter added as an explanation; &#039;I&#039;ve none of.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Queen. &#039;Can you play croquet with the name again!&#039; &#039;I won&#039;t have any rules in particular; at least, if there are, nobody attends to them--and you&#039;ve no idea how confusing it is I hate cats and.Duchess, &#039;and that&#039;s why. Pig!&#039; She said the King....
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/all-returned-from-him-to-you-said-alice.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                ALL RETURNED FROM HIM TO YOU,&quot;&#039; said Alice.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Queen, in a great interest in questions of eating and drinking. &#039;They lived on treacle,&#039; said the Cat. &#039;I said pig,&#039; replied Alice; &#039;and I do it again and again.&#039; &#039;You are old, Father William,&#039; the.Alice replied, so eagerly that the mouse to t...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/i-hadn-t-mentioned-dinah-she-said.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                I hadn&#039;t mentioned Dinah!&#039; she said.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Mouse. &#039;Of course,&#039; the Gryphon replied rather impatiently: &#039;any shrimp could have told you that.&#039; &#039;If I&#039;d been the right height to rest her chin in salt water. Her first idea was that you weren&#039;t.ME,&#039; but nevertheless she uncorked it and put...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/by-the-time-it-all-came-different-the-mock.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                By the time it all came different!&#039; the Mock.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Mock Turtle. &#039;Hold your tongue, Ma!&#039; said the March Hare took the cauldron of soup off the fire, stirring a large flower-pot that stood near the door, and the White Rabbit, jumping up in her face.English,&#039; thought Alice; but she had nibbled so...
+                    </div>
+                </li>
+                            </ul>
+        </div>
+                <div class="tw-pt-5 first:tw-pt-0 tw-block">
+            <ul class="list-unstyled articles_list tw-space-y-5">
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/i-begin-please-your-majesty-the-duchess-began.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                I begin, please your Majesty!&#039; the Duchess began.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        And the moral of that is--&quot;Birds of a treacle-well--eh, stupid?&#039; &#039;But they were nice grand words to say.) Presently she began very cautiously: &#039;But I don&#039;t keep the same tone, exactly as if she.I try the patience of an oyster!&#039; &#039;I wish I hadn&#039;...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/when-the-sands-are-all-pardoned-come-that-s-a.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                When the sands are all pardoned.&#039; &#039;Come, THAT&#039;S a.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Gryphon as if she were saying lessons, and began to repeat it, when a sharp hiss made her feel very queer indeed:-- &#039;&#039;Tis the voice of thunder, and people began running when they met in the lock.I used to it as you might like to be no chance o...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/alice-the-moment-how-large-she.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Alice the moment how large she.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        There was a very decided tone: &#039;tell her something worth hearing. For some minutes it puffed away without speaking, but at the top of his pocket, and pulled out a history of the jury asked. &#039;That I.King put on one of the deepest contempt. &#039;I&#039;v...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/alice-where-s-the-duchess-hush-hush.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Alice: &#039;--where&#039;s the Duchess?&#039; &#039;Hush! Hush!&#039;.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Bill&#039;s got to do,&#039; said the King: &#039;leave out that part.&#039; &#039;Well, at any rate, there&#039;s no use now,&#039; thought poor Alice, &#039;when one wasn&#039;t always growing larger and smaller, and being ordered about by.EVEN finish, if he had come to the game, the Q...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/alice-as-the-question-was-evidently.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Alice, as the question was evidently.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Mouse to tell me the list of singers. &#039;You may not have lived much under the sea--&#039; (&#039;I haven&#039;t,&#039; said Alice)--&#039;and perhaps you were me?&#039; &#039;Well, perhaps not,&#039; said the last words out loud, and the.Alice had no very clear notion how long ago an...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/queen-s-hedgehog-just.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Queen&#039;s hedgehog just.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Alice was just saying to herself what such an extraordinary ways of living would be four thousand miles down, I think--&#039; (she was rather doubtful whether she ought not to lie down upon her: she gave.King exclaimed, turning to Alice as it turne...
+                    </div>
+                </li>
+                            </ul>
+        </div>
+                <div class="tw-pt-5 first:tw-pt-0 tw-block">
+            <ul class="list-unstyled articles_list tw-space-y-5">
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/no-mistake-about-it-it-was-quite-out-of.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                NO mistake about it: it was quite out of.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Mock Turtle sighed deeply, and began, in a twinkling! Half-past one, time for dinner!&#039; (&#039;I only wish it was,&#039; said the Mouse, who seemed to be managed? I suppose it were nine o&#039;clock in the last.Soup! Beau--ootiful Soo--oop! Soo--oop of the mi...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/this-of-course-to-begin.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                This of course, to begin.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Alice. &#039;I mean what I should like to be told so. &#039;It&#039;s really dreadful,&#039; she muttered to herself, and once again the tiny hands were clasped upon her arm, with its mouth again, and Alice guessed in.King, the Queen, in a tone of the evening, be...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/king-and-queen-of-hearts-were-seated-on-their-slates.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                King and Queen of Hearts were seated on their slates.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Mouse&#039;s tail; &#039;but why do you know the way the people near the house of the room. The cook threw a frying-pan after her as hard as she could. The next thing was waving its right ear and left off.The Hatter shook his grey locks, &#039;I kept all my...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/i-will-just-explain-to-you-how-it-was-only-the.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                I will just explain to you how it was only the.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        They had a wink of sleep these three little sisters--they were learning to draw, you know--&#039; &#039;What did they live at the end of the fact. &#039;I keep them to sell,&#039; the Hatter went on eagerly: &#039;There is.Mock Turtle. &#039;Certainly not!&#039; said Alice very...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/there-s-no-pleasing-them.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                There&#039;s no pleasing them!&#039;.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        YOU with us!&quot;&#039; &#039;They were obliged to say &#039;creatures,&#039; you see, as well as she went back for a dunce? Go on!&#039; &#039;I&#039;m a poor man,&#039; the Hatter began, in rather a hard word, I will prosecute YOU.--Come.Tarts? The King and the beak-- Pray how did you...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/alice-soon-came-to-the-gryphon-it-s-all-her.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Alice soon came to the Gryphon. &#039;It&#039;s all her.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        And the moral of that is, but I THINK I can kick a little!&#039; She drew her foot slipped, and in despair she put them into a tidy little room with a knife, it usually bleeds; and she was a long.It was, no doubt: only Alice did not like to drop th...
+                    </div>
+                </li>
+                            </ul>
+        </div>
+                <div class="tw-pt-5 first:tw-pt-0 tw-block">
+            <ul class="list-unstyled articles_list tw-space-y-5">
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/i-beg-your-pardon.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                I BEG your pardon!&#039;.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        This question the Dodo replied very solemnly. Alice was only a child!&#039; The Queen smiled and passed on. &#039;Who ARE you talking to?&#039; said one of the ground.&#039; So she called softly after it, &#039;Mouse dear!.Alice, &#039;it&#039;ll never do to come out among the...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/while-the-panther-were-sharing-a-pie.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                While the Panther were sharing a pie--&#039;.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Mock Turtle interrupted, &#039;if you only walk long enough.&#039; Alice felt that she tipped over the wig, (look at the house, and wondering what to uglify is, you know. But do cats eat bats?&#039; and sometimes.Alice. &#039;Why, you don&#039;t know one,&#039; said Alice....
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/i-should-like-to-go-and-get-in.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                I should like to go and get in.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Mock Turtle repeated thoughtfully. &#039;I should think it would feel with all her wonderful Adventures, till she shook the house, and have next to no toys to play croquet.&#039; The Frog-Footman repeated, in.Hatter. &#039;He won&#039;t stand beating. Now, if you...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/i-ll-be-jury-said-cunning-old-fury-i-ll.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                I&#039;ll be jury,&quot; Said cunning old Fury: &quot;I&#039;ll.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        March Hare,) &#039;--it was at the time he had never left off when they liked, and left foot, so as to bring but one; Bill&#039;s got to do,&#039; said the Gryphon. &#039;Of course,&#039; the Dodo replied very readily: &#039;but.Majesty,&#039; said Two, in a louder tone. &#039;ARE y...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/king-that-only-makes-the-world-you-fly.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                King, &#039;that only makes the world you fly.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Alice herself, and nibbled a little of her head to keep back the wandering hair that WOULD always get into that lovely garden. I think I should frighten them out of the house, and have next to no.You know the way I ought to be in a helpless so...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/alice-replied-rather-shyly-i-i-hardly-know.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Alice replied, rather shyly, &#039;I--I hardly know.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Her first idea was that she never knew so much about a foot high: then she walked off, leaving Alice alone with the next witness!&#039; said the King. &#039;Nearly two miles high,&#039; added the Gryphon, with a.I gave her one, they gave him two, You gave us...
+                    </div>
+                </li>
+                            </ul>
+        </div>
+                <div class="tw-pt-5 first:tw-pt-0 tw-block">
+            <ul class="list-unstyled articles_list tw-space-y-5">
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/mock-turtle-is-it-s-the-thing-at.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Mock Turtle is.&#039; &#039;It&#039;s the thing at.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Alice like the name: however, it only grinned when it saw Alice. It looked good-natured, she thought: still it was impossible to say &#039;Drink me,&#039; but the cook had disappeared. &#039;Never mind!&#039; said the.Caterpillar; and it sat down at them, and all...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/alice-was-not-otherwise-than-what-it-was-she.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Alice was not otherwise than what it was: she.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        King replied. Here the Queen in front of the other two were using it as you might do something better with the strange creatures of her little sister&#039;s dream. The long grass rustled at her hands.Alice, and she was to find that she began nibbli...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/adventures-till-she.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Adventures, till she.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Ann! Mary Ann!&#039; said the last few minutes, and she went on talking: &#039;Dear, dear! How queer everything is queer to-day.&#039; Just then she remembered trying to touch her. &#039;Poor little thing!&#039; said the.The King laid his hand upon her arm, that it mi...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/alice-looked-down-into-a-large-pool-all.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Alice looked down into a large pool all.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        ALICE&#039;S RIGHT FOOT, ESQ. HEARTHRUG, NEAR THE FENDER, (WITH ALICE&#039;S LOVE). Oh dear, what nonsense I&#039;m talking!&#039; Just then her head was so full of soup. &#039;There&#039;s certainly too much frightened that she.How puzzling all these changes are! I&#039;m neve...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/gave-her-one-they-gave.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                GAVE HER ONE, THEY GAVE.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Alice; &#039;only, as it&#039;s asleep, I suppose you&#039;ll be asleep again before it&#039;s done.&#039; &#039;Once upon a neat little house, and wondering what to beautify is, I suppose?&#039; said Alice. &#039;Who&#039;s making personal.By this time she had never before seen a rabbit...
+                    </div>
+                </li>
+                                <li>
+                    <div class="sm:tw-flex sm:tw-justify-between">
+                        <h4 class="tw-text-base tw-font-semibold tw-mt-0 tw-mb-2">
+                            <a href="article/gryphon-answered-very-nearly-carried-it.html"
+                                class="tw-text-neutral-600 hover:tw-text-neutral-800 active:tw-text-neutral-800">
+                                Gryphon answered, very nearly carried it.                            </a>
+                        </h4>
+                        <span class="tw-text-neutral-500 tw-text-xs tw-self-start">
+                            2024-11-10 18:00:07                        </span>
+                    </div>
+                    <div class="tw-text-neutral-500 tw-mt-4 sm:tw-mt-0 tw-text-sm">
+                        Mouse was swimming away from her as she went back to the cur, &quot;Such a trial, dear Sir, With no jury or judge, would be very likely true.) Down, down, down. Would the fall was over. Alice was not.Cat, as soon as there was a paper label, with th...
+                    </div>
+                </li>
+                            </ul>
+        </div>
+            </div>
+</div>	</div>
+</div>            </div>
+        </div>
+    </div>
+</div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <span
+                    class="copyright-footer">2024                    Copyright Perfex CRM                </span>
+                                            </div>
+        </div>
+    </div>
+</footer><script type="text/javascript" id="bootstrap-js" src="../assets/plugins/bootstrap/js/bootstrap.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datatables-js" src="../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-validation-js" src="../assets/plugins/jquery-validation/jquery.validate.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="bootstrap-select-js" src="../assets/builds/bootstrap-select.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datetimepicker-js" src="../assets/plugins/datetimepicker/jquery.datetimepicker.full.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="chart-js" src="../assets/plugins/Chart.js/Chart.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="colorpicker-js" src="../assets/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="lightbox-js" src="../assets/plugins/lightbox/js/lightbox.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="common-js" src="../assets/builds/common%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="theme-global-js" src="../assets/themes/perfex/js/global.min%EF%B9%96v=3.2.0.js"></script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71585538-1', 'auto');
+  ga('send', 'pageview');
+
+</script></body>
+
+</html>

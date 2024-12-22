@@ -1,0 +1,122 @@
+[
+  {
+    "Title": "Startup",
+    "Description": "Best Settings for Startups",
+    "MonthlyPrice": "99",
+    "AnnualPrice": "999",
+    "Price": "99",
+    "ButtonText": "Select",
+    "ButtonColor": "primary",
+    "BackgroundColor": "body",
+    "TitleColor": "dark",
+    "DescriptionColor": "gray-400",
+    "PriceColor": "primary",
+    "Features": [
+      {
+        "Description": "Up to 10 Active Users",
+        "Icon": "check-circle",
+        "Color": "success"
+      },
+      {
+        "Description": "Up to 30 Project Integrations",
+        "Icon": "check-circle",
+        "Color": "success"
+      },
+      {
+        "Description": "Keen Analytics Platform",
+        "Icon": "cross-circle",
+        "Color": ""
+      },
+      {
+        "Description": "Targets Timelines & Files",
+        "Icon": "cross-circle",
+        "Color": ""
+      },
+      {
+        "Description": "Unlimited Projects",
+        "Icon": "cross-circle",
+        "Color": ""
+      }
+    ]
+  },
+  {
+    "Title": "Business",
+    "Description": "Best Settings for Business",
+    "MonthlyPrice": "199",
+    "AnnualPrice": "1999",
+    "Price": "199",
+    "ButtonText": "Select",
+    "ButtonColor": "color-primary btn-active-light-primary btn-light",
+    "BackgroundColor": "primary",
+    "TitleColor": "white",
+    "DescriptionColor": "opacity-75",
+    "PriceColor": "white",
+    "Features": [
+      {
+        "Description": "Up to 10 Active Users",
+        "Icon": "check-circle",
+        "Color": "white"
+      },
+      {
+        "Description": "Up to 30 Project Integrations",
+        "Icon": "check-circle",
+        "Color": "white"
+      },
+      {
+        "Description": "Keen Analytics Platform",
+        "Icon": "check-circle",
+        "Color": "white"
+      },
+      {
+        "Description": "Targets Timelines & Files",
+        "Icon": "check-circle",
+        "Color": "white"
+      },
+      {
+        "Description": "Unlimited Projects",
+        "Icon": "cross-circle",
+        "Color": "white"
+      }
+    ]
+  },
+  {
+    "Title": "Enterprise",
+    "Description": "Best Settings for Enterprise",
+    "MonthlyPrice": "999",
+    "AnnualPrice": "9999",
+    "Price": "999",
+    "ButtonText": "Select",
+    "ButtonColor": "primary",
+    "BackgroundColor": "body",
+    "TitleColor": "dark",
+    "DescriptionColor": "gray-400",
+    "PriceColor": "primary",
+    "Features": [
+      {
+        "Description": "Up to 10 Active Users",
+        "Icon": "check-circle",
+        "Color": "success"
+      },
+      {
+        "Description": "Up to 30 Project Integrations",
+        "Icon": "check-circle",
+        "Color": "success"
+      },
+      {
+        "Description": "Keen Analytics Platform",
+        "Icon": "check-circle",
+        "Color": "success"
+      },
+      {
+        "Description": "Targets Timelines & Files",
+        "Icon": "check-circle",
+        "Color": "success"
+      },
+      {
+        "Description": "Unlimited Projects",
+        "Icon": "check-circle",
+        "Color": "success"
+      }
+    ]
+  }
+]

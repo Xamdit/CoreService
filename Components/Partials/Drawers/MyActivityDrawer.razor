@@ -1,0 +1,261 @@
+@using Service.Components.Partials.General;
+<div id="kt_activities" class="bg-body" data-kt-drawer="true" data-kt-drawer-name="activities" data-kt-drawer-activate="true" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'300px', 'lg': '900px'}" data-kt-drawer-direction="end" data-kt-drawer-toggle="#kt_activities_toggle" data-kt-drawer-close="#kt_activities_close">
+<div class="card shadow-none border-0 rounded-0">
+<div class="card-header" id="kt_activities_header">
+  <h3 class="card-title fw-bold text-gray-900">Activity Logs</h3>
+  <div class="card-toolbar">
+    <button type="button" class="btn btn-sm btn-icon btn-active-light-primary me-n5" id="kt_activities_close">@((MarkupString)Theme.GetIcon("cross", "fs-1"))</button>
+  </div>
+</div>
+<div class="card-body position-relative" id="kt_activities_body">
+<div id="kt_activities_scroll" class="position-relative scroll-y me-n5 pe-5" data-kt-scroll="true" data-kt-scroll-height="auto" data-kt-scroll-wrappers="#kt_activities_body" data-kt-scroll-dependencies="#kt_activities_header, #kt_activities_footer" data-kt-scroll-offset="5px">
+<div class="timeline">
+<div class="timeline-item">
+  <div class="timeline-line w-40px"></div>
+  <div class="timeline-icon symbol symbol-circle symbol-40px me-4">
+    <div class="symbol-label bg-light">@((MarkupString)Theme.GetIcon("message-text-2", "fs-2 text-gray-500"))</div>
+  </div>
+  <div class="timeline-content mb-10 mt-n1">
+    <div class="pe-3 mb-5">
+      <div class="fs-5 fw-semibold mb-2">There are 2 new tasks for you in “AirPlus Mobile App” project:</div>
+      <div class="d-flex align-items-center mt-1 fs-6">
+        <div class="text-muted me-2 fs-7">Added at 4:23 PM by</div>
+        <div class="symbol symbol-circle symbol-25px" data-bs-toggle="tooltip" data-bs-boundary="window" data-bs-placement="top" title="Nina Nilson">
+          <img src='@Theme.GetAssetPath("media/avatars/300-14.jpg")' alt="img"/>
+        </div>
+      </div>
+    </div>
+    <div class="overflow-auto pb-5">
+      <div class="d-flex align-items-center border border-dashed border-gray-300 rounded min-w-750px px-7 py-3 mb-5">
+        <a href="?page=apps/projects/project" class="fs-5 text-gray-900 text-hover-primary fw-semibold w-375px min-w-200px">Meeting with customer</a>
+        <div class="min-w-175px pe-2">
+          <span class="badge badge-light text-muted">Application Design</span>
+        </div>
+        <div class="symbol-group symbol-hover flex-nowrap flex-grow-1 min-w-100px pe-2">
+          <div class="symbol symbol-circle symbol-25px">
+            <img src='@Theme.GetAssetPath("media/avatars/300-2.jpg")' alt="img"/>
+          </div>
+          <div class="symbol symbol-circle symbol-25px">
+            <img src='@Theme.GetAssetPath("media/avatars/300-14.jpg")' alt="img"/>
+          </div>
+          <div class="symbol symbol-circle symbol-25px">
+            <div class="symbol-label fs-8 fw-semibold bg-primary text-inverse-primary">A</div>
+          </div>
+        </div>
+        <div class="min-w-125px pe-2">
+          <span class="badge badge-light-primary">In Progress</span>
+        </div>
+        <a href="?page=apps/projects/project" class="btn btn-sm btn-light btn-active-light-primary">View</a>
+      </div>
+      <div class="d-flex align-items-center border border-dashed border-gray-300 rounded min-w-750px px-7 py-3 mb-0">
+        <a href="?page=apps/projects/project" class="fs-5 text-gray-900 text-hover-primary fw-semibold w-375px min-w-200px">Project Delivery Preparation</a>
+        <div class="min-w-175px">
+          <span class="badge badge-light text-muted">CRM System Development</span>
+        </div>
+        <div class="symbol-group symbol-hover flex-nowrap flex-grow-1 min-w-100px">
+          <div class="symbol symbol-circle symbol-25px">
+            <img src='@Theme.GetAssetPath("media/avatars/300-20.jpg")' alt="img"/>
+          </div>
+          <div class="symbol symbol-circle symbol-25px">
+            <div class="symbol-label fs-8 fw-semibold bg-success text-inverse-primary">B</div>
+          </div>
+        </div>
+        <div class="min-w-125px">
+          <span class="badge badge-light-success">Completed</span>
+        </div>
+        <a href="?page=apps/projects/project" class="btn btn-sm btn-light btn-active-light-primary">View</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="timeline-item">
+  <div class="timeline-line w-40px"></div>
+  <div class="timeline-icon symbol symbol-circle symbol-40px">
+    <div class="symbol-label bg-light">@((MarkupString)Theme.GetIcon("flag", "fs-2 text-gray-500"))</div>
+  </div>
+  <div class="timeline-content mb-10 mt-n2">
+    <div class="overflow-auto pe-3">
+      <div class="fs-5 fw-semibold mb-2">Invitation for crafting engaging designs that speak human workshop</div>
+      <div class="d-flex align-items-center mt-1 fs-6">
+        <div class="text-muted me-2 fs-7">Sent at 4:23 PM by</div>
+        <div class="symbol symbol-circle symbol-25px" data-bs-toggle="tooltip" data-bs-boundary="window" data-bs-placement="top" title="Alan Nilson">
+          <img src='@Theme.GetAssetPath("media/avatars/300-1.jpg")' alt="img"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="timeline-item">
+  <div class="timeline-line w-40px"></div>
+  <div class="timeline-icon symbol symbol-circle symbol-40px">
+    <div class="symbol-label bg-light">@((MarkupString)Theme.GetIcon("disconnect", "fs-2 text-gray-500"))</div>
+  </div>
+  <div class="timeline-content mb-10 mt-n1">
+    <div class="mb-5 pe-3">
+      <a href="#" class="fs-5 fw-semibold text-gray-800 text-hover-primary mb-2">3 New Incoming Project Files:</a>
+      <div class="d-flex align-items-center mt-1 fs-6">
+        <div class="text-muted me-2 fs-7">Sent at 10:30 PM by</div>
+        <div class="symbol symbol-circle symbol-25px" data-bs-toggle="tooltip" data-bs-boundary="window" data-bs-placement="top" title="Jan Hummer">
+          <img src='@Theme.GetAssetPath("media/avatars/300-23.jpg")' alt="img"/>
+        </div>
+      </div>
+    </div>
+    <div class="overflow-auto pb-5">
+      <div class="d-flex align-items-center border border-dashed border-gray-300 rounded min-w-700px p-5">
+        <div class="d-flex flex-aligns-center pe-10 pe-lg-20">
+          <img alt="" class="w-30px me-3" src='@Theme.GetAssetPath("media/svg/files/pdf.svg")'/>
+          <div class="ms-1 fw-semibold">
+            <a href="?page=apps/projects/project" class="fs-6 text-hover-primary fw-bold">Finance KPI App Guidelines</a>
+            <div class="text-gray-500">1.9mb</div>
+          </div>
+        </div>
+        <div class="d-flex flex-aligns-center pe-10 pe-lg-20">
+          <img alt="?page=apps/projects/project" class="w-30px me-3" src='@Theme.GetAssetPath("media/svg/files/doc.svg")'/>
+          <div class="ms-1 fw-semibold">
+            <a href="#" class="fs-6 text-hover-primary fw-bold">Client UAT Testing Results</a>
+            <div class="text-gray-500">18kb</div>
+          </div>
+        </div>
+        <div class="d-flex flex-aligns-center">
+          <img alt="?page=apps/projects/project" class="w-30px me-3" src='@Theme.GetAssetPath("media/svg/files/css.svg")'/>
+          <div class="ms-1 fw-semibold">
+            <a href="#" class="fs-6 text-hover-primary fw-bold">Finance Reports</a>
+            <div class="text-gray-500">20mb</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="timeline-item">
+  <div class="timeline-line w-40px"></div>
+  <div class="timeline-icon symbol symbol-circle symbol-40px">
+    <div class="symbol-label bg-light">@((MarkupString)Theme.GetIcon("abstract-26", "fs-2 text-gray-500"))</div>
+  </div>
+  <div class="timeline-content mb-10 mt-n1">
+    <div class="pe-3 mb-5">
+      <div class="fs-5 fw-semibold mb-2">
+        Task
+        <a href="#" class="text-primary fw-bold me-1">#45890</a>merged with
+        <a href="#" class="text-primary fw-bold me-1">#45890</a>in “Ads Pro Admin Dashboard project:
+      </div>
+      <div class="d-flex align-items-center mt-1 fs-6">
+        <div class="text-muted me-2 fs-7">Initiated at 4:23 PM by</div>
+        <div class="symbol symbol-circle symbol-25px" data-bs-toggle="tooltip" data-bs-boundary="window" data-bs-placement="top" title="Nina Nilson">
+          <img src='@Theme.GetAssetPath("media/avatars/300-14.jpg")' alt="img"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="timeline-item">
+  <div class="timeline-line w-40px"></div>
+  <div class="timeline-icon symbol symbol-circle symbol-40px">
+    <div class="symbol-label bg-light">@((MarkupString)Theme.GetIcon("pencil", "fs-2 text-gray-500"))</div>
+  </div>
+  <div class="timeline-content mb-10 mt-n1">
+    <div class="pe-3 mb-5">
+      <div class="fs-5 fw-semibold mb-2">3 new application design concepts added:</div>
+      <div class="d-flex align-items-center mt-1 fs-6">
+        <div class="text-muted me-2 fs-7">Created at 4:23 PM by</div>
+        <div class="symbol symbol-circle symbol-25px" data-bs-toggle="tooltip" data-bs-boundary="window" data-bs-placement="top" title="Marcus Dotson">
+          <img src='@Theme.GetAssetPath("media/avatars/300-2.jpg")' alt="img"/>
+        </div>
+      </div>
+    </div>
+    <div class="overflow-auto pb-5">
+      <div class="d-flex align-items-center border border-dashed border-gray-300 rounded min-w-700px p-7">
+        <div class="overlay me-10">
+          <div class="overlay-wrapper">
+            <img alt="img" class="rounded w-150px" src='@Theme.GetAssetPath("media/stock/600x400/img-29.jpg")'/>
+          </div>
+          <div class="overlay-layer bg-dark bg-opacity-10 rounded">
+            <a href="#" class="btn btn-sm btn-primary btn-shadow">Explore</a>
+          </div>
+        </div>
+        <div class="overlay me-10">
+          <div class="overlay-wrapper">
+            <img alt="img" class="rounded w-150px" src='@Theme.GetAssetPath("media/stock/600x400/img-31.jpg")'/>
+          </div>
+          <div class="overlay-layer bg-dark bg-opacity-10 rounded">
+            <a href="#" class="btn btn-sm btn-primary btn-shadow">Explore</a>
+          </div>
+        </div>
+        <div class="overlay">
+          <div class="overlay-wrapper">
+            <img alt="img" class="rounded w-150px" src='@Theme.GetAssetPath("media/stock/600x400/img-40.jpg")'/>
+          </div>
+          <div class="overlay-layer bg-dark bg-opacity-10 rounded">
+            <a href="#" class="btn btn-sm btn-primary btn-shadow">Explore</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="timeline-item">
+  <div class="timeline-line w-40px"></div>
+  <div class="timeline-icon symbol symbol-circle symbol-40px">
+    <div class="symbol-label bg-light">@((MarkupString)Theme.GetIcon("sms", "fs-2 text-gray-500"))</div>
+  </div>
+  <div class="timeline-content mb-10 mt-n1">
+    <div class="pe-3 mb-5">
+      <div class="fs-5 fw-semibold mb-2">
+        New case
+        <a href="#" class="text-primary fw-bold me-1">#67890</a>is assigned to you in Multi-platform Database Design project
+      </div>
+      <div class="overflow-auto pb-5">
+        <div class="d-flex align-items-center mt-1 fs-6">
+          <div class="text-muted me-2 fs-7">Added at 4:23 PM by</div>
+          <a href="#" class="text-primary fw-bold me-1">Alice Tan</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="timeline-item">
+  <div class="timeline-line w-40px"></div>
+  <div class="timeline-icon symbol symbol-circle symbol-40px">
+    <div class="symbol-label bg-light">@((MarkupString)Theme.GetIcon("pencil", "fs-2 text-gray-500"))</div>
+  </div>
+  <div class="timeline-content mb-10 mt-n1">
+    <div class="pe-3 mb-5">
+      <div class="fs-5 fw-semibold mb-2">You have received a new order:</div>
+      <div class="d-flex align-items-center mt-1 fs-6">
+        <div class="text-muted me-2 fs-7">Placed at 5:05 AM by</div>
+        <div class="symbol symbol-circle symbol-25px" data-bs-toggle="tooltip" data-bs-boundary="window" data-bs-placement="top" title="Robert Rich">
+          <img src='@Theme.GetAssetPath("media/avatars/300-4.jpg")' alt="img"/>
+        </div>
+      </div>
+    </div>
+    <div class="overflow-auto pb-5">
+      <MyNotice></MyNotice>
+    </div>
+  </div>
+</div>
+<div class="timeline-item">
+  <div class="timeline-line w-40px"></div>
+  <div class="timeline-icon symbol symbol-circle symbol-40px">
+    <div class="symbol-label bg-light">@((MarkupString)Theme.GetIcon("basket", "fs-2 text-gray-500"))</div>
+  </div>
+  <div class="timeline-content mt-n1">
+    <div class="pe-3 mb-5">
+      <div class="fs-5 fw-semibold mb-2">
+        New order
+        <a href="#" class="text-primary fw-bold me-1">#67890</a>is placed for Workshow Planning & Budget Estimation
+      </div>
+      <div class="d-flex align-items-center mt-1 fs-6">
+        <div class="text-muted me-2 fs-7">Placed at 4:23 PM by</div>
+        <a href="#" class="text-primary fw-bold me-1">Jimmy Bold</a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+<div class="card-footer py-5 text-center" id="kt_activities_footer">
+  <a href="?page=pages/user-profile/activity" class="btn btn-bg-body text-primary">View All Activities @((MarkupString)Theme.GetIcon("arrow-right", "fs-3 text-primary"))</a>
+</div>
+</div>
+</div>

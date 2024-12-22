@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>It was opened by another footman in livery, with a teacup.</title>
+	<link rel="shortcut icon" id="favicon" href="../../uploads/company/favicon.ico">
+<link rel="apple-touch-icon”" id="favicon-apple-touch-icon" href="../../uploads/company/favicon.ico">
+<link rel="stylesheet" type="text/css" id="bootstrap-css" href="../../assets/plugins/bootstrap/css/bootstrap.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="inter-font" href="../../assets/plugins/inter/inter%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="datatables-css" href="../../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-css" href="../../assets/plugins/font-awesome/css/fontawesome.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-brands" href="../../assets/plugins/font-awesome/css/brands.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-solid" href="../../assets/plugins/font-awesome/css/solid.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="fontawesome-regular" href="../../assets/plugins/font-awesome/css/regular.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="datetimepicker-css" href="../../assets/plugins/datetimepicker/jquery.datetimepicker.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="bootstrap-select-css" href="../../assets/plugins/bootstrap-select/css/bootstrap-select.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="lightbox-css" href="../../assets/plugins/lightbox/css/lightbox.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="colorpicker-css" href="../../assets/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="tailwind-css" href="../../assets/builds/tailwind%EF%B9%96v=3.2.0.css">
+<link rel="stylesheet" type="text/css" id="theme-css" href="../../assets/themes/perfex/css/style.min%EF%B9%96v=3.2.0.css">
+	<script
+		src="../../assets/plugins/jquery/jquery.min.js">
+	</script>
+	<script>
+if (typeof(jQuery) === 'undefined' && !window.deferAfterjQueryLoaded) {
+    window.deferAfterjQueryLoaded = [];
+    Object.defineProperty(window, "$", {
+        set: function(value) {
+            window.setTimeout(function() {
+                $.each(window.deferAfterjQueryLoaded, function(index, fn) {
+                    fn();
+                });
+            }, 0);
+            Object.defineProperty(window, "$", {
+                value: value
+            });
+        },
+        configurable: true
+    });
+}
+
+var csrfData = {"formatted":{"csrf_token_name":"bf0a8ef7a17e35f854421149e1dc6fe5"},"token_name":"csrf_token_name","hash":"bf0a8ef7a17e35f854421149e1dc6fe5"};
+
+if (typeof(jQuery) == 'undefined') {
+    window.deferAfterjQueryLoaded.push(function() {
+        csrf_jquery_ajax_setup();
+    });
+    window.addEventListener('load', function() {
+        csrf_jquery_ajax_setup();
+    }, true);
+} else {
+    csrf_jquery_ajax_setup();
+}
+
+function csrf_jquery_ajax_setup() {
+    $.ajaxSetup({
+        data: csrfData.formatted
+    });
+
+    $(document).ajaxError(function(event, request, settings) {
+        if (request.status === 419) {
+            alert_float('warning', 'Page expired, refresh the page make an action.')
+        }
+    });
+}
+</script>
+<script>
+function custom_fields_hyperlink() {
+    var cf_hyperlink = $('body').find('.cf-hyperlink');
+    if (cf_hyperlink.length) {
+        $.each(cf_hyperlink, function() {
+            var cfh_wrapper = $(this);
+            if (!cfh_wrapper.hasClass('cfh-initialized')) {
+                var cfh_field_to = cfh_wrapper.attr('data-fieldto');
+                var cfh_field_id = cfh_wrapper.attr('data-field-id');
+                var textEl = $('body').find('#custom_fields_' + cfh_field_to + '_' + cfh_field_id + '_popover');
+                var hiddenField = $("#custom_fields\\\[" + cfh_field_to + "\\\]\\\[" + cfh_field_id + "\\\]");
+                var cfh_value = cfh_wrapper.attr('data-value');
+                hiddenField.val(cfh_value);
+
+                if ($(hiddenField.val()).html() != '') {
+                    textEl.html($(hiddenField.val()).html());
+                }
+                var cfh_field_name = cfh_wrapper.attr('data-field-name');
+
+                textEl.popover({
+                    html: true,
+                    trigger: "manual",
+                    placement: "top",
+                    title: cfh_field_name,
+                    content: function() {
+                        return $(cfh_popover_templates[cfh_field_id]).html();
+                    }
+                }).on("click", function(e) {
+                    var $popup = $(this);
+                    $popup.popover("toggle");
+                    var titleField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id +
+                        "_title");
+                    var urlField = $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_link");
+                    var ttl = $(hiddenField.val()).html();
+                    var cfUrl = $(hiddenField.val()).attr("href");
+                    if (cfUrl) {
+                        $('#cf_hyperlink_open_' + cfh_field_id).attr('href', (cfUrl.indexOf('://') === -
+                            1 ? 'http://' + cfUrl : cfUrl));
+                    }
+                    titleField.val(ttl);
+                    urlField.val(cfUrl);
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-save").click(
+                        function() {
+                            hiddenField.val((urlField.val() != '' ? '<a href="' + urlField.val() +
+                                '" target="_blank">' + (titleField.val() != "" ? titleField
+                                    .val() : urlField.val()) + '</a>' : ''));
+                            textEl.html(titleField.val() !== "" ? titleField.val() : (urlField
+                                .val() != '' ? urlField.val() :
+                                "Click here to add link"));
+                            $popup.popover("toggle");
+                        });
+                    $("#custom_fields_" + cfh_field_to + "_" + cfh_field_id + "_btn-cancel").click(
+                        function() {
+                            if (urlField.val() == '') {
+                                hiddenField.val('');
+                            }
+                            $popup.popover("toggle");
+                        });
+                });
+                cfh_wrapper.addClass('cfh-initialized')
+            }
+        });
+    }
+}
+</script>
+<script src='https://www.google.com/recaptcha/api.js'></script><script>
+
+var site_url = 'https://perfexcrm.com/demo/',
+    app = {},
+    cfh_popover_templates = {};
+
+app.isRTL = 'false';
+app.is_mobile = '';
+app.months_json =
+    '["January","February","March","April","May","June","July","August","September","October","November","December"]';
+
+app.browser = "";
+app.max_php_ini_upload_size_bytes = "104857600";
+app.locale = "en";
+
+app.options = {
+    calendar_events_limit: "4",
+    calendar_first_day: "0",
+    tables_pagination_limit: "25",
+    enable_google_picker: "1",
+    google_client_id: "",
+    google_api: "",
+    default_view_calendar: "dayGridMonth",
+    timezone: "Europe/Berlin",
+    allowed_files: ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt",
+    date_format: "Y-m-d",
+    time_format: "24",
+};
+
+app.lang = {
+    file_exceeds_maxfile_size_in_form: "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" +
+        ' (100 MB)',
+    file_exceeds_max_filesize: "The uploaded file exceeds the upload_max_filesize directive in php.ini" +
+        ' (100 MB)',
+    validation_extension_not_allowed: "File extension not allowed",
+    sign_document_validation: "Please sign the document.",
+    dt_length_menu_all: "All",
+    drop_files_here_to_upload: "Drop files here to upload",
+    browser_not_support_drag_and_drop: "Your browser does not support drag'n'drop file uploads",
+    confirm_action_prompt: "Are you sure you want to perform this action?",
+    datatables: {"emptyTable":"No entries found","info":"Showing _START_ to _END_ of _TOTAL_ entries","infoEmpty":"Showing 0 to 0 of 0 entries","infoFiltered":"(filtered from _MAX_ total entries)","lengthMenu":"_MENU_","loadingRecords":"Loading...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Search...","zeroRecords":"No matching records found","paginate":{"first":"First","last":"Last","next":"Next","previous":"Previous"},"aria":{"sortAscending":" activate to sort column ascending","sortDescending":" activate to sort column descending"}},
+    discussions_lang: {"discussion_add_comment":"Add comment","discussion_newest":"Newest","discussion_oldest":"Oldest","discussion_attachments":"Attachments","discussion_send":"Send","discussion_reply":"Answer","discussion_edit":"Edit","discussion_edited":"Modified","discussion_you":"You","discussion_save":"Save","discussion_delete":"Delete","discussion_view_all_replies":"Show all replies","discussion_hide_replies":"Hide replies","discussion_no_comments":"No comments","discussion_no_attachments":"No attachments","discussion_attachments_drop":"Drag and drop to upload file"},
+};
+window.addEventListener('load', function() {
+    custom_fields_hyperlink();
+});
+</script>
+<script>
+/**
+ * @deprecated 2.3.2
+ * Do not use any of these below as will be removed in future updates.
+ */
+var isRTL = 'false';
+
+var calendar_events_limit = "4";
+var maximum_allowed_ticket_attachments = "4";
+
+var max_php_ini_upload_size_bytes = "104857600";
+
+var file_exceeds_maxfile_size_in_form = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" +
+    ' (100 MB)';
+var file_exceeds_max_filesize = "The uploaded file exceeds the upload_max_filesize directive in php.ini" +
+    ' (100 MB)';
+
+var validation_extension_not_allowed = "File extension not allowed";
+var sign_document_validation = "Please sign the document.";
+var dt_length_menu_all = "All";
+
+var drop_files_here_to_upload = "Drop files here to upload";
+var browser_not_support_drag_and_drop = "Your browser does not support drag'n'drop file uploads";
+var remove_file = "Remove file";
+var tables_pagination_limit = "25";
+var enable_google_picker = "1";
+var google_client_id = "";
+var google_api = "";
+var acceptable_mimes = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt, image/png, image/jpeg, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/x-zip, application/x-rar, text/plain";
+var date_format = "Y-m-d";
+var time_format = "24";
+var default_view_calendar = "dayGridMonth";
+var dt_lang = {"emptyTable":"No entries found","info":"Showing _START_ to _END_ of _TOTAL_ entries","infoEmpty":"Showing 0 to 0 of 0 entries","infoFiltered":"(filtered from _MAX_ total entries)","lengthMenu":"_MENU_","loadingRecords":"Loading...","processing":"<div class=\"dt-loader\"><\/div>","search":"<div class=\"input-group\"><span class=\"input-group-addon\"><span class=\"fa fa-search\"><\/span><\/span>","searchPlaceholder":"Search...","zeroRecords":"No matching records found","paginate":{"first":"First","last":"Last","next":"Next","previous":"Previous"},"aria":{"sortAscending":" activate to sort column ascending","sortDescending":" activate to sort column descending"}};
+var discussions_lang = {"discussion_add_comment":"Add comment","discussion_newest":"Newest","discussion_oldest":"Oldest","discussion_attachments":"Attachments","discussion_send":"Send","discussion_reply":"Answer","discussion_edit":"Edit","discussion_edited":"Modified","discussion_you":"You","discussion_save":"Save","discussion_delete":"Delete","discussion_view_all_replies":"Show all replies","discussion_hide_replies":"Hide replies","discussion_no_comments":"No comments","discussion_no_attachments":"No attachments","discussion_attachments_drop":"Drag and drop to upload file"};
+var confirm_action_prompt = "Are you sure you want to perform this action?";
+var cf_translate_input_link_tip = "Click here to add link";
+
+var locale = 'en';
+var timezone = "Europe/Berlin";
+var allowed_files = ".png,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.txt";
+var calendar_first_day = '0';
+var months_json =
+    '["January","February","March","April","May","June","July","August","September","October","November","December"]';
+</script>
+<meta name="robots" content="noindex">
+</head>
+
+<body
+	class="customers  contract contract-view identity-confirmation"
+	>
+
+	<div id="wrapper">
+    <div id="content">
+        <div class="container">
+            <div class="row">
+                            </div>
+        </div>
+                <div class="container">
+                        <div class="row">
+                                <div class="mtop15 preview-top-wrapper">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="mbot30">
+                <div class="contract-html-logo">
+                    <a href="../../authentication/login.html" class="logo img-responsive">
+        <img src="../../uploads/company/1f03e41865e3e0d535f6202e5fba391a.png" class="img-responsive" alt="Perfex CRM">
+        </a>                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="top" data-sticky data-sticky-class="preview-sticky-header">
+        <div class="container preview-sticky-container">
+            <div class="sm:tw-flex sm:tw-justify-between -tw-mx-4">
+                <div class="sm:tw-self-end tw-inline-flex">
+                    <h4 class="tw-my-0 tw-font-bold contract-html-subject">
+                        It was opened by another footman in livery, with a teacup.<br />
+                        <small>Executed and Executory Contracts</small>
+                    </h4>
+                                    </div>
+                <div class="tw-flex tw-items-end tw-space-x-2 tw-mt-3 sm:tw-mt-0">
+                                        <form action="f15ff1a97fa72241567a4e05ffd2d07f.html" method="post" accept-charset="utf-8">
+                                                                                                                      <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+                    <button type="submit" class="btn btn-default action-button contract-html-pdf">
+                        <i class="fa-regular fa-file-pdf"></i>
+                        Download                    </button>
+                    
+<input type="hidden" name="action" value="contract_pdf" />
+                    </form>                                        <button type="submit" id="accept_action" class="btn btn-success action-button">
+                        <i class="fa-solid fa-signature"></i>
+                        Sign                    </button>
+                                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8 contract-left">
+        <div class="panel_s tw-mt-6 sm:tw-mt-8">
+            <div class="panel-body tc-content contract-html-content">
+                I'm afraid, sir' said Alice, swallowing down her anger as well as the March Hare. 'Exactly so,' said the White Rabbit blew three blasts on the same side of the Gryphon, half to Alice. 'Nothing,' said Alice. 'Why?' 'IT DOES THE BOOTS AND SHOES.' the Gryphon went on. 'We had the door as you say "What a pity!"?' the Rabbit just under the sea--' ('I haven't,' said Alice)--'and perhaps you haven't found it advisable--"' 'Found WHAT?' said the Hatter. 'It isn't mine,' said the Caterpillar took the least idea what you're doing!' cried Alice, quite forgetting her promise. 'Treacle,' said the sage, as he spoke, and added with a trumpet in one hand and a bright brass plate.<br /><br />Alice waited a little, and then all the things between whiles.' 'Then you may SIT down,' the King put on your head-- Do you think you can find them.' As she said to herself, 'if one only knew how to get through the little creature down, and was just possible it had been, it suddenly appeared again. 'By-the-bye, what became of the.<br /><br />Alice. 'Anything you like,' said the Caterpillar took the regular course.' 'What was that?' inquired Alice. 'Reeling and Writhing, of course, to begin with,' the Mock Turtle's Story 'You can't think how glad I am so VERY tired of.<br /><br />I know THAT well enough; don't be particular--Here, Bill! catch hold of this pool? I am to see a little way out of the jury wrote it down 'important,' and some of the way--' 'THAT generally takes some time,' interrupted the Hatter: 'as the things being alive; for instance, there's the arch I've got to the heads of the teacups as the March Hare interrupted in a melancholy air, and, after folding his arms and legs in all directions, tumbling up.<br /><br />May it won't be raving mad after all! I almost wish I'd gone to see the Queen. 'Sentence first--verdict afterwards.' 'Stuff and nonsense!' said Alice to herself. At this the White Rabbit read out, at the cook, to see if she had tired herself out with trying, the poor little thing sat down with wonder at the White Rabbit blew three blasts on the second thing is to do this, so that they could not join the dance. '"What matters it how far we go?" his scaly friend replied. "There is another shore, you know, and he poured a little nervous about it while the Mock Turtle Soup is made from,' said the March Hare. 'Yes, please do!' pleaded Alice. 'And where HAVE my shoulders got to? And oh, my poor little feet, I wonder if I was, I shouldn't like THAT!' 'Oh, you.<br /><br />Queen. 'Sentence first--verdict afterwards.' 'Stuff and nonsense!' said Alice to herself. 'Shy, they seem to dry me at home! Why, I do wonder what CAN have happened to me! I'LL soon make you grow taller, and the great hall, with the grin, which remained some time with one finger for the end of the Queen's absence, and were quite dry again, the cook was busily stirring the soup, and seemed not to lie down on one side, to look about her any more if you'd rather not.' 'We indeed!' cried the Gryphon. 'Do you take me for asking!.<br /><br />Gryphon is, look at it!' This speech caused a remarkable sensation among the party. Some of the house down!' said the Rabbit in a great many teeth, so she set the little passage: and THEN--she found herself at last it sat down again very sadly and quietly, and looked into its face in her hand, watching the setting sun, and thinking of little Alice was more and more puzzled, but she thought it must be kind to them,' thought Alice, 'they're sure to do that,' said the King, 'unless it was.<br /><br />However, on the ground near the centre of the house, and wondering whether she could even make out that the Gryphon whispered in reply, 'for fear they should forget them before the trial's over!' thought Alice. 'Now we shall have somebody to talk nonsense. The Queen's argument was, that you think I can reach the key; and if it had come to the Knave was standing before them, in chains, with a pair of white kid gloves: she took up the other, looking uneasily at the cook, and a fan! Quick.<br /><br />The King's argument was, that if you don't like them raw.' 'Well, be off, and that he had taken advantage of the singers in the sky. Twinkle, twinkle--"' Here the Dormouse denied nothing, being fast asleep. 'After that,' continued the Hatter, with an important air, 'are you all ready? This is the driest thing I know. Silence all round, if you were me?' 'Well, perhaps your feelings may be ONE.' 'One, indeed!' said the King. 'Nearly two miles high,' added the March Hare. 'Yes, please.            </div>
+        </div>
+    </div>
+    <div class="col-md-4 contract-right">
+        <div class="inner tw-mt-8 contract-html-tabs">
+            <ul class="nav nav-tabs nav-tabs-flat mbot15" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#summary" aria-controls="summary" role="tab" data-toggle="tab"
+                        class="tw-flex tw-justify-center tw-space-x-1">
+                        <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                        <span>Summary</span>
+                    </a>
+                </li>
+                <li role="presentation" class="">
+                    <a href="#discussion" aria-controls="discussion" role="tab" data-toggle="tab"
+                        class="tw-flex tw-justify-center tw-space-x-1">
+                        <i class="fa-regular fa-comment" aria-hidden="true"></i>
+                        <span>
+                            Discussion                        </span>
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="summary">
+                    <address class="contract-html-company-info tw-text-normal">
+                        <b style="color:black" class="company-name-formatted">Perfex INC</b><br /> 172 Ivy Club Gottliebfurt<br /> New Heaven<br /> Canada [CA] 2364                    </address>
+                    <div class="row mtop20">
+                                                <div class="col-md-12 contract-value">
+                            <h4 class="bold tw-mb-3">
+                                Contract Value:
+                                $426.00                            </h4>
+                        </div>
+                                                <div class="tw-text-normal col-md-5 text-muted contract-number">
+                            #
+                            Contract Number                        </div>
+                        <div class="tw-text-normal col-md-7 contract-number tw-text-neutral-700">
+                            3                        </div>
+                        <div class="tw-text-normal col-md-5 text-muted contract-start-date">
+                            Start Date                        </div>
+                        <div class="tw-text-normal col-md-7 contract-start-date tw-text-neutral-700">
+                            2024-11-10                        </div>
+                                                <div class="tw-text-normal col-md-5 text-muted contract-end-date">
+                            End Date                        </div>
+                        <div class="tw-text-normal col-md-7 contract-end-date tw-text-neutral-700">
+                            2024-11-14                        </div>
+                                                                        <div class="tw-text-normal col-md-5 text-muted contract-type">
+                            Contract type                        </div>
+                        <div class="tw-text-normal col-md-7 contract-type tw-text-neutral-700">
+                            Executed and Executory Contracts                        </div>
+                                                                    </div>
+                                                        </div>
+                <div role="tabpanel" class="tab-pane" id="discussion">
+                    <form action="f15ff1a97fa72241567a4e05ffd2d07f.html" method="post" accept-charset="utf-8">
+                                                                           <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+                    <div class="contract-comment">
+                        <textarea name="content" rows="4" class="form-control"></textarea>
+                        <button type="submit" class="btn btn-primary mtop10 pull-right"
+                            data-loading-text="Please wait...">Add Comment</button>
+                        
+<input type="hidden" name="action" value="contract_comment" />
+                    </div>
+                    </form>                    <div class="clearfix"></div>
+                                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="identityConfirmationModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form action="f15ff1a97fa72241567a4e05ffd2d07f.html" id="identityConfirmationForm" class="form-horizontal" method="post" accept-charset="utf-8">
+                 <input type="hidden" name="csrf_token_name" value="bf0a8ef7a17e35f854421149e1dc6fe5" />
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">
+          Signature &amp;
+          Confirmation Of Identity        </h4>
+      </div>
+      <div class="modal-body">
+                
+<input type="hidden" name="action" value="sign_contract" />
+        <div id="identity_fields">
+          <div class="form-group">
+            <label for="acceptance_firstname" class="control-label col-sm-2">
+              <span class="text-left inline-block full-width">
+                First Name              </span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="acceptance_firstname" id="acceptance_firstname" class="form-control"
+                required="true"
+                value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="acceptance_lastname" class="control-label col-sm-2">
+              <span class="text-left inline-block full-width">
+                Last Name              </span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="acceptance_lastname" id="acceptance_lastname" class="form-control"
+                required="true"
+                value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="acceptance_email" class="control-label col-sm-2">
+              <span class="text-left inline-block full-width">
+                Email              </span>
+            </label>
+            <div class="col-sm-10">
+              <input type="email" name="acceptance_email" id="acceptance_email" class="form-control" required="true"
+                value="">
+            </div>
+          </div>
+          <p class="bold" id="signatureLabel">
+            Signature          </p>
+          <div class="signature-pad--body">
+            <canvas id="signature" height="130" width="550"></canvas>
+          </div>
+          <input type="text" style="width:1px; height:1px; border:0px;" tabindex="-1" name="signature"
+            id="signatureInput">
+          <div class="dispay-block">
+            <button type="button" class="btn btn-default btn-xs clear" tabindex="-1"
+              data-action="clear">Clear</button>
+            <button type="button" class="btn btn-default btn-xs" tabindex="-1"
+              data-action="undo">Undo</button>
+          </div>
+        </div>
+              </div>
+      <div class="modal-footer">
+        <p class="text-left text-muted e-sign-legal-text">
+          By clicking on "Sign", I consent to be legally bound by this electronic representation of my signature.        </p>
+        <hr />
+        <button type="button" class="btn btn-default"
+          data-dismiss="modal">Cancel</button>
+        <button type="submit"
+          data-loading-text="Please wait..."
+          autocomplete="off" data-form="#identityConfirmationForm"
+          class="btn btn-success">Sign</button>
+      </div>
+      </form>    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<script>
+  $(function() {
+    SignaturePad.prototype.toDataURLAndRemoveBlanks = function() {
+      var canvas = this._ctx.canvas;
+      // First duplicate the canvas to not alter the original
+      var croppedCanvas = document.createElement('canvas'),
+        croppedCtx = croppedCanvas.getContext('2d');
+
+      croppedCanvas.width = canvas.width;
+      croppedCanvas.height = canvas.height;
+      croppedCtx.drawImage(canvas, 0, 0);
+
+      // Next do the actual cropping
+      var w = croppedCanvas.width,
+        h = croppedCanvas.height,
+        pix = {
+          x: [],
+          y: []
+        },
+        imageData = croppedCtx.getImageData(0, 0, croppedCanvas.width, croppedCanvas.height),
+        x, y, index;
+
+      for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+          index = (y * w + x) * 4;
+          if (imageData.data[index + 3] > 0) {
+            pix.x.push(x);
+            pix.y.push(y);
+
+          }
+        }
+      }
+      pix.x.sort(function(a, b) {
+        return a - b
+      });
+      pix.y.sort(function(a, b) {
+        return a - b
+      });
+      var n = pix.x.length - 1;
+
+      w = pix.x[n] - pix.x[0];
+      h = pix.y[n] - pix.y[0];
+      var cut = croppedCtx.getImageData(pix.x[0], pix.y[0], w, h);
+
+      croppedCanvas.width = w;
+      croppedCanvas.height = h;
+      croppedCtx.putImageData(cut, 0, 0);
+
+      return croppedCanvas.toDataURL();
+    };
+
+
+    function signaturePadChanged() {
+
+      var input = document.getElementById('signatureInput');
+      var $signatureLabel = $('#signatureLabel');
+      $signatureLabel.removeClass('text-danger');
+
+      if (signaturePad.isEmpty()) {
+        $signatureLabel.addClass('text-danger');
+        input.value = '';
+        return false;
+      }
+
+      $('#signatureInput-error').remove();
+      var partBase64 = signaturePad.toDataURLAndRemoveBlanks();
+      partBase64 = partBase64.split(',')[1];
+      input.value = partBase64;
+    }
+
+    var canvas = document.getElementById("signature");
+    var clearButton = wrapper.querySelector("[data-action=clear]");
+    var undoButton = wrapper.querySelector("[data-action=undo]");
+    var identityFormSubmit = document.getElementById('identityConfirmationForm');
+
+    var signaturePad = new SignaturePad(canvas, {
+      maxWidth: 2,
+      onEnd: function() {
+        signaturePadChanged();
+      }
+    });
+
+    clearButton.addEventListener("click", function(event) {
+      signaturePad.clear();
+      signaturePadChanged();
+    });
+
+    undoButton.addEventListener("click", function(event) {
+      var data = signaturePad.toData();
+      if (data) {
+        data.pop(); // remove the last dot or line
+        signaturePad.fromData(data);
+        signaturePadChanged();
+      }
+    });
+
+    $('#identityConfirmationForm').submit(function() {
+      signaturePadChanged();
+    });
+  });
+</script><script>
+    $(function() {
+        new Sticky('[data-sticky]');
+        $(".contract-left table").wrap("<div class='table-responsive'></div>");
+        // Create lightbox for contract content images
+        $('.contract-html-content img').wrap(function() {
+            return '<a href="' + $(this).attr('src') + '" data-lightbox="contract"></a>';
+        });
+    })
+</script>            </div>
+        </div>
+    </div>
+</div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <span
+                    class="copyright-footer">2024                    Copyright Perfex CRM                </span>
+                                            </div>
+        </div>
+    </div>
+</footer><script type="text/javascript" id="bootstrap-js" src="../../assets/plugins/bootstrap/js/bootstrap.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datatables-js" src="../../assets/plugins/datatables/datatables.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="jquery-validation-js" src="../../assets/plugins/jquery-validation/jquery.validate.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="bootstrap-select-js" src="../../assets/builds/bootstrap-select.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="datetimepicker-js" src="../../assets/plugins/datetimepicker/jquery.datetimepicker.full.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="chart-js" src="../../assets/plugins/Chart.js/Chart.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="colorpicker-js" src="../../assets/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="lightbox-js" src="../../assets/plugins/lightbox/js/lightbox.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="common-js" src="../../assets/builds/common%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="theme-global-js" src="../../assets/themes/perfex/js/global.min%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="sticky-js" src="../../assets/plugins/sticky/sticky%EF%B9%96v=3.2.0.js"></script>
+<script type="text/javascript" id="signature-pad" src="../../assets/plugins/signature-pad/signature_pad.min%EF%B9%96v=3.2.0.js"></script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71585538-1', 'auto');
+  ga('send', 'pageview');
+
+</script></body>
+
+</html>

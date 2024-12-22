@@ -1,0 +1,25 @@
+@* MenuItem.razor *@
+
+<div class="menu-item">
+  <a class="menu-link" href="@Href" target="@Target">
+    <span class="menu-icon">@((MarkupString)Theme.GetIcon("code", "fs-2"))</span>
+    <span class="menu-title">@Title</span>
+  </a>
+</div>
+
+
+@code {
+
+  [Parameter]
+  public string Href { get; set; } = "#";
+
+  [Parameter]
+  public string Icon { get; set; }
+
+  [Parameter]
+  public string Title { get; set; }
+
+  [Parameter]
+  public string Target { get; set; } = "_self";
+
+}

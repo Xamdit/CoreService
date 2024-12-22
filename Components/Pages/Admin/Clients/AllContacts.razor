@@ -1,0 +1,72 @@
+﻿@namespace Service.Components.Pages.Admin.Clients
+@inherits AllContactsRazor
+
+<div id="wrapper">
+  <div class="content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel_s">
+          <div class="panel-body">
+            @if (ConsentPurposes != null)
+            {
+              <div class="row mbot15">
+                <div class="col-md-3 contacts-filter-column">
+                  <div class="select-placeholder">
+                    <select name="custom_view" title="@label["gdpr_consent"]" id="custom_view" class="selectpicker"
+                            data-width="100%">
+                      <option value=""></option>
+                      @foreach (var purpose in ConsentPurposes)
+                      {
+                        <option value="consent_@purpose.Id">
+                          @purpose.Name
+                        </option>
+                      }
+                    </select>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <div class="clearfix"></div>
+            <!-- here -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+$this->load->view('admin/clients/client_js'); ?>
+
+<div id="contact_data"></div>
+<div id="consent_data"></div>
+@* <script> *@
+@* $(function(){ *@
+@* var optionsHeading = []; *@
+@* var allContactsServerParams = { *@
+@* "custom_view": "[name='custom_view']", *@
+@* } *@
+@* if(is_gdpr() && db.get_option('gdpr_enable_consent_for_contacts') == '1'){ *@
+@* optionsHeading.push($('#th-consent').index()); *@
+@* } *@
+@* _table_api = initDataTable('.table-all-contacts', window.location.href, optionsHeading, optionsHeading,
+allContactsServerParams, [0,'asc']); *@
+@* if(_table_api) { *@
+@* if(is_gdpr() && db.get_option('gdpr_enable_consent_for_contacts') == '1'){ *@
+@* _table_api.on('draw', function () { *@
+@* var tableData = $('.table-all-contacts').find('tbody tr'); *@
+@* $.each(tableData, function() { *@
+@* $(this).find('td:eq(2)').addClass('bg-light-gray'); *@
+@* }); *@
+@* }); *@
+@* $('select[name="custom_view"]').on('change', function(){ *@
+@* _table_api.ajax.reload() *@
+@* .columns.adjust() *@
+@* .responsive.recalc(); *@
+@* }); *@
+@* } *@
+@* } *@
+@* }); *@
+@* </script> *@

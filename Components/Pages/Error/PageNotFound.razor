@@ -1,0 +1,22 @@
+@page "/not-found"
+<style>
+    body {
+        background-image: url(@Theme.GetAssetPath("media/auth/bg1.jpg"));
+    }
+    [data-bs-theme="dark"] body {
+        background-image: url(@Theme.GetAssetPath("media/auth/bg1-dark.jpg"));
+    }
+</style>
+<h1 class="fw-bolder fs-2hx text-gray-900 mb-4">
+  Oops!
+</h1>
+<div class="fw-semibold fs-6 text-gray-500 mb-7">
+  We can't find that page.
+</div>
+<div class="mb-3">
+  <img src='@Theme.GetAssetPath("media/auth/404-error.png")' class="mw-100 mh-300px theme-light-show" alt=""/>
+  <img src='@Theme.GetAssetPath("media/auth/404-error-dark.png")' class="mw-100 mh-300px theme-dark-show" alt=""/>
+</div>
+<div class="mb-0">
+  <a href="/" class="btn btn-sm btn-primary">Return Home</a>
+</div>

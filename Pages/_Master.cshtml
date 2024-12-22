@@ -1,0 +1,63 @@
+@using Service.Framework.Library.Themes
+@using Service.Framework.Library.Themes.Partials
+@namespace Service.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@inject IBootstrapBase BootstrapBase
+@inject ITheme Theme
+
+@{
+  BootstrapBase.Init(Theme);
+}
+
+<!DOCTYPE html>
+<html @Html.Raw(Theme.PrintHtmlAttributes("html"))>
+<!--begin::Head-->
+
+<head>
+  <base href="~/"/>
+  <meta charset="utf-8"/>
+  <meta name="description" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:title" content=""/>
+
+  <link rel="shortcut icon" href="@Theme.GetFavicon()"/>
+
+  <!--begin::Fonts-->
+  @foreach (var font in Theme.GetFonts())
+  {
+    <link rel="stylesheet" href="@font"/>
+  }
+  <!--end::Fonts-->
+
+  <!--begin::Global Stylesheets(mandatory)-->
+  @foreach (var file in Theme.GetGlobalAssets("Css"))
+  {
+    <link rel="stylesheet" type="text/css" href="@file"/>
+  }
+  <!--end::Global Stylesheets-->
+</head>
+<!--end::Head-->
+
+<!--begin::Body-->
+<!body @Html.Raw(Theme.PrintHtmlAttributes("body")) class='@Theme.PrintHtmlClasses("body")'>
+  <partial name="~/Shared/Partials/ThemeMode/MyInit.cshtml"></partial>
+
+  <!--begin::Global Javascript(mandatory)-->
+  @foreach (var file in Theme.GetGlobalAssets("Js"))
+  {
+    <script src="@file"></script>
+  }
+  <!--end::Global Javascript-->
+  <partial name="~/Shared/Partials/MyPageLoader.cshtml"></partial>
+
+  @RenderBody()
+
+  <script src="_framework/blazor.server.js"></script>
+</!body>
+<!--end::Body-->
+
+</html>
