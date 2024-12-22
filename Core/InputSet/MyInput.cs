@@ -1,4 +1,5 @@
 using System.Net;
+using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Library.Net;
@@ -56,6 +57,13 @@ public class MyInput
   {
     var output = _post[key];
     return (T)Convert.ChangeType(output, typeof(T));
+  }
+
+  public T? post<T>()
+  {
+    var jsonString = JsonConvert.SerializeObject(_post);
+    var dataset = JsonConvert.DeserializeObject<T>(jsonString);
+    return dataset;
   }
 
   public void post(string key, string value)

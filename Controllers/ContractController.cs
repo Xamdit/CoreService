@@ -4,6 +4,7 @@ using Service.Controllers.Core;
 using Service.Core.Extensions;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers;
 using Service.Framework.Library.Merger;
 using Service.Helpers;
 using Service.Helpers.Pdf;
@@ -77,15 +78,17 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
         var dataset = TypeMerger.Merge(get_acceptance_info_array<Contract>(), new Contract() { Signed = true });
         db.Contracts.Where(x => x.Id == id).Update(x => dataset);
         self.helper.send_contract_signed_notification_to_staff(id);
-
-        SetAlert("success", "Document signed successfully");
+        set_alert("success", "Document signed successfully");
         return Redirect(Request.Headers["Referer"]);
 
       case "contract_comment":
         if (string.IsNullOrEmpty(content))
           return Redirect(Request.Path);
-        self.helper.add_contract_comment(id, content);
-        return Redirect(Request.Path + "?tab=discussion");
+        var contracts_model = self.model.contracts_model();
+        var contract_data = self.input.post<ContractComment>();
+        contract_data.ContractId = id;
+        contracts_model.add_comment(contract_data, true);
+        return Redirect(self.helper.base_url() + "?tab=discussion");
     }
 
     // DisableNavigation();

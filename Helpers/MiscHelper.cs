@@ -20,6 +20,11 @@ public static class MiscHelper
  * @param  booleanempty should the array values be empty or taken from_POST
  * @return array
  */
+  public static T get_acceptance_info_array<T>() where T : class
+  {
+    return get_acceptance_info_array<T>(false);
+  }
+
   public static T get_acceptance_info_array<T>(bool empty = false) where T : class
   {
     var _httpContextAccessor = new HttpContextAccessor();
@@ -34,15 +39,16 @@ public static class MiscHelper
     var data = new
     {
       Signature = signature,
-      AcceptanceFirstName = empty ? null : request.Form["acceptance_firstname"].ToString(),
-      AcceptanceLastName = empty ? null : request.Form["acceptance_lastname"].ToString(),
-      AcceptanceEmail = !empty && Convert.ToBoolean(request.Form["acceptance_email"]),
-      AcceptanceDate = empty ? null : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-      AcceptanceIp = empty ? null : _httpContextAccessor.HttpContext.Connection.RemoteIpAddress?.ToString()
+      AcceptanceFirstName = empty == true ? null : request.Form["acceptance_firstname"].ToString(),
+      AcceptanceLastName = empty == true ? null : request.Form["acceptance_lastname"].ToString(),
+      AcceptanceEmail = empty == false && Convert.ToBoolean(request.Form["acceptance_email"]),
+      AcceptanceDate = empty == true ? null : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+      AcceptanceIp = empty == true ? null : _httpContextAccessor.HttpContext.Connection.RemoteIpAddress?.ToString()
     };
     var output = Convert.ChangeType(data, typeof(T));
     return (T)output;
   }
+
 
   public static bool process_digital_signature_image(string partBase64, string path)
   {

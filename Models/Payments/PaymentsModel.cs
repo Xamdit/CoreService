@@ -19,7 +19,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
   private readonly PaymentModesModel paymentmodes_model = self.model.payment_modes_model();
   private readonly PaymentAttemptsModel paymentAttemptsModel = self.model.payment_attempts_model();
 
-  public InvoicePaymentRecord Get(int id)
+  public InvoicePaymentRecord get(int id)
   {
     var payment = db.InvoicePaymentRecords
       .Include(x => x.PaymentMode)
@@ -51,7 +51,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
     return payments;
   }
 
-  public int ProcessPayment(InvoicePaymentRecord data, int invoiceId = 0, PaymentOption option = default)
+  public int process_payment(InvoicePaymentRecord data, int invoiceId = 0, PaymentOption option = default)
   {
     if (!string.IsNullOrEmpty(data.PaymentMode)) return !is_staff_logged_in() ? 0 : add((data, option));
 
@@ -173,7 +173,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public bool Update(InvoicePaymentRecord data)
   {
-    var payment = Get(data.Id);
+    var payment = get(data.Id);
     data.Note = data.Note.nl2br();
 
     data = self.hooks.apply_filters("before_payment_updated", data);
@@ -193,7 +193,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public bool Delete(int id)
   {
-    var current = Get(id);
+    var current = get(id);
     if (current == null) return false;
 
     self.hooks.do_action("before_payment_deleted", new { paymentId = id, invoiceId = current.InvoiceId });
