@@ -1044,7 +1044,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self)
     var estimate = get(x => x.Id == id).First();
     var estimate_number = self.helper.format_estimate_number(estimate.Id);
     self.helper.set_mailing_constant();
-    var pdf = self.helper.estimate_pdf(estimate);
+    var pdf = self.library.estimate_pdf(estimate);
     var attach = pdf.Output($"{estimate_number}.pdf");
     var emails_sent = new List<string>();
     var sms_sent = false;
@@ -1154,7 +1154,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self)
       {
         _pdf_estimate = get(x => x.Id == estimate.Id).First();
         self.helper.set_mailing_constant();
-        var pdf = self.helper.estimate_pdf(_pdf_estimate);
+        var pdf = self.library.estimate_pdf(_pdf_estimate);
         attach = pdf.Output($"{estimate_number}.pdf");
       }
 

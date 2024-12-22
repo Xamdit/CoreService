@@ -1,4 +1,3 @@
-using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
@@ -107,7 +106,9 @@ public class ProposalController(ILogger<ProposalController> logger, MyInstance s
         if (success)
         {
           self.helper.process_digital_signature_image(self.input.post("signature"), PROPOSAL_ATTACHMENTS_FOLDER + id);
-          db.Proposals.Where(x => x.Id == id).Update(x => get_acceptance_info_array());
+          db.Proposals.Where(x => x.Id == id)
+            .Update(x => get_acceptance_info_array());
+
           return Redirect(self.helper.site_url("refresh"));
         }
 

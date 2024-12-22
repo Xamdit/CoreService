@@ -282,7 +282,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     newContactData.Signed = 0;
     newContactData.MarkedAsSigned = 0;
     newContactData.Signature = null;
-    newContactData = (Contract)TypeMerger.Merge(newContactData, get_acceptance_info_array(true));
+    newContactData = (Contract)TypeMerger.Merge(newContactData, get_acceptance_info_array<Contract>(true));
     if (contract.DateEnd.HasValue)
     {
       var dStart = contract.DateStart;
@@ -523,7 +523,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (!keepSignature)
     {
-      _data = (Contract)TypeMerger.Merge(_data, get_acceptance_info_array(true));
+      _data = (Contract)TypeMerger.Merge(_data, get_acceptance_info_array<Contract>(true));
       _data.Signed = 0;
       if (!string.IsNullOrEmpty(_contract.Signature)) self.helper.unlink($"{self.helper.get_upload_path_by_type("contract")}{data.ContractId}/{_contract.Signature}");
     }

@@ -369,7 +369,7 @@ public static class PdfHelper
  * @param  string $tag tag for bulk pdf exporter
  * @return mixed object
  */
-  public static PdfDocumentGenerator estimate_pdf(this LibraryBase libs, List<Estimate> estimate, string tag = "")
+  public static PdfDocumentGenerator estimate_pdf(this LibraryBase libs, Estimate estimate, string tag = "")
   {
     var (self, db) = getInstance();
     return self.helper.app_pdf("estimate", LIBSPATH + "pdf/Estimate_pdf", estimate, tag);

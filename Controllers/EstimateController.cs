@@ -63,7 +63,7 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
         if (action == 4 && accepted = true)
         {
           self.helper.process_digital_signature_image(signature, ESTIMATE_ATTACHMENTS_FOLDER + id);
-          db.Estimates.Where(x => x.Id == id).Update(x => get_acceptance_info_array());
+          db.Estimates.Where(x => x.Id == id).Update(x => get_acceptance_info_array<Estimate>());
         }
       }
 
