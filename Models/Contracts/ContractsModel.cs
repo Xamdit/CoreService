@@ -279,7 +279,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     newContactData.Trash = false;
     newContactData.IsExpiryNotified = 0;
-    newContactData.Signed = 0;
+    newContactData.Signed = false;
     newContactData.MarkedAsSigned = 0;
     newContactData.Signature = null;
     newContactData = (Contract)TypeMerger.Merge(newContactData, get_acceptance_info_array<Contract>(true));
@@ -524,7 +524,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     if (!keepSignature)
     {
       _data = (Contract)TypeMerger.Merge(_data, get_acceptance_info_array<Contract>(true));
-      _data.Signed = 0;
+      _data.Signed = false;
       if (!string.IsNullOrEmpty(_contract.Signature)) self.helper.unlink($"{self.helper.get_upload_path_by_type("contract")}{data.ContractId}/{_contract.Signature}");
     }
 

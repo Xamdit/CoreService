@@ -56,7 +56,7 @@ public static class MiscHelper
 
     try
     {
-      System.IO.File.WriteAllBytes(path, decodedImage);
+      File.WriteAllBytes(path, decodedImage);
       retval = true;
       // Assuming a similar global variable usage
       // The following line is an example and may need to be adapted
