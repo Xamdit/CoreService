@@ -1,3 +1,5 @@
+using Service.Core.Constants;
+using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
 
 namespace Service.Helpers;
@@ -75,5 +77,53 @@ public static class MiscHelper
     }
 
     return retval;
+  }
+
+
+  // Method to process the digital signature image
+  public static bool process_digital_signature_image(this HelperBase helper, string partBase64, string path)
+  {
+    if (string.IsNullOrEmpty(partBase64)) return false;
+
+    MaybeCreateUploadPath(path);
+    var filename = UniqueFilename(path, "signature.png");
+
+    var decodedImage = Convert.FromBase64String(partBase64);
+
+    var retval = false;
+
+    path = Path.Combine(path.TrimEnd(Path.DirectorySeparatorChar), filename);
+
+    using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+    {
+      fs.Write(decodedImage, 0, decodedImage.Length);
+      retval = true;
+      ProcessedDigitalSignature = filename;
+    }
+
+    return retval;
+  }
+
+  // Method to create upload path if it does not exist
+  private static void MaybeCreateUploadPath(string path)
+  {
+    if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+  }
+
+  // Method to generate a unique filename
+  private static string UniqueFilename(string path, string filename)
+  {
+    var fullPath = Path.Combine(path, filename);
+    var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
+    var extension = Path.GetExtension(filename);
+    var count = 1;
+
+    while (File.Exists(fullPath))
+    {
+      var tempFileName = $"{fileNameWithoutExtension}({count++}){extension}";
+      fullPath = Path.Combine(path, tempFileName);
+    }
+
+    return Path.GetFileName(fullPath);
   }
 }

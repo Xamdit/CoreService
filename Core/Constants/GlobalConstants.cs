@@ -16,6 +16,7 @@ public static class GlobalConstants
   public static AppObject App = new();
   public static SyncBuilder syncBuilder = new("https://api.xamdit.com");
   public static AppObjectCache app_object_cache = new();
+  public static string ProcessedDigitalSignature { get; set; }
 
 
   // private static IStripeGateway stripeGateway = new StripeGateway();

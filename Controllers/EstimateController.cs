@@ -4,10 +4,12 @@ using Service.Controllers.Core;
 using Service.Core.Extensions;
 using Service.Framework;
 using Service.Framework.Core.Engine;
+using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
 using Service.Helpers;
 using Service.Helpers.Pdf;
 using Service.Helpers.Tags;
+using Service.Libraries.AppNumberToWords;
 
 namespace Service.Controllers;
 
@@ -19,10 +21,10 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
     var (self, db) = getInstance();
     var estimates_model = self.model.estimates_model();
     var invoices_model = self.model.invoices_model();
-    self.helper.check_estimate_restrictions(id, hash);
+    // self.helper.check_estimate_restrictions(id, hash);
     var estimate = estimates_model.get(x => x.Id == id).First();
     if (!is_client_logged_in())
-      self.helper.load_client_language(estimate.ClientId);
+      self.helper.load_client_language(estimate.ClientId.Value);
 
     var identity_confirmation_enabled = db.get_option("estimate_accept_identity_confirmation");
     var redURL = "#";
@@ -30,42 +32,37 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
     {
       var action = self.input.post<int>("estimate_action");
       // Only decline and accept allowed
-      if (action is 3 or 4)
+      if (action is not (3 or 4)) return Redirect(redURL);
+      var success = estimates_model.mark_action_status(action, id, true);
+      redURL = self.helper.base_url();
+      var accepted = false;
+      if (self.helper.is_array(success) && success.invoice != null)
       {
-        var success = estimates_model.mark_action_status(action, id, true);
-
-        redURL = this.uri.uri_string();
-        var accepted = false;
-        if (is_array(success) && success["invoiced"] == true)
+        accepted = true;
+        var _invoice = invoices_model.get(success.invoice.Id);
+        set_alert("success", self.helper.label("clients_estimate_invoiced_successfully"));
+        redURL = self.helper.site_url("invoice/" + _invoice.Id + "/" + _invoice.Hash);
+      }
+      else if ((self.helper.is_array(success) && success.invoice == null) || success.is_success)
+      {
+        if (action == 4)
         {
           accepted = true;
-          var _invoice = invoices_model.get(success["invoiceid"]);
-          set_alert("success", self.helper.label("clients_estimate_invoiced_successfully"));
-          redURL = self.helper.site_url("invoice/" + _invoice.Id + "/" + _invoice.Hash);
-        }
-        else if ((is_array(success) && success["invoiced"] == false) || success)
-        {
-          if (action == 4)
-          {
-            accepted = true;
-            set_alert("success", self.helper.label("clients_estimate_accepted_not_invoiced"));
-          }
-          else
-          {
-            set_alert("success", self.helper.label("clients_estimate_declined"));
-          }
+          set_alert("success", self.helper.label("clients_estimate_accepted_not_invoiced"));
         }
         else
         {
-          set_alert("warning", self.helper.label("clients_estimate_failed_action"));
-        }
-
-        if (action == 4 && accepted = true)
-        {
-          self.helper.process_digital_signature_image(signature, ESTIMATE_ATTACHMENTS_FOLDER + id);
-          db.Estimates.Where(x => x.Id == id).Update(x => get_acceptance_info_array<Estimate>());
+          set_alert("success", self.helper.label("clients_estimate_declined"));
         }
       }
+      else
+      {
+        set_alert("warning", self.helper.label("clients_estimate_failed_action"));
+      }
+
+      if (!(action == 4 && accepted)) return Redirect(redURL);
+      self.helper.process_digital_signature_image(signature, ESTIMATE_ATTACHMENTS_FOLDER + id);
+      db.Estimates.Where(x => x.Id == id).Update(x => get_acceptance_info_array<Estimate>());
 
       return Redirect(redURL);
     }
@@ -85,13 +82,13 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
 
       var estimate_number = self.helper.format_estimate_number(estimate.Id);
       var companyname = db.get_option("invoice_company_name");
-      if (companyname != "") estimate_number += "-" + mb_strtoupper(slug_it(companyname), "UTF-8");
-      pdf.Output(mb_strtoupper(slug_it(estimate_number), "UTF-8") + ".pdf", "D");
+      if (companyname != "") estimate_number += "-" + slug_it(companyname).ToUpper();
+      pdf.Output(slug_it(estimate_number).ToUpper() + ".pdf");
       return MakeError();
     }
 
     self.library.app_number_to_word(new Estimate() { ClientId = estimate.ClientId }, "numberword");
-    self.app_scripts.theme("sticky-js", "assets/plugins/sticky/sticky.js");
+    //self.app_scripts.theme("sticky-js", "assets/plugins/sticky/sticky.js");
 
     data.title = self.helper.format_estimate_number(estimate.Id);
     // this.disableNavigation();

@@ -992,9 +992,9 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     else
     {
       if (cc.Any())
-        await db.Tickets
+        db.Tickets
           .Where(x => x.Id == ticketid)
-          .UpdateAsync(x => new Ticket { Cc = string.Join(",", cc) });
+          .Update(x => new Ticket { Cc = string.Join(",", cc) });
     }
 
     var sendEmail = !(isContact && db.Contracts.Any(x => x.AcceptanceEmail && x.Id == data.ContactId));

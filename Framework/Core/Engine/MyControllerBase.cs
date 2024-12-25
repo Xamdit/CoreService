@@ -174,7 +174,7 @@ public abstract class MyControllerBase : ControllerBase
  * @return  void
  */
   [ApiExplorerSettings(IgnoreApi = true)] // Add this attribute to ignore the method from Swagger
-  protected void Show_error(string message, int statusCode = 500, string heading = "An Error Was Encountered")
+  protected void show_error(string message, int statusCode = 500, string heading = "An Error Was Encountered")
   {
     statusCode = Math.Abs(statusCode);
     if (statusCode >= 100) return;

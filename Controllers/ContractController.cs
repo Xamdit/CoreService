@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
 using Service.Framework;
-using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
 using Service.Framework.Library.Merger;
 using Service.Helpers;

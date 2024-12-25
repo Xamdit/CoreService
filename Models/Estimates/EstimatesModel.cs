@@ -741,14 +741,12 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self)
     return true;
   }
 
-  public bool mark_action_status(int action, int id, bool client = false)
+  public (bool is_success, Invoice? invoice) mark_action_status(int action, int id, bool client = false)
   {
     db.Estimates.Where(x => x.Id == id).Update(x => new Estimate { Status = action });
     var affected_rows = db.SaveChanges();
-
     var notifiedUsers = new List<int>();
-
-    if (affected_rows <= 0) return false;
+    if (affected_rows <= 0) return (false, null);
 
     var estimate = get(x => x.Id == id).FirstOrDefault();
     if (client)
@@ -807,10 +805,10 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self)
         self.helper.pusher_trigger_notification(notifiedUsers);
         self.hooks.do_action("estimate_accepted", id);
         // return new { invoiced, invoiceid };
-        return invoiceid > 0;
+        return (invoiceid > 0, null);
       }
 
-      if (action != 3) return false;
+      if (action != 3) return (false, null);
 
       staff_estimate.ForEach(member =>
       {
@@ -834,7 +832,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self)
       log_estimate_activity(id, "estimate_activity_client_declined", true);
       self.hooks.do_action("estimate_declined", id);
       //return new { invoiced, invoiceid };
-      return invoiceid > 0;
+      return (invoiceid > 0, null);
     }
 
     if (action == 2)
@@ -851,7 +849,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self)
       $"<status>{action}</status>"
     }));
 
-    return true;
+    return (true, null);
   }
 
   /**
