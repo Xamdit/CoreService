@@ -60,6 +60,11 @@ public static class CustomFieldHelper
  * @param  Dictionary<string, Dictionary<int, string>> customFields  All custom fields with id and values
  * @return bool             True if any rows were affected
  */
+  public static bool handle_custom_fields_post(this HelperBase helper, int relId, object customField, bool isCfItems = false)
+  {
+    return false;
+  }
+
   public static bool handle_custom_fields_post(this HelperBase helper, int relId, CustomField customField, bool isCfItems = false)
   {
     return helper.handle_custom_fields_post(relId, new List<CustomField> { customField }, isCfItems);
