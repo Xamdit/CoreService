@@ -1,3 +1,4 @@
+using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
@@ -51,7 +52,7 @@ public static class UploadHelper
     var path = helper.get_upload_path_by_type("ticket") + ticketId + "/";
     var uploadedFiles = new List<TicketAttachment>();
 
-    // Assuming `HttpContext.Current.Request.Files` is used to simulate PHP's `$_FILES`
+    // Assuming `HttpContext.Current.Request.Files` is used to simulate PHP's ` _FILES`
     var files = self.context.Request.Form.Files[indexName];
     if (files == null) return uploadedFiles.Count > 0 ? uploadedFiles : null;
     helper._file_attachments_index_fix(indexName);
@@ -245,5 +246,125 @@ public static class UploadHelper
   private static string GetUploadError(IFormFile file)
   {
     return "An error occurred during the upload.";
+  }
+
+  public static List<Service.Entities.File> handle_task_attachments_array(this HelperBase helper, int taskId, string indexName = "attachments")
+  {
+    var (self, db) = getInstance();
+    var context = self.input.context;
+    var uploadedFiles = new List<Service.Entities.File>();
+    var path = Path.Combine(get_upload_path_by_type("task"), taskId.ToString());
+
+    if (context.Request.Form.Files.Count <= 0) return uploadedFiles.Count > 0 ? uploadedFiles : [];
+    foreach (var file in context.Request.Form.Files)
+    {
+      if (file == null || file.Length == 0 || !is_upload_extension_allowed(file.FileName))
+        continue;
+
+      if (!Directory.Exists(path))
+        Directory.CreateDirectory(path);
+
+
+      var filename = generate_unique_filename(path, file.FileName);
+      var newFilePath = Path.Combine(path, filename);
+
+      using (var stream = new FileStream(newFilePath, FileMode.Create))
+      {
+        file.CopyTo(stream);
+      }
+
+
+      uploadedFiles.Add(new Service.Entities.File
+      {
+        FileName = filename,
+        FileType = file.ContentType
+      });
+      if (is_image(newFilePath)) create_image_thumbnail(path, filename);
+    }
+
+    return uploadedFiles.Count > 0 ? uploadedFiles : [];
+  }
+
+
+  private static string get_upload_path_by_type(string type)
+  {
+    return Path.Combine("uploads", type);
+  }
+
+  private static string generate_unique_filename(string path, string fileName)
+  {
+    var uniqueName = Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid() + Path.GetExtension(fileName);
+    return uniqueName;
+  }
+
+  private static bool is_upload_extension_allowed(string fileName)
+  {
+    var allowedExtensions = new[] { ".jpg", ".png", ".pdf", ".docx" };
+    var fileExtension = Path.GetExtension(fileName).ToLower();
+    return allowedExtensions.Contains(fileExtension);
+  }
+
+  private static bool is_image(string filePath)
+  {
+    var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+    var fileExtension = Path.GetExtension(filePath).ToLower();
+    return allowedImageExtensions.Contains(fileExtension);
+  }
+
+  private static void create_image_thumbnail(string path, string fileName)
+  {
+    var filePath = Path.Combine(path, fileName);
+  }
+
+  /**
+ * Handle lead attachments if any
+ * @param  mixed leadid
+ * @return boolean
+ */
+  public static bool handle_lead_attachments(this HelperBase helper, int leadId, string indexName = "file", bool formActivity = false)
+  {
+    var (self, db) = getInstance();
+    var files = self.input.context.Request.Form.Files;
+
+    // Check if the file exists in the form and handle form activity
+    if (!files.Any(f => f.Name == indexName) && formActivity) return false;
+
+    var file = files.FirstOrDefault(f => f.Name == indexName);
+    if (file == null) return false;
+
+    // Check for upload errors
+    if (file.Length == 0 || !is_upload_extension_allowed(file.FileName))
+    {
+      self.input.context.Response.StatusCode = 400;
+      self.input.context.Response.WriteAsJsonAsync(new { message = "An error occurred during the upload." });
+      return false;
+    }
+
+    // Execute hooks before upload
+    self.hooks.do_action("before_upload_lead_attachment", leadId);
+
+    // Define the upload path
+    var path = Path.Combine(get_upload_path_by_type("lead"), leadId.ToString());
+    Directory.CreateDirectory(path);
+
+    // Generate unique filename
+    var filename = generate_unique_filename(path, file.FileName);
+    var newFilePath = Path.Combine(path, filename);
+
+    // Save the file
+    using (var stream = new FileStream(newFilePath, FileMode.Create))
+    {
+      file.CopyTo(stream);
+    }
+
+    // Add attachment details to the database
+    var leads_model = self.model.leads_model();
+    var dataset = new Service.Entities.File
+    {
+      FileName = filename,
+      FileType = file.ContentType
+    };
+    leads_model.add_attachment_to_database(leadId, dataset, null, formActivity);
+    return true;
   }
 }

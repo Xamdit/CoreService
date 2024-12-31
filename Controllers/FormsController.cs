@@ -75,7 +75,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
             });
 
         var regular_fields = new Lead();
-        var custom_fields = new List<object>();
+        var custom_fields = new List<CustomField>();
         foreach (var val in post_data.Keys.Select(kvp => post_data[key]))
           if (key.Contains("form-cf-"))
           {
@@ -108,7 +108,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
             regular_fields[key] = val;
           }
 
-        int? task_id;
+        int? task_id = null;
         var success = false;
         var insert_to_db = true;
 
@@ -123,7 +123,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
           if (condition != null)
           {
             var total = self.db().Leads.Count(condition);
-            Lead duplicateLead;
+            Lead? duplicateLead = null;
             if (total == 1) duplicateLead = db.Leads.First(condition);
             if (total > 0)
             {
@@ -154,11 +154,11 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
 
                 if (task_name_from_form_name == false) task_name += " - " + form.Name;
                 var description = "";
-                var custom_fields_parsed = new List<object>();
-                foreach (var kvp in custom_fields)
+                var custom_fields_parsed = new Dictionary<string, string>();
+                foreach (var field in custom_fields)
                   // key => field
-                  custom_fields_parsed[field["name"]] = field["value"];
-                var all_fields = TypeMerger.Merge(regular_fields, custom_fields_parsed);
+                  custom_fields_parsed[field.Name] = field.DefaultValue ?? string.Empty;
+                var all_fields = (Dictionary<string, object>)TypeMerger.Merge(regular_fields, custom_fields_parsed);
                 var fields_labels = new List<string>();
                 foreach (var f in data.form_fields)
                   if (f.type != "header" && f.type != "paragraph" && f.type != "file")
@@ -200,14 +200,14 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
                   task_id = task_data.Id;
                   var tasks_model = self.model.tasks_model();
                   var attachment = self.helper.handle_task_attachments_array(task_id, "file-input");
-                  if (attachment &&  (attachment).Count() > 0) tasks_model.add_attachment_to_database(task_id, attachment, false, false);
+                  if (attachment.Any()) tasks_model.add_attachment_to_database(task_id, attachment, false, false);
 
                   var assignee_data = new
                   {
                     taskid = task_id,
                     assignee = form.Responsible
                   };
-                  tasks_model.add_task_assignees(assignee_data, true);
+                  tasks_model.add_task_assignees(assignee_data.assignee, true);
                   self.hooks.do_action("after_add_task", task_id);
                   if (duplicateLead && duplicateLead.Email != "") self.helper.send_mail_template("lead_web_form_submitted", duplicateLead);
                 }
@@ -254,6 +254,8 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
             leads_model.lead_assigned_member_notification(lead_id, form.responsible, true);
             self.helper.handle_custom_fields_post(lead_id, custom_fields_build);
             self.helper.handle_lead_attachments(lead_id, "file-input", form.Name);
+            var field = string.Empty;
+            var to_responsible = false;
             var ids = new List<int>();
             if (form.NotifyLeadImported != 0)
             {
@@ -264,8 +266,8 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
               else
               {
                 ids = JsonConvert.DeserializeObject<List<int>>(form.NotifyIds);
-                var to_responsible = false;
-                var field = form.NotifyType switch
+                to_responsible = false;
+                field = form.NotifyType switch
                 {
                   "specific_staff" => "staffid",
                   "roles" => "role",
@@ -306,7 +308,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
               self.helper.pusher_trigger_notification(notifiedUsers);
             }
 
-            if (isset(regular_fields.Email) && regular_fields.Email != "")
+            if (!string.IsNullOrEmpty(regular_fields.Email) && regular_fields.Email != "")
             {
               var lead = leads_model.get(x => x.Id == lead_id);
               self.helper.send_mail_template("lead_web_form_submitted", lead);
