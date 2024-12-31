@@ -1,5 +1,5 @@
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework;
 using Task = System.Threading.Tasks.Task;
 

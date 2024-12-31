@@ -1,19 +1,19 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Tools;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Framework.Helpers.Security;
 using Service.Helpers;
 using Service.Helpers.Tags;
 using Service.Models.Misc;
 using Service.Models.Proposals;
 using Service.Models.Tasks;
-using File = Global.Entities.File;
-using static Global.Entities.Helpers.ExpressionExtensions;
+using File = Service.Entities.File;
+
 
 namespace Service.Models.Leads;
 
@@ -706,7 +706,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self)
     data = _do_lead_web_to_form_responsibles(data);
     data.webToLead.SuccessSubmitMsg = data.webToLead.SuccessSubmitMsg.nl2br();
     data.webToLead.CreateTaskOnDuplicate = Convert.ToInt32(data.webToLead.CreateTaskOnDuplicate);
-    data.webToLead.MarkPublic = Convert.ToInt32(data.webToLead.MarkPublic);
+    // data.webToLead.MarkPublic = data.webToLead.MarkPublic;
     if (Convert.ToBoolean(data.webToLead.AllowDuplicate))
     {
       data.webToLead.AllowDuplicate = 1;

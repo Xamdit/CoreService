@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Engine;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers.Proposals;
 using Service.Models.Tasks;
+using Task = Service.Entities.Task;
 
 namespace Service.Helpers.Tasks;
 
@@ -15,7 +17,7 @@ using static StaffHelper;
 public static class TaskHelper
 {
   // Function that formats task status for the final user
-  public static string format_task_status(this HelperBase helper, DataSet<Global.Entities.Task> status = null, bool text = false, bool clean = false)
+  public static string format_task_status(this HelperBase helper, DataSet<Task> status = null, bool text = false, bool clean = false)
   {
     var (self, db) = getInstance();
     status ??= helper.get_task_status_by_id(status.Data?.Id ?? 0);
@@ -64,14 +66,14 @@ public static class TaskHelper
 
   // Get task status by passed task id
   // public static TaskOption? get_task_status_by_id(this HelperBase helper, int id)
-  public static DataSet<Global.Entities.Task>? get_task_status_by_id(this HelperBase helper, int id)
+  public static DataSet<Task>? get_task_status_by_id(this HelperBase helper, int id)
   {
     var (self, db) = getInstance();
     var tasks_model = self.model.tasks_model();
 
     var statuses = tasks_model.get_statuses();
 
-    var output = new DataSet<Global.Entities.Task>();
+    var output = new DataSet<Task>();
 
 
     var status = new TaskOption
@@ -189,14 +191,14 @@ public static class TaskHelper
  * Other statement will be included the tasks to be visible for this user only if Show All Tasks For Project Members is set to YES
  * @return string
  */
-  public static Expression<Func<Global.Entities.Task, bool>> get_tasks_where_string(this HelperBase helper, bool table = true)
+  public static Expression<Func<Task, bool>> get_tasks_where_string(this HelperBase helper, bool table = true)
   {
     var (self, db) = getInstance();
     var staffUserId = helper.get_staff_user_id(); // Assuming a method to get the staff user ID like get_staff_user_id()
     var showAllTasksForProjectMember = db.get_option_compare("show_all_tasks_for_project_member", 1); // Assuming a GetOption method
 
     // Building the expression tree to match the conditions
-    Expression<Func<Global.Entities.Task, bool>> filter = t =>
+    Expression<Func<Task, bool>> filter = t =>
       // Tasks assigned to the current staff user
       db.Tasks.Any(t => db.Staff
         .Include(x => x.TaskAssigneds)
@@ -240,7 +242,7 @@ public static class TaskHelper
     };
   }
 
-  public static double total_logged_time(this Global.Entities.Task task)
+  public static double total_logged_time(this Task task)
   {
     return 0;
   }

@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Helpers;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
 using Service.Framework.Library.Merger;

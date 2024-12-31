@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
 

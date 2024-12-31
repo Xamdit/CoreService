@@ -1,7 +1,5 @@
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
@@ -9,6 +7,7 @@ using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Framework.Library.Merger;
 using Service.Helpers;
 using Service.Helpers.Tags;
@@ -16,7 +15,7 @@ using Service.Helpers.Template;
 using Service.Models.Client;
 using Service.Models.Tasks;
 using Service.Models.Users;
-using Chart = Service.Entities.Chart;
+using Chart = Service.Framework.Helpers.Entities.Chart;
 using static Service.Framework.Core.Extensions.StringExtension;
 
 
@@ -342,7 +341,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
       ticket_attachments.Add(new TicketAttachment
       {
         FileName = filename,
-        FileType = self.get_mime_by_extension(filename)
+        FileType = self.helper.get_mime_by_extension(filename)
       });
     }
 
@@ -1431,19 +1430,19 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   }
 
   // Ticket services
-  public List<Global.Entities.Service> get_service()
+  public List<Entities.Service> get_service()
   {
     var rows = db.Services.OrderBy(x => x.Name).ToList();
     return rows;
   }
 
-  public Global.Entities.Service? get_service(int id)
+  public Entities.Service? get_service(int id)
   {
     var row = db.Services.FirstOrDefault(x => x.Id == id);
     return row;
   }
 
-  public int add_service(Global.Entities.Service data)
+  public int add_service(Entities.Service data)
   {
     var result = db.Services.Add(data);
     var insert_id = result.Entity.Id;
@@ -1451,7 +1450,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     return insert_id;
   }
 
-  public bool update_service(Global.Entities.Service data)
+  public bool update_service(Entities.Service data)
   {
     var id = data.Id;
     var result = db.Services.Where(x => x.Id == id).Update(x => data);
@@ -1462,7 +1461,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public bool delete_service(int id)
   {
-    if (db.is_reference_in_table<Global.Entities.Service>("tickets", id)) return true;
+    if (db.is_reference_in_table<Entities.Service>("tickets", id)) return true;
     var result = db.Services.Where(x => x.Id == id).Delete();
     if (result <= 0) return false;
     log_activity($"Ticket Service Deleted [ID: {id}]");

@@ -1,15 +1,15 @@
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Core.Synchronus;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
 using Service.Helpers;
-using File = Global.Entities.File;
-using Task = Global.Entities.Task;
+using File = Service.Entities.File;
+using Task = Service.Entities.Task;
 
 
 namespace Service.Models.Users;

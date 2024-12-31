@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Global.Entities;
+using Service.Entities;
 using Service.Framework.Helpers;
 using Service.Helpers;
 

@@ -1,9 +1,9 @@
 using System.Globalization;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 
 namespace Service.Models.Reports;
 

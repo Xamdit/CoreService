@@ -1,7 +1,5 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Helpers;
-using Global.Entities.Tools;
+
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
@@ -9,6 +7,7 @@ using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Sale;
 using Service.Helpers.Tags;
@@ -16,7 +15,7 @@ using Service.Helpers.Tasks;
 using Service.Models.Client;
 using Service.Models.Tasks;
 using Service.Models.Users;
-using Task = Global.Entities.Task;
+using Task = Service.Entities.Task;
 
 namespace Service.Models.Projects;
 

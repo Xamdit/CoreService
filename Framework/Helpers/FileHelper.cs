@@ -9,7 +9,7 @@ public static class FileHelper
   private static Dictionary<string, string> Mimes = new();
   private static bool hour12 = true;
 
-  public static bool file_exists(this MyInstance self, string path, bool createIfNotExists = false)
+  public static bool file_exists(this HelperBase helper, string path, bool createIfNotExists = false)
   {
     var output = File.Exists(path);
     if (!createIfNotExists || output) return output;
@@ -18,14 +18,14 @@ public static class FileHelper
     return output;
   }
 
-  public static void file_delete(this MyInstance self, string path)
+  public static void file_delete(this HelperBase helper, string path)
   {
     var output = File.Exists(path);
     if (!output) return;
     File.Delete(path);
   }
 
-  public static string pathinfo(this MyInstance self, string path, string info)
+  public static string pathinfo(this HelperBase helper, string path, string info)
   {
     var output = info switch
     {
@@ -38,15 +38,16 @@ public static class FileHelper
     return output;
   }
 
-  public static string file_extension(this MyInstance self, string path)
+  public static string file_extension(this HelperBase helper, string path)
   {
     var output = Path.GetExtension(path).TrimStart('.').ToLower();
     return output;
   }
 
-  public static string get_mime_by_extension(this MyInstance self, string path)
+  public static string get_mime_by_extension(this HelperBase helper, string path)
   {
-    var extension = self.file_extension(path);
+    var (self, db) = getInstance();
+    var extension = self.helper.file_extension(path);
     return mimetype(extension);
   }
 
@@ -241,13 +242,6 @@ public static class FileHelper
   {
     return Path.GetFileName(filepath);
   }
-
-  public static string file_extension(this HelperBase helper, string filepath)
-  {
-    // Get the file extension using Path.GetExtension
-    return Path.GetExtension(filepath);
-  }
-
 
   public static void xcopy(this HelperBase helper, string sourceDirectory, string targetDirectory, bool copySubDirectories = true)
   {

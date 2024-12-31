@@ -1,7 +1,7 @@
 using System.Dynamic;
-using Global.Entities;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;

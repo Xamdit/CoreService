@@ -1,8 +1,9 @@
-using Global.Entities;
+using Service.Entities;
+using File = Service.Entities.File;
 
 namespace Service.Models.Tasks;
 
 public class TaskCommentDto : TaskComment
 {
-  public List<Global.Entities.File> attachments = new();
+  public List<File> attachments = new();
 }

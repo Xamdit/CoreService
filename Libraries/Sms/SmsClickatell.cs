@@ -1,4 +1,4 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
 
 namespace Service.Libraries.Sms;

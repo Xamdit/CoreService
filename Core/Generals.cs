@@ -1,5 +1,5 @@
-using Global.Entities;
 using Microsoft.AspNetCore.Components;
+using Service.Entities;
 using File = System.IO.File;
 
 namespace Service.Core;

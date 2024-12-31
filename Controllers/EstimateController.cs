@@ -1,10 +1,11 @@
-using Global.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
 using Service.Helpers;
 using Service.Helpers.Pdf;
@@ -28,7 +29,7 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
 
     var identity_confirmation_enabled = db.get_option("estimate_accept_identity_confirmation");
     var redURL = "#";
-    if (self.input.post().ContainsKey("estimate_action"))
+    if (self.input.post_has("estimate_action"))
     {
       var action = self.input.post<int>("estimate_action");
       // Only decline and accept allowed
@@ -68,7 +69,7 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
     }
 
     // Handle Estimate PDF generator
-    if (self.input.post().ContainsKey("estimatepdf"))
+    if (self.input.post_has("estimatepdf"))
     {
       PdfDocumentGenerator pdf;
       try

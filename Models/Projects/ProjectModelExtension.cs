@@ -1,9 +1,9 @@
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Task = System.Threading.Tasks.Task;
 
@@ -41,7 +41,7 @@ public static class ProjectModelExtension
     model.log(milestone.ProjectId, "project_activity_deleted_milestone", milestone.Name, show_to_customer);
     db.Tasks
       .Where(x => x.Milestone == id)
-      .Update(x => new Global.Entities.Task { Milestone = null }
+      .Update(x => new Entities.Task { Milestone = null }
       );
     log_activity($"Project Milestone Deleted [{id}]");
     return true;
@@ -161,7 +161,7 @@ public static class ProjectModelExtension
     var (self, db) = getInstance();
     await db.Tasks
       .Where(x => x.RelId == id && x.RelType == "project")
-      .UpdateAsync(x => new Global.Entities.Task
+      .UpdateAsync(x => new Entities.Task
       {
         Status = 5,
         DateFinished = DateTime.Now
@@ -316,7 +316,7 @@ public static class ProjectModelExtension
     var (self, db) = getInstance();
     db.Tasks
       .Where(x => x.RelType == "project" && x.RelId == id)
-      .Update(x => new Global.Entities.Task
+      .Update(x => new Entities.Task
       {
         // Status = TaskStatus.Complete,
         Status = 5,

@@ -1,12 +1,13 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Pdf;
 using Service.Helpers.Sale;
@@ -19,7 +20,8 @@ using Service.Models.Payments;
 using Service.Models.Projects;
 using Service.Models.Statements;
 using Service.Models.Tasks;
-using File = Global.Entities.File;
+using File = Service.Entities.File;
+using Task = Service.Entities.Task;
 using TaskStatus = Service.Models.Tasks.TaskStatus;
 
 
@@ -439,7 +441,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     {
       db.Expenses.Where(x => x.InvoiceId == id).Update(x => new Expense { InvoiceId = null });
       db.Proposals.Where(x => x.InvoiceId == id).Update(x => new Proposal { InvoiceId = null, DateConverted = null });
-      db.Tasks.Where(x => x.InvoiceId == id).Update(x => new Global.Entities.Task { InvoiceId = null, Billed = 0 });
+      db.Tasks.Where(x => x.InvoiceId == id).Update(x => new Task { InvoiceId = null, Billed = 0 });
 
 
       // if is converted from estimate set the estimate invoice to null
@@ -499,7 +501,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
       .ToList()
       .ForEach(task =>
       {
-        db.Tasks.Update(new Global.Entities.Task
+        db.Tasks.Update(new Task
         {
           InvoiceId = null,
           Billed = 0
@@ -587,7 +589,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
 
     var billed_tasks = isset(data, "billed_tasks")
       ? data.billed_tasks
-      : new List<Global.Entities.Task>();
+      : new List<Task>();
 
     var billed_expenses = isset(data, "billed_expenses")
       ? data.billed_expenses
@@ -713,7 +715,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     billed_tasks
       .ForEach(task =>
       {
-        var taskUpdateData = new Global.Entities.Task()
+        var taskUpdateData = new Task()
         {
           Billed = 1,
           InvoiceId = insert_id
@@ -818,7 +820,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (!self.helper.defined("CRON") && manually == false)
     {
-      send_to = self.input.post("sent_to").Split(",").ToList().Select(x => Convert.ToInt32(x)).ToList();
+      send_to = self.input.post<string>("sent_to").Split(",").ToList().Select(x => Convert.ToInt32(x)).ToList();
     }
     else if (self.globals("scheduled_email_contacts") != null)
     {

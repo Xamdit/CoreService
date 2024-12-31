@@ -1,12 +1,12 @@
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Tags;
 using static Service.Framework.Core.Extensions.StringExtension;
+using Task = Service.Entities.Task;
 
 namespace Service.Models.Projects;
 
@@ -60,7 +60,7 @@ public static class ProjectMember3Extension
     var tasks_model = self.model.tasks_model();
     if (tasks_ids.Any())
     {
-      var condition = CreateCondition<Global.Entities.Task>(x => x.Id == project_id);
+      var condition = CreateCondition<Task>(x => x.Id == project_id);
       var tasks = await model.get_tasks(condition);
       tasks_ids = tasks.Select(x => x.Id).ToList();
     }
@@ -614,7 +614,7 @@ public static class ProjectMember3Extension
         var difference = task.DueDate.HasValue
           ? task.DueDate.Value - task.StartDate
           : (TimeSpan?)null; // Handle null gracefully
-        var merge = new Global.Entities.Task()
+        var merge = new Task()
         {
           RelId = id,
           RelType = "project",
@@ -626,7 +626,7 @@ public static class ProjectMember3Extension
             : null
         };
         var tasks_model = self.model.tasks_model();
-        var source = new DataSet<Global.Entities.Task>();
+        var source = new DataSet<Task>();
         source.Data = db.Tasks.Find(task.Id)!;
         return tasks_model.copy(source, merge);
       })
@@ -674,7 +674,7 @@ public static class ProjectMember3Extension
           if (added_milestone != null)
             db.Tasks
               .Where(x => added_tasks.Any(y => y.Id == x.Id) && x.Milestone == task.Milestone)
-              .Update(x => new Global.Entities.Task { Milestone = added_milestone.Id });
+              .Update(x => new Task { Milestone = added_milestone.Id });
         });
     }
 
@@ -687,7 +687,7 @@ public static class ProjectMember3Extension
         {
           db.Tasks
             .Where(x => x.Id == taskId)
-            .Update(x => new Global.Entities.Task { Milestone = 0 });
+            .Update(x => new Task { Milestone = 0 });
         });
 
     // Add project members

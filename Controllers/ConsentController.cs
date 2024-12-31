@@ -1,7 +1,7 @@
-using Global.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Helpers;
 

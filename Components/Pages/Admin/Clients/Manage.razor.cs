@@ -3,9 +3,9 @@
 // </copyright>
 
 using System.Linq.Expressions;
-using Global.Entities;
-using Service.Entities.Extras;
+using Service.Entities;
 using Service.Framework.Core.AppHook;
+using Service.Framework.Helpers.Entities.Extras;
 using Service.Helpers;
 using Service.Models.Invoices;
 using Service.Schemas.Ui.Entities;
@@ -39,7 +39,7 @@ public class ManageRazor : AdminComponentBase
   public List<CustomField> custom_fields => self.helper.get_custom_fields("customers", x => x.ShowOnTable);
 
 
-  public Expression<Func<Global.Entities.Client, bool>> conditionSummary()
+  public Expression<Func<Entities.Client, bool>> conditionSummary()
   {
     if (!customers_view) return default;
     // Get the list of StaffIds first, outside the expression
@@ -49,7 +49,7 @@ public class ManageRazor : AdminComponentBase
       .Select(x => x.StaffId)
       .ToList();
     // Use the staffIds list in the expression
-    Expression<Func<Global.Entities.Client, bool>> where_summary = e =>
+    Expression<Func<Entities.Client, bool>> where_summary = e =>
       e.Id == staffUserId && staffIds.Contains(e.Id);
     return where_summary;
   }

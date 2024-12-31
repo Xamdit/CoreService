@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
 using Service.Helpers;
 using Service.Helpers.Sale;

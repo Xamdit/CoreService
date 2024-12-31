@@ -27,7 +27,7 @@ global using static Service.Helpers.SettingHelper;
 global using static Service.Helpers.Sale.SaleHelper;
 global using static Service.Helpers.EmailTemplateHelper;
 global using static Service.Helpers.Projects.ProjectsHelper;
-global using static Global.Entities.Helpers.EntitiesHelper;
+global using static Service.Framework.Helpers.Entities.EntitiesHelper;
 global using static Service.Helpers.UploadHelper;
 global using static Service.Helpers.DatabaseHelper;
 global using static Service.Helpers.Tags.TagsHelper;

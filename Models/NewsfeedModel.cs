@@ -1,12 +1,13 @@
 using System.Dynamic;
-using Global.Entities;
-using Global.Entities.Tools;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Models.Users;
+using File = Service.Entities.File;
 
 
 namespace Service.Models;
@@ -41,7 +42,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
     return true;
   }
 
-  public List<Global.Entities.File> get_post_attachments(int id, bool images = false)
+  public List<File> get_post_attachments(int id, bool images = false)
   {
     var query = db.Files.Where(f => f.RelId == id && f.RelType == "newsfeed_post");
 

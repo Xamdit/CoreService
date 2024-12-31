@@ -1,8 +1,9 @@
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Helpers;
+using File = Service.Entities.File;
 
 namespace Service.Models.Estimates;
 
@@ -140,7 +141,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
     return row?.Name;
   }
 
-  public List<Global.Entities.File> get_estimate_request_attachments(int id)
+  public List<File> get_estimate_request_attachments(int id)
   {
     var rows = db.Files
       .Where(x => x.RelId == id && x.RelType == "estimate_request")

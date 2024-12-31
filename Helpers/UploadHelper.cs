@@ -1,7 +1,7 @@
-using Global.Entities;
 using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using File = System.IO.File;
 
 namespace Service.Helpers;
@@ -198,7 +198,7 @@ public static class UploadHelper
     insertData["file_name"] = filename;
     insertData["file_mime_type"] = !string.IsNullOrWhiteSpace(file.ContentType)
       ? file.ContentType
-      : self.get_mime_by_extension(filename);
+      : self.helper.get_mime_by_extension(filename);
 
     return insertData;
   }

@@ -1,6 +1,6 @@
-using Global.Entities;
 using Service.Entities;
 using Service.Framework;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 
 namespace Service.Models.Contracts;

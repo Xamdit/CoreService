@@ -1,8 +1,8 @@
 using System.Web;
-using Global.Entities;
 using Microsoft.AspNetCore.Components;
 using Service.Core.Extensions;
 using Service.Core.Synchronus;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
 using Service.Helpers.Tags;
@@ -132,7 +132,7 @@ public static class StaffHelper
     if (staff == null) return url;
     if (string.IsNullOrEmpty(staff.ProfileImage)) return url;
     var profileImagePath = $"uploads/staff_profile_images/{staff_id}/{type}_{staff.ProfileImage}";
-    if (self.file_exists(profileImagePath)) url = self.helper.base_url(profileImagePath);
+    if (self.helper.file_exists(profileImagePath)) url = self.helper.base_url(profileImagePath);
     return url;
   }
 }

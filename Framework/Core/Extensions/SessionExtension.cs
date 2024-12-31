@@ -1,5 +1,5 @@
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 
 namespace Service.Framework.Core.Extensions;
 

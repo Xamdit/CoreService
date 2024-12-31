@@ -1,14 +1,15 @@
 using System.Dynamic;
 using Blazored.LocalStorage;
-using Global.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
+using Task = Service.Entities.Task;
 
 namespace Service.Helpers;
 
@@ -308,7 +309,7 @@ public static class GeneralHelper
     return string.Empty;
   }
 
-  public static int total_logged_time(Global.Entities.Task task)
+  public static int total_logged_time(Task task)
   {
     return 0;
   }

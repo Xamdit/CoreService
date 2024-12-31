@@ -1,8 +1,9 @@
-using Global.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
+using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
 using Service.Helpers.Pdf;
 using Service.Helpers.Tags;
@@ -63,7 +64,7 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
       self.helper.load_client_language(invoice.ClientId);
 
     // Handle Invoice PDF generator
-    if (self.input.post().ContainsKey("invoicepdf"))
+    if (self.input.post_has("invoicepdf"))
     {
       PdfDocumentGenerator pdf;
       try
@@ -83,15 +84,15 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
     }
 
     // Handle _POST payment
-    if (self.input.post().ContainsKey("make_payment"))
+    if (self.input.post_has("make_payment"))
     {
-      if (!self.input.post().ContainsKey("paymentmode"))
+      if (!self.input.post_has("paymentmode"))
       {
         set_alert("warning", self.helper.label("invoice_html_payment_modes_not_selected"));
         return Redirect(self.helper.site_url("invoice/" + id + "/" + hash));
       }
 
-      if ((self.input.post().ContainsKey("amount") || self.input.post<int>("amount") == 0)
+      if ((self.input.post_has("amount") || self.input.post<int>("amount") == 0)
           && db.get_option_compare("allow_payment_amount_to_be_modified", true)
          )
       {
@@ -102,7 +103,7 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
       payments_model.process_payment(self.input.post<InvoicePaymentRecord>(), id);
     }
 
-    if (self.input.post().ContainsKey("paymentpdf"))
+    if (self.input.post_has("paymentpdf"))
     {
       id = self.input.post<int>("paymentpdf");
       var payment = payments_model.get(id);

@@ -1,9 +1,10 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Mail;
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
 using Service.Models.Contracts;
+using File = Service.Entities.File;
 
 namespace Service.Models;
 
@@ -189,7 +190,7 @@ public class EmailsModel(MyInstance self, MyContext db) : MyModel(self)
     _attachments.Add(attachment);
   }
 
-  public void add_attachment(Global.Entities.File attachment)
+  public void add_attachment(File attachment)
   {
     //_attachments.Add(attachment);
   }

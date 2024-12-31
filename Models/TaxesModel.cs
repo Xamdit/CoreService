@@ -1,5 +1,5 @@
-using Global.Entities;
 using Newtonsoft.Json;
+using Service.Entities;
 using Service.Framework;
 using Service.Helpers;
 using Service.Helpers.Sale;

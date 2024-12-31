@@ -1,19 +1,19 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Framework.Library.Merger;
 using Service.Helpers;
 using Service.Helpers.Pdf;
 using Service.Models.Client;
 using Service.Models.Tasks;
-using File = Global.Entities.File;
+using File = Service.Entities.File;
 
 
 namespace Service.Models.Contracts;
@@ -401,7 +401,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
       attach = pdf.Output($"{slug_it(contract.Subject)}.pdf");
     }
 
-    var sent_to_str = self.input.post("sent_to");
+    var sent_to_str = self.input.post<string>("sent_to");
     var sent_to = sent_to_str.Split(",").Select(int.Parse).ToList();
     var sent = false;
 

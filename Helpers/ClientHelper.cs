@@ -1,4 +1,5 @@
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
 using Service.Helpers.Tags;
@@ -6,7 +7,6 @@ using Service.Schemas.Ui.Entities;
 
 namespace Service.Helpers;
 
-using Global.Entities;
 using Models.Contracts;
 
 public static class ClientHelper

@@ -1,14 +1,14 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Dto;
-using Global.Entities.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
-using Service.Entities.Tools;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Core.InputSet;
+using Service.Framework.Entities.Dto;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities.Tools;
 using Service.Helpers;
 using Service.Helpers.Sale;
 using Service.Helpers.Sms;
@@ -21,6 +21,7 @@ using Service.Models.Payments;
 using Service.Models.Projects;
 using Service.Models.Tasks;
 using static Service.Helpers.Pdf.PdfHelper;
+using File = Service.Entities.File;
 
 namespace Service.Models.Estimates;
 
@@ -106,7 +107,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self)
     estimate.Client = clients_model.get(x => x.Id == estimate.ClientId).FirstOrDefault();
 
     if (estimate.Client != null)
-      estimate.Client = new Global.Entities.Client { Company = estimate.DeletedCustomerName };
+      estimate.Client = new Entities.Client { Company = estimate.DeletedCustomerName };
     var scheduled_email = email_schedule_model.get(id, "estimate");
     return (estimate, temp, items, scheduled_email);
   }
@@ -858,7 +859,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self)
    * @param string  id attachment id
    * @return mixed
    */
-  public Global.Entities.File get_attachment(int estimate_id, int id)
+  public File get_attachment(int estimate_id, int id)
   {
     var query = db.Files.AsQueryable();
     query = query.Where(x => x.Id == id);
@@ -867,7 +868,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self)
     return result;
   }
 
-  public List<Global.Entities.File> get_attachments(int estimate_id)
+  public List<File> get_attachments(int estimate_id)
   {
     var query = db.Files.AsQueryable();
     query = query.Where(x => x.RelId == estimate_id);

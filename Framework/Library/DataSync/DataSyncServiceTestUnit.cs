@@ -1,5 +1,5 @@
-using Global.Entities;
 using Newtonsoft.Json;
+using Service.Entities;
 using Service.Framework.Schemas;
 using Task = System.Threading.Tasks.Task;
 

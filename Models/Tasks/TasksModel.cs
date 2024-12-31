@@ -1,13 +1,12 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Helpers;
-using Global.Entities.Tools;
+
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Relations;
 using Service.Helpers.Sale;
@@ -20,7 +19,8 @@ using Service.Models.Projects;
 using Service.Models.Users;
 using static Service.Models.Tasks.TaskStatus;
 using static Service.Framework.Core.Extensions.StringExtension;
-using Task = Global.Entities.Task;
+using File = Service.Entities.File;
+using Task = Service.Entities.Task;
 
 
 namespace Service.Models.Tasks;
@@ -219,7 +219,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       var _at = attachments;
       var at = _at.Select(x =>
         {
-          var file = new Global.Entities.File();
+          var file = new File();
           var external = string.Empty;
           if (string.IsNullOrEmpty(x.External)) return add_attachment_to_database(insert_id, x, external, false);
           external = x.External;
@@ -613,7 +613,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
             // }
 // self.helper.file_put_contents(path,self.helper.get_upload_path_by_type
 //             if (self.helper.fir fwrite(fpt, self.helper.stream_get_contents(f)))
-            db.Files.Add(new Global.Entities.File
+            db.Files.Add(new File
             {
               RelId = insert_id,
               RelType = "task",
@@ -1127,7 +1127,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
    * @param  mixed taskid taskid
    * @return array
    */
-  public List<Global.Entities.File> get_task_attachments(Expression<Func<Global.Entities.File, bool>> where)
+  public List<File> get_task_attachments(Expression<Func<File, bool>> where)
   {
     var rows =
       db.Files.Where(where)
@@ -1226,7 +1226,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
    * @param mixed taskid     task id
    * @param array attachment attachment data
    */
-  public bool add_attachment_to_database(int rel_id, Global.Entities.File attachment, string? external = null, bool notification = true)
+  public bool add_attachment_to_database(int rel_id, File attachment, string? external = null, bool notification = true)
   {
     var file_id = misc_model.add_attachment_to_database(rel_id, "task", attachment, external);
     if (file_id == 0) return false;

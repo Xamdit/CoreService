@@ -54,12 +54,6 @@
     <PackageReference Include="ZXing.Net" Version="0.16.9"/>
     <!-- end test unit package-->
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Global.Entities\Global.Entities.csproj"/>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Framework\Entities\Entities\" />
-  </ItemGroup>
-
+   
 
 </Project>

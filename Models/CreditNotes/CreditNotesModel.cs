@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
@@ -16,7 +16,7 @@ using Service.Models.Contracts;
 using Service.Models.Invoices;
 using Service.Models.Misc;
 using Service.Models.Payments;
-using File = Global.Entities.File;
+using File = Service.Entities.File;
 
 
 namespace Service.Models.CreditNotes;
@@ -192,7 +192,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (credit_note_result.Client == null)
     {
-      credit_note_result.Client = new Global.Entities.Client();
+      credit_note_result.Client = new Entities.Client();
       credit_note_result.Client.Company = credit_note.DeletedCustomerName;
     }
 

@@ -1,7 +1,7 @@
-using Global.Entities;
-using Global.Entities.Tools;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers.Entities;
 
 namespace Service.Models;
 

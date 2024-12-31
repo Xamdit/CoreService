@@ -1,7 +1,7 @@
-using Global.Entities;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers.Security;

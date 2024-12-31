@@ -1,7 +1,7 @@
-using Global.Entities;
-using Global.Entities.Tools;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 
 namespace Service.Models;
 
@@ -124,5 +124,10 @@ public class DepartmentsModel(MyInstance self, MyContext db) : MyModel(self)
     if (userid == 0) userid = staff_user_id;
     var departments = query.Where(x => x.StaffDepartments.Any(y => y.StaffId == userid)).ToList();
     return departments;
+  }
+
+  public List<Department> get_departments()
+  {
+    return new List<Department>();
   }
 }

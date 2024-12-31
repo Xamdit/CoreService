@@ -1,9 +1,10 @@
 using System.Dynamic;
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.AspNetCore.Components;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
+using Service.Framework.Core.InputSet;
 using Service.Helpers.Proposals;
 using Service.Models.Projects;
 
@@ -16,9 +17,9 @@ public static class RelationHelper
     var (self, db) = getInstance();
     var misc_model = self.model.misc_model();
     var q = "";
-    if (self.input.post().TryGetValue("q", out var value))
+    if (self.input.post_has("q"))
     {
-      q = value;
+      q = self.input.post("q");
       q = q.Trim();
     }
 
@@ -45,11 +46,15 @@ public static class RelationHelper
         var where_contacts = CreateCondition<Contact>(x => x.Active);
         if (isset(extra, "client_id") && self.helper.value<int>(extra, "client_id") != null)
           where_contacts = where_contacts.And(x => x.UserId == self.helper.value<int>(extra, "client_id"));
-        if (self.input.post().ContainsKey("tickets_contacts"))
+        if (self.input.post_has("tickets_contacts"))
           if (!helper.has_permission("customers", "", "view") && db.get_option_compare("staff_members_open_tickets_to_all_contacts", 0))
             where_contacts = where_contacts.And(x => db.CustomerAdmins.Any(y => y.StaffId == helper.get_staff_user_id() && y.CustomerId == x.UserId));
-        if (self.input.post().TryGetValue("contact_userid", out var contact_userid))
-          where_contacts = where_contacts.And(x => x.UserId == Convert.ToInt32(contact_userid));
+        if (self.input.post_has("contact_user_id"))
+        {
+          var contact_user_id = self.input.post("contact_user_id");
+          where_contacts = where_contacts.And(x => x.UserId == Convert.ToInt32(contact_user_id));
+        }
+
         var search = misc_model.search_contacts(q, 0, where_contacts);
         data = search.Result;
         break;
@@ -163,7 +168,7 @@ public static class RelationHelper
       case "project":
       {
         Expression<Func<Project, bool>> where_projects = null;
-        if (self.input.post().ContainsKey("customer_id"))
+        if (self.input.post_has("customer_id"))
           where_projects = proj => proj.ClientId == Convert.ToInt32(self.input.post("customer_id"));
         var search = misc_model.search_projects(q, 0, where_projects);
         data = search.Result;

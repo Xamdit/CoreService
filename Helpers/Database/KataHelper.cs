@@ -1,5 +1,5 @@
-using Global.Entities;
 using Microsoft.Data.SqlClient;
+using Service.Entities;
 using SqlKata.Execution;
 
 namespace Service.Helpers.Database;

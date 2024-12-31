@@ -6,10 +6,10 @@
 using System.Dynamic;
 using System.Linq.Expressions;
 using Blazored.LocalStorage;
-using Global.Entities;
 using Microsoft.AspNetCore.Components;
 using Service.Core.Engine;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Task = System.Threading.Tasks.Task;
 

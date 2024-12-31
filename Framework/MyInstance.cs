@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Service.Core.InputSet;
 using Service.Framework.Core.AppHook;
 using Service.Framework.Core.Cache;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Entities;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Core.InputSet;
 using Service.Framework.Entities;
 using Service.Framework.Helpers;
-using Service.Framework.Sessions;
-using Session = Global.Entities.Session;
-
+using Service.Libraries.Documents;
+using Session = Service.Entities.Session;
 
 namespace Service.Framework;
 
@@ -31,6 +30,7 @@ public class MyInstance : IMyInstance
 
   private NavigationManager _navigation { get; set; }
   public IHttpContextAccessor httpContextAccessor { get; set; }
+  public HttpDocument output { get; set; } = new();
 
   public DbSet<Session> session
   {
@@ -72,6 +72,8 @@ public class MyInstance : IMyInstance
   private static MyInstance _instance;
 
   public ControllerBase controller { get; set; }
+  public Language lang { get; set; }
+
   public static MyInstance Instance => _instance ??= new MyInstance();
 
 
@@ -80,7 +82,7 @@ public class MyInstance : IMyInstance
     helper = new HelperBase();
     this.ignore(() =>
     {
-      if (this.file_exists("./framework.sqlite")) return;
+      if (helper.file_exists("./framework.sqlite")) return;
       helper.create_file_if_not_exists("./framework.sqlite");
       var frameworkContext = new FrameworkContext();
       // frameworkContext.SeedData();

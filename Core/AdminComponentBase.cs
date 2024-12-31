@@ -1,6 +1,6 @@
-using Global.Entities;
 using Microsoft.AspNetCore.Components;
 using Service.Components.Layout;
+using Service.Entities;
 using Task = System.Threading.Tasks.Task;
 
 

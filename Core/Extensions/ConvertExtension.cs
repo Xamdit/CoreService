@@ -1,5 +1,5 @@
-using Global.Entities;
 using Newtonsoft.Json;
+using Service.Entities;
 
 namespace Service.Core.Extensions;
 

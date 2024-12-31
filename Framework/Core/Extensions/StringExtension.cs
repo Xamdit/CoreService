@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json;
 using Service.Framework.Core.Engine;
 
 namespace Service.Framework.Core.Extensions;
@@ -136,9 +137,31 @@ public static class StringExtension
     return result;
   }
 
-  public static object array_to_object<T>(this HelperBase self, T[] array)
+  public static Dictionary<string, object> array_to_object(this HelperBase self, params object[] array)
   {
-    return array.Cast<object>().ToArray();
+    var output = new Dictionary<string, object>();
+    array.ToList()
+      .ForEach(x =>
+      {
+        var jsonString = JsonConvert.SerializeObject(x);
+        var item = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+        foreach (var kvp in item)
+        {
+          var key = kvp.Key;
+          var value = kvp.Value;
+          if (output.ContainsKey(key)) output.Remove(key);
+          output[key] = value;
+        }
+      });
+    return output;
+  }
+
+  public static T? array_to_object<T>(this HelperBase helper, T[] array) where T : class
+  {
+    var output = helper.array_to_object(array);
+    var jsonString = JsonConvert.SerializeObject(output);
+    var dataset = JsonConvert.DeserializeObject<T>(jsonString);
+    return dataset;
   }
 
   public static IEnumerable<T> array_flatten<T>(this HelperBase self, IEnumerable<IEnumerable<T>> array)

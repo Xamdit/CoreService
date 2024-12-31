@@ -1,15 +1,14 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Dto;
-using Global.Entities.Helpers;
-using Global.Entities.Tools;
+
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Entities.Dto;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Proposals;
 using Service.Helpers.Sale;
@@ -20,7 +19,7 @@ using Service.Models.Client;
 using Service.Models.Estimates;
 using Service.Models.Leads;
 using Service.Models.Projects;
-using File = Global.Entities.File;
+using File = Service.Entities.File;
 
 
 namespace Service.Models.Proposals;

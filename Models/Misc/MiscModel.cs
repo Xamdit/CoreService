@@ -1,13 +1,14 @@
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
 using Service.Helpers;
 using Service.Helpers.Sale;
 using Service.Models.Tasks;
+using File = Service.Entities.File;
 
 namespace Service.Models.Misc;
 
@@ -98,9 +99,9 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
     return select;
   }
 
-  public int add_attachment_to_database(int rel_id, string rel_type, Global.Entities.File attachment, string? external = null)
+  public int add_attachment_to_database(int rel_id, string rel_type, File attachment, string? external = null)
   {
-    var data = new Global.Entities.File
+    var data = new File
     {
       DateCreated = DateTime.Now,
       RelId = rel_id,
@@ -131,7 +132,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
       var pathParts = Path.GetExtension(attachment.FileName);
       data.FileName = attachment.FileName;
       data.ExternalLink = attachment.ExternalLink;
-      data.FileType = string.IsNullOrEmpty(attachment.FileType) ? self.get_mime_by_extension(pathParts) : attachment.FileType; // Implement GetMimeByExtension as needed
+      data.FileType = string.IsNullOrEmpty(attachment.FileType) ? self.helper.get_mime_by_extension(pathParts) : attachment.FileType; // Implement GetMimeByExtension as needed
       data.External = external;
 
       if (!string.IsNullOrEmpty(attachment.ThumbnailLink)) data.ThumbnailLink = attachment.ThumbnailLink;
@@ -174,7 +175,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
     return insertId;
   }
 
-  public Global.Entities.File? get_file(int id)
+  public File? get_file(int id)
   {
     var row = db.Files.FirstOrDefault(x => x.Id == id);
     return row;

@@ -1,8 +1,9 @@
-using Global.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
+using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
 using Service.Helpers.Pdf;
 using Service.Helpers.Proposals;
@@ -98,7 +99,7 @@ public class ProposalController(ILogger<ProposalController> logger, MyInstance s
         // comment is blank
         if (string.IsNullOrEmpty(self.input.post("content")))
           return Redirect(self.helper.site_url());
-        data = self.input.post();
+        data = self.input.post<dynamic>();
         data.proposalid = id;
         proposals_model.add_comment(data, true);
         return Redirect(self.helper.site_url() + "?tab=discussion");

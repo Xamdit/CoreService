@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Helpers;
 using Microsoft.AspNetCore.Components;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 
 namespace Service.Helpers;
@@ -118,7 +117,7 @@ public static class EstimatesHelper
     return key; // Replace with actual translation logic
   }
 
-  private static bool is_numeric(this HelperBase helper, object value)
+  public  static bool is_numeric(this HelperBase helper, object value)
   {
     // Check if the value is numeric
     return int.TryParse(value.ToString(), out _);

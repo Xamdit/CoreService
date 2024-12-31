@@ -1,14 +1,16 @@
-using Global.Entities;
+using Service.Entities;
+using File = Service.Entities.File;
+using Task = Service.Entities.Task;
 
 namespace Service.Models.Tasks;
 
-public class TaskDto : Global.Entities.Task
+public class TaskDto : Task
 {
   public List<Taggable> Tags { get; set; } = new();
   public List<int> assignees_ids { get; set; } = new();
   public List<TaskFollower> followers { get; set; }
   public List<int> followers_ids { get; set; }
-  public List<Global.Entities.File> attachments { get; set; }
+  public List<File> attachments { get; set; }
   public List<TasksTimer> timesheets { get; set; }
   public bool current_user_is_assigned { get; set; }
   public bool current_user_is_creator { get; set; }

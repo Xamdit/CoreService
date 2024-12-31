@@ -1,4 +1,5 @@
-using Global.Entities;
+using Service.Entities;
+using File = Service.Entities.File;
 
 namespace Service.Models.Leads;
 
@@ -10,5 +11,5 @@ public class LeadDto
   public List<CustomField> CustomFields { get; set; } = new();
   public bool contacted_today { get; set; } = false;
   public object? custom_contact_date { get; set; }
-  public List<Global.Entities.File> remove_attachments { get; set; } = new();
+  public List<File> remove_attachments { get; set; } = new();
 }

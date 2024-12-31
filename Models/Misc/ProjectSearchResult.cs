@@ -1,4 +1,4 @@
-using Global.Entities;
+using Service.Entities;
 
 namespace Service.Models.Misc;
 

@@ -1,10 +1,10 @@
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Sale;
 using Service.Models.Client;

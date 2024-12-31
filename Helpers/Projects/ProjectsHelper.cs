@@ -1,8 +1,9 @@
-using Global.Entities;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Models.Projects;
 using Service.Schemas.Ui.Entities;
+using File = Service.Entities.File;
 
 namespace Service.Helpers.Projects;
 
@@ -77,9 +78,9 @@ public static class ProjectsHelper
     return status;
   }
 
-  public static List<Global.Entities.File> get_project_files(this HelperBase helperBase, int project_id)
+  public static List<File> get_project_files(this HelperBase helperBase, int project_id)
   {
-    return new List<Global.Entities.File>();
+    return new List<File>();
   }
 
   public static List<Project> view_tasks(this HelperBase helperBase, List<string> args)

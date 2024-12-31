@@ -1,12 +1,12 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Framework.Schemas;
 using Service.Helpers;
 using Service.Libraries.MergeField;
@@ -19,6 +19,7 @@ using Service.Models.Tasks;
 using Service.Models.Projects;
 using Service.Models.Proposals;
 using Service.Models.Tickets;
+using File = Service.Entities.File;
 
 namespace Service.Models.Client;
 
@@ -48,7 +49,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
    * @param  array  where
    * @return mixed
    */
-  public Global.Entities.Client? get(int id, Expression<Func<Global.Entities.Client, bool>> condition)
+  public Entities.Client? get(int id, Expression<Func<Entities.Client, bool>> condition)
   {
     var query = db.Clients
       .Include(x => x.Country)
@@ -63,7 +64,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     return client;
   }
 
-  public List<Global.Entities.Client> get(Expression<Func<Global.Entities.Client, bool>> where)
+  public List<Entities.Client> get(Expression<Func<Entities.Client, bool>> where)
   {
     var query = db.Clients
       .Include(x => x.Country)
@@ -151,7 +152,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
    *
    * Add new client to database
    */
-  public int add(Global.Entities.Client data, int? withContact = null)
+  public int add(Entities.Client data, int? withContact = null)
   {
     var client_id = 0;
     var contact_data = new Contact();
@@ -253,7 +254,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
    * @return boolean
    * Update client informations
    */
-  public bool update(Global.Entities.Client data, int id, bool client_request = false)
+  public bool update(Entities.Client data, int id, bool client_request = false)
   {
     var updated = false;
     data = check_zero_columns(data);
@@ -706,7 +707,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
    * @param  mixed id
    * @return boolean
    */
-  public bool update_company_details(Global.Entities.Client data, int id = 0, List<CustomField> custom_fields = default)
+  public bool update_company_details(Entities.Client data, int id = 0, List<CustomField> custom_fields = default)
   {
     var affectedRows = 0;
     if (custom_fields.Any())
@@ -1181,7 +1182,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
    * @param  array  where perform where
    * @return array
    */
-  public List<Global.Entities.File> get_customer_files(int id, Expression<Func<Global.Entities.File, bool>> where)
+  public List<File> get_customer_files(int id, Expression<Func<File, bool>> where)
   {
     var rows = db.Files
       .Where(where)
@@ -1264,11 +1265,11 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool change_client_status(int id, bool status)
   {
-    var result = db.Clients.Where(x => x.Id == id).Update(x => new Global.Entities.Client { Active = status });
+    var result = db.Clients.Where(x => x.Id == id).Update(x => new Entities.Client { Active = status });
 
     if (result <= 0) return false;
     self.hooks.do_action("client_status_changed",
-      new Global.Entities.Client
+      new Entities.Client
       {
         Id = id
         // Status = status
@@ -1460,7 +1461,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     var contact_id = self.helper.get_primary_contact_user_id(client_id);
     db.Clients
       .Where(x => x.Id == client_id)
-      .Update(x => new Global.Entities.Client
+      .Update(x => new Entities.Client
       {
         Active = false,
         RegistrationConfirmed = 0
@@ -1479,7 +1480,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
   {
     var contact_id = self.helper.get_primary_contact_user_id(client_id);
 
-    db.Clients.Where(x => x.Id == client_id).Update(x => new Global.Entities.Client
+    db.Clients.Where(x => x.Id == client_id).Update(x => new Entities.Client
     {
       Active = true,
       RegistrationConfirmed = 1
@@ -1528,7 +1529,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     return true;
   }
 
-  public List<Global.Entities.Client> get_clients_distinct_countries()
+  public List<Entities.Client> get_clients_distinct_countries()
   {
     var rows = db.Clients
       .Include(x => x.Country)
@@ -1579,7 +1580,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     return output;
   }
 
-  private Global.Entities.Client check_zero_columns(Global.Entities.Client data)
+  private Entities.Client check_zero_columns(Entities.Client data)
   {
     // if (! (data.ShowPrimaryContact)) string.IsNullOrEmpty(data.ShowPrimaryContact);
     // if (( (data.DefaultCurrency) && string.IsNullOrEmpty(data.DefaultCurrency))  ) data.DefaultCurrency = 0;
@@ -1593,7 +1594,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
   public void delete_contact_profile_image(int id)
   {
     self.hooks.do_action("before_remove_contact_profile_image");
-    if (self.file_exists(self.helper.get_upload_path_by_type("contact_profile_images") + id))
+    if (self.helper.file_exists(self.helper.get_upload_path_by_type("contact_profile_images") + id))
       self.helper.delete_dir(self.helper.get_upload_path_by_type("contact_profile_images") + id);
     db.Contacts
       .Where(x => x.Id == id)

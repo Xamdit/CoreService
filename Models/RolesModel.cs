@@ -1,8 +1,9 @@
-using Global.Entities;
-using Global.Entities.Tools;
+
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
+using Service.Framework.Helpers.Entities;
 using Service.Models.Users;
 
 namespace Service.Models;

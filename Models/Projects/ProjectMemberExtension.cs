@@ -1,11 +1,10 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Helpers;
-using Global.Entities.Tools;
+
 using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using static Service.Framework.Helpers.FileHelper;
 using Task = System.Threading.Tasks.Task;
@@ -43,7 +42,7 @@ public static class ProjectMemberExtension
     files.ForEach(file =>
     {
       var path = Path.Combine(Directory.GetCurrentDirectory(), file.Id.ToString());
-      self.file_delete(path);
+      self.helper.file_delete(path);
     });
     var tasks_model = self.model.tasks_model();
 
@@ -228,7 +227,7 @@ public static class ProjectMemberExtension
     insert.Subject = file?.FileName;
     insert.ExternalLink = file?.ExternalLink;
 
-    insert.FileType = self.get_mime_by_extension(file.FileName);
+    insert.FileType = self.helper.get_mime_by_extension(file.FileName);
     if (!string.IsNullOrEmpty(file.ThumbnailLink))
       insert.ThumbnailLink = file.ThumbnailLink;
     if (data.StaffId > 0)
@@ -347,7 +346,7 @@ public static class ProjectMemberExtension
     return false;
   }
 
-  public static async Task<(double total_money, double total_seconds, string logged_time)> get_data_total_logged_time(this ProjectsModel model, Expression<Func<Global.Entities.Task, bool>> conditions)
+  public static async Task<(double total_money, double total_seconds, string logged_time)> get_data_total_logged_time(this ProjectsModel model, Expression<Func<Entities.Task, bool>> conditions)
   {
     var (self, db) = getInstance();
     (double total_money, int total_seconds, string logged_time) data = new();
@@ -424,8 +423,8 @@ public static class ProjectMemberExtension
       var _item =
         db.Itemables.FirstOrDefault(x => x.Id == itemId.Id);
 
-      var dataset = new DataSet<Global.Entities.Task>();
-      dataset.Data = new Global.Entities.Task
+      var dataset = new DataSet<Entities.Task>();
+      dataset.Data = new Entities.Task
       {
         Billable = 1,
         Name = _item.Description,

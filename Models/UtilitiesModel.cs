@@ -1,6 +1,6 @@
-using Global.Entities;
-using Service.Entities.Extras;
+using Service.Entities;
 using Service.Framework;
+using Service.Framework.Helpers.Entities.Extras;
 using Service.Helpers;
 using Service.Models.Invoices;
 

@@ -24,7 +24,7 @@ public class Loader(MyInstance self)
     var path = Path.Combine(
       $"templates/{theme}/{route}"
     );
-    if (!self.file_exists(path)) return string.Empty;
+    if (!self.helper.file_exists(path)) return string.Empty;
     if (!route.Contains("."))
       path = $"{path}.html";
     if (!File.Exists(path)) File.Create(path);

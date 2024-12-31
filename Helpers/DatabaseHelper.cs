@@ -1,7 +1,7 @@
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework.Core.Engine;
+using Service.Framework.Helpers.Entities;
 
 namespace Service.Helpers;
 

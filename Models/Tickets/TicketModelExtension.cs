@@ -1,5 +1,5 @@
-using Global.Entities;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Helpers;
 

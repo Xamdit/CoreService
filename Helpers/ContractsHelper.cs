@@ -1,8 +1,8 @@
-using Global.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RestSharp;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
 
