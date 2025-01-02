@@ -184,7 +184,6 @@ public abstract class XComponentBase : MyComponentBase
     self.context = httpContext;
   }
 
-
   public string text(string key)
   {
     return key;

@@ -2,7 +2,7 @@
   {
     "title": "dashboard",
     "icon": "las la-tachometer-alt",
-    "url": "/admin",
+    "url": "/admin/dashboard",
     "target": "_blank"
   },
   {

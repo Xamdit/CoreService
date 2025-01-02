@@ -22,6 +22,7 @@ public class IndexRazor : AdminComponentBase
   {
     await base.OnAfterRenderAsync(firstRender);
     if (!firstRender) return;
+    var uuid = await LocalStorage.GetItemAsync<string>("uuid");
     // Client = new Root.Entities.Client();
     // ClassName = Client.Id == 0 ? "9" : "12";
     var uiHook = UiHook.Instance;

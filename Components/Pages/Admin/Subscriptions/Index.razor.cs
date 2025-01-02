@@ -21,7 +21,7 @@ public class IndexRazor : AdminComponentBase
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
     if (!firstRender) return;
-    ClassName = Client.Id == 0 ? "9" : "12";
+    // ClassName = Client.Id == 0 ? "9" : "12";
     var uiHook = UiHook.Instance;
     var breadcrumb = new List<MenuItem>
     {

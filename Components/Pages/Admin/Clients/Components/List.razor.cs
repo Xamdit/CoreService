@@ -15,8 +15,8 @@ public class ListRazor : MyComponentBase
   /// <inheritdoc/>
   protected override void OnInitialized()
   {
-    // LocalStorage.SetItem("name", "John Smith");
-    // var name = LocalStorage.GetItem<string>("name");
+    var uuid = LocalStorage.GetItemAsync<string>("uuid").Result;
+
     // Console.WriteLine("admin area check");
   }
 

@@ -28,14 +28,15 @@ public class SignInComponent : XComponentBase
     if (userSchema != null)
     {
       var uuid = userSchema.Uuid;
-      // await LocalStorage.SetItemAsync("uuid", userSchema.Uuid);
+      await LocalStorage.SetItemAsync("uuid", userSchema.Uuid);
       // await LocalStorage.SetItemAsync("user_type", UserType);
       try
       {
         var target = userSchema.Type == "admin"
-          ? self.navigation.admin_url("dashboard", new { token = uuid })
-          : self.navigation.client_url("dashboard", new { token = uuid });
-        Console.WriteLine(target);
+          // ? self.navigation.admin_url("dashboard", new { token = uuid })
+          ? self.navigation.admin_url("dashboard")
+          // : self.navigation.client_url("dashboard", new { token = uuid });
+          : self.navigation.client_url("dashboard");
         self.navigation.NavigateTo(target);
       }
       catch (Exception ex)
