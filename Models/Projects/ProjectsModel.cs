@@ -1011,7 +1011,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         activity.ContactId = db.get_contact_user_id();
         activity.StaffId = 0;
-        activity.FullName = self.helper.get_contact_full_name(activity.ContactId);
+        activity.FullName = db.get_contact_full_name(activity.ContactId);
       }
       else if (db.is_staff_logged_in())
       {

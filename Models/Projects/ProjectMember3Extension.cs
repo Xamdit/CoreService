@@ -112,7 +112,7 @@ public static class ProjectMember3Extension
     if (comment.Data.ContactId != 0)
     {
       comment.created_by_current_user = db.client_logged_in() && comment.ContactId == db.get_contact_user_id();
-      comment.profile_picture_url = contact_profile_image_url(comment.ContactId);
+      comment.profile_picture_url = db.contact_profile_image_url(comment.ContactId);
     }
     else
     {
@@ -164,7 +164,7 @@ public static class ProjectMember3Extension
           comment.Options.Add(new Option()
           {
             Name = "profile_picture_url",
-            Value = $"{contact_profile_image_url(comment.Data.ContactId)}"
+            Value = $"{db.contact_profile_image_url(comment.Data.ContactId)}"
           });
         }
         else
@@ -480,10 +480,10 @@ public static class ProjectMember3Extension
     if (db.client_logged_in())
       notification_data.FromClientId = db.get_contact_user_id();
     else
-      notification_data.FromUserId = db.staff_user_id();
+      notification_data.FromUserId = db.get_staff_user_id();
 
     var notifiedUsers = new List<int>();
-    foreach (var member in members.Where(member => member.StaffId != db.staff_user_id() || db.client_logged_in()))
+    foreach (var member in members.Where(member => member.StaffId != db.get_staff_user_id() || db.client_logged_in()))
     {
       notification_data.ToUserId = member.StaffId;
       if (db.add_notification(notification_data)) notifiedUsers.Add(member.StaffId);
