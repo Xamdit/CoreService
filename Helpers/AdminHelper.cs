@@ -62,7 +62,7 @@ public static class AdminHelper
   //   {
   //     var user = Local.GetItemAsync<UserSchema>("user").Result;
   //     // if (isset(GLOBALS['current_user'])) return GLOBALS['current_user'].admin == '1';
-  //     staffid = self.helper.get_staff_user_id();
+  //     staffid = db.get_staff_user_id();
   //   }
   //
   //   var cache = app_object_cache.get<string>($"is-admin-{staffid}");
@@ -88,7 +88,7 @@ public static class AdminHelper
     {
       var user = Local.GetItemAsync<UserSchema>("user").Result;
       // if (isset(GLOBALS['current_user'])) return GLOBALS['current_user'].admin == '1';
-      staffid = self.helper.get_staff_user_id();
+      staffid = db.get_staff_user_id();
     }
 
     var cache = app_object_cache.get<string>($"is-admin-{staffid}");

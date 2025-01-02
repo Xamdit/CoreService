@@ -18,7 +18,7 @@ using File = Service.Entities.File;
 
 namespace Service.Models.Contracts;
 
-public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private ContractTypesModel contract_types_model = self.contract_types_model(db);
   private TasksModel tasks_model = self.tasks_model(db);
@@ -158,7 +158,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
       .Where(x => x.Id == id)
       .Update(x => new Contract { Signature = "" });
     if (!string.IsNullOrEmpty(contract.Signature))
-      self.helper.unlink($"{get_upload_path_by_type("contract")}{id}/{contract.Signature}");
+      unlink($"{get_upload_path_by_type("contract")}{id}/{contract.Signature}");
     return true;
   }
 
@@ -169,7 +169,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
   */
   public bool add_comment(ContractComment data, bool client = false)
   {
-    if (is_staff_logged_in()) client = false;
+    if (db.is_staff_logged_in()) client = false;
     // if (data['action'])
     //   unset(data['action']);
     data.DateCreated = DateTime.Now;
@@ -187,7 +187,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
       var staff_contract = db.Staff.Where(x => x.Id == contract.AddedFrom).ToList();
       var notifiedUsers = staff_contract.Select(x =>
         {
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             Description = "not_contract_comment_from_client",
             ToUserId = x.Id,
@@ -206,7 +206,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
           // this.app_sms.trigger(SMS_TRIGGER_CONTRACT_NEW_COMMENT_TO_STAFF, x.PhoneNumber, merge_fields);
         })
         .ToList();
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      db.pusher_trigger_notification(notifiedUsers);
     }
     else
     {
@@ -298,10 +298,10 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
     var newId = add((newContactData, null));
 
     if (newId == 0) return newId;
-    var custom_fields = self.helper.get_custom_fields("contracts");
+    var custom_fields = db.get_custom_fields("contracts");
     foreach (var field in custom_fields)
     {
-      var value = self.helper.get_custom_field_value(id, field.Id, "contracts", false);
+      var value = db.get_custom_field_value(id, field.Id, "contracts", false);
       if (value == "") return newId;
       db.CustomFieldsValues.Add(new CustomFieldsValue
       {
@@ -464,7 +464,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
     var attachment = get_contract_attachments(attachment_id).FirstOrDefault();
     if (attachment == null) return deleted;
     if (string.IsNullOrEmpty(attachment.External))
-      self.helper.unlink($"{get_upload_path_by_type("contract")}{attachment.RelId}/{attachment.FileName}");
+      unlink($"{get_upload_path_by_type("contract")}{attachment.RelId}/{attachment.FileName}");
 
 
     var affected_rows = db.Files.Where(x => x.Id == attachment_id).Delete();
@@ -474,12 +474,12 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
       log_activity($"Contract Attachment Deleted [ContractID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(get_upload_path_by_type("contract") + attachment.RelId)) return deleted;
+    if (!is_dir(get_upload_path_by_type("contract") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(get_upload_path_by_type("contract") + attachment.RelId);
+    var other_attachments = list_files(get_upload_path_by_type("contract") + attachment.RelId);
     if (!other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(get_upload_path_by_type("contract") + attachment.RelId);
+      delete_dir(get_upload_path_by_type("contract") + attachment.RelId);
 
     return deleted;
   }
@@ -498,7 +498,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
     if (keepSignature)
       data.NewValue = contract.ContractValue == 1;
     data.DateRenewed = DateTime.Now;
-    data.RenewedBy = self.helper.get_staff_full_name(staff_user_id);
+    data.RenewedBy = db.get_staff_full_name(staff_user_id);
     data.RenewedByStaffId = staff_user_id;
     if (data.NewEndDate.HasValue)
       data.NewEndDate = null;
@@ -525,7 +525,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
     {
       _data = (Contract)TypeMerger.Merge(_data, get_acceptance_info_array<Contract>(true));
       _data.Signed = false;
-      if (!string.IsNullOrEmpty(_contract.Signature)) self.helper.unlink($"{get_upload_path_by_type("contract")}{data.ContractId}/{_contract.Signature}");
+      if (!string.IsNullOrEmpty(_contract.Signature)) unlink($"{get_upload_path_by_type("contract")}{data.ContractId}/{_contract.Signature}");
     }
 
     if (db.Contracts.Update(_data).IsModified())

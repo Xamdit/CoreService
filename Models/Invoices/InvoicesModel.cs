@@ -266,7 +266,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
     {
       var temp = staff_user_id;
       staffid = $"{temp}";
-      full_name = self.helper.get_staff_full_name(temp);
+      full_name = db.get_staff_full_name(temp);
     }
 
     db.SalesActivities.Add(new SalesActivity
@@ -536,7 +536,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
     var deleted = false;
     if (attachment == null) return deleted;
     if (string.IsNullOrEmpty(attachment.External))
-      self.helper.unlink(get_upload_path_by_type("invoice") + attachment.RelId + "/" + attachment.FileName);
+      unlink(get_upload_path_by_type("invoice") + attachment.RelId + "/" + attachment.FileName);
     var affected_rows = db.Files.Where(x => x.Id == attachment.Id).Delete();
     if (affected_rows > 0)
     {
@@ -544,12 +544,12 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
       log_activity("Invoice Attachment Deleted [InvoiceID: " + attachment.RelId + "]");
     }
 
-    if (!self.helper.is_dir(get_upload_path_by_type("invoice") + attachment.RelId)) return deleted;
+    if (!is_dir(get_upload_path_by_type("invoice") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(get_upload_path_by_type("invoice") + attachment.RelId);
+    var other_attachments = list_files(get_upload_path_by_type("invoice") + attachment.RelId);
     if (!other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(get_upload_path_by_type("invoice") + attachment.RelId);
+      delete_dir(get_upload_path_by_type("invoice") + attachment.RelId);
 
     return deleted;
   }
@@ -959,7 +959,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
     else
     {
       staffid = $"{staff_user_id}";
-      full_name = self.helper.get_staff_full_name(self.helper.get_staff_user_id());
+      full_name = db.get_staff_full_name(db.get_staff_user_id());
     }
 
     db.SalesActivities.Add(new SalesActivity

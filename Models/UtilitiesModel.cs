@@ -6,7 +6,7 @@ using Service.Models.Invoices;
 
 namespace Service.Models;
 
-public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self,db)
+public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public async Task<bool> AddOrUpdateEvent(Event eventData)
   {
@@ -50,7 +50,7 @@ public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self,db)
   public async Task<List<Event>> GetAllEvents(DateTime start, DateTime end)
   {
     var userId = staff_user_id;
-    var isStaffMember = self.helper.is_staff_member();
+    var isStaffMember = db.is_staff_member();
 
     return db.Events
       .Where(e => (DateTime.Parse(e.Start) >= start && DateTime.Parse(e.Start) <= end && e.UserId == userId) || (isStaffMember && e.Public == 1))

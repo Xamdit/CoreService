@@ -1,6 +1,7 @@
 using System.Net;
 using Newtonsoft.Json;
 using RestSharp;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 
 namespace Service.Helpers;
@@ -17,7 +18,7 @@ public static class RestSharpHelper
     return client;
   }
 
-  public static RestClient rest_client_google(this HelperBase helper)
+  public static RestClient rest_client_google(this MyContext db)
   {
     var options = new RestClientOptions("https://www.google.com")
     {

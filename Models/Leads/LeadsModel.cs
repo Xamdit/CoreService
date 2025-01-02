@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Entities;
@@ -19,9 +20,9 @@ namespace Service.Models.Leads;
 
 public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
-  private MiscModel misc_model = db.misc_model(db);
-  private ProposalsModel proposals_model = db.proposals_model(db);
-  private TasksModel tasks_model = db.tasks_model(db);
+  private MiscModel misc_model = self.misc_model(db);
+  private ProposalsModel proposals_model = self.proposals_model(db);
+  private TasksModel tasks_model = self.tasks_model(db);
 
   public List<(WebToLead formData, List<File> attachments, string publicUrl, Lead lead)> get(Expression<Func<Lead, bool>> condition)
   {
@@ -164,7 +165,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
       var new_status_name = row.Name;
       log_lead_activity(id, "not_lead_activity_status_updated", false, JsonConvert.SerializeObject(new
       {
-        full_name = self.helper.get_staff_full_name(),
+        full_name = db.get_staff_full_name(),
         current_status,
         new_status_name
       }));
@@ -198,7 +199,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
     var affected_rows = db.Leads.Where(x => x.Id == id).Delete();
     if (affected_rows > 0)
     {
-      log_activity($"Lead Deleted [Deleted by: {self.helper.get_staff_full_name()}, ID: {id}]");
+      log_activity($"Lead Deleted [Deleted by: {db.get_staff_full_name()}, ID: {id}]");
       var attachments = get_lead_attachments(id);
       attachments.ToList().ForEach(x => { delete_lead_attachment(x.Id); });
       db.CustomFieldsValues.Where(x => x.RelId == id && x.FieldTo == "leads").Delete();
@@ -339,7 +340,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
     var notifiedUsers = not_user_ids
       .Select(x =>
       {
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_lead_added_attachment",
           ToUserId = x,
@@ -354,7 +355,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
       .ToList()
       .Where(x => x > 0)
       .ToList();
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
   }
 
   public bool delete_lead_attachment(int id)
@@ -363,7 +364,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
     var deleted = false;
     if (attachment == null) return deleted;
     if (string.IsNullOrEmpty(attachment.External))
-      self.helper.unlink($"{get_upload_path_by_type("lead")}{attachment.RelId}/{attachment.FileName}");
+      unlink($"{get_upload_path_by_type("lead")}{attachment.RelId}/{attachment.FileName}");
     var affected_rows = db.Files.Where(x => x.Id == attachment.Id).Delete();
     if (affected_rows > 0)
     {
@@ -371,10 +372,10 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
       log_activity($"Lead Attachment Deleted [ID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(get_upload_path_by_type("lead") + attachment.RelId)) return deleted;
-    var other_attachments = self.helper.list_files(get_upload_path_by_type("lead") + attachment.RelId);
+    if (!is_dir(get_upload_path_by_type("lead") + attachment.RelId)) return deleted;
+    var other_attachments = list_files(get_upload_path_by_type("lead") + attachment.RelId);
     if (!other_attachments.Any())
-      self.helper.delete_dir(get_upload_path_by_type("lead") + attachment.RelId);
+      delete_dir(get_upload_path_by_type("lead") + attachment.RelId);
     return deleted;
   }
 
@@ -503,7 +504,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
         _log_message = "not_lead_activity_status_updated";
         var additional_data = JsonConvert.SerializeObject(new[]
         {
-          self.helper.get_staff_full_name(),
+          db.get_staff_full_name(),
           old_status_name,
           current_status
         });
@@ -568,7 +569,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
       LeadId = id,
       StaffId = staff_user_id,
       AdditionalData = additional_data,
-      FullName = self.helper.get_staff_full_name(staff_user_id)
+      FullName = db.get_staff_full_name(staff_user_id)
     };
     if (integration)
     {
@@ -839,7 +840,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     if (assigned == 0) return;
     if (integration == false)
-      if (assigned == self.helper.get_staff_user_id())
+      if (assigned == db.get_staff_user_id())
         return;
     var name = db.Leads.FirstOrDefault(x => x.Id == lead_id)?.Name;
     var notification_data = new Notification
@@ -852,8 +853,8 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
         : JsonConvert.SerializeObject(new List<string>())
     };
     if (integration) notification_data.FromCompany = true;
-    if (self.helper.add_notification(notification_data))
-      self.helper.pusher_trigger_notification(new List<int> { assigned });
+    if (db.add_notification(notification_data))
+      db.pusher_trigger_notification(new List<int> { assigned });
     var row = db.Staff.First(x => x.Id == assigned);
     var email = row.Email;
     self.helper.send_mail_template("lead_assigned", lead_id, email);
@@ -866,8 +867,8 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
     await db.SaveChangesAsync();
     var not_additional_data = new List<string>
     {
-      self.helper.get_staff_full_name(),
-      "<a href='" + self.navigation.admin_url($"profile/{assigned}") + "' target='_blank'>" + self.helper.get_staff_full_name(assigned) + "</a>"
+      db.get_staff_full_name(),
+      "<a href='" + self.navigation.admin_url($"profile/{assigned}") + "' target='_blank'>" + db.get_staff_full_name(assigned) + "</a>"
     };
     // if (integration)
     // {
@@ -877,5 +878,11 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
     // not_additional_data = JsonConvert.SerializeObject(not_additional_data);
     var not_desc = integration == false ? "not_lead_activity_assigned_to" : "not_lead_activity_assigned_from_form";
     log_lead_activity(lead_id, not_desc, integration, JsonConvert.SerializeObject(not_additional_data));
+  }
+
+  [ApiExplorerSettings(IgnoreApi = true)]
+  public (MyInstance, MyContext ) getInstance()
+  {
+    return (self, db);
   }
 }

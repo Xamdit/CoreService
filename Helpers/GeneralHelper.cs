@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using Service.Controllers.Core;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
@@ -35,7 +36,7 @@ public static class GeneralHelper
 * Return logged staff User ID from session
 * @return mixed
 */
-  public static int get_staff_user_id(this HelperBase helper)
+  public static int get_staff_user_id(this MyContext db)
   {
     return 0;
   }
@@ -70,7 +71,7 @@ public static class GeneralHelper
 * Get contact user id
 * @return mixed
 */
-  public static int get_contact_user_id(this HelperBase helper)
+  public static int get_contact_user_id(this MyContext db)
   {
     // if (!$CI->session->has_userdata('contact_user_id')) {
     //   return false;
@@ -328,8 +329,9 @@ public static class GeneralHelper
  * @param  string $str
  * @return boolean
  */
-  public static async Task<IActionResult> do_recaptcha_validation(this ControllerBase controller, string str = "")
+  public static async Task<IActionResult> do_recaptcha_validation(this AppControllerBase controller, string str = "")
   {
+    var (self, db) = controller.getInstance();
     var client = db.rest_client_google();
     var request = new RestRequest("/recaptcha/api/siteverify", Method.Post);
     request.AddHeader("Content-Type", "application/x-www-form-urlencoded");

@@ -7,7 +7,7 @@ namespace Service.Libraries.Sms;
 public abstract class AppSms(MyInstance instance, MyContext db)
 {
   private static Dictionary<string, SmsGateway> gateways = new();
-  public MyInstance self = instance;
+
 
   public HttpClient client
   {

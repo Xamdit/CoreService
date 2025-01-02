@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers.Entities;
@@ -13,15 +12,16 @@ public static class ProjectModelExtension
 {
   public static int add_milestone(this ProjectsModel model, Milestone data)
   {
+    var (self, db) = model.getInstance();
     data.DateCreated = DateTime.Now;
     data.Description = data.Description.nl2br();
-    var result = model.root.db.Milestones.Add(data);
+    var result = db.Milestones.Add(data);
     if (!result.IsAdded()) return 0;
-    var milestone = model.root.db.Milestones.FirstOrDefault(x => x.Id == result.Entity.Id);
+    var milestone = db.Milestones.FirstOrDefault(x => x.Id == result.Entity.Id);
     if (milestone == null) return 0;
     var project = model.get(x => x.Id == milestone.ProjectId).FirstOrDefault();
     if (project == null) return 0;
-    var show_to_customer = model.root.db.view_milestone(project.ProjectSettings);
+    var show_to_customer = db.view_milestone(project.ProjectSettings);
     model.log(milestone.ProjectId, "project_activity_created_milestone", milestone.Name, show_to_customer);
     log_activity($"Project Milestone Created [ID:{result.Entity.Id}]");
     return result.Entity.Id;
@@ -29,15 +29,16 @@ public static class ProjectModelExtension
 
   public static bool delete_milestone(this ProjectsModel model, int id)
   {
-    var milestone = model.root.db.Milestones.FirstOrDefault(x => x.Id == id);
+    var (self, db) = model.getInstance();
+    var milestone = db.Milestones.FirstOrDefault(x => x.Id == id);
     if (milestone == null) return false;
-    var affected_rows = model.root.db.Milestones.Where(x => x.Id == id).Delete();
+    var affected_rows = db.Milestones.Where(x => x.Id == id).Delete();
     if (affected_rows <= 0) return false;
 
     var project = model.get(x => x.Id == milestone.ProjectId).First();
-    var show_to_customer = model.root.db.view_milestone(project.ProjectSettings);
+    var show_to_customer = db.view_milestone(project.ProjectSettings);
     model.log(milestone.ProjectId, "project_activity_deleted_milestone", milestone.Name, show_to_customer);
-    model.root.db.Tasks
+    db.Tasks
       .Where(x => x.Milestone == id)
       .Update(x => new Entities.Task { Milestone = null }
       );
@@ -52,12 +53,13 @@ public static class ProjectModelExtension
  */
   public static bool send_project_customer_email(this ProjectsModel model, int id, string template)
   {
+    var (self, db) = model.getInstance();
     var sent = false;
-    var clients_model = model.root.model.clients_model(db);
+    var clients_model = model.clients_model(db);
     var contacts = clients_model.get_contacts_for_project_notifications(id, "project_emails");
     contacts.ForEach(contact =>
     {
-      if (model.root.helper.send_mail_template(template, id, contact.UserId, contact))
+      if (helper.send_mail_template(template, id, contact.UserId, contact))
         sent = true;
     });
 
@@ -67,15 +69,16 @@ public static class ProjectModelExtension
 
   public static bool mark_as(this ProjectsModel model, Project data)
   {
-    var row = model.root.db.Projects.FirstOrDefault(x => x.Id == data.Id);
+    var (self, db) = model.getInstance();
+    var row = db.Projects.FirstOrDefault(x => x.Id == data.Id);
     var old_status = row.Status;
-    var affected_rows = model.root.db.Projects.Where(x => x.Id == data.Id).Update(x => new Project
+    var affected_rows = db.Projects.Where(x => x.Id == data.Id).Update(x => new Project
     {
       Status = data.Status
     });
     if (affected_rows <= 0) return false;
 
-    model.root.hooks.do_action("project_status_changed", new
+    hooks.do_action("project_status_changed", new
     {
       status = data.Status,
       project_id = data.Id
@@ -85,7 +88,7 @@ public static class ProjectModelExtension
     if (data.Status == 4)
     {
       log_activity(data.Id, "project_marked_as_finished");
-      model.root.db.Projects
+      db.Projects
         .Where(x => x.Id == data.Id)
         .Update(x => new Project
         {
@@ -96,7 +99,7 @@ public static class ProjectModelExtension
     {
       log_activity(data.Id, "project_status_updated", $"<b><lang>project_status_{data.Status}</lang></b>");
       if (old_status == 4)
-        model.root.db.Projects
+        db.Projects
           .Where(x => x.Id == data.Id)
           .Update(x => new Project
           {
@@ -123,6 +126,7 @@ public static class ProjectModelExtension
 
   public static async Task<bool> _notify_project_members_status_change(this ProjectsModel model, int id, int old_status, int new_status)
   {
+    var (self, db) = model.getInstance();
     var members = model.get_project_members(id);
     // var notifiedUsers = new List<int>();
     var notifiedUsers = members
@@ -130,7 +134,7 @@ public static class ProjectModelExtension
       .ToList()
       .Select(member =>
       {
-        var notified = model.root.helper.add_notification(new Notification
+        var notified = helper.add_notification(new Notification
         {
           FromUserId = model.staff_user_id,
           Description = "not_project_status_updated",
@@ -147,13 +151,14 @@ public static class ProjectModelExtension
       .Where(x => x != 0)
       .ToList();
 
-    model.root.helper.pusher_trigger_notification(notifiedUsers);
+    helper.pusher_trigger_notification(notifiedUsers);
     return true;
   }
 
   public static async Task<ProjectsModel> _mark_all_project_tasks_as_completed(this ProjectsModel model, int id)
   {
-    await model.root.db.Tasks
+    var (self, db) = model.getInstance();
+    await db.Tasks
       .Where(x => x.RelId == id && x.RelType == "project")
       .UpdateAsync(x => new Entities.Task
       {
@@ -163,7 +168,7 @@ public static class ProjectModelExtension
     var tasks = await model.get_tasks(x => x.Id == id);
     tasks.ForEach(task =>
     {
-      model.root.db.TasksTimers
+      db.TasksTimers
         .Where(x => x.TaskId == task.Id && !x.EndTime.HasValue)
         .Update(x => new TasksTimer
         {
@@ -184,6 +189,7 @@ public static class ProjectModelExtension
 
   public static async Task<bool> add_edit_member(this ProjectsModel model, ProjectMember data)
   {
+    var (self, db) = model.getInstance();
     var id = data.Id;
     var affectedRows = 0;
 
@@ -191,7 +197,7 @@ public static class ProjectModelExtension
 
     var new_project_members_to_receive_email = new List<int>();
 
-    var project = model.root.db.Projects.Include(x => x.Client).FirstOrDefault(x => x.Id == id);
+    var project = db.Projects.Include(x => x.Client).FirstOrDefault(x => x.Id == id);
 
     var project_name = project.Name;
     var client_id = project.ClientId;
@@ -202,10 +208,10 @@ public static class ProjectModelExtension
       project_members_in.ForEach(project_member =>
       {
         if (project_members.Contains(project_member.StaffId)) return;
-        var affected_rows = model.root.db.ProjectMembers.Where(x => x.ProjectId == id && x.StaffId == project_member.StaffId).Delete();
+        var affected_rows = db.ProjectMembers.Where(x => x.ProjectId == id && x.StaffId == project_member.StaffId).Delete();
         if (affected_rows <= 0) return;
-        model.root.db.PinnedProjects.Where(x => x.StaffId == project_member.StaffId && x.ProjectId == id).Delete();
-        model.log(id, "project_activity_removed_team_member", model.root.helper.get_staff_full_name(project_member.StaffId));
+        db.PinnedProjects.Where(x => x.StaffId == project_member.StaffId && x.ProjectId == id).Delete();
+        model.log(id, "project_activity_removed_team_member", helper.get_staff_full_name(project_member.StaffId));
         affectedRows++;
       });
 
@@ -214,10 +220,10 @@ public static class ProjectModelExtension
       {
         var notifiedUsers = project_members.Select(staff_id =>
           {
-            var _exists = model.root.db.ProjectMembers.Any(x => x.ProjectId == id && x.StaffId == staff_id);
+            var _exists = db.ProjectMembers.Any(x => x.ProjectId == id && x.StaffId == staff_id);
             if (_exists) return 0;
             if (staff_id == 0) return 0;
-            var affected_rows = model.root.db.ProjectMembers.Add(new ProjectMember
+            var affected_rows = db.ProjectMembers.Add(new ProjectMember
             {
               ProjectId = id,
               StaffId = staff_id
@@ -225,7 +231,7 @@ public static class ProjectModelExtension
             if (affected_rows.IsAdded()) return 0;
             if (staff_id != model.staff_user_id)
             {
-              var notified = model.root.helper.add_notification(new Notification
+              var notified = helper.add_notification(new Notification
               {
                 FromUserId = model.staff_user_id,
                 Description = "not_staff_added_as_project_member",
@@ -240,12 +246,12 @@ public static class ProjectModelExtension
               return notified != null ? staff_id : 0;
             }
 
-            log_activity(id, "project_activity_added_team_member", model.root.helper.get_staff_full_name(staff_id));
+            log_activity(id, "project_activity_added_team_member", helper.get_staff_full_name(staff_id));
             affectedRows++;
             return 0;
           })
           .ToList();
-        model.root.helper.pusher_trigger_notification(notifiedUsers);
+        helper.pusher_trigger_notification(notifiedUsers);
       }
     }
     else
@@ -253,7 +259,7 @@ public static class ProjectModelExtension
       var notifiedUsers = project_members.Select(staff_id =>
         {
           if (staff_id == 0) return 0;
-          var result = model.root.db.ProjectMembers.Add(new ProjectMember
+          var result = db.ProjectMembers.Add(new ProjectMember
           {
             ProjectId = id,
             StaffId = staff_id
@@ -261,7 +267,7 @@ public static class ProjectModelExtension
           if (!result.IsAdded()) return 0;
           if (staff_id != model.staff_user_id)
           {
-            var notified = model.root.helper.add_notification(new Notification
+            var notified = helper.add_notification(new Notification
             {
               FromUserId = model.staff_user_id,
               Description = "not_staff_added_as_project_member",
@@ -275,25 +281,27 @@ public static class ProjectModelExtension
             return staff_id;
           }
 
-          model.log(id, "project_activity_added_team_member", model.root.helper.get_staff_full_name(staff_id));
+          model.log(id, "project_activity_added_team_member", helper.get_staff_full_name(staff_id));
           return 0;
         })
         .ToList();
-      if (notifiedUsers.Any()) model.root.helper.pusher_trigger_notification(notifiedUsers);
+      if (notifiedUsers.Any())
+        helper.pusher_trigger_notification(notifiedUsers);
     }
 
     if (!new_project_members_to_receive_email.Any()) return affectedRows > 0;
     var all_members = model.get_project_members(id);
     all_members.Where(data => new_project_members_to_receive_email.Contains(data.StaffId))
       .ToList()
-      .Select(data => model.root.helper.send_mail_template("project_staff_added_as_member", data, id, client_id))
+      .Select(data => helper.send_mail_template("project_staff_added_as_member", data, id, client_id))
       .ToList();
     return affectedRows > 0;
   }
 
   public static bool is_member(this ProjectsModel model, int project_id, int? staff_id = null)
   {
-    var result = model.root.db.ProjectMembers.Any(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
+    var (self, db) = model.getInstance();
+    var result = db.ProjectMembers.Any(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
     return result;
   }
 
@@ -305,7 +313,8 @@ public static class ProjectModelExtension
 
   public static async Task mark_all_project_tasks_as_completed(this ProjectsModel model, int id)
   {
-    model.root.db.Tasks
+    var (self, db) = model.getInstance();
+    db.Tasks
       .Where(x => x.RelType == "project" && x.RelId == id)
       .Update(x => new Entities.Task
       {
@@ -318,12 +327,12 @@ public static class ProjectModelExtension
     tasks.ForEach(task =>
     {
       //
-      model.root.db.TasksTimers.Where(x => x.TaskId == task.Id && x.EndTime == null)
+      db.TasksTimers.Where(x => x.TaskId == task.Id && x.EndTime == null)
         .Update(x => new TasksTimer()
         {
           EndTime = DateTime.Now
         });
-      model.root.db.SaveChanges();
+      db.SaveChanges();
       //
     });
     // this.log_activity(id, "project_activity_marked_all_tasks_as_complete");

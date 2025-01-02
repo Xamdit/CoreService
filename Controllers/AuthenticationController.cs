@@ -63,7 +63,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
       }
 
       var announcements_model = self.announcements_model(db);
-      announcements_model.set_announcements_as_read_except_last_one(self.helper.get_contact_user_id());
+      announcements_model.set_announcements_as_read_except_last_one(db.get_contact_user_id());
       hooks.do_action("after_contact_login");
       this.maybe_redirect_to_previous_url();
       return Redirect(site_url());

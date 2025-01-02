@@ -14,7 +14,7 @@ using Task = Service.Entities.Task;
 
 namespace Service.Models.Users;
 
-public class StaffModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class StaffModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private DepartmentsModel departments_model = self.departments_model(db);
 
@@ -30,8 +30,8 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self,db)
 
     hooks.do_action("before_delete_staff_member", new { id, transfer_data_to });
 
-    var name = self.helper.get_staff_full_name(id);
-    var transferred_to = self.helper.get_staff_full_name(transfer_data_to);
+    var name = db.get_staff_full_name(id);
+    var transferred_to = db.get_staff_full_name(transfer_data_to);
 
     db.Estimates
       .Where(x => x.AddedFrom == id)
@@ -405,7 +405,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self,db)
 
     if (email) self.helper.die("Email already exists");
 
-    data.IsAdmin = false || is_admin;
+    data.IsAdmin = false || db.is_admin();
 
     var send_welcome_email = true;
     var original_password = data.Password;
@@ -619,7 +619,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self,db)
   public async Task<bool> update_permissions(List<StaffPermission> permissions, int id)
   {
     var result = await db.StaffPermissions.Where(x => x.StaffId == id).DeleteAsync();
-    var is_staff_member = self.helper.is_staff_member(id);
+    var is_staff_member = db.is_staff_member(id);
     permissions.ForEach(sp =>
     {
       var feature = sp.Feature;
@@ -665,7 +665,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self,db)
     var affected_rows = db.SaveChanges();
     if (affected_rows <= 0) return false;
     hooks.do_action("staff_member_profile_updated", id);
-    log_activity($"Staff Profile Updated [Staff: {self.helper.get_staff_full_name(id)}]");
+    log_activity($"Staff Profile Updated [Staff: {db.get_staff_full_name(id)}]");
     return true;
   }
 

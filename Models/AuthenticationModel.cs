@@ -136,7 +136,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
     // this.session.unset_userdata("client_user_id");
     // this.session.unset_userdata("client_logged_in");
     else
-      hooks.do_action("before_staff_logout", self.helper.get_staff_user_id());
+      hooks.do_action("before_staff_logout", db.get_staff_user_id());
     // this.session.unset_userdata("staff_user_id");
     // this.session.unset_userdata("staff_logged_in");
     // this.session.sess_destroy();

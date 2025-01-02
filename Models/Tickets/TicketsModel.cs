@@ -336,8 +336,8 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       Console.WriteLine(filename); // Output: example_filename
       if (string.IsNullOrEmpty(filename)) filename = "attachment";
       if (!file_exists(path))
-        self.helper.file_create($"{path}index.html");
-      filename = self.helper.unique_filename(path, $"{filename}.{extension}");
+        file_create($"{path}index.html");
+      filename = unique_filename(path, $"{filename}.{extension}");
       self.helper.file_put_contents(path + filename, arg.data);
       ticket_attachments.Add(new TicketAttachment
       {
@@ -498,7 +498,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
   public async Task<int> add_reply(Ticket data, int id, int? admin = null, List<TicketDto> pipe_attachments = default, int assign_to_current_user = 0)
   {
     var assigned = 0;
-    if (assign_to_current_user == 0) assigned = self.helper.get_staff_user_id();
+    if (assign_to_current_user == 0) assigned = db.get_staff_user_id();
     var unsetters = new[]
     {
       "note_description",
@@ -650,7 +650,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         self.helper.send_mail_template("ticket_new_reply_to_staff", ticket, member, _attachments);
         if (!db.get_option_compare("receive_notification_on_new_ticket_replies", 1)) return 0;
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_new_ticket_reply",
           ToUserId = member.Id,
@@ -661,7 +661,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
         });
         return notified ? member.Id : 0;
       }).ToList();
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      db.pusher_trigger_notification(notifiedUsers);
     }
     else
     {
@@ -746,16 +746,16 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     var deleted = false;
     var attachment = db.TicketAttachments.FirstOrDefault(x => x.Id == id);
     if (attachment == null) return deleted;
-    if (self.helper.unlink($"{get_upload_path_by_type("ticket")}{attachment.TicketId}/{attachment.FileName}"))
+    if (unlink($"{get_upload_path_by_type("ticket")}{attachment.TicketId}/{attachment.FileName}"))
     {
       db.TicketAttachments.Where(x => x.Id == id).Delete();
       deleted = true;
     }
 
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(get_upload_path_by_type("ticket") + attachment.TicketId);
+    var other_attachments = list_files(get_upload_path_by_type("ticket") + attachment.TicketId);
     if (!other_attachments.Any())
-      self.helper.delete_dir(get_upload_path_by_type("ticket") + attachment.TicketId);
+      delete_dir(get_upload_path_by_type("ticket") + attachment.TicketId);
 
     return deleted;
   }
@@ -880,7 +880,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
         if (data.UserId == 0 && data.ContactId == 0)
         {
           data.UserId = db.get_client_user_id();
-          data.ContactId = self.helper.get_contact_user_id();
+          data.ContactId = db.get_contact_user_id();
         }
       }
 
@@ -928,7 +928,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (!data.Assigned.HasValue && data.Assigned != 0)
       if (data.Assigned != staff_user_id)
       {
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_ticket_assigned_to_you",
           ToUserId = data.Assigned!.Value,
@@ -939,7 +939,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
         });
 
         if (notified)
-          self.helper.pusher_trigger_notification(new List<int> { data.Assigned.Value });
+          db.pusher_trigger_notification(new List<int> { data.Assigned.Value });
         self.helper.send_mail_template("ticket_assigned_to_staff", self.helper.get_staff(data.Assigned).Email, data.Assigned, ticketid, data.UserId, data.ContactId);
       }
 
@@ -974,7 +974,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         self.helper.send_mail_template("ticket_created_to_staff", ticketid, data.UserId, data.ContactId, member, _attachments);
         if (!db.get_option_compare("receive_notification_on_new_ticket", 1)) continue;
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_new_ticket_created",
           ToUserId = member.Id,
@@ -987,7 +987,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
         if (notified) notifiedUsers.Add(member.Id);
       }
 
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      db.pusher_trigger_notification(notifiedUsers);
     }
     else
     {
@@ -1069,8 +1069,8 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
         .ToList()
         .ForEach(attachment =>
         {
-          if (self.helper.is_dir(get_upload_path_by_type("ticket") + ticketid))
-            if (self.helper.delete_dir(get_upload_path_by_type("ticket") + ticketid))
+          if (is_dir(get_upload_path_by_type("ticket") + ticketid))
+            if (delete_dir(get_upload_path_by_type("ticket") + ticketid))
             {
               db.TicketAttachments.Where(x => x.Id == attachment.Id).Delete();
               if (affected_rows > 0) affectedRows++;
@@ -1176,7 +1176,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
         if (data.Assigned != 0 && data.Assigned != staff_user_id)
         {
           sendAssignedEmail = true;
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             Description = "not_ticket_reassigned_to_you",
             ToUserId = data.Assigned.Value,
@@ -1187,7 +1187,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
           });
 
 
-          if (notified) self.helper.pusher_trigger_notification(new List<int> { data.Assigned.Value });
+          if (notified) db.pusher_trigger_notification(new List<int> { data.Assigned.Value });
         }
     }
     else
@@ -1195,7 +1195,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       if (data.Assigned != 0 && data.Assigned != staff_user_id)
       {
         sendAssignedEmail = true;
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_ticket_assigned_to_you",
           ToUserId = data.Assigned.Value,
@@ -1205,7 +1205,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
           AdditionalData = JsonConvert.SerializeObject(new[] { data.Subject })
         });
         if (notified != null)
-          self.helper.pusher_trigger_notification(new List<int> { data.Assigned.Value });
+          db.pusher_trigger_notification(new List<int> { data.Assigned.Value });
       }
     }
 
@@ -1674,7 +1674,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (assignedStaff == 0 || !db.get_option_compare("staff_related_ticket_notification_to_assignee_only", 1))
       return staff_model.get(x => x.Active!.Value)
         .Where(x =>
-          !self.helper.is_staff_member(x.Id) &&
+          !db.is_staff_member(x.Id) &&
           db.get_option_compare("access_tickets_to_none_staff_members", 0) &&
           departments_model.get_staff_departments(x.Id).Contains(department))
         // .Select(x=>x.Id)
@@ -1685,7 +1685,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var output = staff_model.get(x => x.Active!.Value)
       .Where(x =>
-        !self.helper.is_staff_member(x.Id) &&
+        !db.is_staff_member(x.Id) &&
         db.get_option_compare("access_tickets_to_none_staff_members", 0) &&
         departments_model.get_staff_departments(x.Id).Contains(department))
       // .Select(x=>x.Id)

@@ -12,7 +12,7 @@ using File = Service.Entities.File;
 
 namespace Service.Models.Misc;
 
-public class MiscModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public int notifications_limit = 5;
   private TasksModel taxes_model = self.tasks_model(db);
@@ -42,7 +42,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self,db)
         var split = taxname.Split('|');
         if (split.Length >= 2)
         {
-          var tax = self.helper.get_tax_by_name(split[0]);
+          var tax = db.get_tax_by_name(split[0]);
           if (tax != null) taxname = $"{tax.Name}|{tax.TaxRate}";
         }
       }

@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
@@ -25,7 +24,7 @@ using Task = Service.Entities.Task;
 
 namespace Service.Models.Tasks;
 
-public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private List<TaskOption> statuses = new();
   private LeadsModel leads_model = self.leads_model(db);
@@ -214,8 +213,8 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
     if (Convert.ToBoolean(dataset["copy_task_attachments"]))
     {
       var attachments = get_task_attachments(x => x.Id == copy_from.Id);
-      if (self.helper.is_dir(get_upload_path_by_type("task") + copy_from))
-        self.helper.xcopy(get_upload_path_by_type("task") + copy_from, get_upload_path_by_type("task") + insert_id);
+      if (is_dir(get_upload_path_by_type("task") + copy_from))
+        xcopy(get_upload_path_by_type("task") + copy_from, get_upload_path_by_type("task") + insert_id);
       var _at = attachments;
       var at = _at.Select(x =>
         {
@@ -418,7 +417,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
     // var fromTicketId = new List<int>();
     // if (data.TicketToTask) fromTicketId = data.TicketToTask;
     dataset.Data.DateCreated = DateTime.Now;
-    dataset.Data.AddedFrom = clientRequest == false ? staff_user_id : self.helper.get_contact_user_id();
+    dataset.Data.AddedFrom = clientRequest == false ? staff_user_id : db.get_contact_user_id();
     dataset.Data.IsAddedFromContact = clientRequest;
 
     var checklistItems = new List<TaskChecklistItem>();
@@ -605,7 +604,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
             var path = $"{get_upload_path_by_type("ticket")}{fromTicketId}/{ticket_attachment.FileName}";
             if (!file_exists(path)) continue;
 
-            var filename = self.helper.unique_filename(task_path, ticket_attachment.FileName);
+            var filename = unique_filename(task_path, ticket_attachment.FileName);
 
             // var fpt = self.helper.fopen(task_path + filename, 'w');
             // if (file_exists(filename) && self.helper.file_put_contents(filename))
@@ -891,7 +890,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
     if (db.is_client_logged_in())
     {
       data.StaffId = 0;
-      data.ContactId = self.helper.get_contact_user_id();
+      data.ContactId = db.get_contact_user_id();
     }
     else
     {
@@ -978,7 +977,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
 
     if (staff_user_id != data.Id)
     {
-      var notified = self.helper.add_notification(new Notification
+      var notified = db.add_notification(new Notification
       {
         Description = "not_task_added_you_as_follower",
         ToUserId = data.StaffId,
@@ -987,7 +986,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
       });
 
       if (notified)
-        self.helper.pusher_trigger_notification(data.Task.TaskFollowers.Select(x => x.Id).ToList());
+        db.pusher_trigger_notification(data.Task.TaskFollowers.Select(x => x.Id).ToList());
 
       var member = staff_model.get(x => x.TaskFollowers == data.Task.TaskFollowers).First();
 
@@ -1003,7 +1002,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
 
     var additional_notification_data = JsonConvert.SerializeObject(new[]
     {
-      self.helper.get_staff_full_name(data.Task.TaskFollowers.First().Id),
+      db.get_staff_full_name(data.Task.TaskFollowers.First().Id),
       taskName
     });
 
@@ -1049,7 +1048,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
     else if (clientRequest)
     {
       assignData.IsAssignedFromContact = 1;
-      assignData.AssignedFrom = self.helper.get_contact_user_id();
+      assignData.AssignedFrom = db.get_contact_user_id();
     }
     else
     {
@@ -1078,9 +1077,9 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
 
       if (cronOrIntegration) notification_data.FromCompany = true;
 
-      if (clientRequest) notification_data.FromClientId = self.helper.get_contact_user_id();
+      if (clientRequest) notification_data.FromClientId = db.get_contact_user_id();
 
-      if (self.helper.add_notification(notification_data)) self.helper.pusher_trigger_notification(new List<int> { data.AssignedFrom });
+      if (db.add_notification(notification_data)) db.pusher_trigger_notification(new List<int> { data.AssignedFrom });
 
       var member = staff_model.get(x => x.Id == data.AssignedFrom).FirstOrDefault();
 
@@ -1090,7 +1089,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
     var description = "not_task_assigned_someone";
     var additional_notification_data = JsonConvert.SerializeObject(new[]
     {
-      self.helper.get_staff_full_name(data.AssignedFrom),
+      db.get_staff_full_name(data.AssignedFrom),
       task.Name
     });
     if (data.AssignedFrom == staff_user_id)
@@ -1103,7 +1102,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
     }
 
     if (task.RelType == "project")
-      projects_model.log(task.RelId ?? 0, "project_activity_new_task_assignee", $"{task.Name} - {self.helper.get_staff_full_name(data.StaffId)}", task.VisibleToClient);
+      projects_model.log(task.RelId ?? 0, "project_activity_new_task_assignee", $"{task.Name} - {db.get_staff_full_name(data.StaffId)}", task.VisibleToClient);
 
     _send_task_responsible_users_notification(
       description,
@@ -1158,12 +1157,12 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
       {
         var relPath = $"{get_upload_path_by_type("task")}{attachment.RelId}/";
         var fullPath = relPath + attachment.FileName;
-        self.helper.unlink(fullPath);
-        var fname = self.helper.file_name(fullPath);
+        unlink(fullPath);
+        var fname = file_name(fullPath);
         var fext = self.helper.file_extension(fullPath);
         var thumbPath = $"{relPath}{fname}_thumb.{fext}";
         if (file_exists(thumbPath))
-          self.helper.unlink(thumbPath);
+          unlink(thumbPath);
       }
 
       var affected_rows = db.Files.Where(x => x.Id == id).Delete();
@@ -1173,13 +1172,13 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
         log_activity($"Task Attachment Deleted [TaskID: {attachment.RelId}]");
       }
 
-      if (self.helper.is_dir(get_upload_path_by_type("task") + attachment.RelId))
+      if (is_dir(get_upload_path_by_type("task") + attachment.RelId))
       {
         // Check if no attachments left, so we can delete the folder also
-        var other_attachments = self.helper.list_files(get_upload_path_by_type("task") + attachment.RelId);
+        var other_attachments = list_files(get_upload_path_by_type("task") + attachment.RelId);
         if (!other_attachments.Any())
           // okey only index.html so we can delete the folder also
-          self.helper.delete_dir(get_upload_path_by_type("task") + attachment.RelId);
+          delete_dir(get_upload_path_by_type("task") + attachment.RelId);
       }
     }
 
@@ -1344,12 +1343,12 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
     var comment = db.TaskComments.FirstOrDefault(x => x.Id == data.Id);
 
     var edit_tasks = self.helper.has_permission("tasks", "", "edit");
-    if (comment.StaffId != staff_user_id && !edit_tasks && comment.ContactId != self.helper.get_contact_user_id())
+    if (comment.StaffId != staff_user_id && !edit_tasks && comment.ContactId != db.get_contact_user_id())
       return false;
 
     var comment_added = comment.DateCreated;
     var minus_1_hour = DateTime.Now.AddHours(-1);
-    if (!db.get_option_compare("client_staff_add_edit_delete_task_comments_first_hour", 0) && (!db.get_option_compare("client_staff_add_edit_delete_task_comments_first_hour", 1) || comment_added < minus_1_hour) && !is_admin) return false;
+    if (!db.get_option_compare("client_staff_add_edit_delete_task_comments_first_hour", 0) && (!db.get_option_compare("client_staff_add_edit_delete_task_comments_first_hour", 1) || comment_added < minus_1_hour) && !db.is_admin()) return false;
 
     if (db.Files.Any(x => x.TaskCommentId == comment.Id)) data.Content += "[task_attachment]";
     var affected_rows = await db.TaskComments
@@ -1379,14 +1378,14 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
     if (comment == null) return true;
 
     var task_delete = self.helper.has_permission("tasks", "", "delete");
-    var contact_user_id = self.helper.get_contact_user_id();
+    var contact_user_id = db.get_contact_user_id();
     if (comment.StaffId != staff_user_id && !task_delete && comment.ContactId != contact_user_id && force != true) return false;
     {
       var comment_added = comment.DateCreated;
       var minus_1_hour = DateTime.Now.AddHours(-1);
       if (!db.get_option_compare("client_staff_add_edit_delete_task_comments_first_hour", 0) &&
           (!db.get_option_compare("client_staff_add_edit_delete_task_comments_first_hour", 1) || comment_added < minus_1_hour)
-          && !is_admin && !force) return false;
+          && !db.is_admin() && !force) return false;
       var result = db.TaskComments.Where(x => x.Id == id).Delete();
       if (result == 0) return false;
       if (comment.FileId != 0) remove_task_attachment(comment.FileId ?? 0);
@@ -1428,7 +1427,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
     result = db.TaskAssigneds.Where(x => x.Id == id).Delete();
     if (result == 0) return false;
     if (task.RelType == "project")
-      projects_model.log(task.RelId ?? 0, "project_activity_task_assignee_removed", $"{task.Name} - {self.helper.get_staff_full_name(assignee_data.StaffId)}", task.VisibleToClient);
+      projects_model.log(task.RelId ?? 0, "project_activity_task_assignee_removed", $"{task.Name} - {db.get_staff_full_name(assignee_data.StaffId)}", task.VisibleToClient);
 
     return true;
   }
@@ -1598,8 +1597,8 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
 
     db.RelatedItems.Where(x => x.RelId == id && x.RelType == "task").Delete();
 
-    if (self.helper.is_dir(get_upload_path_by_type("task") + id))
-      self.helper.delete_dir(get_upload_path_by_type("task") + id);
+    if (is_dir(get_upload_path_by_type("task") + id))
+      delete_dir(get_upload_path_by_type("task") + id);
 
 
     db.UserMeta.Where(x => x.MetaKey == $"task-hide-completed-items-{id}").Delete();
@@ -1634,7 +1633,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
         var link = $"#taskid={taskid}";
         if (comment_id != 0) link += $"#comment_{comment_id}";
 
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = description,
           ToUserId = x.Id,
@@ -1647,7 +1646,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
         if (email_template != "") self.helper.send_mail_template(email_template, x.Email, x.Id, taskid);
       });
 
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
   }
 
   public void _send_customer_contacts_notification(int taskid, string template_name)
@@ -1664,7 +1663,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
         .ToList()
         .ForEach(x =>
         {
-          if (db.is_client_logged_in() && self.helper.get_contact_user_id() == x.Id) return;
+          if (db.is_client_logged_in() && db.get_contact_user_id() == x.Id) return;
           self.helper.send_mail_template(template_name, x.Email, 0, taskid);
         });
   }
@@ -1940,7 +1939,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
       .GroupBy(t => t.Id) // Group by Id
       .Select(g => g.First()) // Select first tag in each group
       .ToList();
-    var labels = loggers.Select(x => self.helper.get_staff_full_name(x.StaffId)).ToList();
+    var labels = loggers.Select(x => db.get_staff_full_name(x.StaffId)).ToList();
     var labels_ids = loggers.Select(x => x.StaffId).ToList();
     var chart = new Chart
     {
@@ -2158,7 +2157,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
       if (comment_id.HasValue)
         link += $"#comment_{comment_id}";
 
-      var notified = self.helper.add_notification(new Notification
+      var notified = db.add_notification(new Notification
       {
         Description = description,
         ToUserId = member.Id,
@@ -2172,7 +2171,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
       if (email_template != "") self.helper.send_mail_template(email_template, member.Email, member.Id, taskid);
     }
 
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
   }
 
   public void update_checklist_assigned_staff(TaskChecklistItem data)

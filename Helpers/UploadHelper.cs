@@ -14,9 +14,8 @@ public static class UploadHelper
  * @param  string  type
  * @return string
  */
-  public static string get_upload_path_by_type(  string type)
+  public static string get_upload_path_by_type(string type)
   {
-
     var path = type switch
     {
       "lead" => LEAD_ATTACHMENTS_FOLDER,
@@ -49,7 +48,7 @@ public static class UploadHelper
   public static List<TicketAttachment> handle_ticket_attachments(this HelperBase helper, int ticketId, string indexName = "attachments")
   {
     var (self, db) = getInstance();
-    var path = helper.get_upload_path_by_type("ticket") + ticketId + "/";
+    var path = db.get_upload_path_by_type("ticket") + ticketId + "/";
     var uploadedFiles = new List<TicketAttachment>();
 
     // Assuming `HttpContext.Current.Request.Files` is used to simulate PHP's ` _FILES`
@@ -82,7 +81,7 @@ public static class UploadHelper
       if (!allowedExtensions.Contains(extension)) continue;
 
       helper.maybe_create_upload_path(path);
-      var filename = helper.unique_filename(path, file.FileName);
+      var filename = unique_filename(path, file.FileName);
       var newFilePath = Path.Combine(path, filename);
 
       // Upload the file into the specified path
@@ -284,8 +283,6 @@ public static class UploadHelper
 
     return uploadedFiles.Count > 0 ? uploadedFiles : [];
   }
-
-
 
 
   private static string generate_unique_filename(string path, string fileName)

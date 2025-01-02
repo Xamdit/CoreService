@@ -64,14 +64,14 @@ public static class GlobalExtension
       : $"{row.Value}";
   }
 
-  public static IDocumentCollection<Item> document(string currentPath)
+  public static IDocumentCollection<Service.Framework.Schemas.Item> document(string currentPath)
   {
     var folder = Path.GetDirectoryName(currentPath);
     if (!Directory.Exists(folder))
       Directory.CreateDirectory(folder);
     file_exists(currentPath,true);
     var store = new DataStore(currentPath);
-    var collection = store.GetCollection<Item>();
+    var collection = store.GetCollection<Service.Framework.Schemas.Item>();
     return collection;
   }
 

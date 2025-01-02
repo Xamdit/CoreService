@@ -27,21 +27,21 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private List<string> contact_columns => hooks.apply_filters("contact_columns", new List<string> { "firstname", "lastname", "email", "phonenumber", "title", "password", "send_set_password_email", "donotsendwelcomeemail", "permissions", "direction", "invoice_emails", "estimate_emails", "credit_note_emails", "contract_emails", "task_emails", "project_emails", "ticket_emails", "is_primary" });
 
-  private AuthenticationModel authentication_model = db.authentication_model(db);
-  private ClientVaultEntriesModel client_vault_entries_model = db.client_vault_entries_model(db);
-  private ClientGroupsModel client_groups_model = db.client_groups_model(db);
-  private StatementModel statement_model = db.statement_model(db);
-  private TicketsModel tickets_model = db.tickets_model(db);
-  private InvoicesModel invoices_model = db.invoices_model(db);
-  private CreditNotesModel credit_notes_model = db.credit_notes_model(db);
-  private TasksModel tasks_model = db.tasks_model(db);
-  private RolesModel roles_model = db.roles_model(db);
-  private EstimatesModel estimates_model = db.estimates_model(db);
-  private SubscriptionsModel subscriptions_model = db.subscriptions_model(db);
-  private ContractsModel contracts_model = db.contracts_model(db);
-  private ProjectsModel projects_model = db.projects_model(db);
-  private ProposalsModel proposals_model = db.proposals_model(db);
-  private ExpensesModel expenses_model = db.expenses_model(db);
+  private AuthenticationModel authentication_model = self.authentication_model(db);
+  private ClientVaultEntriesModel client_vault_entries_model = self.client_vault_entries_model(db);
+  private ClientGroupsModel client_groups_model = self.client_groups_model(db);
+  private StatementModel statement_model = self.statement_model(db);
+  private TicketsModel tickets_model = self.tickets_model(db);
+  private InvoicesModel invoices_model = self.invoices_model(db);
+  private CreditNotesModel credit_notes_model = self.credit_notes_model(db);
+  private TasksModel tasks_model = self.tasks_model(db);
+  private RolesModel roles_model = self.roles_model(db);
+  private EstimatesModel estimates_model = self.estimates_model(db);
+  private SubscriptionsModel subscriptions_model = self.subscriptions_model(db);
+  private ContractsModel contracts_model = self.contracts_model(db);
+  private ProjectsModel projects_model = self.projects_model(db);
+  private ProposalsModel proposals_model = self.proposals_model(db);
+  private ExpensesModel expenses_model = self.expenses_model(db);
 
   /**
    * Get client object based on passed clientid if not passed clientid return array of all clients
@@ -226,7 +226,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var isStaff = 0;
 
-    if (!client_logged_in && db.is_staff_logged_in())
+    if (!db.client_logged_in() && db.is_staff_logged_in())
     {
       log += $", From Staff: {staff_user_id}";
       isStaff = staff_user_id;
@@ -1008,8 +1008,8 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     if (affected_rows <= 0) return false;
 
-    if (self.helper.is_dir(get_upload_path_by_type("contact_profile_images") + id))
-      self.helper.delete_dir(get_upload_path_by_type("contact_profile_images") + id);
+    if (is_dir(get_upload_path_by_type("contact_profile_images") + id))
+      delete_dir(get_upload_path_by_type("contact_profile_images") + id);
 
     await db.Consents
       .Where(x => x.ContactId == id)
@@ -1210,11 +1210,11 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       var relPath = get_upload_path_by_type("customer") + attachment.RelId + '/';
       var fullPath = relPath + attachment.FileName;
-      self.helper.unlink(fullPath);
-      var fname = self.helper.file_name(fullPath);
+      unlink(fullPath);
+      var fname = file_name(fullPath);
       var fext = self.helper.file_extension(fullPath);
       var thumbPath = $"{relPath}{fname}_thumb.{fext}";
-      if (file_exists(thumbPath)) self.helper.unlink(thumbPath);
+      if (file_exists(thumbPath)) unlink(thumbPath);
     }
 
 
@@ -1226,10 +1226,10 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
       log_activity($"Customer Attachment Deleted [ID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(get_upload_path_by_type("customer") + attachment.RelId)) return deleted;
+    if (!is_dir(get_upload_path_by_type("customer") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(get_upload_path_by_type("customer") + attachment.RelId);
-    if (other_attachments.Any()) self.helper.delete_dir(get_upload_path_by_type("customer") + attachment.RelId);
+    var other_attachments = list_files(get_upload_path_by_type("customer") + attachment.RelId);
+    if (other_attachments.Any()) delete_dir(get_upload_path_by_type("customer") + attachment.RelId);
 
 
     return deleted;
@@ -1549,7 +1549,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
         mail_template("customer_profile_uploaded_file_to_staff", member.Email, member.Id)
           .set_merge_fields(merge_fields)
           .send();
-        var notify = self.helper.add_notification(new Notification
+        var notify = db.add_notification(new Notification
         {
           ToUserId = member.Id,
           Description = "not_customer_uploaded_file",
@@ -1558,7 +1558,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
         return notify ? member.Id : 0;
       })
       .ToList();
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
   }
 
   public List<Staff> get_staff_members_that_can_access_customer(int id)
@@ -1594,7 +1594,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     hooks.do_action("before_remove_contact_profile_image");
     if (file_exists(get_upload_path_by_type("contact_profile_images") + id))
-      self.helper.delete_dir(get_upload_path_by_type("contact_profile_images") + id);
+      delete_dir(get_upload_path_by_type("contact_profile_images") + id);
     db.Contacts
       .Where(x => x.Id == id)
       .Update(x => new Contact { ProfileImage = null });

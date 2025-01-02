@@ -21,7 +21,7 @@ using File = Service.Entities.File;
 
 namespace Service.Models.CreditNotes;
 
-public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private InvoicesModel invoices_model = self.invoices_model(db);
   private ClientsModel clients_model = self.clients_model(db);
@@ -355,7 +355,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self,db)
     var deleted = false;
     if (attachment == null) return deleted;
     if (string.IsNullOrEmpty(attachment.External))
-      self.helper.unlink($"{get_upload_path_by_type("credit_note")}{attachment.RelId}/{attachment.FileName}");
+      unlink($"{get_upload_path_by_type("credit_note")}{attachment.RelId}/{attachment.FileName}");
 
     var affected_rows = db.Files.Where(x => x.Id == id).Delete();
     if (affected_rows > 0)
@@ -364,12 +364,12 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self,db)
       log_activity($"Credit Note Attachment Deleted [Credite Note: {self.helper.format_credit_note_number(attachment.RelId)}]");
     }
 
-    if (!self.helper.is_dir(get_upload_path_by_type("credit_note") + attachment.RelId)) return deleted;
+    if (!is_dir(get_upload_path_by_type("credit_note") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(get_upload_path_by_type("credit_note") + attachment.RelId);
+    var other_attachments = list_files(get_upload_path_by_type("credit_note") + attachment.RelId);
     if (other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(get_upload_path_by_type("credit_note") + attachment.RelId);
+      delete_dir(get_upload_path_by_type("credit_note") + attachment.RelId);
 
     return deleted;
   }
@@ -518,7 +518,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self,db)
     new_credit_note_data.Terms = db.get_option("predefined_terms_credit_note");
     new_credit_note_data.AdminNote = "";
     new_credit_note_data.NewItems.Clear();
-    var custom_fields_items = self.helper.get_custom_fields("items");
+    var custom_fields_items = db.get_custom_fields("items");
     var key = 1;
     var itemables = new List<Itemable>();
     // foreach (var item in _invoice.Items)
@@ -535,7 +535,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self,db)
       new_credit_note_data.NewItems[key].ItemOrder = item.ItemOrder;
       foreach (var cf in custom_fields_items)
       {
-        new_credit_note_data.NewItems[key].CustomFields.Items[cf.Id] = self.helper.get_custom_field_value(item.Id, cf.Id, "items", false);
+        new_credit_note_data.NewItems[key].CustomFields.Items[cf.Id] = db.get_custom_field_value(item.Id, cf.Id, "items", false);
         if (!defined("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST"))
           self.helper.define("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST", true);
       }

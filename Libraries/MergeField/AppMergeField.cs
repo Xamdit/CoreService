@@ -58,7 +58,7 @@ public class AppMergeFields(MyInstance self)
       classesForMergeFieldsInitialized = true;
     }
 
-    var baseName = self.helper.file_name(name);
+    var baseName = file_name(name);
     var mergeFields = get_by_name(baseName);
     // Add logic to process mergeFields
     return new CustomField();
@@ -115,7 +115,7 @@ public class AppMergeFields(MyInstance self)
 
   public string load(string mergeField)
   {
-    var baseName = self.helper.file_name(mergeField);
+    var baseName = file_name(mergeField);
 
     // Add logic to dynamically load classes if necessary
 

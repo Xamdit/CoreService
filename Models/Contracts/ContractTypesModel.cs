@@ -5,7 +5,7 @@ using Service.Helpers;
 
 namespace Service.Models.Contracts;
 
-public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   /**
       * Add new contract type
@@ -81,21 +81,21 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self,db
     foreach (var type in types)
     {
       var total_rows_where = CreateCondition<Contract>(x => x.ContractType == type.Id > 0 && x.Trash == false);
-      if (is_client_logged_in())
+      if (db.is_client_logged_in())
       {
         total_rows_where = total_rows_where.And(x =>
-          x.Client == self.helper.get_client_user_id()
+          x.Client == db.get_client_user_id()
           && string.IsNullOrEmpty(x.NotVisibleToClient)
         );
       }
       else
       {
         var view_contract = self.helper.has_permission("contracts", 0, "view");
-        if (!view_contract) total_rows_where = total_rows_where.And(x => x.AddedFrom == self.helper.get_staff_user_id());
+        if (!view_contract) total_rows_where = total_rows_where.And(x => x.AddedFrom == db.get_staff_user_id());
       }
 
       var _total_rows = db.Contracts.Count(total_rows_where);
-      if (_total_rows == 0 &&db.is_client_logged_in()) continue;
+      if (_total_rows == 0 && db.is_client_logged_in()) continue;
       labels.Add(type.Name);
       totals.Add(_total_rows);
     }

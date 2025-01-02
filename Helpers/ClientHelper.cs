@@ -226,7 +226,7 @@ public static class ClientHelper
   public static bool is_contact_email_verified(this HelperBase helper, int? id = null)
   {
     var (self, db) = getInstance();
-    id ??= self.helper.get_contact_user_id();
+    id ??= db.get_contact_user_id();
     var contact = new Contact();
     if (self.globals<Contact>("contact") != null && self.globals<Contact>("contact").Id == id.Value)
     {
@@ -245,5 +245,10 @@ public static class ClientHelper
     var staff_model = self.staff_model(db);
     var admins = staff_model.get(x => x.Active == true && x.IsAdmin == true);
     admins.ForEach(admin => { self.helper.send_mail_template("customer_new_registration_to_admins", admin.Email, client_id, admin.Id); });
+  }
+
+  public static bool client_logged_in(this MyContext db)
+  {
+    return db.is_client_logged_in();
   }
 }

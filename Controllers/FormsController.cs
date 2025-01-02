@@ -225,7 +225,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
             var notifiedUsers = staff.Select(member =>
             {
               if (member.Id == 0) return 0;
-              var notified = self.helper.add_notification(new Notification()
+              var notified = db.add_notification(new Notification()
               {
                 Description = "not_lead_imported_from_form",
                 ToUserId = member.Id,
@@ -237,7 +237,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
               return notified ? member.Id : 0;
             }).ToList();
 
-            self.helper.pusher_trigger_notification(notifiedUsers);
+            db.pusher_trigger_notification(notifiedUsers);
           }
 
           if (!string.IsNullOrEmpty(regularFields.Email))

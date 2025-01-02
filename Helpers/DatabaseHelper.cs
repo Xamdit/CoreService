@@ -52,9 +52,9 @@ public static class DatabaseHelper
    * Add user notifications
    * @param array values array of values [description,fromuserid,touserid,fromcompany,isread]
    */
-  public static bool add_notification(this HelperBase helper, Notification data)
+  public static bool add_notification(this MyContext db, Notification data)
   {
-    var (self, db) = getInstance();
+
 
     var staff_user_id = helper.get_staff_user_id();
     // var staff_user_id =Convert.ToByte( await get_staff_user_id());
@@ -193,14 +193,14 @@ public static class DatabaseHelper
 * @param  array  users id of users to receive notifications
 * @return null
 */
-  public static bool pusher_trigger_notification(this HelperBase helper, List<int> users)
+  public static bool pusher_trigger_notification(this MyContext db, List<int> users)
   {
-    return helper.pusher_trigger_notification(users.ToArray());
+    return db.pusher_trigger_notification(users.ToArray());
   }
 
-  public static bool pusher_trigger_notification(this HelperBase helper, params int[] users)
+  public static bool pusher_trigger_notification(this MyContext db, params int[] users)
   {
-    var (self, db) = getInstance();
+
     if (db.get_option_compare("pusher_realtime_notifications", 0)) return false;
     if (!users.ToList().Any()) return false;
     var channels = users.Select(x => $"notifications-channel-{x}")

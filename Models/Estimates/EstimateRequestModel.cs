@@ -7,7 +7,7 @@ using File = Service.Entities.File;
 
 namespace Service.Models.Estimates;
 
-public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public const int STATUS_PROCESSING = 2;
 
@@ -160,7 +160,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self,
       Link = $"estimate_request/view/{estimateRequestId}"
     };
 
-    self.helper.add_notification(notification);
+    db.add_notification(notification);
     var email = db.Staff
       .FirstOrDefault(x => x.Id == assigned);
     self.helper.send_mail_template("estimate_request_assigned", estimateRequestId, email);

@@ -25,7 +25,7 @@ using File = Service.Entities.File;
 
 namespace Service.Models.Estimates;
 
-public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   // private List<int> statuses => hooks.apply_filters("before_set_estimate_statuses", new List<int> { 1, 2, 5, 3, 4 });
   private List<string> shipping_fields = new() { "shipping_street", "shipping_city", "shipping_city", "shipping_state", "shipping_zip", "shipping_country" };
@@ -119,7 +119,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
     db.Estimates
       .Where(x => x.Id == id)
       .Update(x => new Estimate { Signature = null });
-    if (!string.IsNullOrEmpty(estimate.Signature)) self.helper.unlink($"{get_upload_path_by_type("estimate")}{id}/{estimate.Signature}");
+    if (!string.IsNullOrEmpty(estimate.Signature)) unlink($"{get_upload_path_by_type("estimate")}{id}/{estimate.Signature}");
     return true;
   }
 
@@ -177,7 +177,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
     var modes = payment_modes_model.Find(x => x.ExpensesOnly != 1);
     new_invoice_data.AllowedPaymentModes = string.Join(",", modes.Select(mode => mode.SelectedByDefault != 0 ? mode.Id : 0).Where(x => x > 0).ToList());
     new_invoice_data.newitems.Clear();
-    var custom_fields_items = self.helper.get_custom_fields("items");
+    var custom_fields_items = db.get_custom_fields("items");
     var key = 0;
     var items = new List<Itemable>();
     // foreach (var item in _estimate.items)
@@ -194,7 +194,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
       new_invoice_data.newitems[key].Order = item.ItemOrder!.Value;
       foreach (var cf in custom_fields_items)
       {
-        new_invoice_data.newitems[key].CustomFields.Items[cf.Id] = self.helper.get_custom_field_value(item.Id, cf.Id, "items", false);
+        new_invoice_data.newitems[key].CustomFields.Items[cf.Id] = db.get_custom_field_value(item.Id, cf.Id, "items", false);
         if (!defined("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST"))
           self.helper.define("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST", true);
       }
@@ -206,7 +206,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
     if (id <= 0) return id;
 
     // Customer accepted the estimate and is auto converted to invoice
-    if (!is_staff_logged_in())
+    if (!db.is_staff_logged_in())
     {
       db.SalesActivities
         .Where(x => x.RelType == "invoice" && x.RelId == id)
@@ -260,7 +260,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
         // + if field names similarity is equal or more then CUSTOM_FIELD_TRANSFER_SIMILARITY%
         // if (cfTransfer != 1 || self.helper.similarity(field.Name, cfTransfer[0].Name) * 100 < CUSTOM_FIELD_TRANSFER_SIMILARITY) continue;
         if (cfTransfer != null || self.helper.similarity(field.Name, cfTransfer.Field.Name) * 100 < self.globals<int>("CUSTOM_FIELD_TRANSFER_SIMILARITY")) continue;
-        var value = self.helper.get_custom_field_value(_estimate.Id, field.Id, "estimate", false);
+        var value = db.get_custom_field_value(_estimate.Id, field.Id, "estimate", false);
 
         if (string.IsNullOrEmpty(value)) continue;
         db.CustomFieldsValues.Add(new CustomFieldsValue
@@ -335,7 +335,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
     new_estimate_data.ClientNote = _estimate.ClientNote;
     new_estimate_data.AdminNote = "";
     new_estimate_data.newitems = new List<ItemableOption>();
-    var custom_fields_items = self.helper.get_custom_fields("items");
+    var custom_fields_items = db.get_custom_fields("items");
     var key = 1;
     var items = new List<Itemable>();
     foreach (var item in items)
@@ -350,7 +350,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
       new_estimate_data.newitems[key].Order = item.ItemOrder!.Value;
       foreach (var cf in custom_fields_items)
       {
-        new_estimate_data.newitems[key].CustomFields.Items[cf.Id] = self.helper.get_custom_field_value(item.Id, cf.Id, "items", false);
+        new_estimate_data.newitems[key].CustomFields.Items[cf.Id] = db.get_custom_field_value(item.Id, cf.Id, "items", false);
         if (!defined("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST"))
           self.helper.define("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST", true);
       }
@@ -360,10 +360,10 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
 
     id = add(new_estimate_data);
     if (id == 0) return 0;
-    var custom_fields = self.helper.get_custom_fields("estimate");
+    var custom_fields = db.get_custom_fields("estimate");
     foreach (var field in custom_fields)
     {
-      var value = self.helper.get_custom_field_value(_estimate.Id, field.Id, "estimate", false);
+      var value = db.get_custom_field_value(_estimate.Id, field.Id, "estimate", false);
       if (string.IsNullOrEmpty(value)) continue;
       db.CustomFieldsValues.Add(new CustomFieldsValue
       {
@@ -759,9 +759,9 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
       var invoiceid = 0;
       var invoiced = false;
 
-      var contact_id = !is_client_logged_in()
+      var contact_id = !db.is_client_logged_in()
         ? self.helper.get_primary_contact_user_id(estimate.ClientId)
-        : self.helper.get_contact_user_id();
+        : db.get_contact_user_id();
 
       if (action == 4)
       {
@@ -789,7 +789,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
         contacts.ForEach(contact => { self.helper.send_mail_template("estimate_accepted_to_customer", estimate, contact); });
         staff_estimate.ForEach(member =>
         {
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             FromCompany = true,
             ToUserId = member.Id,
@@ -803,7 +803,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
           if (notified != null) notifiedUsers.Add(member.Id);
           self.helper.send_mail_template("estimate_accepted_to_staff", estimate, member.Email, contact_id);
         });
-        self.helper.pusher_trigger_notification(notifiedUsers);
+        db.pusher_trigger_notification(notifiedUsers);
         hooks.do_action("estimate_accepted", id);
         // return new { invoiced, invoiceid };
         return (invoiceid > 0, null);
@@ -813,7 +813,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
 
       staff_estimate.ForEach(member =>
       {
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           FromCompany = true,
           ToUserId = member.Id,
@@ -829,7 +829,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
         self.helper.send_mail_template("estimate_declined_to_staff", estimate, member.Email, contact_id);
       });
 
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      db.pusher_trigger_notification(notifiedUsers);
       log_estimate_activity(id, "estimate_activity_client_declined", true);
       hooks.do_action("estimate_declined", id);
       //return new { invoiced, invoiceid };
@@ -890,7 +890,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
     if (attachment == null) return deleted;
 
     if (string.IsNullOrEmpty(attachment.External))
-      self.helper.unlink($"{get_upload_path_by_type("estimate")}{attachment.RelId}/{attachment.FileName}");
+      unlink($"{get_upload_path_by_type("estimate")}{attachment.RelId}/{attachment.FileName}");
 
     db.Files.Where(x => x.Id == id).Delete();
     var affected_rows = db.SaveChanges();
@@ -900,12 +900,12 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
       log_activity($"Estimate Attachment Deleted [EstimateID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(get_upload_path_by_type("estimate") + attachment.RelId)) return deleted;
+    if (!is_dir(get_upload_path_by_type("estimate") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(get_upload_path_by_type("estimate") + attachment.RelId);
+    var other_attachments = list_files(get_upload_path_by_type("estimate") + attachment.RelId);
     if (!other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(get_upload_path_by_type("estimate") + attachment.RelId);
+      delete_dir(get_upload_path_by_type("estimate") + attachment.RelId);
 
 
     return deleted;
@@ -1233,7 +1233,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self,db)
   public void log_estimate_activity(int id, string description = "", bool client = false, string additional_data = "")
   {
     var staffid = $"{staff_user_id}";
-    var full_name = self.helper.get_staff_full_name(staff_user_id);
+    var full_name = db.get_staff_full_name(staff_user_id);
     if (self.is_cron())
     {
       staffid = "[CRON]";

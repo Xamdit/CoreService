@@ -53,7 +53,7 @@ public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self, d
       return 0;
     var isClientLoggedIn = db.is_client_logged_in();
     var staff = !isClientLoggedIn;
-    var userid = isClientLoggedIn ? self.helper.get_contact_user_id() : self.helper.get_staff_user_id();
+    var userid = isClientLoggedIn ? db.get_contact_user_id() : db.get_staff_user_id();
     var items = db.Announcements.Where(x => db.DismissedAnnouncements.Where(y => y.IsStaff == staff && y.UserId == userid).Select(y => y.AnnouncementId).ToList().Contains(x.Id)).ToList();
     items = staff
       ? items.Where(x => x.ShowToStaff).ToList()

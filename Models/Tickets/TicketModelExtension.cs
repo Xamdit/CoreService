@@ -11,6 +11,7 @@ public static class TicketModelExtension
 
   public static async Task<string> insert_piped_ticket(this TicketsModel model, (Ticket ticket, string body, string to) data)
   {
+    var (self, db) = model.getInstance();
     my_model = model;
     var spam_filters_model = model.spam_filters_model;
     var system_blocked_subjects = new[]
@@ -36,7 +37,7 @@ public static class TicketModelExtension
     if (!string.IsNullOrEmpty(mailstatus))
       return await FinalizeLogAndReturn(data, email, cc, tid, subject, mailstatus);
 
-    var department = model.root.db.Departments.FirstOrDefault(x => x.Email == data.to.Trim());
+    var department = db.Departments.FirstOrDefault(x => x.Email == data.to.Trim());
     var departmentId = department?.Id ?? 0;
 
     if (departmentId == 0)
@@ -44,14 +45,14 @@ public static class TicketModelExtension
     if (email == data.to)
       return await FinalizeLogAndReturn(data, email, cc, tid, subject, "Blocked Potential Email Loop");
 
-    var user = model.root.db.Staff.FirstOrDefault(x => x.Active.HasValue && x.Email == email);
+    var user = db.Staff.FirstOrDefault(x => x.Active.HasValue && x.Email == email);
     if (user != null)
       return await HandleStaffResponse(data, user, tid, cc, subject);
 
-    var contact = model.root.db.Contacts.FirstOrDefault(x => x.Email == email);
+    var contact = db.Contacts.FirstOrDefault(x => x.Email == email);
     var userId = contact?.Id ?? 0;
 
-    if (userId == 0 && model.root.db.get_option("email_piping_only_registered") == "1")
+    if (userId == 0 && db.get_option("email_piping_only_registered") == "1")
       return await FinalizeLogAndReturn(data, email, cc, tid, subject, "Unregistered Email Address");
 
     return await HandleTicketCreation(data, email, cc, tid, userId, subject, departmentId);

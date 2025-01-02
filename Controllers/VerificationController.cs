@@ -77,7 +77,7 @@ public class VerificationController(ILogger<ClientControllerBase> logger, MyInst
     if (self.helper.is_contact_email_verified() || !db.is_client_logged_in())
       return Redirect(self.helper.site_url("clients"));
 
-    if (clients_model.send_verification_email(self.helper.get_contact_user_id()))
+    if (clients_model.send_verification_email(db.get_contact_user_id()))
       set_alert("success", self.helper.label("email_verification_mail_sent_successfully"));
     else
       set_alert("danger", self.helper.label("failed_to_send_verification_email"));

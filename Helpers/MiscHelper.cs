@@ -57,7 +57,7 @@ public static class MiscHelper
     var (self, db) = getInstance();
     if (string.IsNullOrEmpty(partBase64)) return false;
 
-    var filename = self.helper.unique_filename(path, "signature.png");
+    var filename = unique_filename(path, "signature.png");
     var decodedImage = Convert.FromBase64String(partBase64);
     var retval = false;
     path = Path.Combine(path.TrimEnd(Path.DirectorySeparatorChar), filename);

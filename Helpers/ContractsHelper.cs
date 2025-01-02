@@ -78,7 +78,7 @@ public static class ContractsHelper
     var staff_contract = db.Staff.Where(x => x.Id == contract.AddedFrom).ToList();
     var notifiedUsers = staff_contract.Select(member =>
       {
-        var notified = self.helper.add_notification(new Notification()
+        var notified = db.add_notification(new Notification()
         {
           Description = "not_contract_signed",
           ToUserId = member.Id,
@@ -94,7 +94,7 @@ public static class ContractsHelper
         return notified ? member.Id : 0;
       })
       .ToList();
-    self.helper.pusher_trigger_notification(notifiedUsers.Where(x => x > 0).ToList());
+    db.pusher_trigger_notification(notifiedUsers.Where(x => x > 0).ToList());
     return true;
   }
 }

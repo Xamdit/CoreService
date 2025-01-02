@@ -75,12 +75,12 @@ public static class ProjectsHelper
     return status;
   }
 
-  public static List<File> get_project_files(this HelperBase helperBase, int project_id)
+  public static List<File> get_project_files(this MyContext db, int project_id)
   {
     return new List<File>();
   }
 
-  public static List<Project> view_tasks(this HelperBase helperBase, List<string> args)
+  public static List<Project> view_tasks(this MyContext db, List<string> args)
   {
     return new List<Project>();
   }

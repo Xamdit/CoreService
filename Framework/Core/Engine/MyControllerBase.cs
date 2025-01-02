@@ -2,6 +2,7 @@ using System.Dynamic;
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Service.Entities;
 using Service.Framework.Schemas;
 
 namespace Service.Framework.Core.Engine;
@@ -111,7 +112,7 @@ public abstract class MyControllerBase : ControllerBase
   }
 
   [ApiExplorerSettings(IgnoreApi = true)] // Add this attribute to ignore the method from Swagger
-  protected JsonResult Show_404(string message = "")
+  protected JsonResult show_404(string message = "")
   {
     var json = new
     {
@@ -226,4 +227,8 @@ public abstract class MyControllerBase : ControllerBase
   {
     Init();
   }
+
+
+
+
 }

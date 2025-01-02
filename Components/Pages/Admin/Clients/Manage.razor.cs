@@ -43,7 +43,7 @@ public class ManageRazor : AdminComponentBase
   {
     if (!customers_view) return default;
     // Get the list of StaffIds first, outside the expression
-    var staffUserId = self.helper.get_staff_user_id();
+    var staffUserId = db.get_staff_user_id();
     var staffIds = db.CustomerAdmins
       .Where(x => x.StaffId == staffUserId)
       .Select(x => x.StaffId)
@@ -58,7 +58,7 @@ public class ManageRazor : AdminComponentBase
   {
     if (!customers_view) return default;
     // Get the list of StaffIds first, outside the expression
-    var staffUserId = self.helper.get_staff_user_id();
+    var staffUserId = db.get_staff_user_id();
     var staffIds = db.CustomerAdmins
       .Where(x => x.StaffId == staffUserId)
       .Select(x => x.StaffId)

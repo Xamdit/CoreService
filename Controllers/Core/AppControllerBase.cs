@@ -15,4 +15,10 @@ public class AppControllerBase(ILogger<MyControllerBase> logger, MyInstance self
     form_validation = new FormValidation(self.httpContextAccessor);
     self.controller = this;
   }
+
+  public (MyInstance, MyContext ) getInstance()
+  {
+    return (self, db);
+  }
+
 }

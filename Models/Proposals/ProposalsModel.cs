@@ -135,7 +135,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
     if (proposal.Assigned != 0)
       if (proposal.Assigned != staff_user_id)
       {
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_proposal_assigned_to_you",
           ToUserId = proposal.Assigned,
@@ -147,7 +147,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
           })
         });
         if (notified)
-          self.helper.pusher_trigger_notification(proposal.Assigned);
+          db.pusher_trigger_notification(proposal.Assigned);
       }
 
     if (dataset.Data.RelType == "lead")
@@ -240,7 +240,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
       if (current_proposal.Assigned != proposal_now.Assigned)
         if (proposal_now.Assigned != staff_user_id)
         {
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             Description = "not_proposal_assigned_to_you",
             ToUserId = proposal_now.Assigned,
@@ -251,7 +251,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
               proposal_now.Subject
             })
           });
-          if (notified) self.helper.pusher_trigger_notification(proposal_now.Assigned);
+          if (notified) db.pusher_trigger_notification(proposal_now.Assigned);
         }
     }
 
@@ -347,7 +347,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
     if (proposal == null) return false;
 
     db.Proposals.Where(x => x.Id == id).Update(x => new Proposal { Signature = null });
-    if (!string.IsNullOrEmpty(proposal.Signature)) self.helper.unlink($"{get_upload_path_by_type("proposal")}{id}/{proposal.Signature}");
+    if (!string.IsNullOrEmpty(proposal.Signature)) unlink($"{get_upload_path_by_type("proposal")}{id}/{proposal.Signature}");
 
     return true;
   }
@@ -382,7 +382,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
     var attachment = get_attachments(0, id).FirstOrDefault();
     var deleted = false;
     if (attachment == null) return deleted;
-    if (string.IsNullOrEmpty(attachment.External)) self.helper.unlink($"{get_upload_path_by_type("proposal")}{attachment.RelId}/{attachment.FileName}");
+    if (string.IsNullOrEmpty(attachment.External)) unlink($"{get_upload_path_by_type("proposal")}{attachment.RelId}/{attachment.FileName}");
 
     var affected_rows = db.Files.Where(x => x.Id == attachment.Id).Delete();
     if (affected_rows > 0)
@@ -391,12 +391,12 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
       log_activity($"Proposal Attachment Deleted [ID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(get_upload_path_by_type("proposal") + attachment.RelId)) return deleted;
+    if (!is_dir(get_upload_path_by_type("proposal") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(get_upload_path_by_type("proposal") + attachment.RelId);
+    var other_attachments = list_files(get_upload_path_by_type("proposal") + attachment.RelId);
     if (!other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(get_upload_path_by_type("proposal") + attachment.RelId);
+      delete_dir(get_upload_path_by_type("proposal") + attachment.RelId);
 
     return deleted;
   }
@@ -435,7 +435,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
       notifiedUsers = staff_proposal
         .Select(member =>
         {
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             Description = "not_proposal_comment_from_client",
             ToUserId = member.Id,
@@ -454,7 +454,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
         .ToList()
         .Where(x => x > 0)
         .ToList();
-      self.helper.pusher_trigger_notification(notifiedUsers.ToArray());
+      db.pusher_trigger_notification(notifiedUsers.ToArray());
     }
     else
     {
@@ -652,7 +652,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
       var notifiedUsers = new List<int>();
       notifiedUsers = staff_proposal.Select(x =>
         {
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             FromCompany = true,
             ToUserId = x.Id,
@@ -664,7 +664,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
         })
         .Where(x => x > 0)
         .ToList();
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      db.pusher_trigger_notification(notifiedUsers);
 
       // Send thank you to the customer email template
       if (status == 3)

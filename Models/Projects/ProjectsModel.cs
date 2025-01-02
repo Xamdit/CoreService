@@ -359,8 +359,8 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     // if (!client_logged_in && is_staff_logged_in())
     //   select += $",(SELECT staffid FROM  task_assigned WHERE taskid= tasks.id AND staffid={staff_user_id}) as current_user_is_assigned";
-    if (client_logged_in) query.Where(x => x.VisibleToClient);
-    if (!client_logged_in && !can_view_tasks && !show_all_tasks_for_project_member)
+    if (db.client_logged_in()) query.Where(x => x.VisibleToClient);
+    if (!db.client_logged_in() && !can_view_tasks && !show_all_tasks_for_project_member)
       query = query.Where(x =>
         db.TaskAssigneds.Any(a => a.StaffId == staff_user_id && a.TaskId == x.Id) ||
         db.TaskFollowers.Any(f => f.StaffId == staff_user_id && f.TaskId == x.Id) ||
@@ -457,14 +457,14 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
   public List<ProjectFile> get_files(int project_id)
   {
     var query = db.ProjectFiles.Where(x => x.ProjectId == project_id).AsQueryable();
-    if (client_logged_in) query = query.Where(x => x.VisibleToCustomer);
+    if (db.client_logged_in()) query = query.Where(x => x.VisibleToCustomer);
     return query.ToList();
   }
 
   public ProjectFile? get_file(int id, int? project_id = null)
   {
     var query = db.ProjectFiles.Where(x => x.Id == id).AsQueryable();
-    if (client_logged_in) query = query.Where(x => x.VisibleToCustomer);
+    if (db.client_logged_in()) query = query.Where(x => x.VisibleToCustomer);
     var file = query.FirstOrDefault();
     if (file == null || !project_id.HasValue) return file;
     return file.ProjectId != project_id ? null : file;
@@ -512,12 +512,12 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       var fullPath = path + file.FileName;
       if (file_exists(fullPath))
       {
-        self.helper.unlink(fullPath);
-        var fname = self.helper.file_name(fullPath);
+        unlink(fullPath);
+        var fname = file_name(fullPath);
         var fext = self.helper.file_extension(fullPath);
         var thumbPath = $"{path}{fname}_thumb.{fext}";
         if (file_exists(thumbPath))
-          self.helper.unlink(thumbPath);
+          unlink(thumbPath);
       }
     }
 
@@ -534,11 +534,11 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
     // Delete discussion comments
     this.delete_discussion_comments(id, "file");
 
-    if (!self.helper.is_dir(get_upload_path_by_type("project") + file.ProjectId)) return true;
+    if (!is_dir(get_upload_path_by_type("project") + file.ProjectId)) return true;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(get_upload_path_by_type("project") + file.ProjectId);
+    var other_attachments = list_files(get_upload_path_by_type("project") + file.ProjectId);
     if (other_attachments.Any())
-      self.helper.delete_dir(get_upload_path_by_type("project") + file.ProjectId);
+      delete_dir(get_upload_path_by_type("project") + file.ProjectId);
     return true;
   }
 
@@ -1009,7 +1009,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       if (db.is_client_logged_in())
       {
-        activity.ContactId = self.helper.get_contact_user_id();
+        activity.ContactId = db.get_contact_user_id();
         activity.StaffId = 0;
         activity.FullName = self.helper.get_contact_full_name(activity.ContactId);
       }
@@ -1017,7 +1017,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         activity.ContactId = 0;
         activity.StaffId = staff_user_id;
-        activity.FullName = self.helper.get_staff_full_name(activity.StaffId);
+        activity.FullName = db.get_staff_full_name(activity.StaffId);
       }
     }
     else
@@ -1065,7 +1065,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         if (member.Id != staff_user_id)
         {
-          var notified = self.helper.add_notification(new Notification()
+          var notified = db.add_notification(new Notification()
           {
             FromUserId = staff_user_id,
             Description = "not_project_status_updated",
@@ -1085,6 +1085,6 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       .ToList();
 
 
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
   }
 }

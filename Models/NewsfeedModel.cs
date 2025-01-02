@@ -12,7 +12,7 @@ using File = Service.Entities.File;
 
 namespace Service.Models;
 
-public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private const int post_likes_limit = 6;
   private const int post_comment_likes_limit = 6;
@@ -162,7 +162,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self,db)
         // continue 2;
       });
       if (post.Creator == member.Id) return;
-      var notified = self.helper.add_notification(new Notification
+      var notified = db.add_notification(new Notification
       {
         Description = "not_published_new_post",
         ToUserId = member.Id,
@@ -171,7 +171,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self,db)
 
       if (notified) notifiedUsers.Add(member.Id);
     });
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
     return postid;
   }
 
@@ -240,20 +240,20 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self,db)
     if (!result.IsAdded()) return 0;
     // var post = this.get_post(post['postid']);
     dynamic post = new ExpandoObject();
-    if (post.creator == self.helper.get_staff_user_id()) return insert_id;
-    var notified = self.helper.add_notification(new Notification
+    if (post.creator == db.get_staff_user_id()) return insert_id;
+    var notified = db.add_notification(new Notification
     {
       Description = "not_commented_your_post",
       ToUserId = post.creator,
       Link = "#postid=" + comment.PostId,
       AdditionalData = JsonConvert.SerializeObject(new[]
       {
-        self.helper.get_staff_full_name(self.helper.get_staff_user_id()),
+        db.get_staff_full_name(db.get_staff_user_id()),
         $"{post.content}"[..50]
       })
     });
     if (notified)
-      self.helper.pusher_trigger_notification(new List<int> { post.creator });
+      db.pusher_trigger_notification(new List<int> { post.creator });
     return insert_id;
   }
 
@@ -291,11 +291,11 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self,db)
   public bool delete_post(int postid)
   {
     var post = db.NewsfeedPosts
-      .FirstOrDefault(p => p.Id == postid && (p.Creator == staff_user_id || is_admin));
+      .FirstOrDefault(p => p.Id == postid && (p.Creator == staff_user_id || db.is_admin()));
 
     if (post == null) return false;
     db.NewsfeedPosts
-      .Where(p => p.Id == postid && (p.Creator == staff_user_id || is_admin))
+      .Where(p => p.Id == postid && (p.Creator == staff_user_id || db.is_admin()))
       .Delete();
 
     db.NewsfeedPostLikes.RemoveRange(
