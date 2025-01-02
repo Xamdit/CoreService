@@ -236,53 +236,53 @@ public static class ProjectMemberExtension
     return result.Entity.Id;
   }
 
-  public static bool send_project_email_template(this ProjectsModel model, int project_id, string staff_template, string customer_template, bool action_visible_to_customer, dynamic additional_data = default)
-  {
-    var (self, db) = model.getInstance();
-    if (additional_data != null)
-    {
-      additional_data.Customers = new List<object>();
-      additional_data.staff = new List<object>();
-    }
-    else if (additional_data.Count() == 1)
-    {
-      if (!additional_data.IsStaff)
-        additional_data.Staff = new List<Staff>();
-      else
-        additional_data.customers = new List<Contact>();
-    }
-
-    var project = model.get(x => x.Id == project_id);
-    model.get_project_members(project_id)
-      .ForEach(member =>
-      {
-        if (db.is_staff_logged_in() && member.StaffId == db.get_staff_user_id()) return;
-        var mailTemplate = model.mail_template(staff_template, project, member, additional_data.staff);
-        if (additional_data.Attachments.Any())
-          foreach (var attachment in additional_data.Attachments)
-            mailTemplate.add_attachment(attachment);
-        mailTemplate.send();
-      });
-
-    if (action_visible_to_customer != true) return true;
-    var clients_model = self.clients_model(db);
-    var contacts = clients_model.get_contacts_for_project_notifications(project_id, "project_emails");
-    contacts
-      .Where(contact => !db.client_logged_in() || contact.Id != db.get_contact_user_id())
-      .Select(contact =>
-      {
-        var mailTemplate = model.mail_template(customer_template, project, contact, additional_data.customers);
-        if (additional_data.Attachments)
-          foreach (var attachment in additional_data.Attachments)
-            mailTemplate.add_attachment(attachment);
-        mailTemplate.send();
-        return true;
-      })
-      .ToList();
-
-
-    return true;
-  }
+  // public static bool send_project_email_template(this ProjectsModel model, int project_id, string staff_template, string customer_template, bool action_visible_to_customer, dynamic additional_data = default)
+  // {
+  //   var (self, db) = model.getInstance();
+  //   if (additional_data != null)
+  //   {
+  //     additional_data.Customers = new List<object>();
+  //     additional_data.staff = new List<object>();
+  //   }
+  //   else if (additional_data.Count() == 1)
+  //   {
+  //     if (!additional_data.IsStaff)
+  //       additional_data.Staff = new List<Staff>();
+  //     else
+  //       additional_data.customers = new List<Contact>();
+  //   }
+  //
+  //   var project = model.get(x => x.Id == project_id);
+  //   model.get_project_members(project_id)
+  //     .ForEach(member =>
+  //     {
+  //       if (db.is_staff_logged_in() && member.StaffId == db.get_staff_user_id()) return;
+  //       var mailTemplate = model.mail_template(staff_template, project, member, additional_data.staff);
+  //       if (additional_data.Attachments.Any())
+  //         foreach (var attachment in additional_data.Attachments)
+  //           mailTemplate.add_attachment(attachment);
+  //       mailTemplate.send();
+  //     });
+  //
+  //   if (action_visible_to_customer != true) return true;
+  //   var clients_model = self.clients_model(db);
+  //   var contacts = clients_model.get_contacts_for_project_notifications(project_id, "project_emails");
+  //   contacts
+  //     .Where(contact => !db.client_logged_in() || contact.Id != db.get_contact_user_id())
+  //     .Select(contact =>
+  //     {
+  //       var mailTemplate = model.mail_template(customer_template, project, contact, additional_data.customers);
+  //       if (additional_data.Attachments)
+  //         foreach (var attachment in additional_data.Attachments)
+  //           mailTemplate.add_attachment(attachment);
+  //       mailTemplate.send();
+  //       return true;
+  //     })
+  //     .ToList();
+  //
+  //
+  //   return true;
+  // }
 
   public static List<Project> get_project_billing_data(this ProjectsModel model, int id)
   {

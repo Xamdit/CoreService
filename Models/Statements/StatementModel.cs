@@ -9,7 +9,7 @@ using Service.Models.Invoices;
 
 namespace Service.Models.Statements;
 
-public class StatementModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class StatementModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private ClientsModel clients_model = self.clients_model(db);
   private CurrenciesModel currencies_model = self.currencies_model(db);
@@ -196,7 +196,7 @@ public class StatementModel(MyInstance self, MyContext db) : MyModel(self,db)
 
         var contact = clients_model.get_contact(contactId);
 
-        var template = mail_template("customer_statement", contact.Email, contactId, statement, cc);
+        var template = this.mail_template("customer_statement", contact.Email, contactId, statement, cc);
         // var attachment = new
         // {
         //   attachment = attach,
