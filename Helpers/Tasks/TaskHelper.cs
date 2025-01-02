@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers.Entities;
 using Service.Helpers.Proposals;
@@ -15,10 +17,10 @@ using static StaffHelper;
 public static class TaskHelper
 {
   // Function that formats task status for the final user
-  public static string format_task_status(this HelperBase helper, DataSet<Task> status = null, bool text = false, bool clean = false)
+  public static string format_task_status(this MyModel model, DataSet<Task> status = null, bool text = false, bool clean = false)
   {
-    var (self, db) = getInstance();
-    status ??= helper.get_task_status_by_id(status.Data?.Id ?? 0);
+    var (self, db) = model.getInstance();
+    status ??= model.get_task_status_by_id(status.Data?.Id ?? 0);
     // var statusName = hooks.apply_filters("task_status_name", status.Name, status);
     var statusName = hooks.apply_filters("task_status_name", status.Data.Name);
 
@@ -30,7 +32,7 @@ public static class TaskHelper
     if (!text)
     {
       color = status.Options.FirstOrDefault(x => x.Name == "color")?.Value ?? "#333";
-      style = $"color:{color};border:1px solid {helper.adjust_hex_brightness(color, 0.4)};background: {helper.adjust_hex_brightness(color, 0.04)};";
+      style = $"color:{color};border:1px solid {adjust_hex_brightness(color, 0.4)};background: {adjust_hex_brightness(color, 0.04)};";
       cssClass = "label";
     }
     else
@@ -44,7 +46,6 @@ public static class TaskHelper
   // Return predefined tasks priorities
   public static List<TaskPriority> GetTasksPriorities(this HelperBase helper)
   {
-    var (self, db) = getInstance();
     return hooks.apply_filters("tasks_priorities", new List<TaskPriority>
     {
       new() { Id = 1, Name = "Low", Color = "#777" },
@@ -55,25 +56,20 @@ public static class TaskHelper
   }
 
   // Get project name by passed id
-  public static string get_task_subject_by_dd(this HelperBase helper, int id)
+  public static string get_task_subject_by_dd(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var task = db.Tasks.FirstOrDefault(t => t.Id == id);
     return task?.Name ?? string.Empty;
   }
 
   // Get task status by passed task id
   // public static TaskOption? get_task_status_by_id(this HelperBase helper, int id)
-  public static DataSet<Task>? get_task_status_by_id(this HelperBase helper, int id)
+  public static DataSet<Task>? get_task_status_by_id(this MyModel model, int id)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var tasks_model = self.tasks_model(db);
-
     var statuses = tasks_model.get_statuses();
-
     var output = new DataSet<Task>();
-
-
     var status = new TaskOption
     {
       id = 0,
@@ -109,7 +105,7 @@ public static class TaskHelper
   }
 
   // Format HTML task assignees
-  public static string FormatMembersByIdsAndNames(this HelperBase helper, string ids, string names, string size = "md")
+  public static string FormatMembersByIdsAndNames(this MyContext db, string ids, string names, string size = "md")
   {
     if (string.IsNullOrEmpty(ids)) return string.Empty;
 
@@ -122,7 +118,7 @@ public static class TaskHelper
       assignees.ForEach(assigned =>
       {
         if (assigned == 0) return;
-        outputAssignees += $"<a href=\"/profile/{assigneeId}\">{helper.staff_profile_image(assigneeId, size)}</a>";
+        outputAssignees += $"<a href=\"/profile/{assigneeId}\">{db.staff_profile_image(assigneeId, size)}</a>";
         exportAssignees += assigned + ", ";
       });
     });
@@ -136,13 +132,13 @@ public static class TaskHelper
   }
 
   // Format task relation name
-  public static string TaskRelName(this HelperBase helper, string relName, int relId, string relType)
+  public static string TaskRelName(this MyContext db, string relName, int relId, string relType)
   {
     return relType switch
     {
-      "invoice" => helper.format_invoice_number(relId),
-      "estimate" => helper.format_estimate_number(relId),
-      "proposal" => helper.format_proposal_number(relId),
+      "invoice" => db.format_invoice_number(relId),
+      "estimate" => db.format_estimate_number(relId),
+      "proposal" => db.format_proposal_number(relId),
       _ => relName
     };
   }
@@ -175,9 +171,9 @@ public static class TaskHelper
  * @param  mixed $id
  * @return string
  */
-  public static string get_task_subject_by_id(this HelperBase helper, int id)
+  public static string get_task_subject_by_id(this MyModel model, int id)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var task = db.Tasks
       .FirstOrDefault(x => x.Id == id);
     return task == null ? task.Name : string.Empty;
@@ -189,9 +185,9 @@ public static class TaskHelper
  * Other statement will be included the tasks to be visible for this user only if Show All Tasks For Project Members is set to YES
  * @return string
  */
-  public static Expression<Func<Task, bool>> get_tasks_where_string(this HelperBase helper, bool table = true)
+  public static Expression<Func<Task, bool>> get_tasks_where_string(this MyModel model, bool table = true)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var staffUserId = db.get_staff_user_id(); // Assuming a method to get the staff user ID like get_staff_user_id()
     var showAllTasksForProjectMember = db.get_option_compare("show_all_tasks_for_project_member", 1); // Assuming a GetOption method
 
@@ -223,9 +219,9 @@ public static class TaskHelper
    *
    * @return int
    */
-  public static double task_timer_round(this HelperBase helper, int seconds)
+  public static double task_timer_round(this MyModel model, int seconds)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var roundMinutes = db.get_option<int>("round_off_task_timer_time");
     var roundSeconds = roundMinutes * 60;
     return db.get_option<int>("round_off_task_timer_option") switch

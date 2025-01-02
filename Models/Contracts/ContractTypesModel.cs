@@ -107,7 +107,7 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self, d
       {
         new()
         {
-          Label = self.helper.label("contract_summary_by_type"),
+          Label = label("contract_summary_by_type"),
           BackgroundColor = "rgba(3,169,244,0.2)",
           BorderColor = "#03a9f4",
           BorderWidth = 1,
@@ -135,7 +135,7 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self, d
       var view_contract = db.has_permission("contracts", 0, "view");
       if (!view_contract)
       {
-        var staff_user_id = this.staff_user_id;
+        var staff_user_id = db.get_staff_user_id();
         query = query.Where(x => x.AddedFrom == staff_user_id);
       }
 
@@ -151,7 +151,7 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self, d
       {
         new()
         {
-          Label = self.helper.label("contract_summary_by_type_value"),
+          Label = label("contract_summary_by_type_value"),
           BackgroundColor = "rgba(37,155,35,0.2)",
           BorderColor = "#84c529",
           Tension = false,

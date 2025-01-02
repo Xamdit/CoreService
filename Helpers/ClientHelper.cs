@@ -71,37 +71,37 @@ public static class ClientHelper
       new()
       {
         Id = 1,
-        Name = helper.label("customer_permission_invoice"),
+        Name = label("customer_permission_invoice"),
         ShortName = "invoices"
       },
       new()
       {
         Id = 2,
-        Name = helper.label("customer_permission_estimate"),
+        Name = label("customer_permission_estimate"),
         ShortName = "estimates"
       },
       new()
       {
         Id = 3,
-        Name = helper.label("customer_permission_contract"),
+        Name = label("customer_permission_contract"),
         ShortName = "contracts"
       },
       new()
       {
         Id = 4,
-        Name = helper.label("customer_permission_proposal"),
+        Name = label("customer_permission_proposal"),
         ShortName = "proposals"
       },
       new()
       {
         Id = 5,
-        Name = helper.label("customer_permission_support"),
+        Name = label("customer_permission_support"),
         ShortName = "support"
       },
       new()
       {
         Id = 6,
-        Name = helper.label("customer_permission_projects"),
+        Name = label("customer_permission_projects"),
         ShortName = "projects"
       }
     };

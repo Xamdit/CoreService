@@ -161,7 +161,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self, db)
       $"<a href='{self.navigation.admin_url($"payments/payment/{paymentId}")}' target='_blank'>#{paymentId}</a>"
     }));
 
-    log_activity($"Payment Recorded [ID : {paymentId}, Invoice Number: {self.helper.format_invoice_number(invoiceId)}, Total: {db.app_format_money(amount, invoice.Currency.Name)}]");
+    log_activity($"Payment Recorded [ID : {paymentId}, Invoice Number: {db.format_invoice_number(invoiceId)}, Total: {db.app_format_money(amount, invoice.Currency.Name)}]");
   }
 
   private void NotifyStaffAndCustomers(InvoicePaymentRecord data, int paymentId)
@@ -209,7 +209,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self, db)
       db.app_format_money(Convert.ToDecimal(current.Amount), current.Invoice.Currency.Name)
     }));
 
-    log_activity($"Payment Deleted [ID : {id}, Invoice Number: {self.helper.format_invoice_number(current.InvoiceId.Value)}]");
+    log_activity($"Payment Deleted [ID : {id}, Invoice Number: {db.format_invoice_number(current.InvoiceId.Value)}]");
 
     hooks.do_action("after_payment_deleted", new { paymentId = id, invoiceId = current.InvoiceId });
 

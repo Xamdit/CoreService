@@ -111,7 +111,7 @@ public static class ProjectMemberExtension
       if (!can_view_project)
         query.Where(x =>
           db.ProjectMembers
-            .Where(y => y.StaffId == model.staff_user_id)
+            .Where(y => y.StaffId == db.get_staff_user_id())
             .Select(y => y.ProjectId)
             .ToList()
             .Contains(x.ProjectId)
@@ -136,7 +136,7 @@ public static class ProjectMemberExtension
         var _additional_data = activity.Data.AdditionalData;
         if (seconds != "")
           _additional_data = $"<seconds>{seconds}</seconds>".Replace(seconds_to_time_format(Convert.ToInt32(seconds)), _additional_data);
-        if (other_lang_keys != "") _additional_data = $"<lang>{other_lang_keys}</lang>".Replace(helper.label(other_lang_keys), _additional_data);
+        if (other_lang_keys != "") _additional_data = $"<lang>{other_lang_keys}</lang>".Replace(label(other_lang_keys), _additional_data);
         if (_additional_data.Contains("project_status_"))
         {
           var row = model.get_project_status_by_id(Convert.ToInt32(strafter(_additional_data, "project_status_")));
@@ -144,7 +144,7 @@ public static class ProjectMemberExtension
             _additional_data = row.Name;
         }
 
-        activity.Data.DescriptionKey = helper.label(activity.Data.DescriptionKey);
+        activity.Data.DescriptionKey = label(activity.Data.DescriptionKey);
         activity.Data.AdditionalData = _additional_data;
         activity.Data.Project.Name = db.get_project_name_by_id(activity.Data.Id);
         activity.Data.DescriptionKey = null;
@@ -172,14 +172,14 @@ public static class ProjectMemberExtension
     if (db.client_logged_in())
       notification_data.FromClientId = db.get_contact_user_id();
     else
-      notification_data.FromUserId = model.staff_user_id;
+      notification_data.FromUserId = db.get_staff_user_id();
 
 
     var members = model.get_project_members(project_id);
     var notifiedUsers = members
       .Select(member =>
       {
-        if (member.StaffId == model.staff_user_id && !db.client_logged_in()) return 0;
+        if (member.StaffId == db.get_staff_user_id() && !db.client_logged_in()) return 0;
         notification_data.ToUserId = member.StaffId;
         return db.add_notification(notification_data)
           ? member.StaffId
@@ -224,7 +224,7 @@ public static class ProjectMemberExtension
     insert.Subject = file?.FileName;
     insert.ExternalLink = file?.ExternalLink;
 
-    insert.FileType = self.get_mime_by_extension(file.FileName);
+    insert.FileType = get_mime_by_extension(file.FileName);
     if (!string.IsNullOrEmpty(file.ThumbnailLink))
       insert.ThumbnailLink = file.ThumbnailLink;
     if (data.StaffId > 0)
@@ -256,7 +256,7 @@ public static class ProjectMemberExtension
     model.get_project_members(project_id)
       .ForEach(member =>
       {
-        if (db.is_staff_logged_in() && member.StaffId == model.staff_user_id) return;
+        if (db.is_staff_logged_in() && member.StaffId == db.get_staff_user_id()) return;
         var mailTemplate = mail_template(staff_template, project, member, additional_data.staff);
         if (additional_data.Attachments.Any())
           foreach (var attachment in additional_data.Attachments)
@@ -394,7 +394,7 @@ public static class ProjectMemberExtension
     var staff_model = self.staff_model(db);
     staff
       .Select(x => x.Id)
-      .Where(staffId => !db.is_staff_logged_in() || staffId != model.staff_user_id)
+      .Where(staffId => !db.is_staff_logged_in() || staffId != db.get_staff_user_id())
       .Select(staffId => staff_model.get(x => x.Id == staffId).FirstOrDefault())
       // .Select(member =>  helper.mail_template(staff_template, project, member, additional_data.Staff))
       .Select(member => mail_template(staff_template, project, member, convert<Staff>(additional_data)))

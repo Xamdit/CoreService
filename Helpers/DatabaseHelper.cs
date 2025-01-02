@@ -53,8 +53,6 @@ public static class DatabaseHelper
    */
   public static bool add_notification(this MyContext db, Notification data)
   {
-
-
     var staff_user_id = db.get_staff_user_id();
     // var staff_user_id =Convert.ToByte( await get_staff_user_id());
     var _is_client_logged_in = db.is_client_logged_in();
@@ -62,14 +60,14 @@ public static class DatabaseHelper
     {
       data.FromUserId = 0;
 
-      data.FromClientId = helper.get_contact_user_id();
-      data.FromFullname = helper.get_contact_full_name(helper.get_contact_user_id());
+      data.FromClientId = db.get_contact_user_id();
+      data.FromFullname = db.get_contact_full_name(db.get_contact_user_id());
     }
     else
     {
       data.FromUserId = staff_user_id;
       data.FromClientId = 0;
-      data.FromFullname = helper.get_staff_full_name(staff_user_id);
+      data.FromFullname = db.get_staff_full_name(staff_user_id);
     }
 
     if (data.FromCompany.HasValue)
@@ -127,9 +125,8 @@ public static class DatabaseHelper
    * @param  mixed id department id
    * @return mixed
    */
-  private static string get_department_email(this HelperBase helper, int id)
+  private static string get_department_email(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var row = db.Departments.FirstOrDefault(x => x.Id == id);
     return row == null ? string.Empty : row.Email;
   }
@@ -199,7 +196,6 @@ public static class DatabaseHelper
 
   public static bool pusher_trigger_notification(this MyContext db, params int[] users)
   {
-
     if (db.get_option_compare("pusher_realtime_notifications", 0)) return false;
     if (!users.ToList().Any()) return false;
     var channels = users.Select(x => $"notifications-channel-{x}")

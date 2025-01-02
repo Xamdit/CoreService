@@ -87,7 +87,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (!canViewAllInvoices)
     {
       // Apply the staff-specific filter based on their permissions
-      var staffFilter = await self.helper.get_invoices_where_sql_for_staff(staff_user_id);
+      var staffFilter = await db.get_invoices_where_sql_for_staff(db.get_staff_user_id());
       invoicesQuery = invoicesQuery.Where(staffFilter);
     }
 
@@ -263,7 +263,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
     }
     else
     {
-      var temp = staff_user_id;
+      var temp = db.get_staff_user_id();
       staffid = $"{temp}";
       full_name = db.get_staff_full_name(temp);
     }
@@ -341,7 +341,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
     var hasPermissionView = db.has_permission("invoices", "view");
     var hasPermissionViewOwn = db.has_permission("invoices", "view_own");
     var allowStaffViewInvoicesAssigned = db.get_option("allow_staff_view_invoices_assigned");
-    var noPermissionsQuery = self.helper.get_invoices_where_sql_for_staff(staff_user_id);
+    var noPermissionsQuery = db.get_invoices_where_sql_for_staff(db.get_staff_user_id());
 
     for (var i = 1; i <= 3; i++)
     {
@@ -401,7 +401,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
     var where = CreateCondition<Expense>(x => x.Billable == true && x.ClientId == client_id && x.InvoiceId == null);
     var can_view_expenses = db.has_permission("expenses", "", "view");
     var output = expenses_model.get(where);
-    if (!can_view_expenses) output = output.Where(x => x.AddedFrom == staff_user_id).ToList();
+    if (!can_view_expenses) output = output.Where(x => x.AddedFrom == db.get_staff_user_id()).ToList();
     return output;
   }
 
@@ -417,7 +417,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
         !string.IsNullOrEmpty(is_last_invoice(id)))
       return false;
 
-    var number = self.helper.format_invoice_number(id);
+    var number = db.format_invoice_number(id);
     var isDraft = is_draft(id);
 
     hooks.do_action("before_invoice_deleted", id);
@@ -582,7 +582,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
     insert.NumberFormat = db.get_option<int>("invoice_number_format");
     insert.DateCreated = DateTime.Now;
     var save_and_send = isset(data, "save_and_send");
-    insert.AddedFrom = !defined("CRON") ? staff_user_id : 0;
+    insert.AddedFrom = !defined("CRON") ? db.get_staff_user_id() : 0;
     insert.CancelOverdueReminders = isset(data, "cancel_overdue_reminders") ? 1 : 0;
     insert.AllowedPaymentModes = isset(data, "allowed_payment_modes") ? JsonConvert.SerializeObject(data.AllowedPaymentModes) : JsonConvert.SerializeObject(new { });
 
@@ -672,7 +672,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
         {
           merged = true;
           var admin_note = or_merge.AdminNote;
-          var note = "Merged into invoice " + self.helper.format_invoice_number(insert_id);
+          var note = "Merged into invoice " + db.format_invoice_number(insert_id);
           if (!string.IsNullOrEmpty(admin_note))
             admin_note += "\n\r" + note;
           else
@@ -840,13 +840,13 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         var statement = convert<StatementResult>(clients_model.get_statement(invoice.ClientId, attachStatement.from, attachStatement.to));
         var statementPdf = PdfHelper.statement_pdf(self.helper, statement);
-        // statementPdfFileName = db.slug_it(self.helper.label("customer_statement") + "-" + statement.Client.company);
+        // statementPdfFileName = db.slug_it(label("customer_statement") + "-" + statement.Client.company);
         attachStatementPdf = statementPdf.Output(statementPdfFileName + ".pdf");
       }
 
       status_updated = self.helper.update_invoice_status(invoice.Id, true, true);
 
-      var invoice_number = self.helper.format_invoice_number(invoice.Id);
+      var invoice_number = db.format_invoice_number(invoice.Id);
 
       if (attachpdf)
       {
@@ -956,7 +956,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
     }
     else
     {
-      staffid = $"{staff_user_id}";
+      staffid = $"{db.get_staff_user_id()}";
       full_name = db.get_staff_full_name(db.get_staff_user_id());
     }
 

@@ -1,5 +1,6 @@
 using System.Web;
 using Microsoft.AspNetCore.Components;
+using Service.Core.Extensions;
 using Service.Core.Synchronus;
 using Service.Entities;
 using Service.Framework.Core.Engine;
@@ -60,7 +61,7 @@ public static class StaffHelper
  * @param  array   $img_attrs additional <img /> attributes
  * @return string
  */
-  public static string staff_profile_image(this MyContext db, int staff_id, string classes = null, string type = "small", Dictionary<string, string> imgAttrs = null)
+  public static string staff_profile_image(this MyContext db, int staff_id, string? classes = null, string type = "small", Dictionary<string, string> imgAttrs = null)
   {
     return db.staff_profile_image(staff_id, new List<string> { classes }, type, imgAttrs);
   }
@@ -92,24 +93,22 @@ public static class StaffHelper
  * @param  mixed $id staff id
  * @return mixed
  */
-  public static Staff get_staff(this HelperBase helper, int? id = null)
+  public static Staff? get_staff(this MyModel model, int? id = null)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var staff_model = self.staff_model(db);
-    if (!id.HasValue && self.cache.has("current_user"))
-    {
-      var current_user = self.cache.get("current_user");
-      if (current_user != null)
-      {
-        var rows = staff_model.get(x => x.Id == number(current_user));
-        return rows.FirstOrDefault();
-      }
-    }
+    if (id.HasValue || !self.cache.has("current_user"))
+      return id.HasValue
+        ? staff_model.get(x => x.Id == id.Value).FirstOrDefault()
+        : null;
 
-    // Staff not logged in
-    return id.HasValue
-      ? staff_model.get(x => x.Id == id.Value).FirstOrDefault()
-      : null;
+    var current_user = self.cache.get("current_user");
+    if (current_user == null)
+      return id.HasValue
+        ? staff_model.get(x => x.Id == id.Value).FirstOrDefault()
+        : null;
+    var rows = staff_model.get(x => x.Id == number(current_user));
+    return rows.FirstOrDefault();
   }
 
   /**
@@ -118,9 +117,8 @@ public static class StaffHelper
  * @param  string $type
  * @return string
  */
-  public static string staff_profile_image_url(int staff_id, string type = "small")
+  public static string staff_profile_image_url(this MyContext db, int staff_id, string type = "small")
   {
-    var (self, db) = getInstance();
     var url = base_url("assets/images/user-placeholder.jpg");
     var staff = staff_id == db.get_staff_user_id() && globals<Staff?>("current_user") != null
       ? globals<Staff?>("current_user")

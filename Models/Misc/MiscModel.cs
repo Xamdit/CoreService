@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
-using Service.Framework.Core.Extensions;
-using Service.Framework.Helpers;
 using Service.Helpers;
 using Service.Helpers.Sale;
 using Service.Models.Tasks;
@@ -108,7 +106,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
       RelType = rel_type,
       AttachmentKey = uuid(),
       StaffId = !attachment.StaffId.HasValue
-        ? staff_user_id
+        ? db.get_staff_user_id()
         // Replace with your actual method to get staff user ID
         : attachment.StaffId.Value
       // Replace with your hash generation logic
@@ -132,7 +130,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
       var pathParts = Path.GetExtension(attachment.FileName);
       data.FileName = attachment.FileName;
       data.ExternalLink = attachment.ExternalLink;
-      data.FileType = string.IsNullOrEmpty(attachment.FileType) ? self.helper.get_mime_by_extension(pathParts) : attachment.FileType; // Implement GetMimeByExtension as needed
+      data.FileType = string.IsNullOrEmpty(attachment.FileType) ? get_mime_by_extension(pathParts) : attachment.FileType; // Implement GetMimeByExtension as needed
       data.External = external;
 
       if (!string.IsNullOrEmpty(attachment.ThumbnailLink)) data.ThumbnailLink = attachment.ThumbnailLink;
@@ -201,7 +199,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
     // If the user doesn't have full expense view permission, limit to their own entries
     if (!hasPermissionExpensesView)
     {
-      var currentUserId = staff_user_id;
+      var currentUserId = db.get_staff_user_id();
       expensesQuery = expensesQuery.Where(e => e.AddedFrom == currentUserId);
     }
 
@@ -257,7 +255,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
     // Handle permission logic
     if (!hasPermissionViewEstimates)
     {
-      var noPermissionQuery = db.get_estimates_where_sql_for_staff(staff_user_id);
+      var noPermissionQuery = db.get_estimates_where_sql_for_staff(db.get_staff_user_id());
       estimatesQuery = estimatesQuery.Where(noPermissionQuery);
     }
 
@@ -334,7 +332,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       Result = new List<Project>(),
       Type = "projects",
-      SearchHeading = self.helper.label("projects")
+      SearchHeading = label("projects")
     };
 
     var hasPermissionViewProject = db.has_permission("projects", "", "view");
@@ -345,7 +343,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
       .Where(condition)
       .AsQueryable();
     if (!hasPermissionViewProject)
-      query = query.Where(x => x.ProjectMembers.Where(y => y.StaffId == staff_user_id).Select(y => y.ProjectId).ToList().Contains(x.Id));
+      query = query.Where(x => x.ProjectMembers.Where(y => y.StaffId == db.get_staff_user_id()).Select(y => y.ProjectId).ToList().Contains(x.Id));
 
     query = !q.StartsWith("#")
       ? query.Where(x =>
@@ -391,7 +389,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
     query = PreprocessQuery(query);
 
     // Permission-based filtering
-    var noPermissionQuery = GetProposalsWhereSqlForStaff(staff_user_id);
+    var noPermissionQuery = GetProposalsWhereSqlForStaff(db.get_staff_user_id());
 
     var proposalsQuery = db.Proposals
       .Include(p => p.Currency)

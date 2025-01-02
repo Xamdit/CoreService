@@ -13,7 +13,7 @@ public class PrivacyPolicyController(ILogger<ClientControllerBase> logger, MyIns
   public IActionResult index()
   {
     data.policy = db.get_option("privacy_policy");
-    data.title = self.helper.label("privacy_policy") + " - " + db.get_option("companyname");
+    data.title = label("privacy_policy") + " - " + db.get_option("companyname");
     return MakeSuccess(data);
   }
 }

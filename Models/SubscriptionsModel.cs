@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
-using Service.Framework.Core.Extensions;
 using Service.Helpers;
 using Service.Models.Invoices;
 

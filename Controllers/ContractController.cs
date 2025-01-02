@@ -19,7 +19,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
   public IActionResult Index([FromQuery] int id, [FromQuery] string hash)
   {
     var contractsModel = self.contracts_model(db);
-    self.helper.check_contract_restrictions(id, hash);
+    this.check_contract_restrictions(id, hash);
     var rows = contractsModel.get(x => x.Id == id);
     if (rows.Count == 0)
       return NotFound();
@@ -54,7 +54,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
   public IActionResult Index([FromForm] int id, [FromForm] string hash, [FromForm] string action, [FromForm] string signature, [FromForm] string content)
   {
     var contractsModel = self.contracts_model(db);
-    self.helper.check_contract_restrictions(id, hash);
+    this.check_contract_restrictions(id, hash);
     var contract = contractsModel.get(x => x.Id == id);
     if (contract.Count == 0)
       return NotFound();

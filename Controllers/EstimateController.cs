@@ -39,7 +39,7 @@ public class EstimateController(ILogger<EstimateController> logger, MyInstance s
       {
         accepted = true;
         var _invoice = invoices_model.get(success.invoice.Id);
-        set_alert("success", self.helper.label("clients_estimate_invoiced_successfully"));
+        set_alert("success", label("clients_estimate_invoiced_successfully"));
         redURL = self.helper.site_url("invoice/" + _invoice.Id + "/" + _invoice.Hash);
       }
       else if ((self.helper.is_array(success) && success.invoice == null) || success.is_success)
@@ -47,16 +47,16 @@ public class EstimateController(ILogger<EstimateController> logger, MyInstance s
         if (action == 4)
         {
           accepted = true;
-          set_alert("success", self.helper.label("clients_estimate_accepted_not_invoiced"));
+          set_alert("success", label("clients_estimate_accepted_not_invoiced"));
         }
         else
         {
-          set_alert("success", self.helper.label("clients_estimate_declined"));
+          set_alert("success", label("clients_estimate_declined"));
         }
       }
       else
       {
-        set_alert("warning", self.helper.label("clients_estimate_failed_action"));
+        set_alert("warning", label("clients_estimate_failed_action"));
       }
 
       if (!(action == 4 && accepted)) return Redirect(redURL);

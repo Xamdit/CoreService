@@ -103,7 +103,7 @@ public static class ProjectMember3Extension
 //
   public static ProjectDiscussionComment get_discussion_comment(this ProjectsModel model, int id)
   {
-    var (self, db) = model.getInstance();
+    var (_, db) = model.getInstance();
     var comment = new DataSet<ProjectDiscussionComment>();
     // comment.Data = db.ProjectDiscussionComments.FirstOrDefault(x => x.Id == id);
     comment.Data = db.ProjectDiscussionComments.Find(id)!;
@@ -118,20 +118,19 @@ public static class ProjectMember3Extension
       comment.created_by_current_user = db.client_logged_in()
         ? false
         : comment.created_by_current_user = db.is_staff_logged_in()
-          ? comment.staff_id == model.staff_user_id
+          ? comment.Data.StaffId == db.get_staff_user_id()
           : false;
 
       // comment.created_by_admin = helper.is_admin(comment.staff_id);
       comment.created_by_admin = db.is_admin(comment.Data.StaffId);
-      comment.Data.profile_picture_url = staff_profile_image_url(comment.Data.StaffId);
+      comment.profile_picture_url = staff_profile_image_url(comment.Data.StaffId);
     }
 
     comment.Data.DateCreated *= 1000;
-    if (!string.IsNullOrEmpty(comment.Modified))
+    if (!string.IsNullOrEmpty(comment.Data.Modified))
       comment.Data.Modified = DateTime.Parse(comment.Data.Modified) * 1000;
     if (!string.IsNullOrEmpty(comment.Data.FileName))
       comment.file_url = site_url($"uploads/discussions/{comment.Data.DiscussionId}/{comment.Data.FileName}");
-
     return comment;
   }
 
@@ -168,7 +167,7 @@ public static class ProjectMember3Extension
         }
         else
         {
-          var value = !db.client_logged_in() && db.is_staff_logged_in() && comment.Data.StaffId == model.staff_user_id;
+          var value = !db.client_logged_in() && db.is_staff_logged_in() && comment.Data.StaffId == db.get_staff_user_id();
           comment.Options.Add(new Option()
           {
             Name = "created_by_current_user",
@@ -177,7 +176,7 @@ public static class ProjectMember3Extension
           comment.Options.Add(new Option()
           {
             Name = "created_by_admin",
-            Value = $"{comment.Data.StaffId.is_admin()}"
+            Value = $"{db.is_admin(comment.Data.StaffId)}"
           });
           comment.Options.Add(new Option()
           {
@@ -255,7 +254,7 @@ public static class ProjectMember3Extension
     else
     {
       _data.Data.ContactId = 0;
-      _data.Data.StaffId = model.staff_user_id;
+      _data.Data.StaffId = db.get_staff_user_id();
       _data.Data.FullName = db.get_staff_full_name(_data.Data.StaffId);
     }
 
@@ -318,7 +317,7 @@ public static class ProjectMember3Extension
     if (db.client_logged_in())
       notification_data.FromClientId = db.get_contact_user_id();
     else
-      notification_data.FromUserId = model.staff_user_id;
+      notification_data.FromUserId = db.get_staff_user_id();
     var notifiedUsers = new List<int>();
 
     var regex = "/data-mention-id='(d+)\'/";
@@ -329,7 +328,7 @@ public static class ProjectMember3Extension
       model.send_project_email_mentioned_users(discussion.ProjectId, "project_new_discussion_comment_to_staff", members.Select(x => db.staff(x)).ToList(), emailTemplateData);
       members.Select(memberId =>
         {
-          if (memberId == model.staff_user_id && !db.client_logged_in()) return 0;
+          if (memberId == db.get_staff_user_id() && !db.client_logged_in()) return 0;
           notification_data.ToUserId = memberId;
           return db.add_notification(notification_data) ? memberId : 0;
         })
@@ -347,7 +346,7 @@ public static class ProjectMember3Extension
         emailTemplateData
       );
       model.get_project_members(discussion.ProjectId)
-        .Where(member => member.StaffId != model.staff_user_id || db.client_logged_in())
+        .Where(member => member.StaffId != db.get_staff_user_id() || db.client_logged_in())
         .ToList()
         .ForEach(member =>
         {
@@ -457,7 +456,7 @@ public static class ProjectMember3Extension
     }
     else
     {
-      data.StaffId = model.staff_user_id;
+      data.StaffId = db.get_staff_user_id();
       data.ContactId = 0;
       data.ShowToCustomer = data.ShowToCustomer;
     }
@@ -569,7 +568,7 @@ public static class ProjectMember3Extension
       Deadline = data.Data.Deadline ?? null,
       Name = !string.IsNullOrEmpty(data.Data.Name) ? data.Data.Name : project.Data.Name,
       ProjectCreated = DateTime.Now,
-      AddedFrom = model.staff_user_id,
+      AddedFrom = db.get_staff_user_id(),
       DateFinished = null
     };
 
@@ -723,7 +722,7 @@ public static class ProjectMember3Extension
   public static string get_staff_notes(this ProjectsModel model, int project_id)
   {
     var (self, db) = model.getInstance();
-    var note = db.ProjectNotes.FirstOrDefault(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
+    var note = db.ProjectNotes.FirstOrDefault(x => x.ProjectId == project_id && x.StaffId == db.get_staff_user_id());
     return note?.Content;
   }
 
@@ -732,7 +731,7 @@ public static class ProjectMember3Extension
   {
     var (self, db) = model.getInstance();
     // Check if the note exists for this project;
-    var notes = db.ProjectNotes.FirstOrDefault(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
+    var notes = db.ProjectNotes.FirstOrDefault(x => x.ProjectId == project_id && x.StaffId == db.get_staff_user_id());
     if (notes != null)
     {
       var affected_rows = db.ProjectNotes
@@ -746,7 +745,7 @@ public static class ProjectMember3Extension
 
     var result = db.ProjectNotes.Add(new ProjectNote
     {
-      StaffId = model.staff_user_id,
+      StaffId = db.get_staff_user_id(),
       Content = data.Content,
       ProjectId = project_id
     });

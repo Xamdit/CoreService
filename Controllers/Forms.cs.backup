@@ -68,7 +68,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
           return MakeSuccess(new
           {
             success = false,
-            message = self.helper.label("recaptcha_error")
+            message = label("recaptcha_error")
           });
 
       var regularFields = new Dictionary<string, string>();
@@ -274,7 +274,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
       if (success)
       {
         SendGdprEmailTemplate("gdpr_removal_request_by_lead", lead.Id);
-        SetAlert("success", self.helper.label("data_removal_request_sent"));
+        SetAlert("success", label("data_removal_request_sent"));
       }
 
       return Redirect(Request.Headers["Referer"].ToString());
@@ -307,7 +307,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
     if (self.helper.FileExists($"{AppContext.BaseDirectory}language/{form.language}/custom_lang.php"))
       self.lang.Load("custom_lang", form.language);
 
-    form.SuccessSubmitMsg = self.helper.label("success_submit_msg");
+    form.SuccessSubmitMsg = label("success_submit_msg");
     form = hooks.apply_filters("ticket_form_settings", form);
 
 
@@ -331,7 +331,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
           return MakeSuccess(new
           {
             success = false,
-            message = self.helper.label("recaptcha_error")
+            message = label("recaptcha_error")
           });
 
       var ticketData = new Ticket()

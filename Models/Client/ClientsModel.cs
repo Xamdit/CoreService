@@ -179,7 +179,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
 
     data.DateCreated = DateTime.Now;
-    data.AddedFrom = staff_user_id;
+    data.AddedFrom = db.get_staff_user_id();
     var result = db.Clients.Add(data);
 
     if (result.IsAdded()) return result.Entity.Id;
@@ -228,8 +228,8 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     if (!db.client_logged_in() && db.is_staff_logged_in())
     {
-      log += $", From Staff: {staff_user_id}";
-      isStaff = staff_user_id;
+      log += $", From Staff: {db.get_staff_user_id()}";
+      isStaff = db.get_staff_user_id();
     }
 
     // //do_action_deprecated("after_client_added", new[] { client_id }, "2.9.4", "after_client_created");
@@ -1212,7 +1212,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
       var fullPath = relPath + attachment.FileName;
       unlink(fullPath);
       var fname = file_name(fullPath);
-      var fext = self.helper.file_extension(fullPath);
+      var fext = file_extension(fullPath);
       var thumbPath = $"{relPath}{fname}_thumb.{fext}";
       if (file_exists(thumbPath)) unlink(thumbPath);
     }

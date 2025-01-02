@@ -18,7 +18,6 @@ using Service.Models.Invoices;
 using Service.Models.Payments;
 using Service.Models.Projects;
 using Service.Models.Tasks;
-using static Service.Helpers.Pdf.PdfHelper;
 using File = Service.Entities.File;
 using static Service.Helpers.Template.TemplateHelper;
 
@@ -276,7 +275,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (client == false)
       log_estimate_activity(_estimate.Id, "estimate_activity_converted", false, JsonConvert.SerializeObject(new[]
       {
-        $"<a href='{self.navigation.admin_url($"invoices/list_invoices/{id}")}'>{self.helper.format_invoice_number(id)}</a>"
+        $"<a href='{self.navigation.admin_url($"invoices/list_invoices/{id}")}'>{db.format_invoice_number(id)}</a>"
       }));
 
     hooks.do_action("estimate_converted_to_invoice", new { invoice_id = id, estimate_id = _estimate.Id });
@@ -419,7 +418,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     if (!hasPermissionView)
     {
-      var staffCondition = db.get_estimates_where_sql_for_staff(staff_user_id);
+      var staffCondition = db.get_estimates_where_sql_for_staff(db.get_staff_user_id());
       whereClauses.And(staffCondition);
     }
 
@@ -462,7 +461,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
   public int add(EstimateDto data)
   {
     data.DateCreated = DateTime.Now;
-    data.AddedFrom = staff_user_id;
+    data.AddedFrom = db.get_staff_user_id();
     data.Prefix = db.get_option("estimate_prefix");
     data.NumberFormat = db.get_option<int>("estimate_number_format");
 
@@ -774,7 +773,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
             var invoice = invoices_model.get(invoiceid);
             log_estimate_activity(id, "estimate_activity_client_accepted_and_converted", true, JsonConvert.SerializeObject(new[]
             {
-              $"<a href='{self.navigation.admin_url($"invoices/list_invoices/{invoiceid}")}'>{self.helper.format_invoice_number(invoice.Id)}</a>"
+              $"<a href='{self.navigation.admin_url($"invoices/list_invoices/{invoiceid}")}'>{db.format_invoice_number(invoice.Id)}</a>"
             }));
           }
         }
@@ -1231,8 +1230,8 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
    */
   public void log_estimate_activity(int id, string description = "", bool client = false, string additional_data = "")
   {
-    var staffid = $"{staff_user_id}";
-    var full_name = db.get_staff_full_name(staff_user_id);
+    var staffid = $"{db.get_staff_user_id()}";
+    var full_name = db.get_staff_full_name(db.get_staff_user_id());
     if (is_cron())
     {
       staffid = "[CRON]";

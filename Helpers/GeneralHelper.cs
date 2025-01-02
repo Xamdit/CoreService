@@ -85,7 +85,7 @@ public static class GeneralHelper
  * @param  array $data
  * @return mixed Url
  */
-  public static string app_generate_short_link(this HelperBase helper, dynamic data)
+  public static string app_generate_short_link(  dynamic data)
   {
     // hooks.do_action("before_generate_short_link", data);
     // $accessToken = db.get_option('bitly_access_token');
@@ -147,7 +147,7 @@ public static class GeneralHelper
   {
   }
 
-  public static string label(this HelperBase helper, string message)
+  public static string label(string message)
   {
     return message;
   }

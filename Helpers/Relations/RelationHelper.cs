@@ -279,7 +279,7 @@ public static class RelationHelper
           addedfrom = relation.addedfrom;
         }
 
-        name = self.helper.format_invoice_number(id);
+        name = db.format_invoice_number(id);
         link = nav.admin_url($"invoices/list_invoices/{id}");
         break;
       }
@@ -407,7 +407,7 @@ public static class RelationHelper
           if (!string.IsNullOrEmpty(relation.subject)) name += $" - {relation.subject}";
         }
 
-        name = self.helper.format_proposal_number(id);
+        name = db.format_proposal_number(id);
         link = nav.admin_url($"proposals/list_proposals/{id}");
         break;
       }

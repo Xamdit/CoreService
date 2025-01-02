@@ -17,10 +17,10 @@ public static class ProposalHelper
 
     if (!string.IsNullOrEmpty(proposal.ShortLink)) return proposal.ShortLink;
 
-    var shortLink = helper.app_generate_short_link(new ShortLinkRequest
+    var shortLink = app_generate_short_link(new ShortLinkRequest
     {
       LongUrl = longUrl,
-      Title = helper.format_proposal_number(proposal.Id)
+      Title = db.format_proposal_number(proposal.Id)
     });
 
 
@@ -110,9 +110,8 @@ public static class ProposalHelper
     return label ? $"<span class='label label-{labelClass} {classes} s-status proposal-status-{status}'>{statusText}</span>" : statusText;
   }
 
-  public static string format_proposal_number(this HelperBase helper, int id)
+  public static string format_proposal_number(this MyContext db, int id)
   {
-    var db = new MyContext();
     var prefix = db.get_option("proposal_number_prefix");
     var padding = int.Parse(db.get_option("number_padding_prefixes"));
     return prefix + id.ToString().PadLeft(padding, '0');

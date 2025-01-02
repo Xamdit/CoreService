@@ -603,7 +603,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var tags = db.get_tags_in(proposal.Id, "proposal");
     db.handle_tags_save(tags, id, "proposal");
-    log_activity($"Copied Proposal {self.helper.format_proposal_number(proposal.Id)}");
+    log_activity($"Copied Proposal {db.format_proposal_number(proposal.Id)}");
     return id;
   }
 
@@ -653,7 +653,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
             ToUserId = x.Id,
             Description = message,
             Link = $"proposals/list_proposals/{id}",
-            AdditionalData = JsonConvert.SerializeObject(new[] { self.helper.format_proposal_number(id) })
+            AdditionalData = JsonConvert.SerializeObject(new[] { db.format_proposal_number(id) })
           });
           return notified ? x.Id : 0;
         })

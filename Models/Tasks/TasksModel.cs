@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
-using Service.Framework.Helpers;
 using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Relations;
@@ -51,7 +50,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         id = STATUS_NOT_STARTED,
         color = "#64748b",
-        name = self.helper.label("task_status_1"),
+        name = label("task_status_1"),
         order = 1,
         filter_default = true
       },
@@ -59,7 +58,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         id = STATUS_IN_PROGRESS,
         color = "#3b82f6",
-        name = self.helper.label("task_status_4"),
+        name = label("task_status_4"),
         order = 2,
         filter_default = true
       },
@@ -67,7 +66,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         id = STATUS_TESTING,
         color = "#0284c7",
-        name = self.helper.label("task_status_3"),
+        name = label("task_status_3"),
         order = 3,
         filter_default = true
       },
@@ -75,7 +74,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         id = STATUS_AWAITING_FEEDBACK,
         color = "#84cc16",
-        name = self.helper.label("task_status_2"),
+        name = label("task_status_2"),
         order = 4,
         filter_default = true
       },
@@ -83,7 +82,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         id = STATUS_COMPLETE,
         color = "#22c55e",
-        name = self.helper.label("task_status_5"),
+        name = label("task_status_5"),
         order = 100,
         filter_default = false
       }
@@ -595,7 +594,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
         if (ticket_attachments.Any())
         {
           var task_path = $"{get_upload_path_by_type("task")}{insert_id}/";
-          self.helper.maybe_create_upload_path(task_path);
+          maybe_create_upload_path(task_path);
 
           foreach (var ticket_attachment in ticket_attachments)
           {
@@ -1157,7 +1156,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
         var fullPath = relPath + attachment.FileName;
         unlink(fullPath);
         var fname = file_name(fullPath);
-        var fext = self.helper.file_extension(fullPath);
+        var fext = file_extension(fullPath);
         var thumbPath = $"{relPath}{fname}_thumb.{fext}";
         if (file_exists(thumbPath))
           unlink(thumbPath);
@@ -1946,7 +1945,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         new()
         {
-          Label = self.helper.label("task_stats_logged_hours"),
+          Label = label("task_stats_logged_hours"),
           Data = new List<int>()
         }
       }

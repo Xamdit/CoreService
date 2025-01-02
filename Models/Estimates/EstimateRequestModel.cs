@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Service.Entities;
 using Service.Framework;
-using Service.Framework.Core.Extensions;
 using Service.Helpers;
 using File = Service.Entities.File;
 

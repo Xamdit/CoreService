@@ -56,7 +56,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
     data.lead.Country ??= 0;
     data.lead.Description = data.lead.Description!.Replace("\n", "<br>"); // Converting new lines to <br>
     data.lead.DateAdded = DateTime.Now; // Set the current date and time
-    data.lead.AddedFrom = staff_user_id; // Implement this method to get the current user ID
+    data.lead.AddedFrom = db.get_staff_user_id(); // Implement this method to get the current user ID
     // Apply hooks before adding lead (implement this method as per your framework)
     data = hooks.apply_filters("before_lead_added", data);
     var tags = new List<Taggable>();
@@ -106,8 +106,8 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       current_status_name = new[]
         {
-          (current_lead_data.lead.Junk, self.helper.label("lead_junk")),
-          (current_lead_data.lead.Lost, self.helper.label("lead_lost"))
+          (current_lead_data.lead.Junk, label("lead_junk")),
+          (current_lead_data.lead.Lost, label("lead_lost"))
         }
         .FirstOrDefault(x => x.Item1).Item2 ?? string.Empty;
     }
@@ -332,9 +332,9 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (form_activity) return;
     var result = get(x => x.Id == lead_id).First();
     var not_user_ids = new List<int>();
-    if (result.lead.AddedFrom != staff_user_id)
+    if (result.lead.AddedFrom != db.get_staff_user_id())
       not_user_ids.Add(result.lead.AddedFrom);
-    if (result.lead.Assigned != staff_user_id && result.lead.Assigned != 0)
+    if (result.lead.Assigned != db.get_staff_user_id() && result.lead.Assigned != 0)
       not_user_ids.Add(result.lead.Assigned);
     var notifiedUsers = not_user_ids
       .Select(x =>
@@ -549,7 +549,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
   public bool staff_can_access_lead(int id, int? staff_id = null)
   {
-    staff_id = staff_id.HasValue ? staff_user_id : staff_id;
+    staff_id ??= db.get_staff_user_id();
     var view_lead = db.has_permission("leads", staff_id, "view");
     if (view_lead) return true;
     var output = db.Leads
@@ -566,9 +566,9 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
       Date = DateTime.Now,
       Description = description,
       LeadId = id,
-      StaffId = staff_user_id,
+      StaffId = db.get_staff_user_id(),
       AdditionalData = additional_data,
-      FullName = db.get_staff_full_name(staff_user_id)
+      FullName = db.get_staff_full_name(db.get_staff_user_id())
     };
     if (integration)
     {

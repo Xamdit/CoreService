@@ -71,7 +71,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
           return MakeSuccess(new
           {
             success = false,
-            message = self.helper.label("recaptcha_error")
+            message = label("recaptcha_error")
           });
 
       var regularFields = new Lead();
@@ -307,7 +307,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
         return Redirect(globals<string>("HTTP_REFERER"));
 
       // self.helper.SendGdprEmailTemplate("gdpr_removal_request_by_lead", result.Lead.Id);
-      set_alert("success", self.helper.label("data_removal_request_sent"));
+      set_alert("success", label("data_removal_request_sent"));
 
       return Redirect(globals<string>("HTTP_REFERER"));
     }
@@ -337,7 +337,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
     // if (self.helper.FileExists($"{appPath}language/{form.Language}/custom_lang.json"))
     //     self.Lang.Load("custom_lang", form.Language);
 
-    form.SuccessSubmitMsg = self.helper.label("success_submit_msg");
+    form.SuccessSubmitMsg = label("success_submit_msg");
     form = hooks.apply_filters("ticket_form_settings", form);
 
     if (self.input.is_ajax_request())
@@ -358,7 +358,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
           return MakeSuccess(new
           {
             success = false,
-            message = self.helper.label("recaptcha_error")
+            message = label("recaptcha_error")
           });
 
       var reqData = convert<Ticket>(postData);

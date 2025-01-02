@@ -43,16 +43,16 @@ public static class UploadHelper
  * @param  mixed  ticketid
  * @return mixed           false if no attachment || array uploaded attachments
  */
-  public static List<TicketAttachment> handle_ticket_attachments(this HelperBase helper, int ticketId, string indexName = "attachments")
+  public static List<TicketAttachment> handle_ticket_attachments(this MyModel model, int ticketId, string indexName = "attachments")
   {
-    var (self, db) = getInstance();
-    var path = db.get_upload_path_by_type("ticket") + ticketId + "/";
+    var (self, db) = model.getInstance();
+    var path = get_upload_path_by_type("ticket") + ticketId + "/";
     var uploadedFiles = new List<TicketAttachment>();
 
     // Assuming `HttpContext.Current.Request.Files` is used to simulate PHP's ` _FILES`
     var files = self.context.Request.Form.Files[indexName];
     if (files == null) return uploadedFiles.Count > 0 ? uploadedFiles : null;
-    helper._file_attachments_index_fix(indexName);
+    _file_attachments_index_fix(indexName);
     var maxAllowedAttachments = db.get_option<int>("maximum_allowed_ticket_attachments");
 
     for (var i = 0; i < files.Length; i++)
@@ -69,7 +69,7 @@ public static class UploadHelper
       // Make sure we have a filepath
       if (string.IsNullOrEmpty(tmpFilePath)) continue;
       // Getting file extension
-      var extension = self.helper.file_extension(file.FileName).ToLower();
+      var extension = file_extension(file.FileName).ToLower();
       var allowedExtensions = db.get_option("ticket_attachments_file_extensions")
         .Split(',')
         .Select(e => e.Trim())
@@ -78,7 +78,7 @@ public static class UploadHelper
       // Check if this extension is allowed
       if (!allowedExtensions.Contains(extension)) continue;
 
-      helper.maybe_create_upload_path(path);
+      maybe_create_upload_path(path);
       var filename = unique_filename(path, file.FileName);
       var newFilePath = Path.Combine(path, filename);
 
@@ -104,7 +104,7 @@ public static class UploadHelper
  * @param  string  path path to check
  * @return null
  */
-  public static void maybe_create_upload_path(this HelperBase helper, string path)
+  public static void maybe_create_upload_path(string path)
   {
     if (Directory.Exists(path)) return;
     Directory.CreateDirectory(path);
@@ -117,7 +117,7 @@ public static class UploadHelper
     }
   }
 
-  public static void _file_attachments_index_fix(this HelperBase helper, string indexName, Dictionary<string, List<string>> files = default)
+  private static void _file_attachments_index_fix(string indexName, Dictionary<string, List<string>> files = default)
   {
     if (!files.ContainsKey(indexName)) return;
     // if (files[indexName].ContainsKey("name") && files[indexName]["name"] is List<string> names) files[indexName]["name"] = names.Where(n => n != null).ToList();
@@ -196,7 +196,7 @@ public static class UploadHelper
     insertData["file_name"] = filename;
     insertData["file_mime_type"] = !string.IsNullOrWhiteSpace(file.ContentType)
       ? file.ContentType
-      : self.helper.get_mime_by_extension(filename);
+      :  get_mime_by_extension(filename);
 
     return insertData;
   }
@@ -207,10 +207,9 @@ public static class UploadHelper
   }
 
 
-  private static bool upload_extension_allowed(string filename)
+  private static bool upload_extension_allowed(this MyContext db, string filename)
   {
-    var (self, db) = getInstance();
-    var extension = self.helper.file_extension(filename);
+    var extension = file_extension(filename);
     var allowed_extensions = db.get_option("allowed_files").Split(",").ToList();
     if (allowed_extensions.Contains("jpg")
         && !allowed_extensions.Contains(".jpeg")

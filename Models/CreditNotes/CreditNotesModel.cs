@@ -34,7 +34,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         id = 1,
         color = "#03a9f4",
-        name = self.helper.label("credit_note_status_open"),
+        name = label("credit_note_status_open"),
         order = 1,
         filter_default = true
       },
@@ -42,7 +42,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         id = 2,
         color = "#84c529",
-        name = self.helper.label("credit_note_status_closed"),
+        name = label("credit_note_status_closed"),
         order = 2,
         filter_default = true
       },
@@ -50,7 +50,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         id = 3,
         color = "#777",
-        name = self.helper.label("credit_note_status_void"),
+        name = label("credit_note_status_void"),
         order = 3,
         filter_default = false
       }
@@ -73,7 +73,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (!has_permission_view)
       invoice_query = invoice_query
         .Where(x =>
-          x.AddedFrom == staff_user_id
+          x.AddedFrom == db.get_staff_user_id()
         );
     var invoices = invoice_query.ToList();
     var output = invoices
@@ -206,7 +206,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     data.creditNote.Prefix = db.get_option("credit_note_prefix");
     data.creditNote.NumberFormat = Convert.ToInt32(db.get_option("credit_note_number_format"));
     data.creditNote.DateCreated = DateTime.Now;
-    data.creditNote.AddedFrom = staff_user_id;
+    data.creditNote.AddedFrom = db.get_staff_user_id();
 
     var items = data.newitems;
     var custom_fields = data.custom_fields;
@@ -438,7 +438,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     var has_permission_view = db.has_permission("credit_notes", "", "view");
     var query = db.CreditNotes.Where(x => x.ClientId == customer_id && x.Status == 1);
     if (!has_permission_view)
-      query = query.Where(x => x.AddedFrom == staff_user_id);
+      query = query.Where(x => x.AddedFrom == db.get_staff_user_id());
     var credits = query.ToList();
     var total = calc_remaining_credits(credits);
     return total;
@@ -508,7 +508,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     new_credit_note_data.ShippingState = _invoice.ShippingState;
     new_credit_note_data.ShippingZip = _invoice.ShippingZip;
     new_credit_note_data.ShippingCountry = _invoice.ShippingCountry;
-    new_credit_note_data.ReferenceNo = self.helper.format_invoice_number(_invoice.Id);
+    new_credit_note_data.ReferenceNo = db.format_invoice_number(_invoice.Id);
     if (_invoice.IncludeShipping)
       new_credit_note_data.IncludeShipping = _invoice.IncludeShipping;
     new_credit_note_data.ShowShippingOnCreditNote = credit_note(_invoice).ShowShippingOnCreditNote;
@@ -527,7 +527,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
       new_credit_note_data.NewItems[key].LongDescription = clear_textarea_breaks(item.LongDescription);
       new_credit_note_data.NewItems[key].Qty = item.Qty;
       new_credit_note_data.NewItems[key].Unit = item.Unit;
-      var taxes = self.helper.get_invoice_item_taxes(item.Id);
+      var taxes = db.get_invoice_item_taxes(item.Id);
       new_credit_note_data.NewItems[key].TaxNames = taxes.Select(x => x.TaxName).ToList();
       new_credit_note_data.NewItems[key].Rate = item.Rate;
       new_credit_note_data.NewItems[key].ItemOrder = item.ItemOrder;
@@ -551,7 +551,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
         self.helper.update_invoice_status(invoice_id, true);
     }
 
-    log_activity($"Created Credit Note From Invoice [Invoice: {self.helper.format_invoice_number(_invoice.Id)}, Credit Note: {db.format_credit_note_number(id)}]");
+    log_activity($"Created Credit Note From Invoice [Invoice: {db.format_invoice_number(_invoice.Id)}, Credit Note: {db.format_credit_note_number(id)}]");
     hooks.do_action("created_credit_note_from_invoice", new { invoice_id, credit_note_id = id });
     return id;
   }
@@ -655,7 +655,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       InvoiceId = data.InvoiceId,
       CreditId = id,
-      StaffId = staff_user_id,
+      StaffId = db.get_staff_user_id(),
       Date = DateTime.UtcNow,
       DateApplied = DateTime.UtcNow,
       Amount = data.Amount
@@ -674,7 +674,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
       // update invoice number for invoice with draft - V2.7.2
       invoices_model.change_invoice_number_when_status_draft(invoice.Id);
     invoice = db.Invoices.Include(x => x.Currency).FirstOrDefault(x => x.Id == data.Id);
-    var inv_number = self.helper.format_invoice_number(data.InvoiceId);
+    var inv_number = db.format_invoice_number(data.InvoiceId);
     var credit_note_number = db.format_credit_note_number(id);
     invoices_model.log(data.InvoiceId, "invoice_activity_applied_credits", false, JsonConvert.SerializeObject(new[]
     {
@@ -724,7 +724,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     var query = db.CreditNotes.Where(x => x.ClientId == customer_id && x.Status == 1).AsQueryable();
     var has_permission_view = db.has_permission("credit_notes", "", "view");
 
-    if (!has_permission_view) query = query.Where(x => x.AddedFrom == staff_user_id);
+    if (!has_permission_view) query = query.Where(x => x.AddedFrom == db.get_staff_user_id());
 
     var credits = query.ToList();
 

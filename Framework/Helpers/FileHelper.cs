@@ -41,15 +41,15 @@ public static class FileHelper
     return output;
   }
 
-  public static string file_extension(this object obj, string path)
+  public static string file_extension(  string path)
   {
     var output = Path.GetExtension(path).TrimStart('.').ToLower();
     return output;
   }
 
-  public static string get_mime_by_extension(this object obj, string path)
+  public static string get_mime_by_extension(  string path)
   {
-    var extension = obj.file_extension(path);
+    var extension =  file_extension(path);
     return mimetype(extension);
   }
 

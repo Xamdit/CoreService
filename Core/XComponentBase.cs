@@ -157,12 +157,10 @@ public abstract class XComponentBase : MyComponentBase
   }
 
 
-
   public string Get_project_name_by_id(int id)
   {
     return string.Empty;
   }
-
 
 
   public bool Is_empty_customer_company(int id)
@@ -174,7 +172,6 @@ public abstract class XComponentBase : MyComponentBase
   {
     return string.Empty;
   }
-
 
 
   public string Optimize_dropbox_thumbnail(string path)

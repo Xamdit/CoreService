@@ -92,7 +92,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
   public int add((Contract contract, CustomField? customField) data)
   {
     data.contract.DateCreated = DateTime.Now;
-    data.contract.AddedFrom = staff_user_id;
+    data.contract.AddedFrom = db.get_staff_user_id();
 
 
     if (!string.IsNullOrEmpty(data.contract.NotVisibleToClient) && data.contract.NotVisibleToClient == "on")
@@ -173,7 +173,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
     // if (data['action'])
     //   unset(data['action']);
     data.DateCreated = DateTime.Now;
-    if (client == false) data.StaffId = staff_user_id;
+    if (client == false) data.StaffId = db.get_staff_user_id();
 
     data.Content = data.Content.nl2br();
 
@@ -498,8 +498,8 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (keepSignature)
       data.NewValue = contract.ContractValue == 1;
     data.DateRenewed = DateTime.Now;
-    data.RenewedBy = db.get_staff_full_name(staff_user_id);
-    data.RenewedByStaffId = staff_user_id;
+    data.RenewedBy = db.get_staff_full_name(db.get_staff_user_id());
+    data.RenewedByStaffId = db.get_staff_user_id();
     if (data.NewEndDate.HasValue)
       data.NewEndDate = null;
     // get the original contract so we can check if is expiry notified on delete the expiry to revert

@@ -19,7 +19,7 @@ public class VerificationController(ILogger<ClientControllerBase> logger, MyInst
 
     var data = new
     {
-      title = self.helper.label("email_verification_required")
+      title = label("email_verification_required")
     };
 
     // this.view("verification_required");
@@ -39,14 +39,14 @@ public class VerificationController(ILogger<ClientControllerBase> logger, MyInst
 
     if (!string.IsNullOrEmpty(contact.EmailVerifiedAt))
     {
-      set_alert("info", self.helper.label("email_already_verified"));
+      set_alert("info", label("email_already_verified"));
       return Redirect(self.helper.site_url("clients"));
     }
 
     if (contact.EmailVerificationKey != key)
     {
-      show_error(self.helper.label("invalid_verification_key"));
-      return MakeError(self.helper.label("invalid_verification_key"));
+      show_error(label("invalid_verification_key"));
+      return MakeError(label("invalid_verification_key"));
     }
 
     var timestampNowMinus2Days = DateTime.Now.AddDays(-2);
@@ -54,16 +54,16 @@ public class VerificationController(ILogger<ClientControllerBase> logger, MyInst
 
     if (contactRegistered < timestampNowMinus2Days)
     {
-      show_error(self.helper.label("verification_key_expired"));
-      return MakeError(self.helper.label("verification_key_expired"));
+      show_error(label("verification_key_expired"));
+      return MakeError(label("verification_key_expired"));
     }
 
     clientsModel.mark_email_as_verified(contact.Id);
 
     if (db.Clients.Any(x => x.Id == contact.Id && x.RegistrationConfirmed == 0))
-      set_alert("info", self.helper.label("email_successfully_verified_but_required_admin_confirmation"));
+      set_alert("info", label("email_successfully_verified_but_required_admin_confirmation"));
     else
-      set_alert("success", self.helper.label("email_successfully_verified"));
+      set_alert("success", label("email_successfully_verified"));
 
     var redirectUri = db.is_client_logged_in() ? "clients" : "authentication";
     return Redirect(self.helper.site_url(redirectUri));
@@ -78,9 +78,9 @@ public class VerificationController(ILogger<ClientControllerBase> logger, MyInst
       return Redirect(self.helper.site_url("clients"));
 
     if (clients_model.send_verification_email(db.get_contact_user_id()))
-      set_alert("success", self.helper.label("email_verification_mail_sent_successfully"));
+      set_alert("success", label("email_verification_mail_sent_successfully"));
     else
-      set_alert("danger", self.helper.label("failed_to_send_verification_email"));
+      set_alert("danger", label("failed_to_send_verification_email"));
 
     return Redirect(self.helper.site_url("verification"));
   }

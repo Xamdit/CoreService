@@ -62,7 +62,7 @@ public class ConsentController(ILogger<MyControllerBase> logger, MyInstance self
     {
       contact,
       purposes = gdpr_model.get_consent_purposes(contact.Id, "contact"),
-      title = self.helper.label("gdpr") + " - " + contact.FirstName + " " + contact.LastName,
+      title = label("gdpr") + " - " + contact.FirstName + " " + contact.LastName,
       bodyclass = "consent"
     };
 
@@ -114,7 +114,7 @@ public class ConsentController(ILogger<MyControllerBase> logger, MyInstance self
     {
       lead,
       purposes = gdpr_model.get_consent_purposes(lead.Id, "lead"),
-      title = self.helper.label("gdpr") + " - " + lead.Name,
+      title = label("gdpr") + " - " + lead.Name,
       bodyclass = "consent"
     };
 

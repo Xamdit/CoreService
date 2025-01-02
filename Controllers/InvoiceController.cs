@@ -31,7 +31,7 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
 
     data.payments = payments_model.get_invoice_payments(id);
     data.payment_modes = payment_modes_model.get();
-    data.title = self.helper.format_invoice_number(invoice.Id);
+    data.title = db.format_invoice_number(invoice.Id);
     // this.disableNavigation();
     // this.disableSubMenu();
     data.hash = hash;
@@ -74,7 +74,7 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
         return MakeError(e.Message);
       }
 
-      var invoice_number = self.helper.format_invoice_number(invoice.Id);
+      var invoice_number = db.format_invoice_number(invoice.Id);
       var companyname = db.get_option("invoice_company_name");
       if (!string.IsNullOrEmpty(companyname)) invoice_number += "-" + db.slug_it(companyname).ToUpper();
       pdf.Output(db.slug_it(invoice_number).ToUpper() + ".pdf");
@@ -86,7 +86,7 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
     {
       if (!self.input.post_has("paymentmode"))
       {
-        set_alert("warning", self.helper.label("invoice_html_payment_modes_not_selected"));
+        set_alert("warning", label("invoice_html_payment_modes_not_selected"));
         return Redirect(self.helper.site_url("invoice/" + id + "/" + hash));
       }
 
@@ -94,7 +94,7 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
           && db.get_option_compare("allow_payment_amount_to_be_modified", true)
          )
       {
-        set_alert("warning", self.helper.label("invoice_html_amount_blank"));
+        set_alert("warning", label("invoice_html_amount_blank"));
         return Redirect(self.helper.site_url("invoice/" + id + "/" + hash));
       }
 
@@ -107,7 +107,7 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
       var payment = payments_model.get(id);
       payment.Invoice = invoices_model.get(payment.Invoice.Id);
       var paymentpdf = self.helper.payment_pdf(payment);
-      paymentpdf.Output(db.slug_it(self.helper.label("payment") + "-" + payment.Id).ToUpper() + ".pdf");
+      paymentpdf.Output(db.slug_it(label("payment") + "-" + payment.Id).ToUpper() + ".pdf");
       return Ok();
     }
 
@@ -115,7 +115,7 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
     // var app_number_to_word = self.library.app_number_to_word(new { ClientId = invoice.ClientId });
     data.payments = payments_model.get_invoice_payments(id);
     data.payment_modes = payment_modes_model.get();
-    data.title = self.helper.format_invoice_number(invoice.Id);
+    data.title = db.format_invoice_number(invoice.Id);
     // this.disableNavigation();
     // this.disableSubMenu();
     data.hash = hash;

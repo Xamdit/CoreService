@@ -53,7 +53,7 @@ public static class FuncHelper
     return slug;
   }
 
-  public static string adjust_hex_brightness(this HelperBase helper, string hex, double percent)
+  public static string adjust_hex_brightness(string hex, double percent)
   {
     // Work out if hash is given
     var hash = "#";

@@ -324,7 +324,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       var filename = arg.attachment.FileName;
       var filenameparts = filename.Split(".").ToList().First();
-      var extension = self.helper.file_extension(filenameparts);
+      var extension = file_extension(filenameparts);
 
       if (!allowed_extensions.Contains($".{extension}")) continue;
       //
@@ -341,7 +341,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       ticket_attachments.Add(new TicketAttachment
       {
         FileName = filename,
-        FileType = self.helper.get_mime_by_extension(filename)
+        FileType = get_mime_by_extension(filename)
       });
     }
 
@@ -595,7 +595,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     }
     else
     {
-      var attachments = self.helper.handle_ticket_attachments(id);
+      var attachments = this.handle_ticket_attachments(id);
       if (attachments.Any())
         insert_ticket_attachments_to_database(attachments, id, insert_id);
     }
@@ -948,7 +948,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     }
     else
     {
-      var attachments = self.helper.handle_ticket_attachments(ticketid);
+      var attachments = this.handle_ticket_attachments(ticketid);
       if (attachments.Any())
         insert_ticket_attachments_to_database(attachments, ticketid);
     }
@@ -1230,10 +1230,10 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     var affected_rows = db.Tickets.Where(x => x.Id == id).Update(x => new Ticket { Status = status });
     var alert = "warning";
-    var message = self.helper.label("ticket_status_changed_fail");
+    var message = label("ticket_status_changed_fail");
     if (affected_rows <= 0) return (alert, message);
     alert = "success";
-    message = self.helper.label("ticket_status_changed_successfully");
+    message = label("ticket_status_changed_successfully");
     hooks.do_action("after_ticket_status_changed", new
     {
       id,
@@ -1493,7 +1493,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         new()
         {
-          Label = self.helper.label("home_weekend_ticket_opening_statistics"),
+          Label = label("home_weekend_ticket_opening_statistics"),
           BackgroundColor = "rgba(197, 61, 169, 0.5)",
           BorderColor = "#c53da9",
           BorderWidth = 1,

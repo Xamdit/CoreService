@@ -5,7 +5,6 @@ using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
-using Service.Framework.Helpers;
 using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Sale;
@@ -58,7 +57,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         Id = 1,
         Color = "#475569",
-        Name = self.helper.label("project_status_1"),
+        Name = label("project_status_1"),
         Order = 1,
         FilterDefault = true
       },
@@ -66,7 +65,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         Id = 2,
         Color = "#2563eb",
-        Name = self.helper.label("project_status_2"),
+        Name = label("project_status_2"),
         Order = 2,
         FilterDefault = true
       },
@@ -74,7 +73,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         Id = 3,
         Color = "#f97316",
-        Name = self.helper.label("project_status_3"),
+        Name = label("project_status_3"),
         Order = 3,
         FilterDefault = true
       },
@@ -82,7 +81,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         Id = 4,
         Color = "#16a34a",
-        Name = self.helper.label("project_status_4"),
+        Name = label("project_status_4"),
         Order = 100,
         FilterDefault = false
       },
@@ -90,7 +89,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         Id = 5,
         Color = "#94a3b8",
-        Name = self.helper.label("project_status_5"),
+        Name = label("project_status_5"),
         Order = 4,
         FilterDefault = false
       }
@@ -514,7 +513,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         unlink(fullPath);
         var fname = file_name(fullPath);
-        var fext = self.helper.file_extension(fullPath);
+        var fext = file_extension(fullPath);
         var thumbPath = $"{path}{fname}_thumb.{fext}";
         if (file_exists(thumbPath))
           unlink(thumbPath);
