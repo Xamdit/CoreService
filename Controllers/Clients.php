@@ -873,7 +873,7 @@ class Clients extends ClientsController
             $type = 'I';
         }
 
-        $pdf_name = slug_it(_l('customer_statement') . '_' . get_option('companyname'));
+        $pdf_name = db.slug_it(_l('customer_statement') . '_' . get_option('companyname'));
         $pdf->Output($pdf_name . '.pdf', $type);
     }
 

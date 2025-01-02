@@ -1,28 +1,28 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Framework.Library.Merger;
 using Service.Helpers;
 using Service.Helpers.Pdf;
 using Service.Models.Client;
 using Service.Models.Tasks;
-using File = Global.Entities.File;
+using File = Service.Entities.File;
 
 
 namespace Service.Models.Contracts;
 
-public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
+public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
-  private ContractTypesModel contract_types_model = self.model.contract_types_model();
-  private TasksModel tasks_model = self.model.tasks_model();
-  private ClientsModel clients_model = self.model.clients_model();
+  private ContractTypesModel contract_types_model = self.contract_types_model(db);
+  private TasksModel tasks_model = self.tasks_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
 
   /**
      * Get contract/s
@@ -92,7 +92,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
   public int add((Contract contract, CustomField? customField) data)
   {
     data.contract.DateCreated = DateTime.Now;
-    data.contract.AddedFrom = staff_user_id;
+    data.contract.AddedFrom = db.get_staff_user_id();
 
 
     if (!string.IsNullOrEmpty(data.contract.NotVisibleToClient) && data.contract.NotVisibleToClient == "on")
@@ -110,12 +110,12 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     data.contract.Hash = Guid.NewGuid().ToString();
 
-    data = self.hooks.apply_filters("before_contract_added", data);
+    data = hooks.apply_filters("before_contract_added", data);
     var result = db.Contracts.Add(data.contract);
     if (!result.IsAdded()) return 0;
     if (custom_fields != null)
       self.helper.handle_custom_fields_post(result.Entity.Id, custom_fields);
-    self.hooks.do_action("after_contract_added", result.Entity.Id);
+    hooks.do_action("after_contract_added", result.Entity.Id);
     log_activity($"New Contract Added [{data.contract.Subject}]");
     return result.Entity.Id;
   }
@@ -135,7 +135,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
       if (data.contract.DateEnd.HasValue && data.contract.DateEnd != contract.DateEnd)
         data.contract.IsExpiryNotified = 0;
 
-    data = self.hooks.apply_filters("before_contract_updated", data, id);
+    data = hooks.apply_filters("before_contract_updated", data, id);
     if (data.customField != null)
     {
       var custom_fields = data.customField;
@@ -145,7 +145,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     var affected_rows = db.Contracts.Where(x => x.Id == id).Update(x => data);
     if (affected_rows <= 0) return affectedRows > 0;
-    self.hooks.do_action("after_contract_updated", id);
+    hooks.do_action("after_contract_updated", id);
     log_activity($"Contract Updated [{data.contract.Subject}]");
     return true;
   }
@@ -158,7 +158,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
       .Where(x => x.Id == id)
       .Update(x => new Contract { Signature = "" });
     if (!string.IsNullOrEmpty(contract.Signature))
-      self.helper.unlink($"{self.helper.get_upload_path_by_type("contract")}{id}/{contract.Signature}");
+      unlink($"{get_upload_path_by_type("contract")}{id}/{contract.Signature}");
     return true;
   }
 
@@ -169,11 +169,11 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
   */
   public bool add_comment(ContractComment data, bool client = false)
   {
-    if (is_staff_logged_in()) client = false;
+    if (db.is_staff_logged_in()) client = false;
     // if (data['action'])
     //   unset(data['action']);
     data.DateCreated = DateTime.Now;
-    if (client == false) data.StaffId = staff_user_id;
+    if (client == false) data.StaffId = db.get_staff_user_id();
 
     data.Content = data.Content.nl2br();
 
@@ -187,7 +187,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
       var staff_contract = db.Staff.Where(x => x.Id == contract.AddedFrom).ToList();
       var notifiedUsers = staff_contract.Select(x =>
         {
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             Description = "not_contract_comment_from_client",
             ToUserId = x.Id,
@@ -199,21 +199,21 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
 
           if (!notified) return 0;
-          var template = mail_template("contract_comment_to_staff", contract, x);
+          var template = this.mail_template("contract_comment_to_staff", contract, x);
           var merge_fields = template.get_merge_fields();
           template.send();
           return contract.Id;
           // this.app_sms.trigger(SMS_TRIGGER_CONTRACT_NEW_COMMENT_TO_STAFF, x.PhoneNumber, merge_fields);
         })
         .ToList();
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      db.pusher_trigger_notification(notifiedUsers);
     }
     else
     {
       var contacts = clients_model.get_contacts(x => x.Id == contract.Client && x.Active && x.ContractEmails == 1, x => true);
       contacts.ForEach(contract =>
       {
-        var template = mail_template("contract_comment_to_customer", contract);
+        var template = this.mail_template("contract_comment_to_customer", contract);
         var merge_fields = template.get_merge_fields();
         template.send();
         // this.app_sms.trigger(SMS_TRIGGER_CONTRACT_NEW_COMMENT_TO_CUSTOMER, contact.PhoneNumber, merge_fields);
@@ -279,10 +279,10 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     newContactData.Trash = false;
     newContactData.IsExpiryNotified = 0;
-    newContactData.Signed = 0;
+    newContactData.Signed = false;
     newContactData.MarkedAsSigned = 0;
     newContactData.Signature = null;
-    newContactData = (Contract)TypeMerger.Merge(newContactData, get_acceptance_info_array(true));
+    newContactData = (Contract)TypeMerger.Merge(newContactData, get_acceptance_info_array<Contract>(true));
     if (contract.DateEnd.HasValue)
     {
       var dStart = contract.DateStart;
@@ -298,10 +298,10 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     var newId = add((newContactData, null));
 
     if (newId == 0) return newId;
-    var custom_fields = self.helper.get_custom_fields("contracts");
+    var custom_fields = db.get_custom_fields("contracts");
     foreach (var field in custom_fields)
     {
-      var value = self.helper.get_custom_field_value(id, field.Id, "contracts", false);
+      var value = db.get_custom_field_value(id, field.Id, "contracts", false);
       if (value == "") return newId;
       db.CustomFieldsValues.Add(new CustomFieldsValue
       {
@@ -322,7 +322,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool delete(int id)
   {
-    self.hooks.do_action("before_contract_deleted", id);
+    hooks.do_action("before_contract_deleted", id);
     clear_signature(id);
     var contract = get(x => x.Id == id);
     var affected_rows = db.Contracts.Where(x => x.Id == id).Delete();
@@ -350,7 +350,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     log_activity($"Contract Deleted [{id}]");
 
-    self.hooks.do_action("after_contract_deleted", id);
+    hooks.do_action("after_contract_deleted", id);
 
     return true;
   }
@@ -398,10 +398,10 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
       self.helper.set_mailing_constant();
       var pdf = self.helper.contract_pdf(contract);
       // attach = pdf.Output($"{slug_it(contract.Subject)}.pdf", 'S');
-      attach = pdf.Output($"{slug_it(contract.Subject)}.pdf");
+      attach = pdf.Output($"{db.slug_it(contract.Subject)}.pdf");
     }
 
-    var sent_to_str = self.input.post("sent_to");
+    var sent_to_str = self.input.post<string>("sent_to");
     var sent_to = sent_to_str.Split(",").Select(int.Parse).ToList();
     var sent = false;
 
@@ -414,12 +414,12 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
         var contact = clients_model.get_contact(contact_id);
         // Send cc only for the first contact
         if (!string.IsNullOrEmpty(cc) && i > 0) cc = "";
-        var template = mail_template("contract_send_to_customer", contract, contact, cc);
+        var template = this.mail_template("contract_send_to_customer", contract, contact, cc);
         if (attachpdf)
           template.add_attachment(new MailAttachment()
           {
             attachment = attach,
-            filename = $"{slug_it(contract.Subject)}.pdf",
+            filename = $"{db.slug_it(contract.Subject)}.pdf",
             type = "application/pdf"
           });
 
@@ -464,7 +464,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     var attachment = get_contract_attachments(attachment_id).FirstOrDefault();
     if (attachment == null) return deleted;
     if (string.IsNullOrEmpty(attachment.External))
-      self.helper.unlink($"{self.helper.get_upload_path_by_type("contract")}{attachment.RelId}/{attachment.FileName}");
+      unlink($"{get_upload_path_by_type("contract")}{attachment.RelId}/{attachment.FileName}");
 
 
     var affected_rows = db.Files.Where(x => x.Id == attachment_id).Delete();
@@ -474,12 +474,12 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
       log_activity($"Contract Attachment Deleted [ContractID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(self.helper.get_upload_path_by_type("contract") + attachment.RelId)) return deleted;
+    if (!is_dir(get_upload_path_by_type("contract") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("contract") + attachment.RelId);
+    var other_attachments = list_files(get_upload_path_by_type("contract") + attachment.RelId);
     if (!other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("contract") + attachment.RelId);
+      delete_dir(get_upload_path_by_type("contract") + attachment.RelId);
 
     return deleted;
   }
@@ -498,8 +498,8 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     if (keepSignature)
       data.NewValue = contract.ContractValue == 1;
     data.DateRenewed = DateTime.Now;
-    data.RenewedBy = self.helper.get_staff_full_name(staff_user_id);
-    data.RenewedByStaffId = staff_user_id;
+    data.RenewedBy = db.get_staff_full_name(db.get_staff_user_id());
+    data.RenewedByStaffId = db.get_staff_user_id();
     if (data.NewEndDate.HasValue)
       data.NewEndDate = null;
     // get the original contract so we can check if is expiry notified on delete the expiry to revert
@@ -523,9 +523,9 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (!keepSignature)
     {
-      _data = (Contract)TypeMerger.Merge(_data, get_acceptance_info_array(true));
-      _data.Signed = 0;
-      if (!string.IsNullOrEmpty(_contract.Signature)) self.helper.unlink($"{self.helper.get_upload_path_by_type("contract")}{data.ContractId}/{_contract.Signature}");
+      _data = (Contract)TypeMerger.Merge(_data, get_acceptance_info_array<Contract>(true));
+      _data.Signed = false;
+      if (!string.IsNullOrEmpty(_contract.Signature)) unlink($"{get_upload_path_by_type("contract")}{data.ContractId}/{_contract.Signature}");
     }
 
     if (db.Contracts.Update(_data).IsModified())
@@ -564,7 +564,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     var affected_rows = db.ContractRenewals.Where(x => x.Id == id).Delete();
     if (affected_rows <= 0) return false;
     if (!string.IsNullOrEmpty(contract.ShortLink))
-      self.helper.app_archive_short_link(contract.ShortLink);
+      db.app_archive_short_link(contract.ShortLink);
 
     if (is_last)
     {
@@ -601,7 +601,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     var diff2 = DateTime.Now.AddDays(+days);
     var query = db.Contracts.AsQueryable();
     // if (staffId.HasValue && !self.helper.staff_can("view", "contracts", staffId.Value))
-    if (staffId.HasValue && !self.helper.staff_can(view: "contracts", staffId: staffId.Value))
+    if (staffId.HasValue && !db.staff_can(view: "contracts", staffId: staffId.Value))
       query.Where(x => x.AddedFrom == staffId);
     var rows = query
       .Where(x =>

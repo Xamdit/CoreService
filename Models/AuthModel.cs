@@ -1,11 +1,11 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Helpers;
 using Service.Schemas;
 
 namespace Service.Models;
 
-public class AuthModel(MyInstance self, MyContext db) : MyModel(self)
+public class AuthModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public UserSchema? Signin(string email, string password, bool isStaff = false)
   {
@@ -39,17 +39,14 @@ public class AuthModel(MyInstance self, MyContext db) : MyModel(self)
         }
       }
 
-      if (!string.IsNullOrEmpty(user.Type))
-      {
-        // await self.Cache.Init(result.Token);
-        // await self.Cache.Set("user", result.Data);
-        self.cache.assign("uuid", user.Uuid);
-        // await self.Cache.Set("user_type", isStaff ? "admin" : "user");
-        return user;
-      }
+      if (string.IsNullOrEmpty(user.Type)) return null;
+      // await self.Cache.Init(result.Token);
+      // await self.Cache.Set("user", result.Data);
+      self.cache.assign("uuid", user.Uuid);
+      // await self.Cache.Set("user_type", isStaff ? "admin" : "user");
+      return user;
 
 
-      return null;
     }
     catch (Exception ex)
     {

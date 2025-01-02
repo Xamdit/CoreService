@@ -1,42 +1,40 @@
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
-using Service.Framework.Helpers;
 using Service.Framework.Library.Merger;
 using Service.Helpers;
 using Service.Helpers.Pdf;
 using Service.Helpers.Sale;
-using Service.Helpers.Template;
 using Service.Models.Client;
 using Service.Models.Contracts;
 using Service.Models.Invoices;
 using Service.Models.Misc;
 using Service.Models.Payments;
-using File = Global.Entities.File;
-
+using File = Service.Entities.File;
+using static Service.Helpers.Template.TemplateHelper;
 
 namespace Service.Models.CreditNotes;
 
-public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
+public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
-  private InvoicesModel invoices_model = self.model.invoices_model();
-  private ClientsModel clients_model = self.model.clients_model();
-  private MiscModel misc_model = self.model.misc_model();
-  private PaymentModesModel payment_modes_model = self.model.payment_modes_model();
+  private InvoicesModel invoices_model = self.invoices_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
+  private MiscModel misc_model = self.misc_model(db);
+  private PaymentModesModel payment_modes_model = self.payment_modes_model(db);
 
   public List<CreditNoteOption> get_statuses()
   {
-    return self.hooks.apply_filters("before_get_credit_notes_statuses", new List<CreditNoteOption>
+    return hooks.apply_filters("before_get_credit_notes_statuses", new List<CreditNoteOption>
     {
       new()
       {
         id = 1,
         color = "#03a9f4",
-        name = self.helper.label("credit_note_status_open"),
+        name = label("credit_note_status_open"),
         order = 1,
         filter_default = true
       },
@@ -44,7 +42,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
       {
         id = 2,
         color = "#84c529",
-        name = self.helper.label("credit_note_status_closed"),
+        name = label("credit_note_status_closed"),
         order = 2,
         filter_default = true
       },
@@ -52,7 +50,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
       {
         id = 3,
         color = "#777",
-        name = self.helper.label("credit_note_status_void"),
+        name = label("credit_note_status_void"),
         order = 3,
         filter_default = false
       }
@@ -61,8 +59,8 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
 
   public async Task<List<CreditNoteResult>> get_available_creditable_invoices(int credit_note_id)
   {
-    var has_permission_view = self.helper.has_permission("invoices", "", "view");
-    var _invoices_statuses_available_for_credits = self.helper.invoices_statuses_available_for_credits();
+    var has_permission_view = db.has_permission("invoices", "", "view");
+    var _invoices_statuses_available_for_credits = this.invoices_statuses_available_for_credits();
     var credit_note = db.CreditNotes.FirstOrDefault(x => x.Id == credit_note_id);
     var invoice_query = db.Invoices
       .Include(x => x.Currency)
@@ -75,7 +73,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     if (!has_permission_view)
       invoice_query = invoice_query
         .Where(x =>
-          x.AddedFrom == staff_user_id
+          x.AddedFrom == db.get_staff_user_id()
         );
     var invoices = invoice_query.ToList();
     var output = invoices
@@ -101,7 +99,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
   public bool send_credit_note_to_client(int id, bool attachpdf = true, string cc = "", bool manually = false)
   {
     var credit_note = get(x => x.Id == id).First();
-    var number = self.helper.format_credit_note_number(credit_note.Id);
+    var number = db.format_credit_note_number(credit_note.Id);
     var sent = false;
     var sent_to = new List<int>();
 
@@ -130,7 +128,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
         {
           if (!string.IsNullOrEmpty(cc) && i > 0) cc = "";
           var contact = clients_model.get_contact(contact_id);
-          var template = mail_template("credit_note_send_to_customer", credit_note, contact, cc);
+          var template = this.mail_template("credit_note_send_to_customer", credit_note, contact, cc);
 
           if (attachpdf)
             template.add_attachment(new MailAttachment()
@@ -152,7 +150,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     if (!sent) return false;
-    self.hooks.do_action("credit_note_sent", id);
+    hooks.do_action("credit_note_sent", id);
     return true;
   }
 
@@ -187,12 +185,12 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     credit_note_result.applied_credits = get_applied_credits(id);
     credit_note_result.remaining_credits = total_remaining_credits_by_credit_note(id);
     credit_note_result.credits_used = total_credits_used_by_credit_note(id);
-    credit_note_result.items = self.helper.get_items_by_type("credit_note", id);
+    credit_note_result.items = db.get_items_by_type("credit_note", id);
     credit_note_result.Client = clients_model.get(x => x.Id == credit_note.ClientId).First();
 
     if (credit_note_result.Client == null)
     {
-      credit_note_result.Client = new Global.Entities.Client();
+      credit_note_result.Client = new Entities.Client();
       credit_note_result.Client.Company = credit_note.DeletedCustomerName;
     }
 
@@ -208,13 +206,13 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     data.creditNote.Prefix = db.get_option("credit_note_prefix");
     data.creditNote.NumberFormat = Convert.ToInt32(db.get_option("credit_note_number_format"));
     data.creditNote.DateCreated = DateTime.Now;
-    data.creditNote.AddedFrom = staff_user_id;
+    data.creditNote.AddedFrom = db.get_staff_user_id();
 
     var items = data.newitems;
     var custom_fields = data.custom_fields;
 
     data.creditNote = map_shipping_columns(data.creditNote);
-    var hook = self.hooks.apply_filters("before_create_credit_note", new { data, items });
+    var hook = hooks.apply_filters("before_create_credit_note", new { data, items });
 
     db.CreditNotes.Add(data.creditNote);
     var insert_id = data.creditNote.Id;
@@ -227,7 +225,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(insert_id, custom_fields);
 
-    foreach (var item in items.Where(item => item.Id == self.helper.add_new_sales_item_post(item!, insert_id, "credit_note")))
+    foreach (var item in items.Where(item => item.Id == db.add_new_sales_item_post(item!, insert_id, "credit_note")))
     {
       var item_taxes = item.ItemTaxes.ToList().Select(x => x.TaxName).ToList();
       var postItem = new PostItem
@@ -235,14 +233,14 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
         // TaxNames = items.Select(x => x.ItemTaxes.ToList()).ToList();
         TaxNames = item_taxes
       };
-      self.helper.maybe_insert_post_item_tax(item.Id, postItem, insert_id, "credit_note");
+      db.maybe_insert_post_item_tax(item.Id, postItem, insert_id, "credit_note");
     }
 
-    self.helper.update_sales_total_tax_column(insert_id, "credit_note", "creditnotes");
+    db.update_sales_total_tax_column(insert_id, "credit_note", "creditnotes");
 
     log_activity($"Credit Note Created [ID: {insert_id}]");
 
-    self.hooks.do_action("after_create_credit_note", insert_id);
+    hooks.do_action("after_create_credit_note", insert_id);
 
     if (save_and_send) send_credit_note_to_client(insert_id, true, manually: true);
 
@@ -274,7 +272,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
       newitems,
       removed_items = data.remove_items.Any() ? data.remove_items : new List<Itemable>()
     };
-    self.hooks.apply_filters("before_update_credit_note", hook);
+    hooks.apply_filters("before_update_credit_note", hook);
 
     data = hook.data;
     items = hook.items;
@@ -285,7 +283,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     data.remove_items
       .Select(x => x.Id)
       .ToList()
-      .ForEach(x => self.helper.handle_removed_sales_item_post(x, "credit_note"))
+      .ForEach(x => db.handle_removed_sales_item_post(x, "credit_note"))
       ;
 
     var affected_rows = db.CreditNotes.Where(x => x.Id == id).Update(x => data);
@@ -300,11 +298,11 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
       var itemTax = item.ItemTaxes.FirstOrDefault();
       if (!string.IsNullOrEmpty(itemTax.TaxName))
       {
-        self.helper.delete_taxes_from_item(itemTax.Id, "credit_note");
+        db.delete_taxes_from_item(itemTax.Id, "credit_note");
       }
       else
       {
-        var item_taxes = self.helper.get_credit_note_item_taxes(item.Id);
+        var item_taxes = db.get_credit_note_item_taxes(item.Id);
         var _item_taxes_names = item_taxes.Select(_item_tax => _item_tax.TaxName).ToList();
         _item_taxes_names.ForEach(_item_tax =>
         {
@@ -315,16 +313,16 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
         });
 
         var i = 0;
-        self.helper.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item.ItemTaxes), id, "credit_note");
+        db.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item.ItemTaxes), id, "credit_note");
       }
     }
 
 
     var result = newitems.Select(item =>
       {
-        var new_item_added = self.helper.add_new_sales_item_post(item, id, "credit_note");
+        var new_item_added = db.add_new_sales_item_post(item, id, "credit_note");
         if (new_item_added <= 1) return false;
-        self.helper.maybe_insert_post_item_tax(new_item_added, convert<PostItem>(item), id, "credit_note");
+        db.maybe_insert_post_item_tax(new_item_added, convert<PostItem>(item), id, "credit_note");
         return true;
       })
       .Where(x => x)
@@ -336,11 +334,11 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     if (result.Any())
     {
       update_credit_note_status(id);
-      self.helper.update_sales_total_tax_column(id, "credit_note", "creditnotes");
+      db.update_sales_total_tax_column(id, "credit_note", "creditnotes");
     }
 
     log_activity($"Credit Note Updated [ID:{id}]");
-    self.hooks.do_action("after_update_credit_note", id);
+    hooks.do_action("after_update_credit_note", id);
     return true;
   }
 
@@ -355,21 +353,21 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     var deleted = false;
     if (attachment == null) return deleted;
     if (string.IsNullOrEmpty(attachment.External))
-      self.helper.unlink($"{self.helper.get_upload_path_by_type("credit_note")}{attachment.RelId}/{attachment.FileName}");
+      unlink($"{get_upload_path_by_type("credit_note")}{attachment.RelId}/{attachment.FileName}");
 
     var affected_rows = db.Files.Where(x => x.Id == id).Delete();
     if (affected_rows > 0)
     {
       deleted = true;
-      log_activity($"Credit Note Attachment Deleted [Credite Note: {self.helper.format_credit_note_number(attachment.RelId)}]");
+      log_activity($"Credit Note Attachment Deleted [Credite Note: {db.format_credit_note_number(attachment.RelId)}]");
     }
 
-    if (!self.helper.is_dir(self.helper.get_upload_path_by_type("credit_note") + attachment.RelId)) return deleted;
+    if (!is_dir(get_upload_path_by_type("credit_note") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("credit_note") + attachment.RelId);
+    var other_attachments = list_files(get_upload_path_by_type("credit_note") + attachment.RelId);
     if (other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("credit_note") + attachment.RelId);
+      delete_dir(get_upload_path_by_type("credit_note") + attachment.RelId);
 
     return deleted;
   }
@@ -388,14 +386,14 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
   */
   public bool delete(int id, bool simpleDelete = false)
   {
-    self.hooks.do_action("before_credit_note_deleted", id);
+    hooks.do_action("before_credit_note_deleted", id);
     var result = db.CreditNotes.Where(x => x.Id == id).Delete();
     var affected_rows = db.SaveChanges();
     if (affected_rows <= 0) return false;
 
     var current_credit_note_number = Convert.ToInt32(db.get_option("next_credit_note_number"));
 
-    if (current_credit_note_number > 1 && simpleDelete == false && self.helper.is_last_credit_note(id))
+    if (current_credit_note_number > 1 && simpleDelete == false && this.is_last_credit_note(id))
       // Decrement next credit note number
       db.Options.Where(x => x.Name == "next_credit_note_number")
         .Update(x => new Option { Value = Convert.ToString(Convert.ToInt32(x.Value) - 1) });
@@ -422,7 +420,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     attachments.ForEach(attachment => { delete_attachment(attachment.Id); });
 
     db.Reminders.Where(x => x.RelId == id && x.RelType == "credit_note").Delete();
-    self.hooks.do_action("after_credit_note_deleted", id);
+    hooks.do_action("after_credit_note_deleted", id);
     return true;
   }
 
@@ -431,16 +429,16 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     db.CreditNotes.Where(x => x.Id == id).Update(x => new CreditNote { Status = status });
     var affected_rows = db.SaveChanges();
     if (affected_rows <= 0) return false;
-    self.hooks.do_action("credit_note_status_changed", id, new { status });
+    hooks.do_action("credit_note_status_changed", id, new { status });
     return true;
   }
 
   public string total_remaining_credits_by_customer(int customer_id)
   {
-    var has_permission_view = self.helper.has_permission("credit_notes", "", "view");
+    var has_permission_view = db.has_permission("credit_notes", "", "view");
     var query = db.CreditNotes.Where(x => x.ClientId == customer_id && x.Status == 1);
     if (!has_permission_view)
-      query = query.Where(x => x.AddedFrom == staff_user_id);
+      query = query.Where(x => x.AddedFrom == db.get_staff_user_id());
     var credits = query.ToList();
     var total = calc_remaining_credits(credits);
     return total;
@@ -500,17 +498,17 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     new_credit_note_data.DiscountPercent = _invoice.DiscountPercent;
     new_credit_note_data.DiscountTotal = _invoice.DiscountTotal;
     new_credit_note_data.DiscountType = _invoice.DiscountType;
-    new_credit_note_data.BillingStreet = self.helper.clear_textarea_breaks(_invoice.BillingStreet);
+    new_credit_note_data.BillingStreet = clear_textarea_breaks(_invoice.BillingStreet);
     new_credit_note_data.BillingCity = _invoice.BillingCity;
     new_credit_note_data.BillingState = _invoice.BillingState;
     new_credit_note_data.BillingZip = _invoice.BillingZip;
     new_credit_note_data.BillingCountry = _invoice.BillingCountry;
-    new_credit_note_data.ShippingStreet = self.helper.clear_textarea_breaks(_invoice.ShippingStreet);
+    new_credit_note_data.ShippingStreet = clear_textarea_breaks(_invoice.ShippingStreet);
     new_credit_note_data.ShippingCity = _invoice.ShippingCity;
     new_credit_note_data.ShippingState = _invoice.ShippingState;
     new_credit_note_data.ShippingZip = _invoice.ShippingZip;
     new_credit_note_data.ShippingCountry = _invoice.ShippingCountry;
-    new_credit_note_data.ReferenceNo = self.helper.format_invoice_number(_invoice.Id);
+    new_credit_note_data.ReferenceNo = db.format_invoice_number(_invoice.Id);
     if (_invoice.IncludeShipping)
       new_credit_note_data.IncludeShipping = _invoice.IncludeShipping;
     new_credit_note_data.ShowShippingOnCreditNote = credit_note(_invoice).ShowShippingOnCreditNote;
@@ -518,7 +516,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     new_credit_note_data.Terms = db.get_option("predefined_terms_credit_note");
     new_credit_note_data.AdminNote = "";
     new_credit_note_data.NewItems.Clear();
-    var custom_fields_items = self.helper.get_custom_fields("items");
+    var custom_fields_items = db.get_custom_fields("items");
     var key = 1;
     var itemables = new List<Itemable>();
     // foreach (var item in _invoice.Items)
@@ -526,17 +524,17 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
 
     {
       new_credit_note_data.NewItems[key].Description = item.Description;
-      new_credit_note_data.NewItems[key].LongDescription = self.helper.clear_textarea_breaks(item.LongDescription);
+      new_credit_note_data.NewItems[key].LongDescription = clear_textarea_breaks(item.LongDescription);
       new_credit_note_data.NewItems[key].Qty = item.Qty;
       new_credit_note_data.NewItems[key].Unit = item.Unit;
-      var taxes = self.helper.get_invoice_item_taxes(item.Id);
+      var taxes = db.get_invoice_item_taxes(item.Id);
       new_credit_note_data.NewItems[key].TaxNames = taxes.Select(x => x.TaxName).ToList();
       new_credit_note_data.NewItems[key].Rate = item.Rate;
       new_credit_note_data.NewItems[key].ItemOrder = item.ItemOrder;
       foreach (var cf in custom_fields_items)
       {
-        new_credit_note_data.NewItems[key].CustomFields.Items[cf.Id] = self.helper.get_custom_field_value(item.Id, cf.Id, "items", false);
-        if (!self.helper.defined("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST"))
+        new_credit_note_data.NewItems[key].CustomFields.Items[cf.Id] = db.get_custom_field_value(item.Id, cf.Id, "items", false);
+        if (!defined("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST"))
           self.helper.define("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST", true);
       }
 
@@ -553,8 +551,8 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
         self.helper.update_invoice_status(invoice_id, true);
     }
 
-    log_activity($"Created Credit Note From Invoice [Invoice: {self.helper.format_invoice_number(_invoice.Id)}, Credit Note: {self.helper.format_credit_note_number(id)}]");
-    self.hooks.do_action("created_credit_note_from_invoice", new { invoice_id, credit_note_id = id });
+    log_activity($"Created Credit Note From Invoice [Invoice: {db.format_invoice_number(_invoice.Id)}, Credit Note: {db.format_credit_note_number(id)}]");
+    hooks.do_action("created_credit_note_from_invoice", new { invoice_id, credit_note_id = id });
     return id;
   }
 
@@ -575,7 +573,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     var insert_id = data.Id;
     if (insert_id <= 0) return insert_id;
     update_credit_note_status(id);
-    self.hooks.do_action("credit_note_refund_created", new { data, credit_note_id = id });
+    hooks.do_action("credit_note_refund_created", new { data, credit_note_id = id });
     return insert_id;
   }
 
@@ -598,7 +596,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (affected_rows <= 0) return data.Id;
     update_credit_note_status(refund.CreditNoteId);
-    self.hooks.do_action("credit_note_refund_updated", new { data, refund_id = refund.CreditNoteId });
+    hooks.do_action("credit_note_refund_updated", new { data, refund_id = refund.CreditNoteId });
     return data.Id;
   }
 
@@ -623,7 +621,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
           payment_gateways.ForEach(gateway =>
           {
             // if (refund.PaymentMode != gateway.Id) return null;
-            var payment_modes_model = self.model.payment_modes_model();
+            var payment_modes_model = self.payment_modes_model(db);
             var row = payment_modes_model.get(x => x.Id == gateway.Id).First();
             refund.PaymentMode = row.Name;
           });
@@ -641,7 +639,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     var affected_rows = db.SaveChanges();
     if (affected_rows <= 0) return false;
     update_credit_note_status(credit_note_id);
-    self.hooks.do_action("credit_note_refund_deleted", new { refund_id, credit_note_id });
+    hooks.do_action("credit_note_refund_deleted", new { refund_id, credit_note_id });
     return true;
   }
 
@@ -657,7 +655,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
     {
       InvoiceId = data.InvoiceId,
       CreditId = id,
-      StaffId = staff_user_id,
+      StaffId = db.get_staff_user_id(),
       Date = DateTime.UtcNow,
       DateApplied = DateTime.UtcNow,
       Amount = data.Amount
@@ -676,15 +674,15 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
       // update invoice number for invoice with draft - V2.7.2
       invoices_model.change_invoice_number_when_status_draft(invoice.Id);
     invoice = db.Invoices.Include(x => x.Currency).FirstOrDefault(x => x.Id == data.Id);
-    var inv_number = self.helper.format_invoice_number(data.InvoiceId);
-    var credit_note_number = self.helper.format_credit_note_number(id);
+    var inv_number = db.format_invoice_number(data.InvoiceId);
+    var credit_note_number = db.format_credit_note_number(id);
     invoices_model.log(data.InvoiceId, "invoice_activity_applied_credits", false, JsonConvert.SerializeObject(new[]
     {
-      self.helper.app_format_money(data.Amount, invoice.Currency.Name),
+      db.app_format_money(data.Amount, invoice.Currency.Name),
       credit_note_number
     }));
 
-    self.hooks.do_action("credits_applied", new { data, credit_note_id = id });
+    hooks.do_action("credits_applied", new { data, credit_note_id = id });
     log_activity($"Credit Applied to Invoice [ Invoice: {inv_number}, Credit: {credit_note_number} ]");
 
     return insert_id;
@@ -724,9 +722,9 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self)
   public async Task<List<CreditNote>> get_open_credits(int customer_id)
   {
     var query = db.CreditNotes.Where(x => x.ClientId == customer_id && x.Status == 1).AsQueryable();
-    var has_permission_view = self.helper.has_permission("credit_notes", "", "view");
+    var has_permission_view = db.has_permission("credit_notes", "", "view");
 
-    if (!has_permission_view) query = query.Where(x => x.AddedFrom == staff_user_id);
+    if (!has_permission_view) query = query.Where(x => x.AddedFrom == db.get_staff_user_id());
 
     var credits = query.ToList();
 

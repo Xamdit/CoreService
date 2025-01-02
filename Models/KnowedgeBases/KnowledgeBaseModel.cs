@@ -1,11 +1,11 @@
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework;
 using Task = System.Threading.Tasks.Task;
 
 namespace Service.Models.KnowedgeBases;
 
-public class KnowledgeBaseModel(MyInstance self, MyContext db) : MyModel(self)
+public class KnowledgeBaseModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   // Get article by id or slug
   public KnowledgeBase? get_article(int? id = null, string slug = null)

@@ -1,12 +1,12 @@
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework;
-using Service.Framework.Core.Extensions;
 using Service.Helpers;
+using File = Service.Entities.File;
 
 namespace Service.Models.Estimates;
 
-public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
+public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public const int STATUS_PROCESSING = 2;
 
@@ -28,7 +28,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
     {
       var logMessage = "not_estimate_request_activity_assigned_updated";
       // Trigger hooks
-      self.hooks.do_action("estimate_request_assigned_changed", new
+      hooks.do_action("estimate_request_assigned_changed", new
       {
         estimate_request_id = data.Id,
         old_staff = oldAssigned,
@@ -58,7 +58,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
     if (currentStatusName == oldStatusName || string.IsNullOrEmpty(oldStatusName)) return true;
     var logMessage = "not_estimate_request_activity_status_updated";
 
-    self.hooks.do_action("estimate_request_status_changed", new
+    hooks.do_action("estimate_request_status_changed", new
     {
       estimate_request_id = data.Id,
       old_status = oldStatusName,
@@ -102,7 +102,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
   public int AddForm(EstimateRequestForm data)
   {
     data.SuccessSubmitMsg = data.SuccessSubmitMsg.Replace("\n", "<br>");
-    data.FormKey = self.helper.uuid();
+    data.FormKey = uuid();
     data.DateCreated = DateTime.Now;
 
     db.EstimateRequestForms.Add(data);
@@ -140,7 +140,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
     return row?.Name;
   }
 
-  public List<Global.Entities.File> get_estimate_request_attachments(int id)
+  public List<File> get_estimate_request_attachments(int id)
   {
     var rows = db.Files
       .Where(x => x.RelId == id && x.RelType == "estimate_request")
@@ -159,10 +159,10 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
       Link = $"estimate_request/view/{estimateRequestId}"
     };
 
-    self.helper.add_notification(notification);
+    db.add_notification(notification);
     var email = db.Staff
       .FirstOrDefault(x => x.Id == assigned);
-    self.helper.send_mail_template("estimate_request_assigned", estimateRequestId, email);
+    db.send_mail_template("estimate_request_assigned", estimateRequestId, email);
     return true;
   }
 

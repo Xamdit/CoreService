@@ -460,7 +460,7 @@ class Staff_model extends App_Model
 
             $this->db->where('staffid', $staffid);
             $this->db->update( 'staff', [
-                'media_path_slug' => slug_it($slug),
+                'media_path_slug' => db.slug_it($slug),
             ]);
 
             if (isset($custom_fields)) {

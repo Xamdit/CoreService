@@ -1,8 +1,6 @@
 using System.Reflection;
-using Global.Entities;
 using Service.Core.Extensions;
-using Service.Framework.Core.Engine;
-using Service.Framework.Helpers;
+using Service.Entities;
 using Service.Models;
 
 namespace Service.Helpers;
@@ -14,7 +12,7 @@ public static class EmailTemplateHelper
 * @since  2.3.0
 * @return mixed
 */
-  public static bool send_mail_template(this HelperBase helper, params object[] args)
+  public static bool send_mail_template(this MyContext db, params object[] args)
   {
     // $params = func_get_args();
     // return mail_template(...$params)->send();
@@ -32,13 +30,13 @@ public static class EmailTemplateHelper
  * @param  string $class mail template class name
  * @return mixed
  */
-  public static EmailsModel mail_template(string className, params object[] parameters)
+  public static EmailsModel mail_template(this MyModel model, string className, params object[] parameters)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     // Get the path of the mail template class file
     var path = GetMailTemplatePath(className, parameters);
 
-    if (self.helper.file_exists(path))
+    if (file_exists(path))
     {
       // Handle error for non-existent mail template
       if (!IsCronJob())
@@ -56,7 +54,7 @@ public static class EmailTemplateHelper
 
     // Initialize the class with the provided parameters
     // var instance = Activator.CreateInstance(mailTemplateType, parameters);
-    var instance = self.model.emails_model();
+    var instance = self.emails_model(db);
 
     // Check if the class has a Send method or some equivalent functionality
     var sendMethod = mailTemplateType.GetMethod("Send");
@@ -64,7 +62,6 @@ public static class EmailTemplateHelper
 
     // Optionally call the send method or return the instance
     sendMethod.Invoke(instance, null);
-
     return instance;
   }
 

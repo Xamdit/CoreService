@@ -1,5 +1,5 @@
-using Global.Entities;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Library.Merger;
 using Service.Helpers.Pdf;
@@ -9,10 +9,10 @@ using Service.Models.Invoices;
 
 namespace Service.Models.Statements;
 
-public class StatementModel(MyInstance self, MyContext db) : MyModel(self)
+public class StatementModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
-  private ClientsModel clients_model = self.model.clients_model();
-  private CurrenciesModel currencies_model = self.model.currencies_model();
+  private ClientsModel clients_model = self.clients_model(db);
+  private CurrenciesModel currencies_model = self.currencies_model(db);
 
   public async Task<StatementResult> get_statement(int customerId, DateTime from, DateTime to)
   {
@@ -183,7 +183,7 @@ public class StatementModel(MyInstance self, MyContext db) : MyModel(self)
     var statement = await get_statement(customerId, DateTime.Parse(from), DateTime.Parse(to));
     self.helper.set_mailing_constant();
     var pdf = self.helper.statement_pdf(statement);
-    var pdfFileName = slug_it($"customer_statement-{statement.Client.Company}");
+    var pdfFileName = db.slug_it($"customer_statement-{statement.Client.Company}");
     var attach = pdf.Output($"{pdfFileName}.pdf");
 
     var i = 0;
@@ -196,7 +196,7 @@ public class StatementModel(MyInstance self, MyContext db) : MyModel(self)
 
         var contact = clients_model.get_contact(contactId);
 
-        var template = mail_template("customer_statement", contact.Email, contactId, statement, cc);
+        var template = this.mail_template("customer_statement", contact.Email, contactId, statement, cc);
         // var attachment = new
         // {
         //   attachment = attach,

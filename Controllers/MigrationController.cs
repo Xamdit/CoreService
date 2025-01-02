@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
+using Service.Entities;
 using Service.Framework;
+using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
 using Service.Helpers.Database;
 using SqlKata.Execution;
@@ -9,16 +11,11 @@ namespace Service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MigrationController : AppControllerBase
+public class MigrationController(ILogger<MigrationController> logger, MyInstance self,MyContext db) : ClientControllerBase(logger, self,db)
 {
-  public MigrationController(ILogger<AppControllerBase> logger, MyInstance self) : base(logger, self)
-  {
-  }
-
   [HttpGet("make")]
   public IActionResult Make()
   {
-    var (self, db) = getInstance();
     self.config.Load("migration");
     if (self.config.item<bool>("migration_enabled") != true)
       return Content(
@@ -83,7 +80,7 @@ public class MigrationController : AppControllerBase
       new { table = "vault", field = "description" }
     };
 
-    tables = self.hooks.apply_filters("migration_tables_to_replace_old_links", tables);
+    tables = hooks.apply_filters("migration_tables_to_replace_old_links", tables);
 
     var affectedRows = 0;
 

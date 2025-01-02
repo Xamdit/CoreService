@@ -1,5 +1,8 @@
 using Newtonsoft.Json;
+using Service.Entities;
 using Service.Framework.Core.Engine;
+using Service.Framework.Helpers.Context;
+using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 
 namespace Service.Framework.Helpers;
@@ -9,7 +12,7 @@ public static class FileHelper
   private static Dictionary<string, string> Mimes = new();
   private static bool hour12 = true;
 
-  public static bool file_exists(this MyInstance self, string path, bool createIfNotExists = false)
+  public static bool file_exists(string path, bool createIfNotExists = false)
   {
     var output = File.Exists(path);
     if (!createIfNotExists || output) return output;
@@ -18,14 +21,14 @@ public static class FileHelper
     return output;
   }
 
-  public static void file_delete(this MyInstance self, string path)
+  public static void file_delete(string path)
   {
-    var output = File.Exists(path);
+    var output = file_exists(path);
     if (!output) return;
     File.Delete(path);
   }
 
-  public static string pathinfo(this MyInstance self, string path, string info)
+  public static string pathinfo(  string path, string info)
   {
     var output = info switch
     {
@@ -38,15 +41,15 @@ public static class FileHelper
     return output;
   }
 
-  public static string file_extension(this MyInstance self, string path)
+  public static string file_extension(  string path)
   {
     var output = Path.GetExtension(path).TrimStart('.').ToLower();
     return output;
   }
 
-  public static string get_mime_by_extension(this MyInstance self, string path)
+  public static string get_mime_by_extension(  string path)
   {
-    var extension = self.file_extension(path);
+    var extension =  file_extension(path);
     return mimetype(extension);
   }
 
@@ -87,16 +90,15 @@ public static class FileHelper
   }
 
 
-  public static string protected_file_url_by_path(this HelperBase helper, string path, bool preview = false)
+  public static string protected_file_url_by_path(  string path, bool preview = false)
   {
     return string.Empty;
   }
 
-  public static string _dt(this HelperBase helper, DateTime parsedDate, bool isTimesheet = false)
+  public static string _dt(  DateTime parsedDate, bool isTimesheet = false)
   {
-    var self = MyInstance.Instance;
-
-    var dateFormat = self.config.get("date_format", "HH:mm:ss tt");
+    var db = new MyContext();
+    var dateFormat = db.config("date_format", "HH:mm:ss tt");
     var timeFormat = isTimesheet ? "HH:mm" : "HH:mm:ss tt";
     var formattedDate = hour12
       ? parsedDate.ToString($"{dateFormat} {timeFormat}")
@@ -104,9 +106,9 @@ public static class FileHelper
     return formattedDate;
   }
 
-  public static string _dt(this HelperBase helper, string date, bool isTimesheet = false)
+  public static string _dt(  string date, bool isTimesheet = false)
   {
-    var self = MyInstance.Instance;
+    var self = new MyInstance();
     var dateFormat = self.config.get("date_format", "HH:mm:ss tt");
     if (string.IsNullOrWhiteSpace(date) || date == "0000-00-00 00:00:00") return "";
     var parsedDate = DateTime.Parse(date);
@@ -124,7 +126,7 @@ public static class FileHelper
  * @param  string filename filename
  * @return string           the unique filename
  */
-  public static string unique_filename(this HelperBase helper, string dir, string filename)
+  public static string unique_filename(  string dir, string filename)
   {
     return filename;
   }
@@ -182,39 +184,34 @@ public static class FileHelper
   }
 
 
-  public static bool is_dir(this HelperBase helper, string path)
+  public static bool is_dir(  string path)
   {
     return Directory.Exists(path);
   }
 
-  public static bool delete_dir(this HelperBase helper, string path)
+  public static bool delete_dir(  string path)
   {
     Directory.Delete(path, true);
     return true;
   }
 
   // delete recursive
-  public static bool unlink(this HelperBase helper, string path)
+  public static bool unlink(  string path)
   {
     Directory.Delete(path, true);
     return true;
   }
 
-  public static List<string?> list_files(this HelperBase helper, string path)
+  public static List<string?> list_files(  string path)
   {
     return Directory.GetFiles(path).Select(Path.GetFileName).ToList();
   }
 
-  public static bool file_create(this HelperBase helper, string path, bool if_not_exists = false)
+  public static bool file_create(  string path, bool if_not_exists = false)
   {
     if (if_not_exists && File.Exists(path)) return false;
     File.Create(path);
     return true;
-  }
-
-  public static bool file_exists(this HelperBase helperBase, string path)
-  {
-    return File.Exists(path);
   }
 
   public static int file_put_contents(this HelperBase self, string path, string data, bool append = false)
@@ -237,19 +234,12 @@ public static class FileHelper
     }
   }
 
-  public static string file_name(this HelperBase helper, string filepath)
+  public static string file_name(  string filepath)
   {
     return Path.GetFileName(filepath);
   }
 
-  public static string file_extension(this HelperBase helper, string filepath)
-  {
-    // Get the file extension using Path.GetExtension
-    return Path.GetExtension(filepath);
-  }
-
-
-  public static void xcopy(this HelperBase helper, string sourceDirectory, string targetDirectory, bool copySubDirectories = true)
+  public static void xcopy(  string sourceDirectory, string targetDirectory, bool copySubDirectories = true)
   {
     // Ensure the source directory exists
     if (!Directory.Exists(sourceDirectory)) throw new DirectoryNotFoundException($"Source directory does not exist: {sourceDirectory}");
@@ -274,11 +264,11 @@ public static class FileHelper
     subDirectories.ForEach(subDirectory =>
     {
       var newTargetDirectory = Path.Combine(targetDirectory, subDirectory.Name);
-      helper.xcopy(subDirectory.FullName, newTargetDirectory, copySubDirectories); // Recursively copy subdirectories
+       xcopy(subDirectory.FullName, newTargetDirectory, copySubDirectories); // Recursively copy subdirectories
     });
   }
 
-  public static string stream_get_contents(this HelperBase helper, Stream stream)
+  public static string stream_get_contents(  Stream stream)
   {
     if (stream == null) throw new ArgumentNullException(nameof(stream));
     if (!stream.CanRead) throw new InvalidOperationException("Stream cannot be read.");
@@ -286,7 +276,7 @@ public static class FileHelper
     return reader.ReadToEnd();
   }
 
-  public static void delete_files_by_extension(this HelperBase helper, string directoryPath, string extension)
+  public static void delete_files_by_extension(  string directoryPath, string extension)
   {
     if (!Directory.Exists(directoryPath))
     {
@@ -309,19 +299,19 @@ public static class FileHelper
       }
   }
 
-  public static bool create_folder_if_not_exists(this HelperBase helper, string path)
+  public static bool create_folder_if_not_exists(  string path)
   {
     if (Directory.Exists(path)) return false;
     Directory.CreateDirectory(path);
     return true;
   }
 
-  public static bool create_file_if_not_exists(this HelperBase helper, string currentPath)
+  public static bool create_file_if_not_exists(  string currentPath)
   {
     try
     {
       var folder = Path.GetDirectoryName(currentPath);
-      helper.create_folder_if_not_exists(folder);
+       create_folder_if_not_exists(folder);
       if (!File.Exists(currentPath))
         File.Create(currentPath).Dispose(); // Create the file and immediately release the file handle
       return true;
@@ -332,7 +322,7 @@ public static class FileHelper
     }
   }
 
-  public static bool create_json_file(this HelperBase helper, string path, object? data = null)
+  public static bool create_json_file(  string path, object? data = null)
   {
     try
     {

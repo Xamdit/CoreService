@@ -1,6 +1,5 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
-using Service.Framework.Helpers;
 
 namespace Service.Libraries.MergeField;
 
@@ -18,14 +17,14 @@ public class AppMergeFields(MyInstance self)
   protected Dictionary<string, List<object>> fields = new();
 
   // Paths to load the classes
-  // protected List<string> registered = self.hooks.apply_filters("register_merge_fields", new List<string>());
+  // protected List<string> registered = hooks.apply_filters("register_merge_fields", new List<string>());
   protected List<string> registered
   {
     get
     {
       if (has_build_method())
         set(build());
-      return self.hooks.apply_filters("register_merge_fields", new List<string>());
+      return hooks.apply_filters("register_merge_fields", new List<string>());
     }
   }
   // public List<string> getRegistered()
@@ -58,7 +57,7 @@ public class AppMergeFields(MyInstance self)
       classesForMergeFieldsInitialized = true;
     }
 
-    var baseName = self.helper.file_name(name);
+    var baseName = file_name(name);
     var mergeFields = get_by_name(baseName);
     // Add logic to process mergeFields
     return new CustomField();
@@ -105,7 +104,7 @@ public class AppMergeFields(MyInstance self)
     }
 
     // Apply custom fields and return
-    return self.hooks.apply_filters("available_merge_fields", available);
+    return hooks.apply_filters("available_merge_fields", available);
   }
 
   public string get_name()
@@ -115,7 +114,7 @@ public class AppMergeFields(MyInstance self)
 
   public string load(string mergeField)
   {
-    var baseName = self.helper.file_name(mergeField);
+    var baseName = file_name(mergeField);
 
     // Add logic to dynamically load classes if necessary
 

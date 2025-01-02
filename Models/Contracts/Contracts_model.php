@@ -536,7 +536,7 @@ class Contracts_model extends App_Model
                     if ($attachpdf) {
                         $template->add_attachment([
                             'attachment' => $attach,
-                            'filename'   => slug_it($contract->subject) . '.pdf',
+                            'filename'   => db.slug_it($contract->subject) . '.pdf',
                             'type'       => 'application/pdf',
                         ]);
                     }

@@ -1,6 +1,6 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Models.Estimates;
-using Task = Global.Entities.Task;
+using Task = Service.Entities.Task;
 
 namespace Service.Models.Invoices;
 

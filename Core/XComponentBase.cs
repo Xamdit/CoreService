@@ -6,10 +6,10 @@
 using System.Dynamic;
 using System.Linq.Expressions;
 using Blazored.LocalStorage;
-using Global.Entities;
 using Microsoft.AspNetCore.Components;
 using Service.Core.Engine;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Task = System.Threading.Tasks.Task;
 
@@ -29,24 +29,7 @@ public abstract class XComponentBase : MyComponentBase
   public string? Env => Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 
-  public MyInstance self
-  {
-    get
-    {
-      var (self, db) = getInstance();
-      self.navigation = NavigationManager;
-      return self;
-    }
-  }
-
-  public MyContext db
-  {
-    get
-    {
-      var (self, db) = getInstance();
-      return db;
-    }
-  }
+  public MyContext db = new();
 
   protected MarkupString GetTemplatePart(string section, params dynamic[] args)
   {
@@ -86,7 +69,6 @@ public abstract class XComponentBase : MyComponentBase
 
   public string? GetFragment()
   {
-    var (self, db) = getInstance();
     self.navigation = NavigationManager;
     var uri = self.navigation.Uri;
     var fragment = NavigationManager.ToAbsoluteUri(uri).Fragment;
@@ -122,63 +104,55 @@ public abstract class XComponentBase : MyComponentBase
     return string.Empty;
   }
 
-  public string Format_invoice_number(int id)
+  public string format_invoice_number(int id)
   {
     return string.Empty;
   }
 
   // public bool is_sale_discount_applied(Proposal item)
-  public bool Is_sale_discount_applied(dynamic item)
+  public bool is_sale_discount_applied(dynamic item)
   {
     return false;
   }
 
-  public string Get_custom_field_value(int id, int subid, string value)
+  public string get_custom_field_value(int id, int subid, string value)
   {
     return string.Empty;
   }
 
   // public bool is_sale_discount(Proposal proposal, string fieldname)
-  public bool Is_sale_discount(dynamic proposal, string fieldname)
+  public bool is_sale_discount(dynamic proposal, string fieldname)
   {
     return false;
   }
 
-  public string Format_credit_note_number(int id)
+  public string format_credit_note_number(int id)
   {
     return string.Empty;
   }
 
-  public string Format_organization_info()
+  public string format_organization_info()
   {
     return string.Empty;
   }
 
   // public string format_customer_info(Contact contract, params string[] args)
-  public string Format_customer_info(dynamic contract, params string[] args)
+  public string format_customer_info(dynamic contract, params string[] args)
   {
     return string.Empty;
   }
 
-  public string Get_custom_fields(string table, Expression<Func<object, bool>> condition)
+  public string get_custom_fields(string table, Expression<Func<object, bool>> condition)
   {
     return string.Empty;
   }
 
-  public bool Is_client_logged_in()
-  {
-    return false;
-  }
 
-  public string Get_project_name_by_id(int id)
+  public string get_project_name_by_id(int id)
   {
     return string.Empty;
   }
 
-  public string Clear_textarea_breaks(string? item = null)
-  {
-    return string.Empty;
-  }
 
   public bool Is_empty_customer_company(int id)
   {
@@ -190,17 +164,13 @@ public abstract class XComponentBase : MyComponentBase
     return string.Empty;
   }
 
-  public string Get_upload_path_by_type(string path)
-  {
-    return string.Empty;
-  }
 
   public string Optimize_dropbox_thumbnail(string path)
   {
     return string.Empty;
   }
 
-  public string Get_mime_class(string mime)
+  public string get_mime_class(string mime)
   {
     return string.Empty;
   }
@@ -208,15 +178,10 @@ public abstract class XComponentBase : MyComponentBase
   /// <inheritdoc/>
   protected override async Task OnInitializedAsync()
   {
-    var (self, db) = getInstance();
     await base.OnInitializedAsync();
+    self.navigation = NavigationManager;
     var httpContext = HttpContextAccessor.HttpContext;
     self.context = httpContext;
-  }
-
-  public bool is_admin()
-  {
-    return false;
   }
 
   public string text(string key)

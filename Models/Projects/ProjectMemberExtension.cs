@@ -1,13 +1,9 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Helpers;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
 using Service.Entities;
-using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
-using static Service.Framework.Helpers.FileHelper;
 using Task = System.Threading.Tasks.Task;
 
 namespace Service.Models.Projects;
@@ -16,8 +12,8 @@ public static class ProjectMemberExtension
 {
   public static async Task delete(this ProjectsModel model, int project_id)
   {
-    var (self, db) = getInstance();
-    self.hooks.do_action("before_project_deleted", project_id);
+    var (self, db) = model.getInstance();
+    hooks.do_action("before_project_deleted", project_id);
     var project_name = db.get_project_name_by_id(project_id);
     var query = db.Projects.Where(x => x.Id == project_id).AsQueryable();
 
@@ -43,9 +39,9 @@ public static class ProjectMemberExtension
     files.ForEach(file =>
     {
       var path = Path.Combine(Directory.GetCurrentDirectory(), file.Id.ToString());
-      self.file_delete(path);
+      file_delete(path);
     });
-    var tasks_model = self.model.tasks_model();
+    var tasks_model = self.tasks_model(db);
 
     var tasks = await model.get_tasks(x => x.Id == project_id);
     tasks.ForEach(task => { tasks_model.delete_task(task.Id, false); });
@@ -102,27 +98,27 @@ public static class ProjectMemberExtension
       });
     await db.PinnedProjects.Where(x => x.ProjectId == project_id).DeleteAsync();
     log_activity($"Project Deleted [ID: {project_id}, Name: {project_name}]");
-    self.hooks.do_action("after_project_deleted", project_id);
+    hooks.do_action("after_project_deleted", project_id);
   }
 
   public static List<DataSet<ProjectActivity>> get_activity(this ProjectsModel model, object id, int limit = 0, bool only_project_members_activity = false)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var query = db.ProjectActivities.Where(x => x.ProjectId == Convert.ToInt32(id)).AsQueryable();
-    if (!model.client_logged_in)
+    if (!db.client_logged_in())
     {
-      var can_view_project = self.helper.has_permission("projects", "", "view");
+      var can_view_project = db.has_permission("projects", "", "view");
       if (!can_view_project)
         query.Where(x =>
           db.ProjectMembers
-            .Where(y => y.StaffId == model.staff_user_id)
+            .Where(y => y.StaffId == db.get_staff_user_id())
             .Select(y => y.ProjectId)
             .ToList()
             .Contains(x.ProjectId)
         );
     }
 
-    if (model.client_logged_in) query.Where(x => x.VisibleToCustomer);
+    if (db.client_logged_in()) query.Where(x => x.VisibleToCustomer);
     if (int.TryParse($"{id}", out var project_id))
       query.Where(x => x.ProjectId == project_id);
     if (int.TryParse($"{limit}", out var _limit) && _limit > 0)
@@ -135,20 +131,20 @@ public static class ProjectMemberExtension
       .Select(x => new DataSet<ProjectActivity>() { Data = x })
       .Select(activity =>
       {
-        var seconds = self.helper.get_string_between(activity.Data.AdditionalData, "<seconds>", "</seconds>");
-        var other_lang_keys = self.helper.get_string_between(activity.Data.AdditionalData, "<lang>", "</lang>");
+        var seconds = get_string_between(activity.Data.AdditionalData, "<seconds>", "</seconds>");
+        var other_lang_keys = get_string_between(activity.Data.AdditionalData, "<lang>", "</lang>");
         var _additional_data = activity.Data.AdditionalData;
         if (seconds != "")
           _additional_data = $"<seconds>{seconds}</seconds>".Replace(seconds_to_time_format(Convert.ToInt32(seconds)), _additional_data);
-        if (other_lang_keys != "") _additional_data = $"<lang>{other_lang_keys}</lang>".Replace(self.helper.label(other_lang_keys), _additional_data);
+        if (other_lang_keys != "") _additional_data = $"<lang>{other_lang_keys}</lang>".Replace(label(other_lang_keys), _additional_data);
         if (_additional_data.Contains("project_status_"))
         {
-          var row = self.helper.get_project_status_by_id(Convert.ToInt32(self.helper.strafter(_additional_data, "project_status_")));
+          var row = model.get_project_status_by_id(Convert.ToInt32(strafter(_additional_data, "project_status_")));
           if (string.IsNullOrEmpty(row.Name))
             _additional_data = row.Name;
         }
 
-        activity.Data.DescriptionKey = self.helper.label(activity.Data.DescriptionKey);
+        activity.Data.DescriptionKey = label(activity.Data.DescriptionKey);
         activity.Data.AdditionalData = _additional_data;
         activity.Data.Project.Name = db.get_project_name_by_id(activity.Data.Id);
         activity.Data.DescriptionKey = null;
@@ -161,11 +157,11 @@ public static class ProjectMemberExtension
 
   public static bool new_project_file_notification(this ProjectsModel model, int file_id, int project_id)
   {
-    var (self, db) = getInstance();
+    var (_, db) = model.getInstance();
     var file = model.get_file(file_id);
 
     var additional_data = file.FileName;
-    self.helper.log_activity(project_id, "project_activity_uploaded_file", additional_data, file.VisibleToCustomer);
+    log_activity(project_id, "project_activity_uploaded_file", additional_data, file.VisibleToCustomer);
     var notification_data = new Notification
     {
       Description = "not_project_file_uploaded",
@@ -173,25 +169,25 @@ public static class ProjectMemberExtension
     };
 
 
-    if (model.client_logged_in)
-      notification_data.FromClientId = self.helper.get_contact_user_id();
+    if (db.client_logged_in())
+      notification_data.FromClientId = db.get_contact_user_id();
     else
-      notification_data.FromUserId = model.staff_user_id;
+      notification_data.FromUserId = db.get_staff_user_id();
 
 
     var members = model.get_project_members(project_id);
     var notifiedUsers = members
       .Select(member =>
       {
-        if (member.StaffId == model.staff_user_id && !model.client_logged_in) return 0;
+        if (member.StaffId == db.get_staff_user_id() && !db.client_logged_in()) return 0;
         notification_data.ToUserId = member.StaffId;
-        return self.helper.add_notification(notification_data)
+        return db.add_notification(notification_data)
           ? member.StaffId
           : 0;
       })
       .ToList();
 
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
 
     return model.send_project_email_template(
       project_id,
@@ -217,8 +213,8 @@ public static class ProjectMemberExtension
 
   public static int add_external_file(this ProjectsModel model, ProjectFile data)
   {
-    var (self, db) = getInstance();
-    var file = self.helper.get_project_files(data.Id).FirstOrDefault();
+    var (self, db) = model.getInstance();
+    var file = db.get_project_files(data.Id).FirstOrDefault();
     var insert = new ProjectFile();
     insert.DateCreated = DateTime.Now;
     insert.Id = data.Id;
@@ -228,7 +224,7 @@ public static class ProjectMemberExtension
     insert.Subject = file?.FileName;
     insert.ExternalLink = file?.ExternalLink;
 
-    insert.FileType = self.get_mime_by_extension(file.FileName);
+    insert.FileType = get_mime_by_extension(file.FileName);
     if (!string.IsNullOrEmpty(file.ThumbnailLink))
       insert.ThumbnailLink = file.ThumbnailLink;
     if (data.StaffId > 0)
@@ -240,65 +236,65 @@ public static class ProjectMemberExtension
     return result.Entity.Id;
   }
 
-  public static bool send_project_email_template(this ProjectsModel model, int project_id, string staff_template, string customer_template, bool action_visible_to_customer, dynamic additional_data = default)
-  {
-    var (self, db) = getInstance();
-    if (additional_data != null)
-    {
-      additional_data.Customers = new List<object>();
-      additional_data.staff = new List<object>();
-    }
-    else if (additional_data.Count() == 1)
-    {
-      if (!additional_data.IsStaff)
-        additional_data.Staff = new List<Staff>();
-      else
-        additional_data.customers = new List<Contact>();
-    }
-
-    var project = model.get(x => x.Id == project_id);
-    model.get_project_members(project_id)
-      .ForEach(member =>
-      {
-        if (is_staff_logged_in() && member.StaffId == model.staff_user_id) return;
-        var mailTemplate = mail_template(staff_template, project, member, additional_data.staff);
-        if (additional_data.Attachments.Any())
-          foreach (var attachment in additional_data.Attachments)
-            mailTemplate.add_attachment(attachment);
-        mailTemplate.send();
-      });
-
-    if (action_visible_to_customer != true) return true;
-    var clients_model = self.model.clients_model();
-    var contacts = clients_model.get_contacts_for_project_notifications(project_id, "project_emails");
-    contacts
-      .Where(contact => !model.client_logged_in || contact.Id != self.helper.get_contact_user_id())
-      .Select(contact =>
-      {
-        var mailTemplate = mail_template(customer_template, project, contact, additional_data.customers);
-        if (additional_data.Attachments)
-          foreach (var attachment in additional_data.Attachments)
-            mailTemplate.add_attachment(attachment);
-        mailTemplate.send();
-        return true;
-      })
-      .ToList();
-
-
-    return true;
-  }
+  // public static bool send_project_email_template(this ProjectsModel model, int project_id, string staff_template, string customer_template, bool action_visible_to_customer, dynamic additional_data = default)
+  // {
+  //   var (self, db) = model.getInstance();
+  //   if (additional_data != null)
+  //   {
+  //     additional_data.Customers = new List<object>();
+  //     additional_data.staff = new List<object>();
+  //   }
+  //   else if (additional_data.Count() == 1)
+  //   {
+  //     if (!additional_data.IsStaff)
+  //       additional_data.Staff = new List<Staff>();
+  //     else
+  //       additional_data.customers = new List<Contact>();
+  //   }
+  //
+  //   var project = model.get(x => x.Id == project_id);
+  //   model.get_project_members(project_id)
+  //     .ForEach(member =>
+  //     {
+  //       if (db.is_staff_logged_in() && member.StaffId == db.get_staff_user_id()) return;
+  //       var mailTemplate = model.mail_template(staff_template, project, member, additional_data.staff);
+  //       if (additional_data.Attachments.Any())
+  //         foreach (var attachment in additional_data.Attachments)
+  //           mailTemplate.add_attachment(attachment);
+  //       mailTemplate.send();
+  //     });
+  //
+  //   if (action_visible_to_customer != true) return true;
+  //   var clients_model = self.clients_model(db);
+  //   var contacts = clients_model.get_contacts_for_project_notifications(project_id, "project_emails");
+  //   contacts
+  //     .Where(contact => !db.client_logged_in() || contact.Id != db.get_contact_user_id())
+  //     .Select(contact =>
+  //     {
+  //       var mailTemplate = model.mail_template(customer_template, project, contact, additional_data.customers);
+  //       if (additional_data.Attachments)
+  //         foreach (var attachment in additional_data.Attachments)
+  //           mailTemplate.add_attachment(attachment);
+  //       mailTemplate.send();
+  //       return true;
+  //     })
+  //     .ToList();
+  //
+  //
+  //   return true;
+  // }
 
   public static List<Project> get_project_billing_data(this ProjectsModel model, int id)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var rows = db.Projects.Where(x => x.Id == id).ToList();
     return rows;
   }
 
   public static async Task<(string hours, double total_money)> total_logged_time_by_billing_type(this ProjectsModel model, int id, Expression<Func<bool>> conditions)
   {
-    var (self, db) = getInstance();
-    var projects_model = self.model.projects_model();
+    var (self, db) = model.getInstance();
+    var projects_model = self.projects_model(db);
     var project_data = model.get_project_billing_data(id).FirstOrDefault();
     var data = new List<object>();
     var logged_time = string.Empty;
@@ -340,16 +336,16 @@ public static class ProjectMemberExtension
 
   public static bool delete_discussion_comments(this ProjectsModel model, int id, string type)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var comments = db.ProjectDiscussionComments.Where(x => x.DiscussionId == id && x.DiscussionType == type).ToList();
     foreach (var comment in comments) model.delete_discussion_comment_attachment(comment.FileName, id);
     db.ProjectDiscussionComments.Where(x => x.DiscussionId == id && x.DiscussionType == type).Delete();
     return false;
   }
 
-  public static async Task<(double total_money, double total_seconds, string logged_time)> get_data_total_logged_time(this ProjectsModel model, Expression<Func<Global.Entities.Task, bool>> conditions)
+  public static async Task<(double total_money, double total_seconds, string logged_time)> get_data_total_logged_time(this ProjectsModel model, Expression<Func<Entities.Task, bool>> conditions)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     (double total_money, int total_seconds, string logged_time) data = new();
     var id = db.ExtractIdFromCondition(conditions) ?? 0;
     var project_data = model.get_project_billing_data(id).FirstOrDefault();
@@ -374,7 +370,7 @@ public static class ProjectMemberExtension
 
   public static bool update_discussion_last_activity(this ProjectsModel model, int id, string type)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     if (type == "file")
       db.ProjectFiles.Where(x => x.Id == id).Update(x => new ProjectFile
       {
@@ -393,19 +389,19 @@ public static class ProjectMemberExtension
 
   public static async Task send_project_email_mentioned_users(this ProjectsModel model, int project_id, string staff_template, List<Staff> staff, object additional_data)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var project = model.get(x => x.Id == project_id);
-    var staff_model = self.model.staff_model();
+    var staff_model = self.staff_model(db);
     staff
       .Select(x => x.Id)
-      .Where(staffId => !is_staff_logged_in() || staffId != model.staff_user_id)
+      .Where(staffId => !db.is_staff_logged_in() || staffId != db.get_staff_user_id())
       .Select(staffId => staff_model.get(x => x.Id == staffId).FirstOrDefault())
-      // .Select(member => self.helper.mail_template(staff_template, project, member, additional_data.Staff))
-      .Select(member => mail_template(staff_template, project, member, convert<Staff>(additional_data)))
+      // .Select(member =>  helper.mail_template(staff_template, project, member, additional_data.Staff))
+      .Select(member => model.mail_template(staff_template, project, member, convert<Staff>(additional_data)))
       .ToList()
       .ForEach(mailTemplate =>
       {
-        var attachments = self.helper.get_project_files(Convert.ToInt32(additional_data));
+        var attachments = db.get_project_files(Convert.ToInt32(additional_data));
         if (attachments.Any())
           foreach (var attachment in attachments)
             mailTemplate.add_attachment(attachment);
@@ -415,17 +411,17 @@ public static class ProjectMemberExtension
 
   public static bool convert_estimate_items_to_tasks(this ProjectsModel model, int project_id, List<Itemable> items, List<int> assignees, DataSet<Project> project_data, List<string> project_settings)
   {
-    var (self, db) = getInstance();
-    var staff_model = self.model.staff_model();
-    var tasks_model = self.model.tasks_model();
+    var (self, db) = model.getInstance();
+    var staff_model = self.staff_model(db);
+    var tasks_model = self.tasks_model(db);
     for (var index = 0; index < items.Count; index++)
     {
       var itemId = items[index];
       var _item =
         db.Itemables.FirstOrDefault(x => x.Id == itemId.Id);
 
-      var dataset = new DataSet<Global.Entities.Task>();
-      dataset.Data = new Global.Entities.Task
+      var dataset = new DataSet<Entities.Task>();
+      dataset.Data = new Entities.Task
       {
         Billable = 1,
         Name = _item.Description,
@@ -439,7 +435,7 @@ public static class ProjectMemberExtension
       };
       dataset["with_default_assignee"] = false;
 
-      if (self.helper.view_tasks(project_settings).Any())
+      if (db.view_tasks(project_settings).Any())
         dataset.Data.VisibleToClient = true;
       var task_id = tasks_model.add(dataset);
       if (task_id == 0) return false;

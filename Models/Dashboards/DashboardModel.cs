@@ -1,13 +1,13 @@
 using System.Globalization;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 
 namespace Service.Models.Dashboards;
 
-public class DashboardModel(MyInstance self, MyContext db) : MyModel(self)
+public class DashboardModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   // Get upcoming events this week
   public List<Event> GetUpcomingEvents()

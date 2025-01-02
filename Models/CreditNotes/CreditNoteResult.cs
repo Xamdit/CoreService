@@ -1,5 +1,5 @@
-using Global.Entities;
-using File = Global.Entities.File;
+using Service.Entities;
+using File = Service.Entities.File;
 
 namespace Service.Models.CreditNotes;
 
@@ -12,7 +12,7 @@ public class CreditNoteResult
   public double TotalLeftToPay { get; set; }
   public CreditNote CreditNote { get; set; }
   public List<CreditNoteRefund> CreditNoteRefunds { get; set; }
-  public Global.Entities.Client Client { get; set; }
+  public Entities.Client Client { get; set; }
   public string remaining_credits { get; set; }
   public List<Credit> applied_credits { get; set; }
   public List<File> attachments { get; set; }

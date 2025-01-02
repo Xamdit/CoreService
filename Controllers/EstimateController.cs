@@ -1,77 +1,73 @@
-using Global.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
-using Service.Framework.Core.Engine;
+using Service.Framework.Core.Extensions;
+using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
 using Service.Helpers;
 using Service.Helpers.Pdf;
 using Service.Helpers.Tags;
+using Service.Libraries.AppNumberToWords;
 
 namespace Service.Controllers;
 
-public class EstimateController(ILogger<MyControllerBase> logger, MyInstance self) : ClientControllerBase(logger, self)
+public class EstimateController(ILogger<EstimateController> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   [HttpGet]
   public IActionResult index(int id, string hash, string signature, string estimate_action)
   {
-    var (self, db) = getInstance();
-    var estimates_model = self.model.estimates_model();
-    var invoices_model = self.model.invoices_model();
-    self.helper.check_estimate_restrictions(id, hash);
+    var estimates_model = self.estimates_model(db);
+    var invoices_model = self.invoices_model(db);
+    // self.helper.check_estimate_restrictions(id, hash);
     var estimate = estimates_model.get(x => x.Id == id).First();
-    if (!is_client_logged_in())
-      self.helper.load_client_language(estimate.ClientId);
+    if (!db.is_client_logged_in())
+      self.helper.load_client_language(estimate.ClientId.Value);
 
     var identity_confirmation_enabled = db.get_option("estimate_accept_identity_confirmation");
     var redURL = "#";
-    if (self.input.post().ContainsKey("estimate_action"))
+    if (self.input.post_has("estimate_action"))
     {
       var action = self.input.post<int>("estimate_action");
       // Only decline and accept allowed
-      if (action is 3 or 4)
+      if (action is not (3 or 4)) return Redirect(redURL);
+      var success = estimates_model.mark_action_status(action, id, true);
+      redURL = base_url();
+      var accepted = false;
+      if (self.helper.is_array(success) && success.invoice != null)
       {
-        var success = estimates_model.mark_action_status(action, id, true);
-
-        redURL = this.uri.uri_string();
-        var accepted = false;
-        if (is_array(success) && success["invoiced"] == true)
+        accepted = true;
+        var _invoice = invoices_model.get(success.invoice.Id);
+        set_alert("success", label("clients_estimate_invoiced_successfully"));
+        redURL = self.helper.site_url("invoice/" + _invoice.Id + "/" + _invoice.Hash);
+      }
+      else if ((self.helper.is_array(success) && success.invoice == null) || success.is_success)
+      {
+        if (action == 4)
         {
           accepted = true;
-          var _invoice = invoices_model.get(success["invoiceid"]);
-          set_alert("success", self.helper.label("clients_estimate_invoiced_successfully"));
-          redURL = self.helper.site_url("invoice/" + _invoice.Id + "/" + _invoice.Hash);
-        }
-        else if ((is_array(success) && success["invoiced"] == false) || success == true)
-        {
-          if (action == 4)
-          {
-            accepted = true;
-            set_alert("success", self.helper.label("clients_estimate_accepted_not_invoiced"));
-          }
-          else
-          {
-            set_alert("success", self.helper.label("clients_estimate_declined"));
-          }
+          set_alert("success", label("clients_estimate_accepted_not_invoiced"));
         }
         else
         {
-          set_alert("warning", self.helper.label("clients_estimate_failed_action"));
-        }
-
-        if (action == 4 && accepted = true)
-        {
-          self.helper.process_digital_signature_image(signature, ESTIMATE_ATTACHMENTS_FOLDER + id);
-          db.Estimates.Where(x => x.Id == id).Update(x => get_acceptance_info_array());
+          set_alert("success", label("clients_estimate_declined"));
         }
       }
+      else
+      {
+        set_alert("warning", label("clients_estimate_failed_action"));
+      }
+
+      if (!(action == 4 && accepted)) return Redirect(redURL);
+      self.helper.process_digital_signature_image(signature, ESTIMATE_ATTACHMENTS_FOLDER + id);
+      db.Estimates.Where(x => x.Id == id).Update(x => get_acceptance_info_array<Estimate>());
 
       return Redirect(redURL);
     }
 
     // Handle Estimate PDF generator
-    if (self.input.post().ContainsKey("estimatepdf"))
+    if (self.input.post_has("estimatepdf"))
     {
       PdfDocumentGenerator pdf;
       try
@@ -83,29 +79,29 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
         return MakeError(e.Message);
       }
 
-      var estimate_number = self.helper.format_estimate_number(estimate.Id);
+      var estimate_number = db.format_estimate_number(estimate.Id);
       var companyname = db.get_option("invoice_company_name");
-      if (companyname != "") estimate_number += "-" + mb_strtoupper(slug_it(companyname), "UTF-8");
-      pdf.Output(mb_strtoupper(slug_it(estimate_number), "UTF-8") + ".pdf", "D");
+      if (companyname != "") estimate_number += "-" + db.slug_it(companyname).ToUpper();
+      pdf.Output(db.slug_it(estimate_number).ToUpper() + ".pdf");
       return MakeError();
     }
 
     self.library.app_number_to_word(new Estimate() { ClientId = estimate.ClientId }, "numberword");
-    self.app_scripts.theme("sticky-js", "assets/plugins/sticky/sticky.js");
+    //self.app_scripts.theme("sticky-js", "assets/plugins/sticky/sticky.js");
 
-    data.title = self.helper.format_estimate_number(estimate.Id);
+    data.title = db.format_estimate_number(estimate.Id);
     // this.disableNavigation();
     // this.disableSubMenu();
     data.hash = hash;
     data.can_be_accepted = false;
-    data.estimate = self.hooks.apply_filters("estimate_html_pdf_data", estimate);
+    data.estimate = hooks.apply_filters("estimate_html_pdf_data", estimate);
     data.bodyclass = "viewestimate";
     data.Identity_confirmation_enabled = identity_confirmation_enabled;
     if (identity_confirmation_enabled == "1") data.bodyclass += " identity-confirmation";
 
     // this.view("estimatehtml");
     // add_views_tracking("estimate", id);
-    // self.hooks.do_action("estimate_html_viewed", id);
+    // hooks.do_action("estimate_html_viewed", id);
     // no_index_customers_area();
     // this.layout();
     return this.MakeSuccess(data);

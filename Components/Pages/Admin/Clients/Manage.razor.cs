@@ -3,9 +3,9 @@
 // </copyright>
 
 using System.Linq.Expressions;
-using Global.Entities;
-using Service.Entities.Extras;
+using Service.Entities;
 using Service.Framework.Core.AppHook;
+using Service.Framework.Helpers.Entities.Extras;
 using Service.Helpers;
 using Service.Models.Invoices;
 using Service.Schemas.Ui.Entities;
@@ -36,20 +36,20 @@ public class ManageRazor : AdminComponentBase
 
   public List<object> table_data = new();
 
-  public List<CustomField> custom_fields => self.helper.get_custom_fields("customers", x => x.ShowOnTable);
+  public List<CustomField> custom_fields => db.get_custom_fields("customers", x => x.ShowOnTable);
 
 
-  public Expression<Func<Global.Entities.Client, bool>> conditionSummary()
+  public Expression<Func<Entities.Client, bool>> conditionSummary()
   {
     if (!customers_view) return default;
     // Get the list of StaffIds first, outside the expression
-    var staffUserId = self.helper.get_staff_user_id();
-    var staffIds = self.db().CustomerAdmins
+    var staffUserId = db.get_staff_user_id();
+    var staffIds = db.CustomerAdmins
       .Where(x => x.StaffId == staffUserId)
       .Select(x => x.StaffId)
       .ToList();
     // Use the staffIds list in the expression
-    Expression<Func<Global.Entities.Client, bool>> where_summary = e =>
+    Expression<Func<Entities.Client, bool>> where_summary = e =>
       e.Id == staffUserId && staffIds.Contains(e.Id);
     return where_summary;
   }
@@ -58,8 +58,8 @@ public class ManageRazor : AdminComponentBase
   {
     if (!customers_view) return default;
     // Get the list of StaffIds first, outside the expression
-    var staffUserId = self.helper.get_staff_user_id();
-    var staffIds = self.db().CustomerAdmins
+    var staffUserId = db.get_staff_user_id();
+    var staffIds = db.CustomerAdmins
       .Where(x => x.StaffId == staffUserId)
       .Select(x => x.StaffId)
       .ToList();
@@ -72,10 +72,10 @@ public class ManageRazor : AdminComponentBase
   protected override async Task OnInitializedAsync()
   {
     await base.OnInitializedAsync();
-    customer_create = self.helper.has_permission("customers", 0, "create");
-    customer_edit = self.helper.has_permission("customers", 0, "edit");
-    customers_view = self.helper.has_permission("customers", 0, "edit");
-    customers_delete = self.helper.has_permission("customers", 0, "delete");
+    customer_create = db.has_permission("customers", 0, "create");
+    customer_edit = db.has_permission("customers", 0, "edit");
+    customers_view = db.has_permission("customers", 0, "edit");
+    customers_delete = db.has_permission("customers", 0, "delete");
   }
 
   protected override async Task OnAfterRenderAsync(bool firstRender)

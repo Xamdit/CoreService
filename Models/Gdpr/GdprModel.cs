@@ -1,21 +1,21 @@
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework;
 
 namespace Service.Models.Gdpr;
 
-public class GdprModel(MyInstance self, MyContext db) : MyModel(self)
+public class GdprModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  public int AddRequest(GdprRequest data)
+  public bool AddRequest(GdprRequest data)
   {
     if (string.IsNullOrEmpty(data.Status)) data.Status = "pending";
     data.RequestDate = today();
     var result = db.GdprRequests.Add(data);
-    return result.Entity.Id;
+    return result.State == EntityState.Added;
   }
 
-  public int AddRemovalRequestAsync(GdprRequest data)
+  public bool add_removal_request(GdprRequest data)
   {
     data.RequestType = "account_removal";
     return AddRequest(data);

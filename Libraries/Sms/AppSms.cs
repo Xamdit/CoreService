@@ -1,4 +1,4 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
 using Service.Helpers;
 
@@ -7,7 +7,7 @@ namespace Service.Libraries.Sms;
 public abstract class AppSms(MyInstance instance, MyContext db)
 {
   private static Dictionary<string, SmsGateway> gateways = new();
-  public MyInstance self = instance;
+
 
   public HttpClient client
   {
@@ -34,7 +34,6 @@ public abstract class AppSms(MyInstance instance, MyContext db)
 
   public void add_gateway(string id, SmsGateway data)
   {
-    var (self, db) = getInstance();
     if (!is_initialized(id))
     {
       foreach (var option in data.Options)

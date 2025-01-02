@@ -1,11 +1,11 @@
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework;
 using Task = System.Threading.Tasks.Task;
 
 namespace Service.Models.Invoices;
 
-public class InvoiceItemsModel(MyInstance self, MyContext db) : MyModel(self)
+public class InvoiceItemsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public async Task<int?> CopyAsync(Item itemData)
   {

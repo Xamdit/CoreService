@@ -1,11 +1,11 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Tools;
+using Service.Entities;
 using Service.Framework;
+using Service.Framework.Helpers.Entities;
 
 namespace Service.Models.Client;
 
-public class ClientVaultEntriesModel(MyInstance self, MyContext db) : MyModel(self)
+public class ClientVaultEntriesModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   /**
        * Get single vault entry
@@ -84,7 +84,7 @@ public class ClientVaultEntriesModel(MyInstance self, MyContext db) : MyModel(se
     var affected_rows = db.SaveChanges();
     if (affected_rows <= 0) return false;
     log_activity("Vault Entry Deleted [Customer ID: " + vault.CustomerId + "]");
-    self.hooks.do_action("customer_vault_entry_deleted", new Vault { Id = id, CustomerId = vault.CustomerId });
+    hooks.do_action("customer_vault_entry_deleted", new Vault { Id = id, CustomerId = vault.CustomerId });
     return true;
   }
 }

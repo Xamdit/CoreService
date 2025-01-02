@@ -129,14 +129,14 @@ public class AppMenu(MyInstance self)
     // itemsGroup.Children = get_child(parent, group);
     // foreach (var parent in itemsGroup.Keys.ToList())
     //   itemsGroup[parent]["children"] = get_child(parent, group);
-    self.hooks.apply_filters($"{group}_menu_items", itemsGroup);
+    hooks.apply_filters($"{group}_menu_items", itemsGroup);
     return itemsGroup;
   }
 
   private List<AppMenuItem> get_child(string parentSlug, string group)
   {
     var children = child.ContainsKey(group) && child[group].ContainsKey(parentSlug) ? child[group][parentSlug] : new List<AppMenuItem>();
-    var output = self.hooks.apply_filters($"{group}_menu_child_items", children);
+    var output = hooks.apply_filters($"{group}_menu_child_items", children);
     return output;
   }
 

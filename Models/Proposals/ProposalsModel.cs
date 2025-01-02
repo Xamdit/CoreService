@@ -1,37 +1,34 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Dto;
-using Global.Entities.Helpers;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Entities.Dto;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Proposals;
 using Service.Helpers.Sale;
 using Service.Helpers.Sms;
 using Service.Helpers.Tags;
-using Service.Helpers.Template;
 using Service.Models.Client;
 using Service.Models.Estimates;
 using Service.Models.Leads;
 using Service.Models.Projects;
-using File = Global.Entities.File;
-
+using File = Service.Entities.File;
+using static Service.Helpers.Template.TemplateHelper;
 
 namespace Service.Models.Proposals;
 
-public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
+public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
-  private readonly List<int> statuses = self.hooks.apply_filters("before_set_proposal_statuses", new List<int> { 6, 4, 1, 5, 2, 3 });
-  private EstimateRequestModel estimate_request_model = self.model.estimate_request_model();
-  private ProjectsModel projects_model = self.model.projects_model();
-  private ClientsModel clients_model = self.model.clients_model();
-  private LeadsModel leads_model = self.model.leads_model();
+  private readonly List<int> statuses = hooks.apply_filters("before_set_proposal_statuses", new List<int> { 6, 4, 1, 5, 2, 3 });
+  private EstimateRequestModel estimate_request_model = self.estimate_request_model(db);
+  private ProjectsModel projects_model = self.projects_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
+  private LeadsModel leads_model = self.leads_model(db);
   private bool _copy = false;
 
   public List<int> get_statuses()
@@ -76,8 +73,8 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
 
     dataset.Data.Address = dataset.Data.Address.Trim().nl2br();
     dataset.Data.DateCreated = DateTime.Now;
-    dataset.Data.AddedFrom = staff_user_id;
-    dataset.Data.Hash = self.helper.uuid();
+    dataset.Data.AddedFrom = db.get_staff_user_id();
+    dataset.Data.Hash = uuid();
 
 
     var items = new List<ItemableOption>();
@@ -94,7 +91,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       Data = dataset.Data,
       Items = items
     };
-    hook = self.hooks.apply_filters("before_create_proposal", hook);
+    hook = hooks.apply_filters("before_create_proposal", hook);
     dataset.Data = hook.Data;
     items = hook.Items;
     var result = db.Proposals.Add(dataset.Data);
@@ -113,34 +110,34 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(insert_id, custom_fields);
 
-    self.helper.handle_tags_save(tags, insert_id, "proposal");
+    db.handle_tags_save(tags, insert_id, "proposal");
     items.ForEach(item =>
     {
-      var itemid = self.helper.add_new_sales_item_post(item, insert_id, "proposal");
+      var itemid = db.add_new_sales_item_post(item, insert_id, "proposal");
       if (itemid > 0)
-        self.helper.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "proposal");
+        db.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "proposal");
     });
 
-    foreach (var item in items.Where(item => item.Id == self.helper.add_new_sales_item_post(item, insert_id, "proposal")))
-      self.helper.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), insert_id, "proposal");
+    foreach (var item in items.Where(item => item.Id == db.add_new_sales_item_post(item, insert_id, "proposal")))
+      db.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), insert_id, "proposal");
 
     foreach (var item in items)
     {
-      var itemid = self.helper.add_new_sales_item_post(item, insert_id, "proposal");
+      var itemid = db.add_new_sales_item_post(item, insert_id, "proposal");
       //key => item
       if (itemid > 0)
-        self.helper.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "proposal");
+        db.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "proposal");
     }
 
     var proposal = get(x => x.Id == insert_id);
     if (proposal.Assigned != 0)
-      if (proposal.Assigned != staff_user_id)
+      if (proposal.Assigned != db.get_staff_user_id())
       {
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_proposal_assigned_to_you",
           ToUserId = proposal.Assigned,
-          FromUserId = staff_user_id,
+          FromUserId = db.get_staff_user_id(),
           Link = $"proposals/list_proposals/{insert_id}",
           AdditionalData = JsonConvert.SerializeObject(new[]
           {
@@ -148,7 +145,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
           })
         });
         if (notified)
-          self.helper.pusher_trigger_notification(proposal.Assigned);
+          db.pusher_trigger_notification(proposal.Assigned);
       }
 
     if (dataset.Data.RelType == "lead")
@@ -156,10 +153,10 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       {
         $"<a href='{self.navigation.admin_url($"proposals/list_proposals/{insert_id}")}' target='_blank'>{dataset.Data.Subject}</a>"
       }));
-    self.helper.update_sales_total_tax_column(insert_id, "proposal", "proposals");
+    db.update_sales_total_tax_column(insert_id, "proposal", "proposals");
     log_activity($"New Proposal Created [ID: {insert_id}]");
     if (save_and_send) send_proposal_to_email(insert_id);
-    self.hooks.do_action("proposal_created", insert_id);
+    hooks.do_action("proposal_created", insert_id);
     return insert_id;
   }
 
@@ -205,7 +202,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     if (data.NewItems.Any()) NewItems = data.NewItems;
 
     if (data.Tags.Any())
-      if (self.helper.handle_tags_save(data.Tags, id, "proposal"))
+      if (db.handle_tags_save(data.Tags, id, "proposal"))
         affectedRows++;
 
     data.Data.Address = data.Data.Address.Trim().nl2br();
@@ -219,7 +216,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
         ? data.removed_items
         : new List<Proposal>()
     };
-    self.hooks.apply_filters("before_proposal_updated", hook);
+    hooks.apply_filters("before_proposal_updated", hook);
 
     data = hook.data;
     data.removed_items = hook.removed_items;
@@ -228,10 +225,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     items.Clear();
 
     // Delete items checked to be removed from database
-    foreach (var remove_item_id in data.removed_items.Select(x => x.Id).ToList())
-      if (self.helper.handle_removed_sales_item_post(remove_item_id, "proposal"))
-        affectedRows++;
-
+    affectedRows += data.removed_items.Select(x => x.Id).Count(remove_item_id => db.handle_removed_sales_item_post(remove_item_id, "proposal"));
 
     var affected_rows = db.Proposals.Where(x => x.Id == id).Update(x => data);
     if (affected_rows > 0)
@@ -239,27 +233,27 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       affectedRows++;
       var proposal_now = get(x => x.Id == id);
       if (current_proposal.Assigned != proposal_now.Assigned)
-        if (proposal_now.Assigned != staff_user_id)
+        if (proposal_now.Assigned != db.get_staff_user_id())
         {
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             Description = "not_proposal_assigned_to_you",
             ToUserId = proposal_now.Assigned,
-            FromUserId = staff_user_id,
+            FromUserId = db.get_staff_user_id(),
             Link = $"proposals/list_proposals/{id}",
             AdditionalData = JsonConvert.SerializeObject(new[]
             {
               proposal_now.Subject
             })
           });
-          if (notified) self.helper.pusher_trigger_notification(proposal_now.Assigned);
+          if (notified) db.pusher_trigger_notification(proposal_now.Assigned);
         }
     }
 
     // foreach (var itemTaxes in items.Select(x => x.ItemTaxes).ToList())
     foreach (var item in items.ToList())
     {
-      if (self.helper.update_sales_item_post(item.Id, item)) affectedRows++;
+      if (db.update_sales_item_post(item.Id, item)) affectedRows++;
       if (item.CustomFields.Items.Any())
       {
         var temp = db.CustomFields.Where(x => item.CustomFields.Items.Contains(x.Name)).ToList();
@@ -272,7 +266,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       {
         if (!string.IsNullOrEmpty(name))
         {
-          if (self.helper.delete_taxes_from_item(item.Id, "proposal"))
+          if (db.delete_taxes_from_item(item.Id, "proposal"))
             affectedRows++;
         }
         else
@@ -284,28 +278,28 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
             .ToList();
           db.ItemTaxes.RemoveRange(_item_taxes_names);
           db.SaveChanges();
-          self.helper.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), id, "proposal");
+          db.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), id, "proposal");
         }
       });
     }
 
     foreach (var item in NewItems)
     {
-      var new_item_added = self.helper.add_new_sales_item_post(convert<Itemable>(item), id, "proposal");
+      var new_item_added = db.add_new_sales_item_post(convert<Itemable>(item), id, "proposal");
       if (new_item_added <= 0) continue;
-      self.helper.maybe_insert_post_item_tax(new_item_added, convert<PostItem>(item), id, "proposal");
+      db.maybe_insert_post_item_tax(new_item_added, convert<PostItem>(item), id, "proposal");
       affectedRows++;
     }
 
     if (affectedRows > 0)
     {
-      self.helper.update_sales_total_tax_column(id, "proposal", "proposals");
+      db.update_sales_total_tax_column(id, "proposal", "proposals");
       log_activity($"Proposal Updated [ID:{id}]");
     }
 
     if (save_and_send) send_proposal_to_email(id);
     if (affectedRows <= 0) return false;
-    self.hooks.do_action("after_proposal_updated", id);
+    hooks.do_action("after_proposal_updated", id);
     return true;
   }
 
@@ -322,7 +316,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       .Include(x => x.Currency)
       .Where(condition)
       .ToList();
-    if (is_client_logged_in())
+    if (db.is_client_logged_in())
       query
         .Where(x => string.IsNullOrEmpty(x.State));
     var rows = query.ToList();
@@ -330,7 +324,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     var proposal = query.ToList().First();
     if (proposal != null) return proposal;
     var attachments = get_attachments(id);
-    var items = self.helper.get_items_by_type("proposal", id);
+    var items = db.get_items_by_type("proposal", id);
     var visible_attachments_to_customer_found = attachments.Any(x => x.VisibleToCustomer);
 
     if (proposal.ProjectId.HasValue)
@@ -348,7 +342,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     if (proposal == null) return false;
 
     db.Proposals.Where(x => x.Id == id).Update(x => new Proposal { Signature = null });
-    if (!string.IsNullOrEmpty(proposal.Signature)) self.helper.unlink($"{self.helper.get_upload_path_by_type("proposal")}{id}/{proposal.Signature}");
+    if (!string.IsNullOrEmpty(proposal.Signature)) unlink($"{get_upload_path_by_type("proposal")}{id}/{proposal.Signature}");
 
     return true;
   }
@@ -383,7 +377,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     var attachment = get_attachments(0, id).FirstOrDefault();
     var deleted = false;
     if (attachment == null) return deleted;
-    if (string.IsNullOrEmpty(attachment.External)) self.helper.unlink($"{self.helper.get_upload_path_by_type("proposal")}{attachment.RelId}/{attachment.FileName}");
+    if (string.IsNullOrEmpty(attachment.External)) unlink($"{get_upload_path_by_type("proposal")}{attachment.RelId}/{attachment.FileName}");
 
     var affected_rows = db.Files.Where(x => x.Id == attachment.Id).Delete();
     if (affected_rows > 0)
@@ -392,12 +386,12 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       log_activity($"Proposal Attachment Deleted [ID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(self.helper.get_upload_path_by_type("proposal") + attachment.RelId)) return deleted;
+    if (!is_dir(get_upload_path_by_type("proposal") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("proposal") + attachment.RelId);
+    var other_attachments = list_files(get_upload_path_by_type("proposal") + attachment.RelId);
     if (!other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("proposal") + attachment.RelId);
+      delete_dir(get_upload_path_by_type("proposal") + attachment.RelId);
 
     return deleted;
   }
@@ -409,13 +403,13 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool add_comment(ProposalComment data, bool client = false)
   {
-    if (is_staff_logged_in())
+    if (db.is_staff_logged_in())
       client = false;
 
 
     data.DateCreated = DateTime.Now;
     if (client == false)
-      data.StaffId = staff_user_id;
+      data.StaffId = db.get_staff_user_id();
     data.Content = data.Content.nl2br();
     var result = db.ProposalComments.Add(data);
     if (!result.IsAdded()) return false;
@@ -436,7 +430,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       notifiedUsers = staff_proposal
         .Select(member =>
         {
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             Description = "not_proposal_comment_from_client",
             ToUserId = member.Id,
@@ -446,24 +440,24 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
             AdditionalData = JsonConvert.SerializeObject(new[] { proposal.Subject })
           });
           if (notified) return member.Id;
-          var template = mail_template("proposal_comment_to_staff", proposal.Id, member.Email);
+          var template = this.mail_template("proposal_comment_to_staff", proposal.Id, member.Email);
           var merge_fields = template.get_merge_fields();
           template.send();
-          self.library.app_sms().trigger(self.globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_STAFF"), member.PhoneNumber, merge_fields);
+          self.library.app_sms().trigger(globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_STAFF"), member.PhoneNumber, merge_fields);
           return 0;
         })
         .ToList()
         .Where(x => x > 0)
         .ToList();
-      self.helper.pusher_trigger_notification(notifiedUsers.ToArray());
+      db.pusher_trigger_notification(notifiedUsers.ToArray());
     }
     else
     {
       // Send email/sms to client that admin commented
-      var template = mail_template("proposal_comment_to_customer", proposal);
+      var template = this.mail_template("proposal_comment_to_customer", proposal);
       var merge_fields = template.get_merge_fields();
       template.send();
-      self.library.app_sms().trigger(self.globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_CUSTOMER"), proposal.Phone, merge_fields);
+      self.library.app_sms().trigger(globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_CUSTOMER"), proposal.Phone, merge_fields);
     }
 
     return true;
@@ -545,11 +539,11 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     // foreach (var field in fields )
     //   if (!in_array(field, not_copy_fields))
     //     insert_data[field] = proposal.field;
-    insert_data.Data.AddedFrom = staff_user_id;
+    insert_data.Data.AddedFrom = db.get_staff_user_id();
     insert_data.Data.DateCreated = DateTime.Now;
     insert_data.Data.Date = DateTime.Now;
     insert_data.Data.Status = 6;
-    insert_data.Data.Hash = self.helper.uuid();
+    insert_data.Data.Hash = uuid();
 
     // in case open till is expired set new 7 days starting from current date
     if (insert_data.Data.OpenTill.HasValue && !db.get_option_compare("proposal_due_after", 0))
@@ -563,7 +557,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     insert_data.NewItems.Clear();
-    var custom_fields_items = self.helper.get_custom_fields("items");
+    var custom_fields_items = db.get_custom_fields("items");
     var key = 1;
     var items = new List<DataSet<Proposal>>();
     // var items = new List<ProposalDto>();
@@ -571,7 +565,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     foreach (var item in items)
     {
       insert_data.NewItems[key].Description = (string)item["description"];
-      insert_data.NewItems[key].LongDescription = self.helper.clear_textarea_breaks((string)item["long_description"]);
+      insert_data.NewItems[key].LongDescription = clear_textarea_breaks((string)item["long_description"]);
       insert_data.NewItems[key].Qty = (int)item["qty"];
       insert_data.NewItems[key].Unit = (string)item["unit"];
       insert_data.NewItems[key].Names = new List<string>();
@@ -582,9 +576,9 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       insert_data.NewItems[key].Order = (int)item["item_order"];
       foreach (var cf in custom_fields_items)
       {
-        insert_data.NewItems[key].CustomFields.Items[cf.Id] = self.helper.get_custom_field_value(item.Data.Id, cf.Id, "items", false);
+        insert_data.NewItems[key].CustomFields.Items[cf.Id] = db.get_custom_field_value(item.Data.Id, cf.Id, "items", false);
 
-        if (!self.helper.defined("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST")) self.helper.define("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST", true);
+        if (!defined("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST")) self.helper.define("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST", true);
       }
 
       key++;
@@ -593,10 +587,10 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     var insert_id = add(insert_data);
 
     if (!insert_id.HasValue) return null;
-    var custom_fields = self.helper.get_custom_fields("proposal");
+    var custom_fields = db.get_custom_fields("proposal");
     foreach (var field in custom_fields)
     {
-      var value = self.helper.get_custom_field_value(proposal.Id, field.Id, "proposal", false);
+      var value = db.get_custom_field_value(proposal.Id, field.Id, "proposal", false);
       if (value == "") continue;
       db.CustomFieldsValues.Add(new CustomFieldsValue
       {
@@ -608,8 +602,8 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     var tags = db.get_tags_in(proposal.Id, "proposal");
-    self.helper.handle_tags_save(tags, id, "proposal");
-    log_activity($"Copied Proposal {self.helper.format_proposal_number(proposal.Id)}");
+    db.handle_tags_save(tags, id, "proposal");
+    log_activity($"Copied Proposal {db.format_proposal_number(proposal.Id)}");
     return id;
   }
 
@@ -653,32 +647,32 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       var notifiedUsers = new List<int>();
       notifiedUsers = staff_proposal.Select(x =>
         {
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             FromCompany = true,
             ToUserId = x.Id,
             Description = message,
             Link = $"proposals/list_proposals/{id}",
-            AdditionalData = JsonConvert.SerializeObject(new[] { self.helper.format_proposal_number(id) })
+            AdditionalData = JsonConvert.SerializeObject(new[] { db.format_proposal_number(id) })
           });
           return notified ? x.Id : 0;
         })
         .Where(x => x > 0)
         .ToList();
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      db.pusher_trigger_notification(notifiedUsers);
 
       // Send thank you to the customer email template
       if (status == 3)
       {
-        staff_proposal.ForEach(x => self.helper.send_mail_template("proposal_accepted_to_staff", original_proposal, x.Email));
-        self.helper.send_mail_template("proposal_accepted_to_customer", original_proposal);
-        self.hooks.do_action("proposal_accepted", id);
+        staff_proposal.ForEach(x => db.send_mail_template("proposal_accepted_to_staff", original_proposal, x.Email));
+        db.send_mail_template("proposal_accepted_to_customer", original_proposal);
+        hooks.do_action("proposal_accepted", id);
       }
       else
       {
         // Client declined send template to admin
-        staff_proposal.ForEach(member => self.helper.send_mail_template("proposal_declined_to_staff", original_proposal, member.Email));
-        self.hooks.do_action("proposal_declined", id);
+        staff_proposal.ForEach(member => db.send_mail_template("proposal_declined_to_staff", original_proposal, member.Email));
+        hooks.do_action("proposal_declined", id);
       }
     }
 
@@ -706,8 +700,8 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool delete(int id)
   {
-    var tasks_model = self.model.tasks_model();
-    self.hooks.do_action("before_proposal_deleted", id);
+    var tasks_model = self.tasks_model(db);
+    hooks.do_action("before_proposal_deleted", id);
 
     clear_signature(id);
     var proposal = get(x => x.Id == id);
@@ -715,7 +709,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     if (affected_rows <= 0) return false;
 
     if (!string.IsNullOrEmpty(proposal.ShortLink))
-      self.helper.app_archive_short_link(proposal.ShortLink);
+      db.app_archive_short_link(proposal.ShortLink);
 
     delete_tracked_emails(id, "proposal");
     db.ProposalComments.Where(x => x.ProposalId == id).Delete();
@@ -743,7 +737,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     db.Reminders.Where(x => x.RelId == id && x.RelType == "proposal").Delete();
     db.ViewsTrackings.Where(x => x.RelId == id && x.RelType == "proposal").Delete();
     log_activity($"Proposal Deleted [ProposalID:{id}]");
-    self.hooks.do_action("after_proposal_deleted", id);
+    hooks.do_action("after_proposal_deleted", id);
 
     return true;
   }
@@ -785,7 +779,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       }
 
       data.Company = _data.Company;
-      data.Address = self.helper.clear_textarea_breaks(_data.Address);
+      data.Address = clear_textarea_breaks(_data.Address);
       data.Zip = _data.Zip;
       data.Country = _data.Country!.Id;
       data.State = _data.State;
@@ -838,14 +832,14 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
 
     db.Proposals.Where(x => x.Id == proposal.Id).Update(x => new Proposal { IsExpiryNotified = 1 });
 
-    var template = mail_template("proposal_expiration_reminder", proposal);
+    var template = this.mail_template("proposal_expiration_reminder", proposal);
     var merge_fields = template.get_merge_fields();
 
     template.send();
 
     // if (self.helper.can_send_sms_based_on_creation_date(proposal.DateCreated))
     //   sms_sent = this.app_sms.trigger(SMS_TRIGGER_PROPOSAL_EXP_REMINDER, proposal.Phone, merge_fields);
-    var sms_sent = self.helper.can_send_sms_based_on_creation_date(proposal.DateCreated) && self.library.app_sms().trigger(self.globals("SMS_TRIGGER_PROPOSAL_EXP_REMINDER"), proposal.Phone, merge_fields);
+    var sms_sent = self.helper.can_send_sms_based_on_creation_date(proposal.DateCreated) && self.library.app_sms().trigger(globals("SMS_TRIGGER_PROPOSAL_EXP_REMINDER"), proposal.Phone, merge_fields);
     return sms_sent;
   }
 
@@ -854,13 +848,13 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     // Proposal status is draft update to sent
     if (db.Proposals.Any(x => x.Id == id && x.Status == 6)) db.Proposals.Where(x => x.Id == id).Update(x => new Proposal { Status = 4 });
     var proposal = get(x => x.Id == id);
-    var sent = self.helper.send_mail_template("proposal_send_to_customer", proposal, attachpdf, cc);
+    var sent = db.send_mail_template("proposal_send_to_customer", proposal, attachpdf, cc);
     if (!sent) return false;
 
     // Set to status sent
     db.Proposals.Where(x => x.Id == id)
       .Update(x => new Proposal { Status = 4 });
-    self.hooks.do_action("proposal_sent", id);
+    hooks.do_action("proposal_sent", id);
     return true;
   }
 

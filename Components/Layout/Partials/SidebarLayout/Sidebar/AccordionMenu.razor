@@ -1,5 +1,5 @@
 @* AccordionMenu.razor *@
-<div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
+<div class="menu-item here show menu-accordion">
   <span class="menu-link">
     <span class="menu-icon">@((MarkupString)Theme.GetIcon(@Icon, "fs-2"))</span>
     <span class="menu-title">@Title</span>
@@ -9,7 +9,8 @@
     @foreach (var item in SubMenuItems)
     {
       <div class="menu-item">
-        <a class="menu-link active" href="@item.Url">
+        @* <a class="menu-link active" href="@item.Url"> *@
+        <a class="menu-link" href="@item.Url">
           <span class="menu-bullet">
             <span class="bullet bullet-dot"></span>
           </span>
@@ -23,14 +24,11 @@
 
 @code {
 
-  [Parameter]
-  public string Icon { get; set; }
+  [Parameter] public string Icon { get; set; }
 
-  [Parameter]
-  public string Title { get; set; }
+  [Parameter] public string Title { get; set; }
 
-  [Parameter]
-  public List<SidebarMenuItem> SubMenuItems { get; set; }
+  [Parameter] public List<SidebarMenuItem> SubMenuItems { get; set; }
 
   protected override async Task OnInitializedAsync()
   {

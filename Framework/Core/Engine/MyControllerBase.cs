@@ -1,7 +1,9 @@
 using System.Dynamic;
 using System.Net;
 using System.Text;
+using Azure;
 using Microsoft.AspNetCore.Mvc;
+using Service.Controllers.Core;
 using Service.Framework.Schemas;
 
 namespace Service.Framework.Core.Engine;
@@ -111,7 +113,7 @@ public abstract class MyControllerBase : ControllerBase
   }
 
   [ApiExplorerSettings(IgnoreApi = true)] // Add this attribute to ignore the method from Swagger
-  protected JsonResult Show_404(string message = "")
+  protected JsonResult show_404(string message = "")
   {
     var json = new
     {
@@ -174,7 +176,7 @@ public abstract class MyControllerBase : ControllerBase
  * @return  void
  */
   [ApiExplorerSettings(IgnoreApi = true)] // Add this attribute to ignore the method from Swagger
-  protected void Show_error(string message, int statusCode = 500, string heading = "An Error Was Encountered")
+  protected void show_error(string message, int statusCode = 500, string heading = "An Error Was Encountered")
   {
     statusCode = Math.Abs(statusCode);
     if (statusCode >= 100) return;

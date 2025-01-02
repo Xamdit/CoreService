@@ -1,21 +1,23 @@
 using Newtonsoft.Json;
+using Service.Entities;
+using Service.Framework;
 using Service.Framework.Core.Engine;
-using Service.Helpers.Template;
-
+using Service.Framework.Core.InputSet;
+using static Service.Helpers.Template.TemplateHelper;
 
 namespace Service.Helpers.Sms;
 
 public static class SmsHelper
 {
   // hooks().add_action("admin_init", "maybe_test_sms_gateway");
-  public static string maybe_test_sms_gateway(this HelperBase helper, SmsTestRequest request)
+  public static string maybe_test_sms_gateway(this MyContext db, SmsTestRequest request)
   {
-    if (!is_staff_logged_in() || !request.SmsGatewayTest) return string.Empty;
-    var gateway = helper.get_sms_gateway(request.Id);
+    if (!db.is_staff_logged_in() || !request.SmsGatewayTest) return string.Empty;
+    var gateway = db.get_sms_gateway(request.Id);
     if (gateway == null) return JsonConvert.SerializeObject(new { success = false, error = "SMS gateway not found." });
     gateway.SetTestMode(true);
     // Send the SMS
-    var result = gateway.Send(request.Number, helper.clear_textarea_breaks(request.Message));
+    var result = gateway.Send(request.Number, clear_textarea_breaks(request.Message));
     // Prepare the response
     var response = new { success = false };
 
@@ -27,17 +29,16 @@ public static class SmsHelper
     return "Unauthorized or invalid request";
   }
 
-  private static ISmsGateway get_sms_gateway(this HelperBase helper, string gatewayId)
+  private static ISmsGateway get_sms_gateway(this MyContext db, string gatewayId)
   {
     // Retrieve the correct SMS gateway based on the ID
     // Example: return _smsGatewayFactory.GetGatewayById(gatewayId);
     return null; // Replace with actual gateway retrieval logic
   }
 
-  public static void maybe_test_sms_gateway(this HelperBase helper)
+  public static void maybe_test_sms_gateway(this MyContext db)
   {
-    var (self, db) = getInstance();
-    if (!is_staff_logged_in() || string.IsNullOrEmpty(self.input.post("sms_gateway_test")))
+    if (!db.is_staff_logged_in() || string.IsNullOrEmpty(self.input.post("sms_gateway_test")))
       return;
     // gateway = self.{"sms_" . self.input.post("id")};
     // gateway.set_test_mode(true);
@@ -61,9 +62,8 @@ public static class SmsHelper
 
   // hooks().add_action("app_init", "app_init_sms_gateways");
 
-  private static void app_init_sms_gateways(this HelperBase helper)
+  private static void app_init_sms_gateways(this MyInstance self)
   {
-    var (self, db) = getInstance();
     var gateways = new List<string>
     {
       "sms/sms_clickatell",
@@ -71,7 +71,7 @@ public static class SmsHelper
       "sms/sms_twilio"
     };
 
-    gateways = self.hooks.apply_filters("sms_gateways", gateways);
+    gateways = hooks.apply_filters("sms_gateways", gateways);
 
     // foreach (var gateway in gateways  )
     //   self.load.library(gateway);
@@ -79,7 +79,6 @@ public static class SmsHelper
 
   public static bool is_sms_trigger_active(this HelperBase helper, string trigger = "")
   {
-    var (self, db) = getInstance();
     // var active = app_sms.get_active_gateway();
     // return !active ? false : app_sms.is_trigger_active(trigger);
     return false;

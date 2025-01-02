@@ -1,8 +1,8 @@
-using Global.Entities;
-using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Models.Projects;
 using Service.Schemas.Ui.Entities;
+using File = Service.Entities.File;
 
 namespace Service.Helpers.Projects;
 
@@ -13,9 +13,8 @@ public static class ProjectsHelper
  * @param  mixed id project id
  * @return mixed
  */
-  public static int get_client_id_by_project_id(this HelperBase helper, int id)
+  public static int get_client_id_by_project_id(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var project = db.Projects.FirstOrDefault(x => x.Id == id);
     return project?.ClientId ?? 0;
   }
@@ -25,10 +24,9 @@ public static class ProjectsHelper
  * @param  mixed $project_id
  * @return mixed
  */
-  public static int get_project_billing_type(this HelperBase helper, int project_id)
+  public static int get_project_billing_type(this MyContext db, int project_id)
   {
-    var (self, db) = getInstance();
-    var project = db.Projects.Where(x => x.Id == project_id).FirstOrDefault();
+    var project = db.Projects.FirstOrDefault(x => x.Id == project_id);
     return project?.BillingType ?? 0;
   }
 
@@ -54,12 +52,9 @@ public static class ProjectsHelper
  * @param  mixed $id project id
  * @return array
  */
-  public static ProjectSettingOption get_project_status_by_id(this HelperBase helper, int id)
+  public static ProjectSettingOption get_project_status_by_id(this ProjectsModel model, int id)
   {
-    var (self, db) = getInstance();
-    var projects_model = self.model.projects_model();
-    var statuses = projects_model.get_project_statuses();
-
+    var statuses = model.get_project_statuses();
     var status = new ProjectSettingOption()
     {
       Id = 0,
@@ -77,12 +72,12 @@ public static class ProjectsHelper
     return status;
   }
 
-  public static List<Global.Entities.File> get_project_files(this HelperBase helperBase, int project_id)
+  public static List<File> get_project_files(this MyContext db, int project_id)
   {
-    return new List<Global.Entities.File>();
+    return new List<File>();
   }
 
-  public static List<Project> view_tasks(this HelperBase helperBase, List<string> args)
+  public static List<Project> view_tasks(this MyContext db, List<string> args)
   {
     return new List<Project>();
   }

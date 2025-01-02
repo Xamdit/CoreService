@@ -1,12 +1,12 @@
 using System.Linq.Expressions;
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
 using Service.Helpers;
 using Service.Helpers.Sale;
 
 namespace Service.Models;
 
-public class ExpensesModel(MyInstance self, MyContext db) : MyModel(self)
+public class ExpensesModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public int? add(Expense expense, List<CustomField> customFields = default, string? RepeatEveryCustom = null, string? RepeatTypeCustom = null)
   {
@@ -74,7 +74,7 @@ public class ExpensesModel(MyInstance self, MyContext db) : MyModel(self)
 
   public decimal GetExpensesTotal(Expense queryData)
   {
-    var currency = self.helper.get_currency(queryData.Currency) ?? self.helper.get_base_currency();
+    var currency = db.get_currency(queryData.Currency) ?? db.get_base_currency();
     var expenses = db.Expenses
       .Where(e => e.Currency == currency.Id)
       .ToList();

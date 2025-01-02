@@ -1,4 +1,4 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Models.Estimates;
 
 namespace Service.Models.Proposals;

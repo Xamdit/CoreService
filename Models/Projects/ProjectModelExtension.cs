@@ -1,9 +1,8 @@
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Task = System.Threading.Tasks.Task;
 
@@ -13,7 +12,7 @@ public static class ProjectModelExtension
 {
   public static int add_milestone(this ProjectsModel model, Milestone data)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     data.DateCreated = DateTime.Now;
     data.Description = data.Description.nl2br();
     var result = db.Milestones.Add(data);
@@ -30,7 +29,7 @@ public static class ProjectModelExtension
 
   public static bool delete_milestone(this ProjectsModel model, int id)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var milestone = db.Milestones.FirstOrDefault(x => x.Id == id);
     if (milestone == null) return false;
     var affected_rows = db.Milestones.Where(x => x.Id == id).Delete();
@@ -41,7 +40,7 @@ public static class ProjectModelExtension
     model.log(milestone.ProjectId, "project_activity_deleted_milestone", milestone.Name, show_to_customer);
     db.Tasks
       .Where(x => x.Milestone == id)
-      .Update(x => new Global.Entities.Task { Milestone = null }
+      .Update(x => new Entities.Task { Milestone = null }
       );
     log_activity($"Project Milestone Deleted [{id}]");
     return true;
@@ -54,13 +53,13 @@ public static class ProjectModelExtension
  */
   public static bool send_project_customer_email(this ProjectsModel model, int id, string template)
   {
-    var (self, db) = getInstance();
+    var (_, db) = model.getInstance();
     var sent = false;
-    var clients_model = self.model.clients_model();
+    var clients_model = model.clients_model;
     var contacts = clients_model.get_contacts_for_project_notifications(id, "project_emails");
     contacts.ForEach(contact =>
     {
-      if (self.helper.send_mail_template(template, id, contact.UserId, contact))
+      if (db.send_mail_template(template, id, contact.UserId, contact))
         sent = true;
     });
 
@@ -70,7 +69,7 @@ public static class ProjectModelExtension
 
   public static bool mark_as(this ProjectsModel model, Project data)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var row = db.Projects.FirstOrDefault(x => x.Id == data.Id);
     var old_status = row.Status;
     var affected_rows = db.Projects.Where(x => x.Id == data.Id).Update(x => new Project
@@ -79,7 +78,7 @@ public static class ProjectModelExtension
     });
     if (affected_rows <= 0) return false;
 
-    self.hooks.do_action("project_status_changed", new
+    hooks.do_action("project_status_changed", new
     {
       status = data.Status,
       project_id = data.Id
@@ -127,17 +126,17 @@ public static class ProjectModelExtension
 
   public static async Task<bool> _notify_project_members_status_change(this ProjectsModel model, int id, int old_status, int new_status)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var members = model.get_project_members(id);
     // var notifiedUsers = new List<int>();
     var notifiedUsers = members
-      .Where(member => member.StaffId != model.staff_user_id)
+      .Where(member => member.StaffId != db.get_staff_user_id())
       .ToList()
       .Select(member =>
       {
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
-          FromUserId = model.staff_user_id,
+          FromUserId = db.get_staff_user_id(),
           Description = "not_project_status_updated",
           Link = $"projects/view/{id}",
           ToUserId = member.StaffId,
@@ -152,16 +151,16 @@ public static class ProjectModelExtension
       .Where(x => x != 0)
       .ToList();
 
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
     return true;
   }
 
   public static async Task<ProjectsModel> _mark_all_project_tasks_as_completed(this ProjectsModel model, int id)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     await db.Tasks
       .Where(x => x.RelId == id && x.RelType == "project")
-      .UpdateAsync(x => new Global.Entities.Task
+      .UpdateAsync(x => new Entities.Task
       {
         Status = 5,
         DateFinished = DateTime.Now
@@ -190,7 +189,7 @@ public static class ProjectModelExtension
 
   public static async Task<bool> add_edit_member(this ProjectsModel model, ProjectMember data)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var id = data.Id;
     var affectedRows = 0;
 
@@ -212,7 +211,7 @@ public static class ProjectModelExtension
         var affected_rows = db.ProjectMembers.Where(x => x.ProjectId == id && x.StaffId == project_member.StaffId).Delete();
         if (affected_rows <= 0) return;
         db.PinnedProjects.Where(x => x.StaffId == project_member.StaffId && x.ProjectId == id).Delete();
-        model.log(id, "project_activity_removed_team_member", self.helper.get_staff_full_name(project_member.StaffId));
+        model.log(id, "project_activity_removed_team_member", db.get_staff_full_name(project_member.StaffId));
         affectedRows++;
       });
 
@@ -230,11 +229,11 @@ public static class ProjectModelExtension
               StaffId = staff_id
             });
             if (affected_rows.IsAdded()) return 0;
-            if (staff_id != model.staff_user_id)
+            if (staff_id != db.get_staff_user_id())
             {
-              var notified = self.helper.add_notification(new Notification
+              var notified = db.add_notification(new Notification
               {
-                FromUserId = model.staff_user_id,
+                FromUserId = db.get_staff_user_id(),
                 Description = "not_staff_added_as_project_member",
                 Link = $"projects/view/{id}",
                 ToUserId = staff_id,
@@ -247,12 +246,12 @@ public static class ProjectModelExtension
               return notified != null ? staff_id : 0;
             }
 
-            log_activity(id, "project_activity_added_team_member", self.helper.get_staff_full_name(staff_id));
+            log_activity(id, "project_activity_added_team_member", db.get_staff_full_name(staff_id));
             affectedRows++;
             return 0;
           })
           .ToList();
-        self.helper.pusher_trigger_notification(notifiedUsers);
+        db.pusher_trigger_notification(notifiedUsers);
       }
     }
     else
@@ -266,11 +265,11 @@ public static class ProjectModelExtension
             StaffId = staff_id
           });
           if (!result.IsAdded()) return 0;
-          if (staff_id != model.staff_user_id)
+          if (staff_id != db.get_staff_user_id())
           {
-            var notified = self.helper.add_notification(new Notification
+            var notified = db.add_notification(new Notification
             {
-              FromUserId = model.staff_user_id,
+              FromUserId = db.get_staff_user_id(),
               Description = "not_staff_added_as_project_member",
               Link = $"projects/view/{id}",
               ToUserId = staff_id,
@@ -282,26 +281,27 @@ public static class ProjectModelExtension
             return staff_id;
           }
 
-          model.log(id, "project_activity_added_team_member", self.helper.get_staff_full_name(staff_id));
+          model.log(id, "project_activity_added_team_member", db.get_staff_full_name(staff_id));
           return 0;
         })
         .ToList();
-      if (notifiedUsers.Any()) self.helper.pusher_trigger_notification(notifiedUsers);
+      if (notifiedUsers.Any())
+        db.pusher_trigger_notification(notifiedUsers);
     }
 
     if (!new_project_members_to_receive_email.Any()) return affectedRows > 0;
     var all_members = model.get_project_members(id);
     all_members.Where(data => new_project_members_to_receive_email.Contains(data.StaffId))
       .ToList()
-      .Select(data => self.helper.send_mail_template("project_staff_added_as_member", data, id, client_id))
+      .Select(data => db.send_mail_template("project_staff_added_as_member", data, id, client_id))
       .ToList();
     return affectedRows > 0;
   }
 
   public static bool is_member(this ProjectsModel model, int project_id, int? staff_id = null)
   {
-    var (self, db) = getInstance();
-    var result = db.ProjectMembers.Any(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
+    var (self, db) = model.getInstance();
+    var result = db.ProjectMembers.Any(x => x.ProjectId == project_id && x.StaffId == db.get_staff_user_id());
     return result;
   }
 
@@ -313,10 +313,10 @@ public static class ProjectModelExtension
 
   public static async Task mark_all_project_tasks_as_completed(this ProjectsModel model, int id)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     db.Tasks
       .Where(x => x.RelType == "project" && x.RelId == id)
-      .Update(x => new Global.Entities.Task
+      .Update(x => new Entities.Task
       {
         // Status = TaskStatus.Complete,
         Status = 5,

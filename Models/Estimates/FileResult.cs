@@ -1,4 +1,4 @@
-using File = Global.Entities.File;
+using File = Service.Entities.File;
 
 namespace Service.Models.Estimates;
 

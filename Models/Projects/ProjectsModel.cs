@@ -1,14 +1,11 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Helpers;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
-using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Sale;
 using Service.Helpers.Tags;
@@ -16,20 +13,20 @@ using Service.Helpers.Tasks;
 using Service.Models.Client;
 using Service.Models.Tasks;
 using Service.Models.Users;
-using Task = Global.Entities.Task;
+using Task = Service.Entities.Task;
 
 namespace Service.Models.Projects;
 
-public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
+public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private List<ProjectSettingOption> statuses = new();
-  private CurrenciesModel currencies_model = self.model.currencies_model();
-  private ClientsModel clients_model = self.model.clients_model();
-  private TasksModel tasks_model = self.model.tasks_model();
-  private ProjectsModel projects_model = self.model.projects_model();
-  private StaffModel staff_model = self.model.staff_model();
+  private CurrenciesModel currencies_model = self.currencies_model(db);
+  public ClientsModel clients_model = self.clients_model(db);
+  private TasksModel tasks_model = self.tasks_model(db);
+  private ProjectsModel projects_model = self.projects_model(db);
+  private StaffModel staff_model = self.staff_model(db);
 
-  private List<string> project_settings = self.hooks.apply_filters("project_settings", new List<string>
+  private List<string> project_settings = hooks.apply_filters("project_settings", new List<string>
   {
     "available_features",
     "view_tasks",
@@ -54,13 +51,13 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public List<ProjectSettingOption> get_project_statuses()
   {
-    statuses = self.hooks.apply_filters("before_get_project_statuses", new List<ProjectSettingOption>
+    statuses = hooks.apply_filters("before_get_project_statuses", new List<ProjectSettingOption>
     {
       new()
       {
         Id = 1,
         Color = "#475569",
-        Name = self.helper.label("project_status_1"),
+        Name = label("project_status_1"),
         Order = 1,
         FilterDefault = true
       },
@@ -68,7 +65,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
       {
         Id = 2,
         Color = "#2563eb",
-        Name = self.helper.label("project_status_2"),
+        Name = label("project_status_2"),
         Order = 2,
         FilterDefault = true
       },
@@ -76,7 +73,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
       {
         Id = 3,
         Color = "#f97316",
-        Name = self.helper.label("project_status_3"),
+        Name = label("project_status_3"),
         Order = 3,
         FilterDefault = true
       },
@@ -84,7 +81,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
       {
         Id = 4,
         Color = "#16a34a",
-        Name = self.helper.label("project_status_4"),
+        Name = label("project_status_4"),
         Order = 100,
         FilterDefault = false
       },
@@ -92,7 +89,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
       {
         Id = 5,
         Color = "#94a3b8",
-        Name = self.helper.label("project_status_5"),
+        Name = label("project_status_5"),
         Order = 4,
         FilterDefault = false
       }
@@ -167,20 +164,20 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     {
       db.PinnedProjects.Add(new PinnedProject
       {
-        StaffId = staff_user_id,
+        StaffId = db.get_staff_user_id(),
         ProjectId = id
       });
       return true;
     }
 
-    db.PinnedProjects.Where(x => x.StaffId == staff_user_id && x.ProjectId == id).Delete();
+    db.PinnedProjects.Where(x => x.StaffId == db.get_staff_user_id() && x.ProjectId == id).Delete();
 
     return true;
   }
 
   public Currency get_currency(int id)
   {
-    var customer_currency = clients_model.get_customer_default_currency(self.helper.get_client_id_by_project_id(id));
+    var customer_currency = clients_model.get_customer_default_currency(db.get_client_id_by_project_id(id));
     var currency = customer_currency != 0
       ? currencies_model.get(customer_currency)
       : currencies_model.get_base_currency();
@@ -309,7 +306,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     // project.client_data = new StdClass();
     project.Client = clients_model.get(x => x.Id == project.ClientId).FirstOrDefault();
     project.ClientId = project.Client.Id;
-    project = self.hooks.apply_filters("project_get", project);
+    project = hooks.apply_filters("project_get", project);
     // GLOBALS["project"] = project;
     // return project;
 
@@ -351,7 +348,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
   // public async Task<bool> get_tasks(int id,Expression<Func<object,true>> where ,bool apply_restrictions = false,bool count = false,Action callback = null){
   public async Task<List<Task>> get_tasks(Expression<Func<Task, bool>> condition, bool apply_restrictions = false, bool count = false, Action<(int? count, int page, int limit)> action = null)
   {
-    var can_view_tasks = self.helper.has_permission("tasks", "", "view");
+    var can_view_tasks = db.has_permission("tasks", "", "view");
     var show_all_tasks_for_project_member = db.get_option<bool>("show_all_tasks_for_project_member");
     var query = db.Tasks
       .Include(x => x.Milestone)
@@ -361,13 +358,13 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
     // if (!client_logged_in && is_staff_logged_in())
     //   select += $",(SELECT staffid FROM  task_assigned WHERE taskid= tasks.id AND staffid={staff_user_id}) as current_user_is_assigned";
-    if (client_logged_in) query.Where(x => x.VisibleToClient);
-    if (!client_logged_in && !can_view_tasks && !show_all_tasks_for_project_member)
+    if (db.client_logged_in()) query.Where(x => x.VisibleToClient);
+    if (!db.client_logged_in() && !can_view_tasks && !show_all_tasks_for_project_member)
       query = query.Where(x =>
-        db.TaskAssigneds.Any(a => a.StaffId == staff_user_id && a.TaskId == x.Id) ||
-        db.TaskFollowers.Any(f => f.StaffId == staff_user_id && f.TaskId == x.Id) ||
+        db.TaskAssigneds.Any(a => a.StaffId == db.get_staff_user_id() && a.TaskId == x.Id) ||
+        db.TaskFollowers.Any(f => f.StaffId == db.get_staff_user_id() && f.TaskId == x.Id) ||
         x.IsPublic ||
-        (x.AddedFrom == staff_user_id && !x.IsAddedFromContact)
+        (x.AddedFrom == db.get_staff_user_id() && !x.IsAddedFromContact)
       );
 
     // if (where["milestones.hide_from_customer"])
@@ -388,7 +385,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     // if ((this.uri.segment(3) == "milestones_kanban") | (this.uri.segment(3) == "milestones_kanban_load_more")) query = query.OrderBy(x=>x.MilestoneOrder);
     // else
     // {
-    //   var orderByString = self.hooks.apply_filters("project_tasks_array_default_order", "FIELD(status, 5), duedate IS NULL ASC, duedate");
+    //   var orderByString = hooks.apply_filters("project_tasks_array_default_order", "FIELD(status, 5), duedate IS NULL ASC, duedate");
     //   query = query.OrderBy(x=>x.orderByString);
     //   db.order_by(orderByString, "", false);
     // }
@@ -398,7 +395,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
     var tasks = query.ToList();
 
-    // tasks = self.hooks.apply_filters("get_projects_tasks", tasks, new
+    // tasks = hooks.apply_filters("get_projects_tasks", tasks, new
     // {
     //   project_id = id,
     //   where = where,
@@ -459,14 +456,14 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
   public List<ProjectFile> get_files(int project_id)
   {
     var query = db.ProjectFiles.Where(x => x.ProjectId == project_id).AsQueryable();
-    if (client_logged_in) query = query.Where(x => x.VisibleToCustomer);
+    if (db.client_logged_in()) query = query.Where(x => x.VisibleToCustomer);
     return query.ToList();
   }
 
   public ProjectFile? get_file(int id, int? project_id = null)
   {
     var query = db.ProjectFiles.Where(x => x.Id == id).AsQueryable();
-    if (client_logged_in) query = query.Where(x => x.VisibleToCustomer);
+    if (db.client_logged_in()) query = query.Where(x => x.VisibleToCustomer);
     var file = query.FirstOrDefault();
     if (file == null || !project_id.HasValue) return file;
     return file.ProjectId != project_id ? null : file;
@@ -504,22 +501,22 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public bool remove_file(int id, bool logActivity = true)
   {
-    self.hooks.do_action("before_remove_project_file", id);
+    hooks.do_action("before_remove_project_file", id);
     var file = db.ProjectFiles.FirstOrDefault(x => x.Id == id);
     if (file == null) return false;
 
     if (string.IsNullOrEmpty(file.External))
     {
-      var path = $"{self.helper.get_upload_path_by_type("project") + file.ProjectId}/";
+      var path = $"{get_upload_path_by_type("project") + file.ProjectId}/";
       var fullPath = path + file.FileName;
-      if (self.helper.file_exists(fullPath))
+      if (file_exists(fullPath))
       {
-        self.helper.unlink(fullPath);
-        var fname = self.helper.file_name(fullPath);
-        var fext = self.helper.file_extension(fullPath);
+        unlink(fullPath);
+        var fname = file_name(fullPath);
+        var fext = file_extension(fullPath);
         var thumbPath = $"{path}{fname}_thumb.{fext}";
-        if (self.helper.file_exists(thumbPath))
-          self.helper.unlink(thumbPath);
+        if (file_exists(thumbPath))
+          unlink(thumbPath);
       }
     }
 
@@ -536,11 +533,11 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     // Delete discussion comments
     this.delete_discussion_comments(id, "file");
 
-    if (!self.helper.is_dir(self.helper.get_upload_path_by_type("project") + file.ProjectId)) return true;
+    if (!is_dir(get_upload_path_by_type("project") + file.ProjectId)) return true;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("project") + file.ProjectId);
+    var other_attachments = list_files(get_upload_path_by_type("project") + file.ProjectId);
     if (other_attachments.Any())
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("project") + file.ProjectId);
+      delete_dir(get_upload_path_by_type("project") + file.ProjectId);
     return true;
   }
 
@@ -576,7 +573,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
   // public List<(Milestone milestone, Task<int> TotalLoggedTime)> get_milestones(Expression<Func<Milestone, bool>> condition)
   // {
-  //   var (self, db) = getInstance();
+  //
   //   var project_id = db.ExtractIdFromCondition(condition);
 
   //   var milestones = db.Milestones.Where(condition)
@@ -589,7 +586,6 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public List<DataSet<Milestone>> get_milestones(Expression<Func<Milestone, bool>> condition)
   {
-    var (self, db) = getInstance();
     var project_id = db.ExtractIdFromCondition(condition)!.Value;
     var milestones = db.Milestones.Where(condition)
       .Where(x => x.ProjectId == project_id)
@@ -715,7 +711,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
       dataset.Data.ProjectCost = false;
     }
 
-    dataset.Data.AddedFrom = staff_user_id;
+    dataset.Data.AddedFrom = db.get_staff_user_id();
     var items_to_convert = new List<Itemable>();
     int? estimate_id = null;
     var items_assignees = new List<int>();
@@ -726,7 +722,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
       items_assignees = convert<List<int>>(dataset["items_assignee"]);
     }
 
-    dataset = self.hooks.apply_filters("before_add_project", dataset);
+    dataset = hooks.apply_filters("before_add_project", dataset);
     List<Taggable> tags = new();
     if (dataset.Tags.Any()) tags = dataset.Tags;
 
@@ -734,7 +730,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     var result = db.Projects.Add(project(dataset));
     if (!result.IsAdded()) return 0;
     var insert_id = result.Entity.Id;
-    self.helper.handle_tags_save(tags, insert_id, "project");
+    db.handle_tags_save(tags, insert_id, "project");
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(insert_id, custom_fields);
     // var _pm = this;
@@ -823,7 +819,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (send_project_marked_as_finished_email_to_contacts) this.send_project_customer_email(insert_id, "project_marked_as_finished_to_customer");
 
-    self.hooks.do_action("after_add_project", insert_id);
+    hooks.do_action("after_add_project", insert_id);
 
     log_activity($"New Project Created [ID: {insert_id}]");
 
@@ -943,14 +939,14 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     // if (mark_all_tasks_as_completed)
     //   mark_all_tasks_as_completed = true;
     if (dataset.Tags.Any())
-      if (self.helper.handle_tags_save(dataset.Tags, id, "project"))
+      if (db.handle_tags_save(dataset.Tags, id, "project"))
         affectedRows++;
     if (dataset.Options.Any(x => x.Name == "cancel_recurring_tasks"))
       cancel_recurring_tasks(id);
     if (dataset.Data.ContactNotification.HasValue)
       dataset.Data.NotifyContacts = JsonConvert.SerializeObject(dataset.Data.ContactNotification == 2 ? dataset.Data.NotifyContacts : "");
 
-    dataset.Data = self.hooks.apply_filters("before_update_project", dataset, id);
+    dataset.Data = hooks.apply_filters("before_update_project", dataset, id);
 
 
     var affected_rows = db.Projects.Where(x => x.Id == id).Update(x => dataset.Data);
@@ -973,7 +969,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     log_activity($"Project Updated [ID: {id}]");
     if (original_project.Status != dataset.Data.Status)
     {
-      self.hooks.do_action("project_status_changed", new
+      hooks.do_action("project_status_changed", new
       {
         status = dataset.Data.Status,
         project_id = id
@@ -997,7 +993,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
         this.notify_project_members_status_change(id, original_project.Status, dataset.Data.Status);
     }
 
-    self.hooks.do_action("after_update_project", id);
+    hooks.do_action("after_update_project", id);
 
     return true;
   }
@@ -1008,19 +1004,19 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     var activity = new ProjectActivity();
 
     // Check if the request is coming from a cron job or a logged-in user (staff or client)
-    if (!self.helper.is_cron())
+    if (!is_cron())
     {
-      if (is_client_logged_in())
+      if (db.is_client_logged_in())
       {
-        activity.ContactId = self.helper.get_contact_user_id();
+        activity.ContactId = db.get_contact_user_id();
         activity.StaffId = 0;
-        activity.FullName = self.helper.get_contact_full_name(activity.ContactId);
+        activity.FullName = db.get_contact_full_name(activity.ContactId);
       }
-      else if (is_staff_logged_in)
+      else if (db.is_staff_logged_in())
       {
         activity.ContactId = 0;
-        activity.StaffId = staff_user_id;
-        activity.FullName = self.helper.get_staff_full_name(activity.StaffId);
+        activity.StaffId = db.get_staff_user_id();
+        activity.FullName = db.get_staff_full_name(activity.StaffId);
       }
     }
     else
@@ -1039,7 +1035,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
     // Optional: If you want to modify data before saving
 
-    activity = self.hooks.apply_filters("before_log_project_activity", activity);
+    activity = hooks.apply_filters("before_log_project_activity", activity);
 
     // Insert the activity into the database using Entity Framework
     db.ProjectActivities.Add(activity);
@@ -1066,28 +1062,71 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     //var notifiedUsers = new List<int>();
     var notifiedUsers = members.Select(member =>
       {
-        if (member.Id != staff_user_id)
+        if (member.Id == db.get_staff_user_id()) return 0;
+        var notified = db.add_notification(new Notification()
         {
-          var notified = self.helper.add_notification(new Notification()
+          FromUserId = db.get_staff_user_id(),
+          Description = "not_project_status_updated",
+          Link = "projects/view/" + id,
+          ToUserId = member.Id,
+          AdditionalData = JsonConvert.SerializeObject(new List<string>()
           {
-            FromUserId = staff_user_id,
-            Description = "not_project_status_updated",
-            Link = "projects/view/" + id,
-            ToUserId = member.Id,
-            AdditionalData = JsonConvert.SerializeObject(new List<string>()
-            {
-              "<lang>project_status_" + old_status + "</lang>",
-              "<lang>project_status_" + new_status + "</lang>"
-            })
-          });
-          if (notified) return member.Id;
-        }
-
-        return 0;
+            "<lang>project_status_" + old_status + "</lang>",
+            "<lang>project_status_" + new_status + "</lang>"
+          })
+        });
+        return notified ? member.Id : 0;
       })
       .ToList();
 
 
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
+  }
+
+  public bool send_project_email_template(int project_id, string staff_template, string customer_template, bool action_visible_to_customer, dynamic additional_data = default)
+  {
+    if (additional_data != null)
+    {
+      additional_data.Customers = new List<object>();
+      additional_data.staff = new List<object>();
+    }
+    else if (additional_data.Count() == 1)
+    {
+      if (!additional_data.IsStaff)
+        additional_data.Staff = new List<Staff>();
+      else
+        additional_data.customers = new List<Contact>();
+    }
+
+    var project = get(x => x.Id == project_id).First();
+    this.get_project_members(project_id)
+      .ForEach(member =>
+      {
+        if (db.is_staff_logged_in() && member.StaffId == db.get_staff_user_id()) return;
+        var mailTemplate = EmailTemplateHelper.mail_template(this, staff_template, project, member, additional_data.staff);
+        if (additional_data.Attachments.Any())
+          foreach (var attachment in additional_data.Attachments)
+            mailTemplate.add_attachment(attachment);
+        mailTemplate.send();
+      });
+
+    if (action_visible_to_customer != true) return true;
+    var clients_model = self.clients_model(db);
+    var contacts = clients_model.get_contacts_for_project_notifications(project_id, "project_emails");
+    contacts
+      .Where(contact => !db.client_logged_in() || contact.Id != db.get_contact_user_id())
+      .Select(contact =>
+      {
+        var mailTemplate = EmailTemplateHelper.mail_template(this, customer_template, project, contact, additional_data.customers);
+        if (additional_data.Attachments)
+          foreach (var attachment in additional_data.Attachments)
+            mailTemplate.add_attachment(attachment);
+        mailTemplate.send();
+        return true;
+      })
+      .ToList();
+
+
+    return true;
   }
 }

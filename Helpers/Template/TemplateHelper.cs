@@ -1,13 +1,13 @@
 using System.Text.RegularExpressions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
-using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers.Context;
 
 namespace Service.Helpers.Template;
 
 public static class TemplateHelper
 {
-  public static string clear_textarea_breaks(this HelperBase helper, string text, string replace = "")
+  public static string clear_textarea_breaks(string text, string replace = "")
   {
     if (string.IsNullOrEmpty(text)) return text;
     var breaks = new[] { "<br />", "<br>", "<br/>" };
@@ -15,7 +15,7 @@ public static class TemplateHelper
     return text.Trim();
   }
 
-  public static string Nl2BrSaveHtml(this HelperBase helper, string content)
+  public static string Nl2BrSaveHtml(string content)
   {
     if (!Regex.IsMatch(content, @"<\/.*>")) return content.Replace("\n", "<br />");
     var lines = content.Split(new[] { "\n", "\r\n", "\r" }, StringSplitOptions.None);
@@ -27,15 +27,15 @@ public static class TemplateHelper
     );
   }
 
-  public static void AppJsAlerts(this HelperBase helper)
+  public static void AppJsAlerts(this MyModel model)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     // var alertClass = GetAlertClass();
     var alertClass = string.Empty;
     var script = string.Empty;
-    if (!string.IsNullOrEmpty(self.session.get_string("system-popup")))
+    if (!string.IsNullOrEmpty(self.input.session.get_string("system-popup")))
     {
-      var message = self.session.get_string("system-popup");
+      var message = self.input.session.get_string("system-popup");
       script = $@"<script>
                                 $(function() {{
                                     var popupData = {{
@@ -49,7 +49,7 @@ public static class TemplateHelper
 
     if (string.IsNullOrEmpty(alertClass)) return;
 
-    var alertMessage = self.session.get_string($"message-{alertClass}");
+    var alertMessage = self.input.session.get_string($"message-{alertClass}");
     script = $@"<script>
                                 $(function() {{
                                     alert_float('{alertClass}', '{alertMessage}');
@@ -58,11 +58,10 @@ public static class TemplateHelper
     // self.httpContextAccessor.Response.WriteAsync(script);
   }
 
-  public static string GetCompanyLogo(this HelperBase helper, string uri = "", string hrefClass = "", string type = "")
+  public static string GetCompanyLogo(this MyContext db, string uri = "", string hrefClass = "", string type = "")
   {
-    var (self, db) = getInstance();
     var companyLogo = db.config("company_logo");
-    var companyName = db.config("companyname");
+    var companyName = db.config("company_name");
     var logoUrl = string.IsNullOrEmpty(uri) ? "/" : uri;
 
     if (!string.IsNullOrEmpty(companyLogo)) return $"<a href='{logoUrl}' class='logo img-responsive {hrefClass}'><img src='/uploads/company/{companyLogo}' alt='{companyName}' class='img-responsive'></a>";

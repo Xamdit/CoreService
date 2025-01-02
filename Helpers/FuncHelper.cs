@@ -1,12 +1,13 @@
 using System.Dynamic;
 using System.Text.RegularExpressions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 
 namespace Service.Helpers;
 
 public static class FuncHelper
 {
-  public static bool in_array_multidimensional<T>(this HelperBase helper, List<T> array, string value, params string[] additionalValues)
+  public static bool in_array_multidimensional<T>(this MyContext db, List<T> array, string value, params string[] additionalValues)
   {
     // var allValues = new List<T> { value };
     // allValues.AddRange(additionalValues);
@@ -38,9 +39,8 @@ public static class FuncHelper
     return result;
   }
 
-  public static string slug_it(string str, dynamic options = null)
+  public static string slug_it(this MyContext db, string str, dynamic options = null)
   {
-    var (self, db) = getInstance();
     // Set the default options
     dynamic defaults = new ExpandoObject();
     defaults.lang = db.get_option("active_language");
@@ -53,7 +53,7 @@ public static class FuncHelper
     return slug;
   }
 
-  public static string adjust_hex_brightness(this HelperBase helper, string hex, double percent)
+  public static string adjust_hex_brightness(string hex, double percent)
   {
     // Work out if hash is given
     var hash = "#";

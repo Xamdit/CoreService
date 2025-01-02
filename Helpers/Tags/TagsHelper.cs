@@ -1,4 +1,4 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 
 namespace Service.Helpers.Tags;
@@ -15,9 +15,8 @@ public static class TagsHelper
   /// <param name="relId">Relationship ID</param>
   /// <param name="relType">Relationship type</param>
   /// <returns>Boolean</returns>
-  public static bool handle_tags_save(this HelperBase helperBase, List<Taggable> tags, object relId, string relType)
+  public static bool handle_tags_save(this MyContext db, List<Taggable> tags, object relId, string relType)
   {
-    var (self, db) = getInstance();
     return db._call_tags_method<bool>("save", tags, relId, relType);
   }
 

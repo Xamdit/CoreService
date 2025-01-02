@@ -1,9 +1,9 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
 
 namespace Service.Models.Payments;
 
-public class PaymentAttemptsModel(MyInstance self, MyContext db) : MyModel(self)
+public class PaymentAttemptsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   /**
        * @param array $data

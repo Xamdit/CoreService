@@ -1,11 +1,12 @@
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
+using Task = Service.Entities.Task;
 
 namespace Service.Core.Extensions;
 
 public static class EfcoreExtensions
 {
-  public static Global.Entities.Task task(this MyContext db, int id)
+  public static Task task(this MyContext db, int id)
   {
     var output = db.Tasks
       .Include(x => x.TaskAssigneds)

@@ -6,6 +6,7 @@ using System.Dynamic;
 using Microsoft.AspNetCore.Components;
 using Service.Core.Engine;
 using Service.Core.Extensions;
+using Service.Framework;
 using Service.Schemas.Ui.Entities;
 using Task = System.Threading.Tasks.Task;
 
@@ -38,6 +39,7 @@ public class TabsRazor : MyComponentBase
 
   public string CreateUrl(string key)
   {
+    var self = new MyInstance();
     var url = self.navigation.admin_url($"clients/client/{Client.Id}?group={key}");
     // var output = $"<a data-group='{key}' href='url'>";
     var output = $"<a data-group='{key}' href='url'>";

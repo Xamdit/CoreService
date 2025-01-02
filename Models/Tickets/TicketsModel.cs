@@ -1,7 +1,5 @@
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
@@ -9,6 +7,7 @@ using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 using Service.Framework.Library.Merger;
 using Service.Helpers;
 using Service.Helpers.Tags;
@@ -16,28 +15,28 @@ using Service.Helpers.Template;
 using Service.Models.Client;
 using Service.Models.Tasks;
 using Service.Models.Users;
-using Chart = Service.Entities.Chart;
-using static Service.Framework.Core.Extensions.StringExtension;
+using Chart = Service.Framework.Helpers.Entities.Chart;
 
 
 namespace Service.Models.Tickets;
 
-public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
+public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private bool piping = false;
 
-  private DepartmentsModel departments_model = self.model.departments_model();
-  private SpamFiltersModel spam_filters_model = self.model.spam_filters_model();
-  private StaffModel staff_model = self.model.staff_model();
-  private ClientsModel clients_model = self.model.clients_model();
-  private TasksModel tasks_model = self.model.tasks_model();
+
+  private DepartmentsModel departments_model = self.departments_model(db);
+  public SpamFiltersModel spam_filters_model = self.spam_filters_model(db);
+  private StaffModel staff_model = self.staff_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
+  private TasksModel tasks_model = self.tasks_model(db);
 
   public async Task<int> ticket_count(int? status = null)
   {
     var query = db.Tickets.Where(x => x.MergedTicketId == null).AsQueryable();
-    if (!is_admin)
+    if (!db.is_admin())
     {
-      var staff_deparments_ids = departments_model.get_staff_departments(staff_user_id)
+      var staff_deparments_ids = departments_model.get_staff_departments(db.get_staff_user_id())
         .Select(x => x.Id)
         .ToList();
       if (db.get_option("staff_access_only_assigned_departments") == "1")
@@ -58,7 +57,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         if (departments_ids.Any())
         {
           var temp_items = db.StaffDepartments
-            .Where(x => departments_ids.Contains(x.DepartmentId!.Value) && x.StaffId == staff_user_id)
+            .Where(x => departments_ids.Contains(x.DepartmentId!.Value) && x.StaffId == db.get_staff_user_id())
             .Select(x => x.DepartmentId)
             .ToList();
           query = query.Where(x =>
@@ -78,7 +77,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   // {
   //   var body = string.Empty;
   //   var subject = string.Empty;
-  //   data = self.hooks.apply_filters("piped_ticket_data", body, subject);
+  //   data = hooks.apply_filters("piped_ticket_data", body, subject);
   //   piping = true;
   //   var attachments = data.TicketAttachments;
   //   subject = data.Subject;
@@ -325,7 +324,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     {
       var filename = arg.attachment.FileName;
       var filenameparts = filename.Split(".").ToList().First();
-      var extension = self.helper.file_extension(filenameparts);
+      var extension = file_extension(filenameparts);
 
       if (!allowed_extensions.Contains($".{extension}")) continue;
       //
@@ -335,14 +334,14 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
       Console.WriteLine(filename); // Output: example_filename
       if (string.IsNullOrEmpty(filename)) filename = "attachment";
-      if (!self.helper.file_exists(path))
-        self.helper.file_create($"{path}index.html");
-      filename = self.helper.unique_filename(path, $"{filename}.{extension}");
+      if (!file_exists(path))
+        file_create($"{path}index.html");
+      filename = unique_filename(path, $"{filename}.{extension}");
       self.helper.file_put_contents(path + filename, arg.data);
       ticket_attachments.Add(new TicketAttachment
       {
         FileName = filename,
-        FileType = self.get_mime_by_extension(filename)
+        FileType = get_mime_by_extension(filename)
       });
     }
 
@@ -364,7 +363,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
     query = query.Where(where).OrderBy(x => x.LastReply);
 
-    var _is_client_logged_in = self.helper.is_client_logged_in();
+    var _is_client_logged_in = db.is_client_logged_in();
     if (_is_client_logged_in) query = query.Where(x => x.MergedTicketId == null);
     return query.ToList();
   }
@@ -498,7 +497,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   public async Task<int> add_reply(Ticket data, int id, int? admin = null, List<TicketDto> pipe_attachments = default, int assign_to_current_user = 0)
   {
     var assigned = 0;
-    if (assign_to_current_user == 0) assigned = self.helper.get_staff_user_id();
+    if (assign_to_current_user == 0) assigned = db.get_staff_user_id();
     var unsetters = new[]
     {
       "note_description",
@@ -547,7 +546,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (piping) data.Message = preg_replace("/\v+/u", "<br>", data.Message);
 
     // admin can have html
-    if (admin == null && self.hooks.apply_filters("ticket_message_without_html_for_non_admin", true))
+    if (admin == null && hooks.apply_filters("ticket_message_without_html_for_non_admin", true))
     {
       data.Message = self.helper.strip_tags(data.Message);
       data.Message = nl2br_save_html(data.Message);
@@ -557,7 +556,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
       data.UserId = 0;
 
     data.Message = self.helper.remove_emojis(data.Message);
-    data = self.hooks.apply_filters("before_ticket_reply_add", data, id, admin);
+    data = hooks.apply_filters("before_ticket_reply_add", data, id, admin);
     var sender = self.helper.convert<TicketReply>(data);
     var result = db.TicketReplies.Add(sender);
     var insert_id = result.Entity.Id;
@@ -568,7 +567,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     var old_ticket_status = row.Status;
 
 
-    var newStatus = self.hooks.apply_filters(
+    var newStatus = hooks.apply_filters(
       "ticket_reply_status",
       new
       {
@@ -596,7 +595,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     }
     else
     {
-      var attachments = self.helper.handle_ticket_attachments(id);
+      var attachments = this.handle_ticket_attachments(id);
       if (attachments.Any())
         insert_ticket_attachments_to_database(attachments, id, insert_id);
     }
@@ -617,7 +616,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     await db.SaveChangesAsync();
 
     if (old_ticket_status != newStatus.OldStatus)
-      self.hooks.do_action("after_ticket_status_changed", new
+      hooks.do_action("after_ticket_status_changed", new
       {
         id,
         status = newStatus
@@ -639,8 +638,8 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (admin == null)
     {
-      var departments_model = self.model.departments_model();
-      var staff_model = self.model.staff_model();
+      var departments_model = self.departments_model(db);
+      var staff_model = self.staff_model(db);
       // this.load.model("departments_model");
       // this.load.model("staff_model");
 
@@ -648,9 +647,9 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
       var staff = await get_staff_members_for_ticket_notification(ticket.Department!, ticket.Assigned ?? 0);
       var notifiedUsers = staff.Select(member =>
       {
-        self.helper.send_mail_template("ticket_new_reply_to_staff", ticket, member, _attachments);
+        db.send_mail_template("ticket_new_reply_to_staff", ticket, member, _attachments);
         if (!db.get_option_compare("receive_notification_on_new_ticket_replies", 1)) return 0;
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_new_ticket_reply",
           ToUserId = member.Id,
@@ -661,11 +660,11 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         });
         return notified ? member.Id : 0;
       }).ToList();
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      db.pusher_trigger_notification(notifiedUsers);
     }
     else
     {
-      self.ignore(async () => await update_staff_replying(id));
+      ignore(async () => await update_staff_replying(id));
       var total_staff_replies = db.TicketReplies.Count(x => x.Admin != null && x.Id == ticket.Id);
       if (
         ticket.Assigned == 0 &&
@@ -683,7 +682,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
       }
 
       var sendEmail = !(isContact && db.Contacts.Count(x => x.TicketEmails == 1 && x.Id == ticket.ContactId) == 0);
-      if (sendEmail) self.helper.send_mail_template("ticket_new_reply_to_customer", ticket, email, _attachments, cc);
+      if (sendEmail) db.send_mail_template("ticket_new_reply_to_customer", ticket, email, _attachments, cc);
     }
 
     if (string.IsNullOrEmpty(cc))
@@ -705,7 +704,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
       await db.Tickets.Where(x => x.Id == id).UpdateAsync(x => new Ticket { Cc = cc });
     }
 
-    self.hooks.do_action("after_ticket_reply_added", new
+    hooks.do_action("after_ticket_reply_added", new
     {
       data,
       id,
@@ -725,7 +724,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool delete_ticket_reply(int ticket_id, int reply_id)
   {
-    self.hooks.do_action("before_delete_ticket_reply", new { ticket_id, reply_id });
+    hooks.do_action("before_delete_ticket_reply", new { ticket_id, reply_id });
     var affected_rows = db.TicketReplies.Where(x => x.Id == reply_id).Delete();
     if (affected_rows <= 0) return false;
     // Get the reply attachments by passing the reply_id to get_ticket_attachments method
@@ -746,16 +745,16 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     var deleted = false;
     var attachment = db.TicketAttachments.FirstOrDefault(x => x.Id == id);
     if (attachment == null) return deleted;
-    if (self.helper.unlink($"{self.helper.get_upload_path_by_type("ticket")}{attachment.TicketId}/{attachment.FileName}"))
+    if (unlink($"{get_upload_path_by_type("ticket")}{attachment.TicketId}/{attachment.FileName}"))
     {
       db.TicketAttachments.Where(x => x.Id == id).Delete();
       deleted = true;
     }
 
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("ticket") + attachment.TicketId);
+    var other_attachments = list_files(get_upload_path_by_type("ticket") + attachment.TicketId);
     if (!other_attachments.Any())
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("ticket") + attachment.TicketId);
+      delete_dir(get_upload_path_by_type("ticket") + attachment.TicketId);
 
     return deleted;
   }
@@ -816,7 +815,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   {
     var ticket_replies_order = db.get_option("ticket_replies_order");
 
-    ticket_replies_order = self.hooks.apply_filters("ticket_replies_order", ticket_replies_order);
+    ticket_replies_order = hooks.apply_filters("ticket_replies_order", ticket_replies_order);
 
     var replies = db.TicketReplies
       .Include(x => x.Contact)
@@ -879,8 +878,8 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         // Opened from customer portal otherwise is passed from pipe or admin area
         if (data.UserId == 0 && data.ContactId == 0)
         {
-          data.UserId = self.helper.get_client_user_id();
-          data.ContactId = self.helper.get_contact_user_id();
+          data.UserId = db.get_client_user_id();
+          data.ContactId = db.get_contact_user_id();
         }
       }
 
@@ -895,14 +894,14 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     // CC is only from admin area
     var cc = data.Cc;
     data.Date = date("Y-m-d H:i:s");
-    data.TicketKey = self.helper.uuid();
+    data.TicketKey = uuid();
     data.Status = 1;
     data.Message = data.Message.Trim();
     data.Subject = data.Subject.Trim();
     if (piping) data.Message = preg_replace("/\v+/u", "<br>", data.Message);
 
     // Admin can have html
-    if (admin == null && self.hooks.apply_filters("ticket_message_without_html_for_non_admin", true))
+    if (admin == null && hooks.apply_filters("ticket_message_without_html_for_non_admin", true))
     {
       data.Message = self.helper.strip_tags(data.Message);
       data.Subject = self.helper.strip_tags(data.Subject);
@@ -914,21 +913,21 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
     var tags = data.Tags;
     data.Message = self.helper.remove_emojis(data.Message);
-    // data = self.hooks.apply_filters("before_ticket_created", data, admin);
-    data = self.hooks.apply_filters("before_ticket_created", data);
+    // data = hooks.apply_filters("before_ticket_created", data, admin);
+    data = hooks.apply_filters("before_ticket_created", data);
 
     var result = db.Tickets.Add(data);
     var ticketid = result.Entity.Id;
 
     if (ticketid == 0) return 0;
-    self.helper.handle_tags_save(tags, ticketid, "ticket");
+    db.handle_tags_save(tags, ticketid, "ticket");
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(ticketid, custom_fields);
 
     if (!data.Assigned.HasValue && data.Assigned != 0)
-      if (data.Assigned != staff_user_id)
+      if (data.Assigned != db.get_staff_user_id())
       {
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_ticket_assigned_to_you",
           ToUserId = data.Assigned!.Value,
@@ -939,8 +938,8 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         });
 
         if (notified)
-          self.helper.pusher_trigger_notification(new List<int> { data.Assigned.Value });
-        self.helper.send_mail_template("ticket_assigned_to_staff", self.helper.get_staff(data.Assigned).Email, data.Assigned, ticketid, data.UserId, data.ContactId);
+          db.pusher_trigger_notification(new List<int> { data.Assigned.Value });
+        db.send_mail_template("ticket_assigned_to_staff", this.get_staff(data.Assigned).Email, data.Assigned, ticketid, data.UserId, data.ContactId);
       }
 
     if (pipe_attachments.Any())
@@ -949,7 +948,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     }
     else
     {
-      var attachments = self.helper.handle_ticket_attachments(ticketid);
+      var attachments = this.handle_ticket_attachments(ticketid);
       if (attachments.Any())
         insert_ticket_attachments_to_database(attachments, ticketid);
     }
@@ -972,9 +971,9 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
       var staffToNotify = await get_staff_members_for_ticket_notification(data.Department, data.Assigned ?? 0);
       foreach (var member in staffToNotify)
       {
-        self.helper.send_mail_template("ticket_created_to_staff", ticketid, data.UserId, data.ContactId, member, _attachments);
+        db.send_mail_template("ticket_created_to_staff", ticketid, data.UserId, data.ContactId, member, _attachments);
         if (!db.get_option_compare("receive_notification_on_new_ticket", 1)) continue;
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_new_ticket_created",
           ToUserId = member.Id,
@@ -987,14 +986,14 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         if (notified) notifiedUsers.Add(member.Id);
       }
 
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      db.pusher_trigger_notification(notifiedUsers);
     }
     else
     {
       if (cc.Any())
-        await db.Tickets
+        db.Tickets
           .Where(x => x.Id == ticketid)
-          .UpdateAsync(x => new Ticket { Cc = string.Join(",", cc) });
+          .Update(x => new Ticket { Cc = string.Join(",", cc) });
     }
 
     var sendEmail = !(isContact && db.Contracts.Any(x => x.AcceptanceEmail && x.Id == data.ContactId));
@@ -1002,7 +1001,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     {
       var ticket = get_ticket_by_id(ticketid);
       // admin == null ? [] : _attachments - Admin opened ticket from admin area add the attachments to the email
-      self.helper.send_mail_template(
+      db.send_mail_template(
         template,
         ticket,
         email,
@@ -1010,7 +1009,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         cc);
     }
 
-    self.hooks.do_action("ticket_created", ticketid);
+    hooks.do_action("ticket_created", ticketid);
     log_activity($"New Ticket Created [ID: {ticketid}]");
     return ticketid;
   }
@@ -1034,7 +1033,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
     query = userid.HasValue
       ? query.Where(x => x.UserId == userid)
-      : query.Where(x => x.UserId == client_user_id);
+      : query.Where(x => x.UserId == db.get_client_user_id());
 
 
     var rows = query.Take(limit)
@@ -1051,7 +1050,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   public bool delete(int ticketid)
   {
     var affectedRows = 0;
-    self.hooks.do_action("before_ticket_deleted", ticketid);
+    hooks.do_action("before_ticket_deleted", ticketid);
     // final delete ticket
 
     var affected_rows = db.Tickets.Where(x => x.Id == ticketid).Delete();
@@ -1069,8 +1068,8 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         .ToList()
         .ForEach(attachment =>
         {
-          if (self.helper.is_dir(self.helper.get_upload_path_by_type("ticket") + ticketid))
-            if (self.helper.delete_dir(self.helper.get_upload_path_by_type("ticket") + ticketid))
+          if (is_dir(get_upload_path_by_type("ticket") + ticketid))
+            if (delete_dir(get_upload_path_by_type("ticket") + ticketid))
             {
               db.TicketAttachments.Where(x => x.Id == attachment.Id).Delete();
               if (affected_rows > 0) affectedRows++;
@@ -1107,7 +1106,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (affectedRows <= 0) return false;
     log_activity($"Ticket Deleted [ID: {ticketid}]");
 
-    self.hooks.do_action("after_ticket_deleted", ticketid);
+    hooks.do_action("after_ticket_deleted", ticketid);
 
     return true;
   }
@@ -1120,7 +1119,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   public bool update_single_ticket_settings(TicketOption data)
   {
     var affectedRows = 0;
-    data = self.hooks.apply_filters("before_ticket_settings_updated", data);
+    data = hooks.apply_filters("before_ticket_settings_updated", data);
 
     var ticketBeforeUpdate = get_ticket_by_id(data.Id);
 
@@ -1140,7 +1139,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (data.Tags.Any())
       tags = data.Tags;
 
-    if (self.helper.handle_tags_save(tags, data.Id, "ticket")) affectedRows++;
+    if (db.handle_tags_save(tags, data.Id, "ticket")) affectedRows++;
 
     // if ((data.Priority && data.Priority == "") || !data.Priority)
     //   data.Priority = 0;
@@ -1156,7 +1155,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     var affected_rows = db.Tickets.Where(x => x.Id == data.Id).Update(x => data);
     if (affected_rows > 0)
     {
-      self.hooks.do_action(
+      hooks.do_action(
         "ticket_settings_updated",
         new
         {
@@ -1173,10 +1172,10 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (current_assigned != 0)
     {
       if (current_assigned != data.Assigned)
-        if (data.Assigned != 0 && data.Assigned != staff_user_id)
+        if (data.Assigned != 0 && data.Assigned != db.get_staff_user_id())
         {
           sendAssignedEmail = true;
-          var notified = self.helper.add_notification(new Notification
+          var notified = db.add_notification(new Notification
           {
             Description = "not_ticket_reassigned_to_you",
             ToUserId = data.Assigned.Value,
@@ -1187,15 +1186,15 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
           });
 
 
-          if (notified) self.helper.pusher_trigger_notification(new List<int> { data.Assigned.Value });
+          if (notified) db.pusher_trigger_notification(new List<int> { data.Assigned.Value });
         }
     }
     else
     {
-      if (data.Assigned != 0 && data.Assigned != staff_user_id)
+      if (data.Assigned != 0 && data.Assigned != db.get_staff_user_id())
       {
         sendAssignedEmail = true;
-        var notified = self.helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           Description = "not_ticket_assigned_to_you",
           ToUserId = data.Assigned.Value,
@@ -1205,7 +1204,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
           AdditionalData = JsonConvert.SerializeObject(new[] { data.Subject })
         });
         if (notified != null)
-          self.helper.pusher_trigger_notification(new List<int> { data.Assigned.Value });
+          db.pusher_trigger_notification(new List<int> { data.Assigned.Value });
       }
     }
 
@@ -1213,7 +1212,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     {
       var row = db.Staff.FirstOrDefault(x => x.Id == data.Assigned);
       var assignedEmail = row.Email;
-      self.helper.send_mail_template("ticket_assigned_to_staff", assignedEmail, data.Assigned, data.Id, data.UserId, data.ContactId);
+      db.send_mail_template("ticket_assigned_to_staff", assignedEmail, data.Assigned, data.Id, data.UserId, data.ContactId);
     }
 
     if (affectedRows <= 0) return false;
@@ -1231,11 +1230,11 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   {
     var affected_rows = db.Tickets.Where(x => x.Id == id).Update(x => new Ticket { Status = status });
     var alert = "warning";
-    var message = self.helper.label("ticket_status_changed_fail");
+    var message = label("ticket_status_changed_fail");
     if (affected_rows <= 0) return (alert, message);
     alert = "success";
-    message = self.helper.label("ticket_status_changed_successfully");
-    self.hooks.do_action("after_ticket_status_changed", new
+    message = label("ticket_status_changed_successfully");
+    hooks.do_action("after_ticket_status_changed", new
     {
       id,
       status
@@ -1431,19 +1430,19 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   }
 
   // Ticket services
-  public List<Global.Entities.Service> get_service()
+  public List<Entities.Service> get_service()
   {
     var rows = db.Services.OrderBy(x => x.Name).ToList();
     return rows;
   }
 
-  public Global.Entities.Service? get_service(int id)
+  public Entities.Service? get_service(int id)
   {
     var row = db.Services.FirstOrDefault(x => x.Id == id);
     return row;
   }
 
-  public int add_service(Global.Entities.Service data)
+  public int add_service(Entities.Service data)
   {
     var result = db.Services.Add(data);
     var insert_id = result.Entity.Id;
@@ -1451,7 +1450,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     return insert_id;
   }
 
-  public bool update_service(Global.Entities.Service data)
+  public bool update_service(Entities.Service data)
   {
     var id = data.Id;
     var result = db.Services.Where(x => x.Id == id).Update(x => data);
@@ -1462,7 +1461,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public bool delete_service(int id)
   {
-    if (db.is_reference_in_table<Global.Entities.Service>("tickets", id)) return true;
+    if (db.is_reference_in_table<Entities.Service>("tickets", id)) return true;
     var result = db.Services.Where(x => x.Id == id).Delete();
     if (result <= 0) return false;
     log_activity($"Ticket Service Deleted [ID: {id}]");
@@ -1477,10 +1476,10 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   public Chart get_weekly_tickets_opening_statistics()
   {
     var departments_ids = new List<int>();
-    if (!is_admin)
+    if (!db.is_admin())
       if (db.get_option_compare("staff_access_only_assigned_departments", 1))
       {
-        var staff_deparments_ids = departments_model.get_staff_departments(staff_user_id).Select(x => x.Id).ToList();
+        var staff_deparments_ids = departments_model.get_staff_departments(db.get_staff_user_id()).Select(x => x.Id).ToList();
         departments_ids.Clear();
         departments_ids = !staff_deparments_ids.Any()
           ? departments_model.get().Select(x => x.Id).ToList()
@@ -1494,7 +1493,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
       {
         new()
         {
-          Label = self.helper.label("home_weekend_ticket_opening_statistics"),
+          Label = label("home_weekend_ticket_opening_statistics"),
           BackgroundColor = "rgba(197, 61, 169, 0.5)",
           BorderColor = "#c53da9",
           BorderWidth = 1,
@@ -1552,7 +1551,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     // Some users don"t want to fill the email
     if (string.IsNullOrEmpty(email)) return false;
 
-    var customer_id = self.helper.get_user_id_by_contact_id(contact_id);
+    var customer_id = db.get_user_id_by_contact_id(contact_id);
     db.Tickets
       .Where(x => x.UserId == 0)
       .Where(x => x.ContactId == 0)
@@ -1674,7 +1673,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (assignedStaff == 0 || !db.get_option_compare("staff_related_ticket_notification_to_assignee_only", 1))
       return staff_model.get(x => x.Active!.Value)
         .Where(x =>
-          !self.helper.is_staff_member(x.Id) &&
+          !db.is_staff_member(x.Id) &&
           db.get_option_compare("access_tickets_to_none_staff_members", 0) &&
           departments_model.get_staff_departments(x.Id).Contains(department))
         // .Select(x=>x.Id)
@@ -1685,7 +1684,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
     var output = staff_model.get(x => x.Active!.Value)
       .Where(x =>
-        !self.helper.is_staff_member(x.Id) &&
+        !db.is_staff_member(x.Id) &&
         db.get_option_compare("access_tickets_to_none_staff_members", 0) &&
         departments_model.get_staff_departments(x.Id).Contains(department))
       // .Select(x=>x.Id)

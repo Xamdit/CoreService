@@ -1,11 +1,11 @@
-using Global.Entities;
 using Service.Entities;
 using Service.Framework;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 
 namespace Service.Models.Contracts;
 
-public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self)
+public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   /**
       * Add new contract type
@@ -81,21 +81,21 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self)
     foreach (var type in types)
     {
       var total_rows_where = CreateCondition<Contract>(x => x.ContractType == type.Id > 0 && x.Trash == false);
-      if (is_client_logged_in())
+      if (db.is_client_logged_in())
       {
         total_rows_where = total_rows_where.And(x =>
-          x.Client == self.helper.get_client_user_id()
+          x.Client == db.get_client_user_id()
           && string.IsNullOrEmpty(x.NotVisibleToClient)
         );
       }
       else
       {
-        var view_contract = self.helper.has_permission("contracts", 0, "view");
-        if (!view_contract) total_rows_where = total_rows_where.And(x => x.AddedFrom == self.helper.get_staff_user_id());
+        var view_contract = db.has_permission("contracts", 0, "view");
+        if (!view_contract) total_rows_where = total_rows_where.And(x => x.AddedFrom == db.get_staff_user_id());
       }
 
       var _total_rows = db.Contracts.Count(total_rows_where);
-      if (_total_rows == 0 && is_client_logged_in()) continue;
+      if (_total_rows == 0 && db.is_client_logged_in()) continue;
       labels.Add(type.Name);
       totals.Add(_total_rows);
     }
@@ -107,7 +107,7 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self)
       {
         new()
         {
-          Label = self.helper.label("contract_summary_by_type"),
+          Label = label("contract_summary_by_type"),
           BackgroundColor = "rgba(3,169,244,0.2)",
           BorderColor = "#03a9f4",
           BorderWidth = 1,
@@ -132,10 +132,10 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self)
     {
       labels.Add(type.Name);
       var query = db.Contracts.Where(x => x.ContractType == (type.Id == 1) && x.Trash == false).AsQueryable();
-      var view_contract = self.helper.has_permission("contracts", 0, "view");
+      var view_contract = db.has_permission("contracts", 0, "view");
       if (!view_contract)
       {
-        var staff_user_id = this.staff_user_id;
+        var staff_user_id = db.get_staff_user_id();
         query = query.Where(x => x.AddedFrom == staff_user_id);
       }
 
@@ -151,7 +151,7 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self)
       {
         new()
         {
-          Label = self.helper.label("contract_summary_by_type_value"),
+          Label = label("contract_summary_by_type_value"),
           BackgroundColor = "rgba(37,155,35,0.2)",
           BorderColor = "#84c529",
           Tension = false,

@@ -1,17 +1,16 @@
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
-using Service.Framework.Core.Extensions;
 using Service.Helpers;
 using Service.Models.Invoices;
 
 namespace Service.Models;
 
-public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self)
+public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
-  private readonly InvoicesModel invoices_model = self.model.invoices_model();
+  private readonly InvoicesModel invoices_model = self.invoices_model(db);
 
   public List<Subscription> get(Expression<Func<Subscription, bool>> where)
   {
@@ -61,8 +60,8 @@ public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self)
     {
       // Assign values from the data dictionary
       DateCreated = DateTime.Now,
-      Hash = self.helper.uuid(),
-      CreatedFrom = staff_user_id
+      Hash = uuid(),
+      CreatedFrom = db.get_staff_user_id()
     };
 
     db.Subscriptions.Add(subscription);
@@ -93,7 +92,7 @@ public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (contact == null) return false;
 
-    var sent = self.helper.send_mail_template(template, subscription, contact, cc);
+    var sent = db.send_mail_template(template, subscription, contact, cc);
     if (!sent || template != "subscription_send_to_customer") return false;
     subscription.LastSentAt = DateTime.UtcNow;
     db.Subscriptions.Update(subscription);

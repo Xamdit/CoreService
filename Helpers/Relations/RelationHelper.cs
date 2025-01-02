@@ -1,9 +1,11 @@
 using System.Dynamic;
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.AspNetCore.Components;
 using Service.Core.Extensions;
+using Service.Entities;
+using Service.Framework;
 using Service.Framework.Core.Engine;
+using Service.Framework.Core.InputSet;
 using Service.Helpers.Proposals;
 using Service.Models.Projects;
 
@@ -13,17 +15,18 @@ public static class RelationHelper
 {
   public static object get_relation_data(this HelperBase helper, string type, int rel_id = 0, object? extra = null)
   {
-    var (self, db) = getInstance();
-    var misc_model = self.model.misc_model();
+    var self = new MyInstance();
+    var db = new MyContext();
+    var misc_model = self.misc_model(db);
     var q = "";
-    if (self.input.post().TryGetValue("q", out var value))
+    if (self.input.post_has("q"))
     {
-      q = value;
+      q = self.input.post("q");
       q = q.Trim();
     }
 
-    var tasks_model = self.model.tasks_model();
-    var clients_model = self.model.clients_model();
+    var tasks_model = self.tasks_model(db);
+    var clients_model = self.clients_model(db);
     dynamic data = new ExpandoObject();
     switch (type)
     {
@@ -45,18 +48,22 @@ public static class RelationHelper
         var where_contacts = CreateCondition<Contact>(x => x.Active);
         if (isset(extra, "client_id") && self.helper.value<int>(extra, "client_id") != null)
           where_contacts = where_contacts.And(x => x.UserId == self.helper.value<int>(extra, "client_id"));
-        if (self.input.post().ContainsKey("tickets_contacts"))
-          if (!helper.has_permission("customers", "", "view") && db.get_option_compare("staff_members_open_tickets_to_all_contacts", 0))
-            where_contacts = where_contacts.And(x => db.CustomerAdmins.Any(y => y.StaffId == helper.get_staff_user_id() && y.CustomerId == x.UserId));
-        if (self.input.post().TryGetValue("contact_userid", out var contact_userid))
-          where_contacts = where_contacts.And(x => x.UserId == Convert.ToInt32(contact_userid));
+        if (self.input.post_has("tickets_contacts"))
+          if (!db.has_permission("customers", "", "view") && db.get_option_compare("staff_members_open_tickets_to_all_contacts", 0))
+            where_contacts = where_contacts.And(x => db.CustomerAdmins.Any(y => y.StaffId == db.get_staff_user_id() && y.CustomerId == x.UserId));
+        if (self.input.post_has("contact_user_id"))
+        {
+          var contact_user_id = self.input.post("contact_user_id");
+          where_contacts = where_contacts.And(x => x.UserId == Convert.ToInt32(contact_user_id));
+        }
+
         var search = misc_model.search_contacts(q, 0, where_contacts);
         data = search.Result;
         break;
       }
       case "invoice" when rel_id != 0:
       {
-        var invoices_model = self.model.invoices_model();
+        var invoices_model = self.invoices_model(db);
         data = invoices_model.get(rel_id);
         break;
       }
@@ -68,7 +75,7 @@ public static class RelationHelper
       }
       case "credit_note" when rel_id != 0:
       {
-        var credit_notes_model = self.model.credit_notes_model();
+        var credit_notes_model = self.credit_notes_model(db);
         data = credit_notes_model.get(x => x.Id == rel_id);
         break;
       }
@@ -80,7 +87,7 @@ public static class RelationHelper
       }
       case "estimate" when rel_id != 0:
       {
-        var estimates_model = self.model.estimates_model();
+        var estimates_model = self.estimates_model(db);
         data = estimates_model.get(x => x.Id == rel_id);
         break;
       }
@@ -92,7 +99,7 @@ public static class RelationHelper
       }
       case "contract" or "contracts":
       {
-        var contracts_model = self.model.contracts_model();
+        var contracts_model = self.contracts_model(db);
 
         if (rel_id != 0)
         {
@@ -108,7 +115,7 @@ public static class RelationHelper
       }
       case "ticket" when rel_id != 0:
       {
-        var tickets_model = self.model.tickets_model();
+        var tickets_model = self.tickets_model(db);
         data = tickets_model.get(x => x.Id == rel_id);
         break;
       }
@@ -120,7 +127,7 @@ public static class RelationHelper
       }
       case "expense" or "expenses" when rel_id != 0:
       {
-        var expenses_model = self.model.expenses_model();
+        var expenses_model = self.expenses_model(db);
         data = expenses_model.get(x => x.Id == rel_id);
         break;
       }
@@ -132,7 +139,7 @@ public static class RelationHelper
       }
       case "lead" or "leads" when rel_id != 0:
       {
-        var leads_model = self.model.leads_model();
+        var leads_model = self.leads_model(db);
         data = leads_model.get(x => x.Id == rel_id);
         break;
       }
@@ -144,7 +151,7 @@ public static class RelationHelper
       }
       case "proposal" when rel_id != 0:
       {
-        var proposals_model = self.model.proposals_model();
+        var proposals_model = self.proposals_model(db);
         data = proposals_model.get(x => x.Id == rel_id);
         break;
       }
@@ -156,14 +163,14 @@ public static class RelationHelper
       }
       case "project" when rel_id != 0:
       {
-        var projects_model = self.model.projects_model();
+        var projects_model = self.projects_model(db);
         data = projects_model.get(x => x.Id == rel_id);
         break;
       }
       case "project":
       {
         Expression<Func<Project, bool>> where_projects = null;
-        if (self.input.post().ContainsKey("customer_id"))
+        if (self.input.post_has("customer_id"))
           where_projects = proj => proj.ClientId == Convert.ToInt32(self.input.post("customer_id"));
         var search = misc_model.search_projects(q, 0, where_projects);
         data = search.Result;
@@ -171,7 +178,7 @@ public static class RelationHelper
       }
       case "staff" when rel_id != 0:
       {
-        var staff_model = self.model.staff_model();
+        var staff_model = self.staff_model(db);
         data = staff_model.get(x => x.Id == rel_id);
         break;
       }
@@ -190,7 +197,7 @@ public static class RelationHelper
       }
     }
 
-    // data = self.hooks.apply_filters("get_relation_data", data, compact(type, rel_id, extra));
+    // data = hooks.apply_filters("get_relation_data", data, compact(type, rel_id, extra));
     return data;
   }
 
@@ -202,9 +209,9 @@ public static class RelationHelper
  * @param  string  type
  * @return mixed
  */
-  public static RelationValues get_relation_values(this NavigationManager nav, RelationValues? relation = null, string type = "")
+  public static RelationValues get_relation_values(this MyContext db, NavigationManager nav, RelationValues? relation = null, string type = "")
   {
-    var (self, db) = getInstance();
+    var self = new MyInstance();
     if (relation == null)
       return new RelationValues()
       {
@@ -255,7 +262,7 @@ public static class RelationHelper
           name = $"{relation.firstname} {relation.lastname}";
         }
 
-        subtext = self.helper.get_company_name(userid);
+        subtext = db.get_company_name(userid);
         link = nav.admin_url($"clients/client/{userid}?contactid={id}");
         break;
       }
@@ -272,7 +279,7 @@ public static class RelationHelper
           addedfrom = relation.addedfrom;
         }
 
-        name = self.helper.format_invoice_number(id);
+        name = db.format_invoice_number(id);
         link = nav.admin_url($"invoices/list_invoices/{id}");
         break;
       }
@@ -289,7 +296,7 @@ public static class RelationHelper
           addedfrom = relation.addedfrom;
         }
 
-        name = self.helper.format_credit_note_number(id);
+        name = db.format_credit_note_number(id);
         link = nav.admin_url($"credit_notes/list_credit_notes/{id}");
         break;
       }
@@ -306,7 +313,7 @@ public static class RelationHelper
           addedfrom = relation.addedfrom;
         }
 
-        name = self.helper.format_estimate_number(id);
+        name = db.format_estimate_number(id);
         link = nav.admin_url($"estimates/list_estimates/{id}");
         break;
       }
@@ -400,7 +407,7 @@ public static class RelationHelper
           if (!string.IsNullOrEmpty(relation.subject)) name += $" - {relation.subject}";
         }
 
-        name = self.helper.format_proposal_number(id);
+        name = db.format_proposal_number(id);
         link = nav.admin_url($"proposals/list_proposals/{id}");
         break;
       }
@@ -451,13 +458,13 @@ public static class RelationHelper
           clientId = relation.client_id;
         }
 
-        name = $"#{id} - {name} - {self.helper.get_company_name(clientId)}";
+        name = $"#{id} - {name} - {db.get_company_name(clientId)}";
         link = nav.admin_url($"projects/view/{id}");
         break;
       }
     }
 
-    return self.hooks.apply_filters("relation_values", new
+    return hooks.apply_filters("relation_values", new
     {
       id,
       name,
@@ -476,24 +483,22 @@ public static class RelationHelper
    * @param  string rel_id rel_id
    * @return string
    */
-  public static List<object> init_relation_options(this HelperBase helper, List<RelationValues> data, string type, int rel_id = 0)
+  public static List<object> init_relation_options(this MyContext db, List<RelationValues> data, string type, int rel_id = 0)
   {
-    var (self, db) = getInstance();
-
+    var self = new MyInstance();
     var _data = new List<object>();
-
-    var has_permission_projects_view = helper.has_permission("projects", "", "view");
-    var has_permission_customers_view = helper.has_permission("customers", "", "view");
-    var has_permission_contracts_view = helper.has_permission("contracts", "", "view");
-    var has_permission_invoices_view = helper.has_permission("invoices", "", "view");
-    var has_permission_estimates_view = helper.has_permission("estimates", "", "view");
-    var has_permission_expenses_view = helper.has_permission("expenses", "", "view");
-    var has_permission_proposals_view = helper.has_permission("proposals", "", "view");
-    var is_admin = helper.is_admin();
-    var projects_model = self.model.projects_model();
+    var has_permission_projects_view = db.has_permission("projects", "", "view");
+    var has_permission_customers_view = db.has_permission("customers", "", "view");
+    var has_permission_contracts_view = db.has_permission("contracts", "", "view");
+    var has_permission_invoices_view = db.has_permission("invoices", "", "view");
+    var has_permission_estimates_view = db.has_permission("estimates", "", "view");
+    var has_permission_expenses_view = db.has_permission("expenses", "", "view");
+    var has_permission_proposals_view = db.has_permission("proposals", "", "view");
+    var is_admin = db.is_admin();
+    var projects_model = self.projects_model(db);
     foreach (var relation in data)
     {
-      var relation_values = self.navigation.get_relation_values(relation, type);
+      var relation_values = db.get_relation_values(null, relation, type);
       switch (type)
       {
         case "project":
@@ -505,32 +510,32 @@ public static class RelationHelper
         }
         case "lead":
         {
-          if (!helper.has_permission("leads", "", "view"))
-            if (relation.assigned != helper.get_staff_user_id() && relation.addedfrom != helper.get_staff_user_id() && relation.is_public != true && rel_id != relation_values.id)
+          if (!db.has_permission("leads", "", "view"))
+            if (relation.assigned != db.get_staff_user_id() && relation.addedfrom != db.get_staff_user_id() && relation.is_public != true && rel_id != relation_values.id)
               continue;
           break;
         }
-        case "customer" when !has_permission_customers_view && !helper.have_assigned_customers() && rel_id != relation_values.id:
+        case "customer" when !has_permission_customers_view && !db.have_assigned_customers() && rel_id != relation_values.id:
           continue;
         case "customer":
         {
-          if (helper.have_assigned_customers() && rel_id != relation_values.id && !has_permission_customers_view)
-            if (!helper.is_customer_admin(relation_values.id))
+          if (db.have_assigned_customers() && rel_id != relation_values.id && !has_permission_customers_view)
+            if (!db.is_customer_admin(relation_values.id))
               continue;
           break;
         }
-        case "contract" when !has_permission_contracts_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
-        case "invoice" when !has_permission_invoices_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
-        case "estimate" when !has_permission_estimates_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
-        case "expense" when !has_permission_expenses_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
-        case "proposal" when !has_permission_proposals_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
+        case "contract" when !has_permission_contracts_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
+        case "invoice" when !has_permission_invoices_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
+        case "estimate" when !has_permission_estimates_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
+        case "expense" when !has_permission_expenses_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
+        case "proposal" when !has_permission_proposals_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
           continue;
       }
 
       _data.Add(relation_values);
     }
 
-    _data = self.hooks.apply_filters("init_relation_options", _data, compact(("type", rel_id)));
+    _data = hooks.apply_filters("init_relation_options", _data, compact(("type", rel_id)));
     return _data;
   }
 }

@@ -1,13 +1,12 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
-using Service.Helpers;
 
 namespace Service.Models;
 
-public class TodoModel(MyInstance self) : MyModel(self)
+public class TodoModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
-  public int todo_limit = self.hooks.apply_filters("todos_limit", 10);
+  public int todo_limit = hooks.apply_filters("todos_limit", 10);
 
   public void set_todos_limit(int limit)
   {
@@ -22,14 +21,12 @@ public class TodoModel(MyInstance self) : MyModel(self)
 
   public List<Todo> get()
   {
-    var db = self.db();
-    var id = staff_user_id;
+    var id = db.get_staff_user_id();
     return db.Todos.Where(x => x.StaffId == id).ToList();
   }
 
   public Todo? get(int id)
   {
-    var db = self.db();
     return db.Todos.FirstOrDefault(x => x.StaffId == id && x.Id == id);
   }
 
@@ -41,8 +38,7 @@ public class TodoModel(MyInstance self) : MyModel(self)
    */
   public async Task<List<Todo>> get_todo_items(int finished, int page = 0)
   {
-    var (self, db) = getInstance();
-    var staffId = staff_user_id;
+    var staffId = db.get_staff_user_id();
     var query = db.Todos
       .Where(x => x.Finished == finished && x.StaffId == staffId)
       .OrderBy(x => x.ItemOrder)
@@ -73,10 +69,9 @@ public class TodoModel(MyInstance self) : MyModel(self)
    */
   public async Task<int> add(Todo data)
   {
-    var db = self.db();
     data.DateCreated = DateTime.Now;
     data.Description = data.Description.nl2br();
-    var staffId = staff_user_id;
+    var staffId = db.get_staff_user_id();
     if (staffId != null) data.StaffId = staffId;
     var result = await db.Todos.AddAsync(data);
     await db.SaveChangesAsync();
@@ -85,7 +80,6 @@ public class TodoModel(MyInstance self) : MyModel(self)
 
   public bool update(int id, Todo data)
   {
-    var db = self.db();
     data.Description = data.Description.nl2br();
     db.Todos.Update(data);
     var affectedRows = db.SaveChanges();
@@ -98,7 +92,6 @@ public class TodoModel(MyInstance self) : MyModel(self)
    */
   public void update_todo_items_order(params Todo[] data)
   {
-    var db = self.db();
     var dataset = data.ToList();
     dataset = dataset.Select((x, i) =>
     {
@@ -117,8 +110,7 @@ public class TodoModel(MyInstance self) : MyModel(self)
    */
   public async Task<bool> delete_todo_item(int id)
   {
-    var db = self.db();
-    var staffId = staff_user_id;
+    var staffId = db.get_staff_user_id();
     db.RemoveRange(db.Todos.Where(x => x.Id == id && x.StaffId == staffId));
     var affectedRows = await db.SaveChangesAsync();
     return affectedRows > 0;
@@ -132,8 +124,7 @@ public class TodoModel(MyInstance self) : MyModel(self)
    */
   public async Task<dynamic> change_todo_status(int id, int status)
   {
-    var db = self.db();
-    var staffId = staff_user_id;
+    var staffId = db.get_staff_user_id();
     await db.Todos.Where(x => x.Id == id && x.StaffId == staffId)
       .UpdateAsync(x => new Todo { Finished = status, DateFinished = today() });
     var affectedRows = await db.SaveChangesAsync();

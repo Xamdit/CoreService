@@ -4,7 +4,7 @@ namespace Service.Framework.Library.Net.Sessions;
 
 public class TestUnit
 {
-  private MyInstance self = MyInstance.Instance;
+  private MyInstance self = new();
 
   [Test]
   public void Test()

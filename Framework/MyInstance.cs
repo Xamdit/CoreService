@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Service.Core.InputSet;
-using Service.Framework.Core.AppHook;
+using Service.Entities;
 using Service.Framework.Core.Cache;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Entities;
-using Service.Framework.Core.Extensions;
-using Service.Framework.Entities;
-using Service.Framework.Helpers;
-using Service.Framework.Sessions;
-using Session = Global.Entities.Session;
-
+using Service.Framework.Core.InputSet;
+using Service.Libraries.Documents;
 
 namespace Service.Framework;
 
@@ -25,21 +19,13 @@ public class MyInstance : IMyInstance
   public CacheManager cache { get; set; }
   public HelperBase helper = new();
   public LibraryBase library { get; set; }
-  public ModelBase model { get; set; }
+
   public FrameworkContext fw = new();
   public IServiceProvider services { get; set; }
 
   private NavigationManager _navigation { get; set; }
   public IHttpContextAccessor httpContextAccessor { get; set; }
-
-  public DbSet<Session> session
-  {
-    get
-    {
-      var (self, db) = getInstance();
-      return db.Sessions;
-    }
-  }
+  public HttpDocument output { get; set; } = new();
 
   public NavigationManager navigation
   {
@@ -50,14 +36,6 @@ public class MyInstance : IMyInstance
     set => _navigation = value;
   }
 
-  public Hooks hooks
-  {
-    get
-    {
-      var output = new Hooks(this);
-      return output;
-    }
-  }
 
   public HttpContext context
   {
@@ -69,29 +47,27 @@ public class MyInstance : IMyInstance
     }
   }
 
+
   private static MyInstance _instance;
 
   public ControllerBase controller { get; set; }
-  public static MyInstance Instance => _instance ??= new MyInstance();
+  public Language lang { get; set; }
 
 
-  private MyInstance()
+  public MyInstance()
   {
     helper = new HelperBase();
-    this.ignore(() =>
+    ignore(() =>
     {
-      if (this.file_exists("./framework.sqlite")) return;
-      helper.create_file_if_not_exists("./framework.sqlite");
+      if (file_exists("./framework.sqlite")) return;
+      create_file_if_not_exists("./framework.sqlite");
       var frameworkContext = new FrameworkContext();
       // frameworkContext.SeedData();
     });
-
-    helper.log_message("info", "MyInstance Class Initialized");
     cache = new CacheManager(this);
     // config = new Config(this).Init();
     input = new MyInput();
-    load = new Loader(this);
+    load = new Loader(this, new MyContext());
     library = new LibraryBase();
-    model = new ModelBase();
   }
 }

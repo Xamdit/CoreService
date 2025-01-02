@@ -251,7 +251,7 @@ class Statement_model extends App_Model
             set_mailing_constant();
             $pdf = statement_pdf($statement);
 
-            $pdf_file_name = slug_it(_l('customer_statement') . '-' . $statement['client']->company);
+            $pdf_file_name = db.slug_it(_l('customer_statement') . '-' . $statement['client']->company);
 
             $attach = $pdf->Output($pdf_file_name . '.pdf', 'S');
 

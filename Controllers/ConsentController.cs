@@ -1,15 +1,16 @@
-using Global.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
+using Service.Framework.Core.Engine;
 using Service.Helpers;
 
 namespace Service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ConsentController(ILogger<ConsentController> logger, MyInstance self) : ClientControllerBase(logger, self)
+public class ConsentController(ILogger<MyControllerBase> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   [HttpGet]
   public IActionResult Index()
@@ -20,12 +21,10 @@ public class ConsentController(ILogger<ConsentController> logger, MyInstance sel
   [HttpPost("contact")]
   public IActionResult Contact([FromForm] string key)
   {
-    var (self, db) = getInstance();
-    var clientsModel = self.model.clients_model();
-
-    if ((self.helper.is_gdpr() && db.get_option_compare("gdpr_enable_consent_for_contacts", "0")) || !self.helper.is_gdpr())
+    var db = new MyContext();
+    var clientsModel = self.clients_model(db);
+    if ((db.is_gdpr() && db.get_option_compare("gdpr_enable_consent_for_contacts", "0")) || !db.is_gdpr())
       return MakeError("This page is currently disabled, check back later.");
-
     var meta = db.UserMeta.FirstOrDefault(x => x.MetaKey == "consent_key" && x.MetaValue == key);
 
     if (meta == null)
@@ -36,7 +35,7 @@ public class ConsentController(ILogger<ConsentController> logger, MyInstance sel
     if (contact == null)
       return NotFound();
 
-    var gdpr_model = self.model.gdpr_model();
+    var gdpr_model = self.gdpr_model(db);
 
     if (Request.Method == "POST" && Request.Form.Any())
     {
@@ -63,7 +62,7 @@ public class ConsentController(ILogger<ConsentController> logger, MyInstance sel
     {
       contact,
       purposes = gdpr_model.get_consent_purposes(contact.Id, "contact"),
-      title = self.helper.label("gdpr") + " - " + contact.FirstName + " " + contact.LastName,
+      title = label("gdpr") + " - " + contact.FirstName + " " + contact.LastName,
       bodyclass = "consent"
     };
 
@@ -79,10 +78,10 @@ public class ConsentController(ILogger<ConsentController> logger, MyInstance sel
   [HttpPost("lead")]
   public IActionResult Lead([FromForm] string hash)
   {
-    var (self, db) = getInstance();
-    var gdpr_model = self.model.gdpr_model();
+    var db = new MyContext();
+    var gdpr_model = self.gdpr_model(db);
 
-    if ((self.helper.is_gdpr() && db.get_option("gdpr_enable_consent_for_leads") == "0") || !self.helper.is_gdpr())
+    if ((db.is_gdpr() && db.get_option("gdpr_enable_consent_for_leads") == "0") || !db.is_gdpr())
       return MakeError("This page is currently disabled, check back later.");
 
     var lead = db.Leads.FirstOrDefault(x => x.Hash == hash);
@@ -115,7 +114,7 @@ public class ConsentController(ILogger<ConsentController> logger, MyInstance sel
     {
       lead,
       purposes = gdpr_model.get_consent_purposes(lead.Id, "lead"),
-      title = self.helper.label("gdpr") + " - " + lead.Name,
+      title = label("gdpr") + " - " + lead.Name,
       bodyclass = "consent"
     };
 

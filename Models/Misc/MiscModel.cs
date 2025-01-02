@@ -1,20 +1,19 @@
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
-using Service.Framework.Core.Extensions;
-using Service.Framework.Helpers;
 using Service.Helpers;
 using Service.Helpers.Sale;
 using Service.Models.Tasks;
+using File = Service.Entities.File;
 
 namespace Service.Models.Misc;
 
-public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
+public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public int notifications_limit = 5;
-  private TasksModel taxes_model = self.model.tasks_model();
+  private TasksModel taxes_model = self.tasks_model(db);
 
   public string get_taxes_dropdown_template(string name, string taxname, Taxis? type = null, int item_id = 0, bool is_edit = false, bool manual = false)
   {
@@ -41,7 +40,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
         var split = taxname.Split('|');
         if (split.Length >= 2)
         {
-          var tax = self.helper.get_tax_by_name(split[0]);
+          var tax = db.get_tax_by_name(split[0]);
           if (tax != null) taxname = $"{tax.Name}|{tax.TaxRate}";
         }
       }
@@ -98,16 +97,16 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
     return select;
   }
 
-  public int add_attachment_to_database(int rel_id, string rel_type, Global.Entities.File attachment, string? external = null)
+  public int add_attachment_to_database(int rel_id, string rel_type, File attachment, string? external = null)
   {
-    var data = new Global.Entities.File
+    var data = new File
     {
       DateCreated = DateTime.Now,
       RelId = rel_id,
       RelType = rel_type,
-      AttachmentKey = self.helper.uuid(),
+      AttachmentKey = uuid(),
       StaffId = !attachment.StaffId.HasValue
-        ? staff_user_id
+        ? db.get_staff_user_id()
         // Replace with your actual method to get staff user ID
         : attachment.StaffId.Value
       // Replace with your hash generation logic
@@ -131,7 +130,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
       var pathParts = Path.GetExtension(attachment.FileName);
       data.FileName = attachment.FileName;
       data.ExternalLink = attachment.ExternalLink;
-      data.FileType = string.IsNullOrEmpty(attachment.FileType) ? self.get_mime_by_extension(pathParts) : attachment.FileType; // Implement GetMimeByExtension as needed
+      data.FileType = string.IsNullOrEmpty(attachment.FileType) ? get_mime_by_extension(pathParts) : attachment.FileType; // Implement GetMimeByExtension as needed
       data.External = external;
 
       if (!string.IsNullOrEmpty(attachment.ThumbnailLink)) data.ThumbnailLink = attachment.ThumbnailLink;
@@ -174,7 +173,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
     return insertId;
   }
 
-  public Global.Entities.File? get_file(int id)
+  public File? get_file(int id)
   {
     var row = db.Files.FirstOrDefault(x => x.Id == id);
     return row;
@@ -184,8 +183,8 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
   {
     var result = new SearchResult<Expense>();
 
-    var hasPermissionExpensesView = self.helper.has_permission("expenses", "view");
-    var hasPermissionExpensesViewOwn = self.helper.has_permission("expenses", "view_own");
+    var hasPermissionExpensesView = db.has_permission("expenses", "view");
+    var hasPermissionExpensesViewOwn = db.has_permission("expenses", "view_own");
 
     if (!hasPermissionExpensesView && !hasPermissionExpensesViewOwn) return result;
     var expensesQuery = db.Expenses
@@ -200,7 +199,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
     // If the user doesn't have full expense view permission, limit to their own entries
     if (!hasPermissionExpensesView)
     {
-      var currentUserId = staff_user_id;
+      var currentUserId = db.get_staff_user_id();
       expensesQuery = expensesQuery.Where(e => e.AddedFrom == currentUserId);
     }
 
@@ -235,8 +234,8 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
   {
     var result = new SearchResult<Estimate>();
 
-    var hasPermissionViewEstimates = self.helper.has_permission("estimates", "view");
-    var hasPermissionViewEstimatesOwn = self.helper.has_permission("estimates", "view_own");
+    var hasPermissionViewEstimates = db.has_permission("estimates", "view");
+    var hasPermissionViewEstimatesOwn = db.has_permission("estimates", "view_own");
     var allowStaffViewEstimatesAssigned = db.get_option("allow_staff_view_estimates_assigned") == "1";
 
     if (!hasPermissionViewEstimates && !hasPermissionViewEstimatesOwn && !allowStaffViewEstimatesAssigned) return result;
@@ -256,7 +255,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
     // Handle permission logic
     if (!hasPermissionViewEstimates)
     {
-      var noPermissionQuery = self.helper.get_estimates_where_sql_for_staff(staff_user_id);
+      var noPermissionQuery = db.get_estimates_where_sql_for_staff(db.get_staff_user_id());
       estimatesQuery = estimatesQuery.Where(noPermissionQuery);
     }
 
@@ -303,7 +302,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
   public SearchResult<Staff> search_staff(string query, int limit = 0)
   {
     var output = new SearchResult<Staff>();
-    var staff_can_view = self.helper.has_permission("staff", "", "view");
+    var staff_can_view = db.has_permission("staff", "", "view");
     if (!staff_can_view) return output;
     var staffQuery = db.Staff
       .Where(s =>
@@ -333,10 +332,10 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
     {
       Result = new List<Project>(),
       Type = "projects",
-      SearchHeading = self.helper.label("projects")
+      SearchHeading = label("projects")
     };
 
-    var hasPermissionViewProject = self.helper.has_permission("projects", "", "view");
+    var hasPermissionViewProject = db.has_permission("projects", "", "view");
     // Projects
     var query = db.Projects
       .Include(p => p.Client)
@@ -344,7 +343,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
       .Where(condition)
       .AsQueryable();
     if (!hasPermissionViewProject)
-      query = query.Where(x => x.ProjectMembers.Where(y => y.StaffId == staff_user_id).Select(y => y.ProjectId).ToList().Contains(x.Id));
+      query = query.Where(x => x.ProjectMembers.Where(y => y.StaffId == db.get_staff_user_id()).Select(y => y.ProjectId).ToList().Contains(x.Id));
 
     query = !q.StartsWith("#")
       ? query.Where(x =>
@@ -382,15 +381,15 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
     var result = new SearchResult<Proposal> { SearchHeading = "Proposals" };
 
     // Simulated permission checks
-    var hasPermissionViewProposals = self.helper.has_permission("proposals", "", "view");
-    var hasPermissionViewProposalsOwn = self.helper.has_permission("proposals", "", "view_own");
+    var hasPermissionViewProposals = db.has_permission("proposals", "", "view");
+    var hasPermissionViewProposalsOwn = db.has_permission("proposals", "", "view_own");
     var allowStaffViewProposalsAssigned = db.get_option<bool>("allow_staff_view_proposals_assigned");
 
     if (!hasPermissionViewProposals && !hasPermissionViewProposalsOwn && !allowStaffViewProposalsAssigned) return result;
     query = PreprocessQuery(query);
 
     // Permission-based filtering
-    var noPermissionQuery = GetProposalsWhereSqlForStaff(staff_user_id);
+    var noPermissionQuery = GetProposalsWhereSqlForStaff(db.get_staff_user_id());
 
     var proposalsQuery = db.Proposals
       .Include(p => p.Currency)
@@ -444,8 +443,8 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
       SearchHeading = "Credit Notes"
     };
 
-    var hasPermissionViewCreditNotes = self.helper.has_permission("credit_notes", "view");
-    var hasPermissionViewOwnCreditNotes = self.helper.has_permission("credit_notes", "view_own");
+    var hasPermissionViewCreditNotes = db.has_permission("credit_notes", "view");
+    var hasPermissionViewOwnCreditNotes = db.has_permission("credit_notes", "view_own");
 
     if (!hasPermissionViewCreditNotes && !hasPermissionViewOwnCreditNotes) return result;
     query = SanitizeQuery(query);

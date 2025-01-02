@@ -1,11 +1,11 @@
 using System.Linq.Expressions;
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
 using Service.Libraries.gateways;
 
 namespace Service.Models.Payments;
 
-public class PaymentModesModel(MyInstance self, MyContext db) : MyModel(self)
+public class PaymentModesModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   /**
   * @deprecated 2.3.4
@@ -126,7 +126,7 @@ public class PaymentModesModel(MyInstance self, MyContext db) : MyModel(self)
     //   data[check] = !isset(data[check]) ? 0 : 1;
     // });
 
-    data = self.hooks.apply_filters("before_paymentmode_added", data);
+    data = hooks.apply_filters("before_paymentmode_added", data);
     var dataset = new PaymentMode
     {
       Name = data.Name,
@@ -143,7 +143,7 @@ public class PaymentModesModel(MyInstance self, MyContext db) : MyModel(self)
     var insertId = data.Id;
     if (insertId <= 0) return false;
     log_activity($"New Payment Mode Added [ID: {insertId}, Name:{data.Name}]");
-    self.hooks.do_action("after_paymentmode_added", new { id = insertId, data });
+    hooks.do_action("after_paymentmode_added", new { id = insertId, data });
     return true;
   }
 
@@ -172,7 +172,7 @@ public class PaymentModesModel(MyInstance self, MyContext db) : MyModel(self)
     var affectedRows = db.SaveChanges();
     if (affectedRows > 0) updated = true;
 
-    self.hooks.do_action("after_update_paymentmode", new
+    hooks.do_action("after_update_paymentmode", new
     {
       id,
       data
@@ -208,8 +208,8 @@ public class PaymentModesModel(MyInstance self, MyContext db) : MyModel(self)
   {
     if (!_gateways.Any())
     {
-      self.hooks.do_action("before_get_payment_gateways");
-      _gateways = self.hooks.apply_filters("app_payment_gateways", _paymentGateways);
+      hooks.do_action("before_get_payment_gateways");
+      _gateways = hooks.apply_filters("app_payment_gateways", _paymentGateways);
     }
 
     var modes = new List<PaymentMode>();

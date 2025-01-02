@@ -1,11 +1,8 @@
 using System.Linq.Expressions;
-using Global.Entities;
-using Global.Entities.Helpers;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
-using Service.Framework.Helpers;
 using Service.Framework.Library.Merger;
-using Service.Helpers.Sale;
 using Service.Models.Invoices;
 
 
@@ -19,10 +16,9 @@ public static class InvoiceHelper
  * @param  object invoice
  * @return string Url
  */
-  public static string get_invoice_shortlink(this HelperBase helper, Invoice invoice)
+  public static string get_invoice_shortlink(this MyContext db, Invoice invoice)
   {
-    var (self, db) = getInstance();
-    var long_url = helper.site_url($"invoice/{invoice.Id}/{invoice.Hash}");
+    var long_url = site_url($"invoice/{invoice.Id}/{invoice.Hash}");
     if (db.get_option_compare("bitly_access_token", null))
       return long_url;
 
@@ -30,10 +26,10 @@ public static class InvoiceHelper
     if (!string.IsNullOrEmpty(invoice.ShortLink)) return invoice.ShortLink;
 
     // Create short link and return the newly created short link
-    var shortLink = helper.app_generate_short_link(new
+    var shortLink = app_generate_short_link(new
     {
       long_url,
-      title = helper.format_invoice_number(invoice.Id)
+      title = db.format_invoice_number(invoice.Id)
     });
 
     if (!string.IsNullOrEmpty(shortLink)) return long_url;
@@ -49,9 +45,9 @@ public static class InvoiceHelper
    * @param  mixed invoice_total
    * @return mixed  total left
    */
-  public static string get_invoice_total_left_to_pay(this HelperBase helper, int id, decimal? invoice_total = null)
+  public static double get_invoice_total_left_to_pay(this HelperBase helper, int id, double? invoice_total = null)
   {
-    return "";
+    return 0;
   }
 
   /**
@@ -184,18 +180,17 @@ public static class InvoiceHelper
    * @param  mixed id
    * @return string
    */
-  public static string format_invoice_number(this HelperBase helper, int id)
+  public static string format_invoice_number(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var invoice = db.Invoices.FirstOrDefault(x => x.Id == id);
 
     if (invoice == null) return "";
     var number =
       invoice.Status == InvoiceStatus.STATUS_DRAFT
         ? invoice.Prefix + "DRAFT"
-        : helper.sales_number_format(invoice.Number, invoice.NumberFormat, invoice.Prefix, DateTime.Parse(invoice.Date));
+        : db.sales_number_format(invoice.Number, invoice.NumberFormat, invoice.Prefix, DateTime.Parse(invoice.Date));
 
-    self.hooks.apply_filters("format_invoice_number", new { id, number, invoice });
+    hooks.apply_filters("format_invoice_number", new { id, number, invoice });
     return number;
   }
 
@@ -204,9 +199,8 @@ public static class InvoiceHelper
    * @param  mixed itemid
    * @return array
    */
-  public static List<ItemTax> get_invoice_item_taxes(this HelperBase helper, int itemid)
+  public static List<ItemTax> get_invoice_item_taxes(this MyContext db, int itemid)
   {
-    var (self, db) = getInstance();
     var output = db.ItemTaxes.Where(x => x.ItemId == itemid).ToList();
     return output;
   }
@@ -279,10 +273,9 @@ public static class InvoiceHelper
     return false;
   }
 
-  public static async Task<Expression<Func<Invoice, bool>>> get_invoices_where_sql_for_staff(this HelperBase helper, int staff_id)
+  public static async Task<Expression<Func<Invoice, bool>>> get_invoices_where_sql_for_staff(this MyContext db, int staff_id)
   {
-    var (self, db) = getInstance();
-    var has_permission_view_own = helper.has_permission("invoices", "", "view_own");
+    var has_permission_view_own = db.has_permission("invoices", "", "view_own");
     var allow_staff_view_invoices_assigned = db.get_option("allow_staff_view_invoices_assigned");
 
     // Expression that will hold our condition
@@ -315,22 +308,22 @@ public static class InvoiceHelper
    * @param  mixed $invoice_total
    * @return mixed  total left
    */
-  public static double get_invoice_total_left_to_pay(this HelperBase helper, int id, double invoice_total = 0)
+  public static double get_invoice_total_left_to_pay(this MyModel model, int id, double invoice_total = 0)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     if (invoice_total == 0)
     {
       var row = db.Invoices.FirstOrDefault(x => x.Id == id);
       invoice_total = row.Total;
     }
 
-    var payments_model = self.model.payments_model();
-    var credit_notes_model = self.model.credit_notes_model();
+    var payments_model = self.payments_model(db);
+    var credit_notes_model = self.credit_notes_model(db);
     var payments = payments_model.get_invoice_payments(id);
     var credits = credit_notes_model.get_applied_invoice_credits(id);
     payments = (List<InvoicePaymentRecord>)TypeMerger.Merge(payments, credits);
     var totalPayments = payments.Select(payment => Convert.ToDouble(payment.Amount)).ToList().Sum();
-    // return helper.number_format(invoice_total - totalPayments, get_decimal_places());
+    // return number_format(invoice_total - totalPayments, get_decimal_places());
     return invoice_total - totalPayments;
   }
 }

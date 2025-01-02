@@ -1,13 +1,13 @@
 using System.Globalization;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Helpers;
+using Service.Framework.Helpers.Entities;
 
 namespace Service.Models.Reports;
 
-public class ReportsModel(MyInstance self, MyContext db) : MyModel(self)
+public class ReportsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public Chart get_stats_chart_data(string label, Dictionary<string, object> where, Dictionary<string, object> datasetOptions, int year)
   {

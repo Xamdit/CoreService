@@ -8,478 +8,496 @@
 
 
 <div id="wrapper">
-<div class="content">
-<div class="row">
-<div class="col-md-12">
-<div class="_filters _hidden_inputs hidden">
-  form_hidden("my_customers");
-  form_hidden("requires_registration_confirmation");
-  @foreach (var group in groups)
-  {
-    form_hidden($"customer_group_{group.Id}");
-  }
-  @foreach (var type in contract_types)
-  {
-    form_hidden($"contract_type_{type.Id}");
-  }
-  @foreach (var status in invoice_statuses)
-  {
-    form_hidden($"invoices_{status}");
-  }
-  @foreach (var status in estimate_statuses)
-  {
-    form_hidden($"estimates_{status}");
-  }
-  @foreach (var status in project_statuses)
-  {
-    form_hidden($"projects_{status.Id}");
-  }
-  @foreach (var status in proposal_statuses)
-  {
-    form_hidden($"proposals_{status}");
-  }
-  @foreach (var cadmin in customer_admins)
-  {
-    form_hidden($"responsible_admin_{cadmin.StaffId}");
-  }
-  @foreach (var country in countries)
-  {
-    form_hidden($"country_{country.Id}");
-  }
-</div>
-<div class="_buttons">
-  @if (customer_create)
-  {
-    <a href='@self.navigation.admin_url("clients/client")' class="btn btn-primary mright5 test pull-left display-block">
-      <i class="fa-regular fa-plus tw-mr-1"></i>
-      @label["new_client"]
-    </a>
-    <a href='@self.navigation.admin_url("clients/import")>' class="btn btn-primary pull-left display-block mright5 hidden-xs">
-      <i class="fa-solid fa-upload tw-mr-1"></i>
-      @label["import_customers"]
-    </a>
-  }
-  <a href='@self.navigation.admin_url("clients/all_contacts")' class="btn btn-default pull-left display-block mright5">
-    <i class="fa-regular fa-user tw-mr-1"></i>
-    @label["customer_contacts"]
-  </a>
-  <div class="visible-xs">
-    <div class="clearfix"></div>
-  </div>
-  <div class="btn-group pull-right mleft4 btn-with-tooltip-group _filter_data" data-toggle="tooltip" data-title='@label["ilter_by"]'>
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <i class="fa fa-filter" aria-hidden="true"></i>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-left" style="width:300px;">
-      <li class="active">
-        <a href="#" data-cview="all" onclick="dt_custom_view('','.table-clients',''); return false;">
-          @label["customers_sort_all"]
-        </a>
-      </li>
-      @if (
-        db.get_option_compare("customer_requires_registration_confirmation", "1") ||
-        @* fapp.total_rows<Service.Entities.Client>(x=>x.RegistrationConfirmed==0)>0 && *@
-        self.db().Clients.Any(x => x.RegistrationConfirmed == 0)
-        )
-      {
-        <li class="divider"/>
-        <li>
-          <a href="#" data-cview="requires_registration_confirmation" onclick="dt_custom_view('requires_registration_confirmation','.table-clients','requires_registration_confirmation'); return false;">
-            @label["customer_requires_registration_confirmation"]
-          </a>
-        </li>
-      }
-
-      <li class="divider"></li>
-      <li>
-        <a href="#" data-cview="my_customers" onclick="dt_custom_view('my_customers','.table-clients','my_customers'); return false;">
-          @label["customers_assigned_to_me"]
-        </a>
-      </li>
-      <li class="divider"></li>
-      @if (groups.Any())
-      {
-        <li class="dropdown-submenu pull-left groups">
-          <a href="#" tabindex="-1">
-            @label["customer_groups"]
-          </a>
-          <ul class="dropdown-menu dropdown-menu-left">
-            @foreach (var group in groups)
-            {
-              <li>
-                <a href="#" data-cview="customer_group_{group.id}"
-                   onclick="dt_custom_view('customer_group_{group.id}','.table-clients','customer_group_{group.id}'); return false;">
-                  @* @group.Name *@
-                </a>
-              </li>
-            }
-          </ul>
-        </li>
-        <div class="clearfix"></div>
-        <li class="divider"></li>
-      }
-      @if (countries.Any())
-      {
-        <li class="dropdown-submenu pull-left countries">
-          <a href="#" tabindex="-1">
-            @label["clients_country"]
-          </a>
-          <ul class="dropdown-menu dropdown-menu-left">
-            @foreach (var country in countries)
-            {
-              <li>
-                <a href="#" data-cview='@($"country_{country.Id}")' onclick='dt_custom_view("@($"country_{country.Id}")", ".table-clients", "@($"country_{country.Id}")"); return false;'>
-                  @country.ShortName
-                </a>
-              </li>
-            }
-          </ul>
-        </li>
-        <div class="clearfix"></div>
-        <li class="divider"></li>
-      }
-      <li class="dropdown-submenu pull-left invoice">
-        <a href="#" tabindex="-1">
-          @label["invoices"]
-        </a>
-        <ul class="dropdown-menu dropdown-menu-left">
+  <div class="content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="_filters _hidden_inputs hidden">
+          form_hidden("my_customers");
+          form_hidden("requires_registration_confirmation");
+          @foreach (var group in groups)
+          {
+            form_hidden($"customer_group_{group.Id}");
+          }
+          @foreach (var type in contract_types)
+          {
+            form_hidden($"contract_type_{type.Id}");
+          }
           @foreach (var status in invoice_statuses)
           {
-            <li>
-              <a href="#" data-cview='@($"invoices_{status}")' onclick='dt_custom_view("@($"invoices_{status}")", ".table-clients", "@($"invoices_{status}")"); return false;'>
-                @string.Format(label["customer_have_invoices_by"], format_invoice_status(status, "", false))
-              </a>
-            </li>
+            form_hidden($"invoices_{status}");
           }
-        </ul>
-      </li>
-      <div class="clearfix"></div>
-      using System.Threading.Tasks.Dataflow;
-      using Service.Core.Extensions;
-      <li class="divider"></li>
-      <li class="dropdown-submenu pull-left estimate">
-        <a href="#" tabindex="-1">
-          @label["estimates"]
-        </a>
-        <ul class="dropdown-menu dropdown-menu-left">
           @foreach (var status in estimate_statuses)
           {
-            <li>
-              <a href="#" data-cview="estimates_@status" onclick="dt_custom_view('estimates_@status','.table-clients','estimates_@status'); return false;">
-                @string.Format(label["customer_have_estimates_by"],
-                  self.helper.format_estimate_status(Convert.ToInt32(status), "", false))
-              </a>
-            </li>
+            form_hidden($"estimates_{status}");
           }
-
-        </ul>
-      </li>
-      <div class="clearfix"></div>
-      <li class="divider"></li>
-      <li class="dropdown-submenu pull-left project">
-        <a href="#" tabindex="-1">
-          @label["projects"]
-        </a>
-        <ul class="dropdown-menu dropdown-menu-left">
           @foreach (var status in project_statuses)
           {
-            <li>
-              <a href="#" data-cview='@($"projects_{status.Id}")' onclick="dt_custom_view('@($"projects_{status.Id}")', '.table-clients', '@($"projects_{status.Id}")'); return false;">
-                @string.Format(label["customer_have_projects_by"], status.Name)
-              </a>
-            </li>
+            form_hidden($"projects_{status.Id}");
           }
-        </ul>
-      </li>
-      <div class="clearfix"></div>
-      <li class="divider"></li>
-      <li class="dropdown-submenu pull-left proposal">
-        <a href="#" tabindex="-1">
-          @label["proposals"]
-        </a>
-        <ul class="dropdown-menu dropdown-menu-left">
           @foreach (var status in proposal_statuses)
           {
-            <li>
-              <a href="#" data-cview="proposals_{status}" onclick="dt_custom_view('proposals_{status}','.table-clients','proposals_{status}'); return false;">
-                string.Format(@label["customer_have_proposals_by"],format_proposal_status( status, '' , false));
-              </a>
-            </li>
+            form_hidden($"proposals_{status}");
           }
-        </ul>
-      </li>
-      <div class="clearfix"></div>
-      @if (contract_types.Any())
-      {
-        <li class="divider"></li>
-        <li class="dropdown-submenu pull-left contract_types">
-          <a href="#" tabindex="-1">
-            @label["contract_types"]
-          </a>
-          <ul class="dropdown-menu dropdown-menu-left">
-            @foreach (var type in contract_types)
-            {
-              <li>
-                <a href="#" data-cview="contract_type_{type.id}" onclick="dt_custom_view('contract_type_{type.id}','.table-clients','contract_type_{type.id}'); return false;">
-                  string.Format(@label["customer_have_contracts_by_type"],type['name'])
-                </a>
-              </li>
-            }
-          </ul>
-        </li>
-      }
-
-      @if (customer_admins.Any() && (customer_create || customer_edit))
-      {
-        <div class="clearfix">
+          @foreach (var cadmin in customer_admins)
+          {
+            form_hidden($"responsible_admin_{cadmin.StaffId}");
+          }
+          @foreach (var country in countries)
+          {
+            form_hidden($"country_{country.Id}");
+          }
         </div>
-        <li class="divider"></li>
-        <li class="dropdown-submenu pull-left responsible_admin">
-          <a href="#" tabindex="-1">
-            @label["responsible_admin"]
+        <div class="_buttons">
+          @if (customer_create)
+          {
+            <a href='@self.navigation.admin_url("clients/client")'
+               class="btn btn-primary mright5 test pull-left display-block">
+              <i class="fa-regular fa-plus tw-mr-1"></i>
+              @label["new_client"]
+            </a>
+            <a href='@self.navigation.admin_url("clients/import")>'
+               class="btn btn-primary pull-left display-block mright5 hidden-xs">
+              <i class="fa-solid fa-upload tw-mr-1"></i>
+              @label["import_customers"]
+            </a>
+          }
+          <a href='@self.navigation.admin_url("clients/all_contacts")'
+             class="btn btn-default pull-left display-block mright5">
+            <i class="fa-regular fa-user tw-mr-1"></i>
+            @label["customer_contacts"]
           </a>
-          <ul class="dropdown-menu dropdown-menu-left">
-            @foreach (var cadmin in customer_admins)
-            {
-              <li>
-                <a href="#" data-cview="@($"responsible_admin_{cadmin.StaffId}")" onclick="dt_custom_view('responsible_admin_@cadmin.StaffId', '.table-clients', 'responsible_admin_@cadmin.StaffId'); return false;">
-                  @self.helper.get_staff_full_name(cadmin.StaffId)
+          <div class="visible-xs">
+            <div class="clearfix"></div>
+          </div>
+          <div class="btn-group pull-right mleft4 btn-with-tooltip-group _filter_data" data-toggle="tooltip"
+               data-title='@label["ilter_by"]'>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+              <i class="fa fa-filter" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-left" style="width:300px;">
+              <li class="active">
+                <a href="#" data-cview="all" onclick="dt_custom_view('','.table-clients',''); return false;">
+                  @label["customers_sort_all"]
                 </a>
               </li>
-            }
-          </ul>
-        </li>
-      }
-    </ul>
-  </div>
-</div>
-<div class="clearfix"></div>
-<div class="panel_s tw-mt-2 sm:tw-mt-4">
-  <div class="panel-body">
-    @if (customers_view || self.helper.have_assigned_customers())
-    {
-      <div class="mbot15">
-        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-flex tw-items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="tw-w-5 tw-h-5 tw-text-neutral-500 tw-mr-1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
-          </svg>
-          <span>
+              @if (
+                db.get_option_compare("customer_requires_registration_confirmation", "1") ||
+                @* fapp.total_rows<Service.Entities.Client>(x=>x.RegistrationConfirmed==0)>0 && *@
+                db.Clients.Any(x => x.RegistrationConfirmed == 0)
+              )
+              {
+                <li class="divider"/>
+                <li>
+                  <a href="#" data-cview="requires_registration_confirmation"
+                     onclick="dt_custom_view('requires_registration_confirmation','.table-clients','requires_registration_confirmation'); return false;">
+                    @label["customer_requires_registration_confirmation"]
+                  </a>
+                </li>
+              }
+
+              <li class="divider"></li>
+              <li>
+                <a href="#" data-cview="my_customers"
+                   onclick="dt_custom_view('my_customers','.table-clients','my_customers'); return false;">
+                  @label["customers_assigned_to_me"]
+                </a>
+              </li>
+              <li class="divider"></li>
+              @if (groups.Any())
+              {
+                <li class="dropdown-submenu pull-left groups">
+                  <a href="#" tabindex="-1">
+                    @label["customer_groups"]
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-left">
+                    @foreach (var group in groups)
+                    {
+                      <li>
+                        <a href="#" data-cview="customer_group_{group.id}"
+                           onclick="dt_custom_view('customer_group_{group.id}','.table-clients','customer_group_{group.id}'); return false;">
+                          @* @group.Name *@
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </li>
+                <div class="clearfix"></div>
+                <li class="divider"></li>
+              }
+              @if (countries.Any())
+              {
+                <li class="dropdown-submenu pull-left countries">
+                  <a href="#" tabindex="-1">
+                    @label["clients_country"]
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-left">
+                    @foreach (var country in countries)
+                    {
+                      <li>
+                        <a href="#" data-cview='@($"country_{country.Id}")'
+                           onclick='dt_custom_view("@($"country_{country.Id}")", ".table-clients", "@($"country_{country.Id}")"); return false;'>
+                          @country.ShortName
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </li>
+                <div class="clearfix"></div>
+                <li class="divider"></li>
+              }
+              <li class="dropdown-submenu pull-left invoice">
+                <a href="#" tabindex="-1">
+                  @label["invoices"]
+                </a>
+                <ul class="dropdown-menu dropdown-menu-left">
+                  @foreach (var status in invoice_statuses)
+                  {
+                    <li>
+                      <a href="#" data-cview='@($"invoices_{status}")'
+                         onclick='dt_custom_view("@($"invoices_{status}")", ".table-clients", "@($"invoices_{status}")"); return false;'>
+                        @string.Format(label["customer_have_invoices_by"], format_invoice_status(status, "", false))
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </li>
+              <div class="clearfix"></div>
+              using System.Threading.Tasks.Dataflow;
+              using Service.Core.Extensions;
+              <li class="divider"></li>
+              <li class="dropdown-submenu pull-left estimate">
+                <a href="#" tabindex="-1">
+                  @label["estimates"]
+                </a>
+                <ul class="dropdown-menu dropdown-menu-left">
+                  @foreach (var status in estimate_statuses)
+                  {
+                    <li>
+                      <a href="#" data-cview="estimates_@status"
+                         onclick="dt_custom_view('estimates_@status','.table-clients','estimates_@status'); return false;">
+                        @string.Format(label["customer_have_estimates_by"],
+                          self.helper.format_estimate_status(Convert.ToInt32(status), "", false))
+                      </a>
+                    </li>
+                  }
+
+                </ul>
+              </li>
+              <div class="clearfix"></div>
+              <li class="divider"></li>
+              <li class="dropdown-submenu pull-left project">
+                <a href="#" tabindex="-1">
+                  @label["projects"]
+                </a>
+                <ul class="dropdown-menu dropdown-menu-left">
+                  @foreach (var status in project_statuses)
+                  {
+                    <li>
+                      <a href="#" data-cview='@($"projects_{status.Id}")'
+                         onclick="dt_custom_view('@($"projects_{status.Id}")', '.table-clients', '@($"projects_{status.Id}")'); return false;">
+                        @string.Format(label["customer_have_projects_by"], status.Name)
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </li>
+              <div class="clearfix"></div>
+              <li class="divider"></li>
+              <li class="dropdown-submenu pull-left proposal">
+                <a href="#" tabindex="-1">
+                  @label["proposals"]
+                </a>
+                <ul class="dropdown-menu dropdown-menu-left">
+                  @foreach (var status in proposal_statuses)
+                  {
+                    <li>
+                      <a href="#" data-cview="proposals_{status}"
+                         onclick="dt_custom_view('proposals_{status}','.table-clients','proposals_{status}'); return false;">
+                        string.Format(@label["customer_have_proposals_by"],format_proposal_status( status, '' , false));
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </li>
+              <div class="clearfix"></div>
+              @if (contract_types.Any())
+              {
+                <li class="divider"></li>
+                <li class="dropdown-submenu pull-left contract_types">
+                  <a href="#" tabindex="-1">
+                    @label["contract_types"]
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-left">
+                    @foreach (var type in contract_types)
+                    {
+                      <li>
+                        <a href="#" data-cview="contract_type_{type.id}"
+                           onclick="dt_custom_view('contract_type_{type.id}','.table-clients','contract_type_{type.id}'); return false;">
+                          string.Format(@label["customer_have_contracts_by_type"],type['name'])
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </li>
+              }
+
+              @if (customer_admins.Any() && (customer_create || customer_edit))
+              {
+                <div class="clearfix">
+                </div>
+                <li class="divider"></li>
+                <li class="dropdown-submenu pull-left responsible_admin">
+                  <a href="#" tabindex="-1">
+                    @label["responsible_admin"]
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-left">
+                    @foreach (var cadmin in customer_admins)
+                    {
+                      <li>
+                        <a href="#" data-cview="@($"responsible_admin_{cadmin.StaffId}")"
+                           onclick="dt_custom_view('responsible_admin_@cadmin.StaffId', '.table-clients', 'responsible_admin_@cadmin.StaffId'); return false;">
+                          @db.get_staff_full_name(cadmin.StaffId)
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="panel_s tw-mt-2 sm:tw-mt-4">
+          <div class="panel-body">
+            @if (customers_view || db.have_assigned_customers())
+            {
+              <div class="mbot15">
+                <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-flex tw-items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                       stroke="currentColor" class="tw-w-5 tw-h-5 tw-text-neutral-500 tw-mr-1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                  </svg>
+                  <span>
             @label["customers_summary"]
           </span>
-        </h4>
-        <div class="tw-grid tw-grid-cols-2 md:tw-grid-cols-3 lg:tw-grid-cols-6 tw-gap-2">
-          <div
-            class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
+                </h4>
+                <div class="tw-grid tw-grid-cols-2 md:tw-grid-cols-3 lg:tw-grid-cols-6 tw-gap-2">
+                  <div
+                    class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
             <span class="tw-font-semibold tw-mr-3 rtl:tw-ml-3 tw-text-lg">
-              @self.db().Clients.Where(conditionSummary()).Count();
+              @db.Clients.Where(conditionSummary()).Count();
             </span>
-            <span class="text-dark tw-truncate sm:tw-text-clip">
+                    <span class="text-dark tw-truncate sm:tw-text-clip">
               @label["customers_summary_total"]
             </span>
-          </div>
-          <div
-            class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
+                  </div>
+                  <div
+                    class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
             <span class="tw-font-semibold tw-mr-3 rtl:tw-ml-3 tw-text-lg">
-              @self.db().Clients.Where(conditionSummary()).Count(x => x.Active);
+              @db.Clients.Where(conditionSummary()).Count(x => x.Active);
             </span>
-            <span class="text-success tw-truncate sm:tw-text-clip">
+                    <span class="text-success tw-truncate sm:tw-text-clip">
               @label["active_customers"]
             </span>
-          </div>
-          <div
-            class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
-            @self.db().Clients.Where(conditionSummary()).Count(x => !x.Active);
-            <span class="tw-font-semibold tw-mr-3 rtl:tw-ml-3 tw-text-lg">
+                  </div>
+                  <div
+                    class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
+                    @db.Clients.Where(conditionSummary()).Count(x => !x.Active);
+                    <span class="tw-font-semibold tw-mr-3 rtl:tw-ml-3 tw-text-lg">
             </span>
-            <span class="text-danger tw-truncate sm:tw-text-clip">
+                    <span class="text-danger tw-truncate sm:tw-text-clip">
               @label["inactive_active_customers"]
             </span>
-          </div>
-          <div
-            class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
+                  </div>
+                  <div
+                    class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
             <span class="tw-font-semibold tw-mr-3 rtl:tw-ml-3 tw-text-lg">
               @{
-                @self.db().Contacts.Where(conditionSummaryOfContact()).Count(x => x.Active)
+                @db.Contacts.Where(conditionSummaryOfContact()).Count(x => x.Active)
               }
             </span>
-            <span class="text-info tw-truncate sm:tw-text-clip">
+                    <span class="text-info tw-truncate sm:tw-text-clip">
               @label["customers_summary_active"]
             </span>
-          </div>
-          <div
-            class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
+                  </div>
+                  <div
+                    class="md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 tw-flex-1 tw-flex tw-items-center">
             <span class="tw-font-semibold tw-mr-3 rtl:tw-ml-3 tw-text-lg">
-              @self.db().Contacts.Where(conditionSummaryOfContact()).Count(x => !x.Active)
+              @db.Contacts.Where(conditionSummaryOfContact()).Count(x => !x.Active)
             </span>
-            <span class="text-danger tw-truncate sm:tw-text-clip">
+                    <span class="text-danger tw-truncate sm:tw-text-clip">
               @label["customers_summary_inactive"]
             </span>
-          </div>
-          <div
-            class="tw-flex tw-items-center md:tw-border-r md:tw-border-solid tw-flex-1 md:tw-border-neutral-300 lg:tw-border-r-0">
+                  </div>
+                  <div
+                    class="tw-flex tw-items-center md:tw-border-r md:tw-border-solid tw-flex-1 md:tw-border-neutral-300 lg:tw-border-r-0">
             <span class="tw-font-semibold tw-mr-3 rtl:tw-ml-3 tw-text-lg">
-              @self.db().Contacts.Where(conditionSummaryOfContact()).Count(x => x.LastLogin == DateTime.Now.Date);
+              @db.Contacts.Where(conditionSummaryOfContact()).Count(x => x.LastLogin == DateTime.Now.Date);
             </span>
-            <span class="text-muted tw-truncate" data-toggle="tooltip"
-                  data-title='@label["ustomers_summary_logged_in_today"]'>
+                    <span class="text-muted tw-truncate" data-toggle="tooltip"
+                          data-title='@label["ustomers_summary_logged_in_today"]'>
               var contactsTemplate="" ;
-              @if (contacts_logged_in_today.Any())
-              {
-                foreach (var contact in contacts_logged_in_today)
-                {
-                  var url = self.navigation.admin_url($"clients/client/{contact.UserId}?contactid={contact.Id}");
-                  var fullName = contact.FirstName + " " + contact.LastName;
+                      @if (contacts_logged_in_today.Any())
+                      {
+                        foreach (var contact in contacts_logged_in_today)
+                        {
+                          var url = self.navigation.admin_url($"clients/client/{contact.UserId}?contactid={contact.Id}");
+                          var fullName = contact.FirstName + " " + contact.LastName;
                           @* var dateLoggedIn = _dt(contact.LastLogin); *@
                           @* var html = $"<a href='url' target='_blank'>{fullName}</a><br /><small>{dateLoggedIn}</small><br
                     />"; *@
                           @* contactsTemplate += html_escape("<p class='mbot5'>" + html + "</p>"); *@
-                }
-              }
-              @if (string.IsNullOrEmpty(contactsTemplate))
-              {
-                <span class="pointer text-has-action" data-toggle="popover"
-                      data-title='@label["customers_summary_logged_in_today"]' data-html="true"
-                      data-content="@contactsTemplate" data-placement="bottom">
+                        }
+                      }
+                      @if (string.IsNullOrEmpty(contactsTemplate))
+                      {
+                        <span class="pointer text-has-action" data-toggle="popover"
+                              data-title='@label["customers_summary_logged_in_today"]' data-html="true"
+                              data-content="@contactsTemplate" data-placement="bottom">
                   @label["customers_summary_logged_in_today"]
                 </span>
-              }
-              else
-              {
-                <span>
+                      }
+                      else
+                      {
+                        <span>
                   @label["customers_summary_logged_in_today"]
                 </span>
-              }
+                      }
             </span>
-          </div>
-        </div>
-      </div>
-    }
+                  </div>
+                </div>
+              </div>
+            }
 
-    <hr class="hr-panel-separator"/>
-    <a href="#" data-toggle="modal" data-target="#customers_bulk_action" class="bulk-actions-btn table-btn hide" data-table=".table-clients">
-      @label["bulk_actions"]
-    </a>
-    <div class="modal fade bulk_actions" id="customers_bulk_action" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <hr class="hr-panel-separator"/>
+            <a href="#" data-toggle="modal" data-target="#customers_bulk_action" class="bulk-actions-btn table-btn hide"
+               data-table=".table-clients">
+              @label["bulk_actions"]
+            </a>
+            <div class="modal fade bulk_actions" id="customers_bulk_action" tabindex="-1" role="dialog">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">
                 &times;
               </span>
-            </button>
-            <h4 class="modal-title">
-              @label["bulk_actions"]
-            </h4>
-          </div>
-          <div class="modal-body">
-            @if (customers_delete)
-            {
-              <div class="checkbox checkbox-danger">
-                <input type="checkbox" name="mass_delete" id="mass_delete">
-                <label for="mass_delete">
-                  @label["mass_delete"]
-                </label>
+                    </button>
+                    <h4 class="modal-title">
+                      @label["bulk_actions"]
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    @if (customers_delete)
+                    {
+                      <div class="checkbox checkbox-danger">
+                        <input type="checkbox" name="mass_delete" id="mass_delete">
+                        <label for="mass_delete">
+                          @label["mass_delete"]
+                        </label>
+                      </div>
+                      <hr class="mass_delete_separator"/>
+                    }
+
+                    <div id="bulk_change">
+                      @* @render_select("move_to_groups_customers_bulk[]", groups, new[] { "id", "name" },
+                      "customer_groups", "", new { multiple = true }, [], "", "", false); *@
+                      <p class="text-danger">
+                        @label["bulk_action_customers_groups_warning"]
+                      </p>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                      @label["close"]
+                    </button>
+                    <a href="#" class="btn btn-primary" onclick="customers_bulk_action(this); return false;">
+                      @label["confirm"]
+                    </a>
+                  </div>
+                </div>
               </div>
-              <hr class="mass_delete_separator"/>
+            </div>
+
+            <div class="checkbox">
+              <input type="checkbox" checked id="exclude_inactive" name="exclude_inactive">
+              <label for="exclude_inactive">
+                @label["exclude_inactive"]
+                @label["clients"]
+              </label>
+            </div>
+            <div class="clearfix mtop20"></div>
+            $table_data=[];
+            $_table_data=[
+            '<span class="hide"> - </span>
+            <div class="checkbox mass_select_all_wrap">
+              <input type="checkbox" id="mass_select_all" data-to-table="clients"><label></label>
+            </div>
+            ',
+            [
+            'name' => _l('the_number_sign'),
+            'th_attrs' => ['class' => 'toggleable', 'id' => 'th-number'],
+            ],
+            [
+            'name' => _l('clients_list_company'),
+            'th_attrs' => ['class' => 'toggleable', 'id' => 'th-company'],
+            ],
+            [
+            'name' => _l('contact_primary'),
+            'th_attrs' => ['class' => 'toggleable', 'id' => 'th-primary-contact'],
+            ],
+            [
+            'name' => _l('company_primary_email'),
+            'th_attrs' => ['class' => 'toggleable', 'id' => 'th-primary-contact-email'],
+            ],
+            [
+            'name' => _l('clients_list_phone'),
+            'th_attrs' => ['class' => 'toggleable', 'id' => 'th-phone'],
+            ],
+            [
+            'name' => _l('customer_active'),
+            'th_attrs' => ['class' => 'toggleable', 'id' => 'th-active'],
+            ],
+            [
+            'name' => _l('customer_groups'),
+            'th_attrs' => ['class' => 'toggleable', 'id' => 'th-groups'],
+            ],
+            [
+            'name' => _l('date_created'),
+            'th_attrs' => ['class' => 'toggleable', 'id' => 'th-date-created'],
+            ],
+            ];
+            foreach (var _t in _table_data ) {
+            array_push(table_data, _t);
             }
 
-            <div id="bulk_change">
-              @* @render_select("move_to_groups_customers_bulk[]", groups, new[] { "id", "name" },
-                      "customer_groups", "", new { multiple = true }, [], "", "", false); *@
-              <p class="text-danger">
-                @label["bulk_action_customers_groups_warning"]
-              </p>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">
-              @label["close"]
-            </button>
-            <a href="#" class="btn btn-primary" onclick="customers_bulk_action(this); return false;">
-              @label["confirm"]
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="checkbox">
-      <input type="checkbox" checked id="exclude_inactive" name="exclude_inactive">
-      <label for="exclude_inactive">
-        @label["exclude_inactive"]
-        @label["clients"]
-      </label>
-    </div>
-    <div class="clearfix mtop20"></div>
-    $table_data=[];
-    $_table_data=[
-    '<span class="hide"> - </span>
-    <div class="checkbox mass_select_all_wrap">
-      <input type="checkbox" id="mass_select_all" data-to-table="clients"><label></label>
-    </div>',
-    [
-    'name' => _l('the_number_sign'),
-    'th_attrs' => ['class' => 'toggleable', 'id' => 'th-number'],
-    ],
-    [
-    'name' => _l('clients_list_company'),
-    'th_attrs' => ['class' => 'toggleable', 'id' => 'th-company'],
-    ],
-    [
-    'name' => _l('contact_primary'),
-    'th_attrs' => ['class' => 'toggleable', 'id' => 'th-primary-contact'],
-    ],
-    [
-    'name' => _l('company_primary_email'),
-    'th_attrs' => ['class' => 'toggleable', 'id' => 'th-primary-contact-email'],
-    ],
-    [
-    'name' => _l('clients_list_phone'),
-    'th_attrs' => ['class' => 'toggleable', 'id' => 'th-phone'],
-    ],
-    [
-    'name' => _l('customer_active'),
-    'th_attrs' => ['class' => 'toggleable', 'id' => 'th-active'],
-    ],
-    [
-    'name' => _l('customer_groups'),
-    'th_attrs' => ['class' => 'toggleable', 'id' => 'th-groups'],
-    ],
-    [
-    'name' => _l('date_created'),
-    'th_attrs' => ['class' => 'toggleable', 'id' => 'th-date-created'],
-    ],
-    ];
-    foreach (var _t in _table_data ) {
-    array_push(table_data, _t);
-    }
 
 
-
-    @foreach (var field in custom_fields)
-    {
-      // table_data.Add(new
-      // {
-      //   name = field.Name,
-      //   @th_attrs = new
-      //   {
-      //     "data-type" = field.Type,
-      //     "data-custom-field" = 1
-      //   }
-      // });
-    }
-    @self.hooks.apply_filters("customers_table_columns", table_data);
-    <div class="panel-table-full">
-      @* @render_datatable(table_data, "clients", new string[] { "number-index-2" }, new
+            @foreach (var field in custom_fields)
+            {
+              // table_data.Add(new
+              // {
+              //   name = field.Name,
+              //   @th_attrs = new
+              //   {
+              //     "data-type" = field.Type,
+              //     "data-custom-field" = 1
+              //   }
+              // });
+            }
+            @hooks.apply_filters("customers_table_columns", table_data);
+            <div class="panel-table-full">
+              @* @render_datatable(table_data, "clients", new string[] { "number-index-2" }, new
               {
               "data-last-order-identifier" = "customers",
               "data-default-order" = get_table_last_order('customers')
               }); *@
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-</div>
-</div>
-</div>
 </div>

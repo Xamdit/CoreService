@@ -1,6 +1,5 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Framework.Core.Engine;
-using Service.Framework.Helpers;
 using Service.Models.Statements;
 using File = System.IO.File;
 
@@ -12,13 +11,12 @@ public static class PdfHelper
 
   public static string LIBSPATH = "./libraries/";
 
-  public static void load_pdf_language(this HelperBase helper, string clientLanguage)
+  public static void load_pdf_language(this MyContext db, string clientLanguage)
   {
-    var (self, db) = getInstance();
     var language = db.get_option("active_language");
 
     // When cron or email sending PDF document the PDFs need to be in the client language
-    if (helper.is_data_for_customer() || helper.is_cron())
+    if (db.is_data_for_customer() || is_cron())
     {
       if (!string.IsNullOrEmpty(clientLanguage)) language = clientLanguage;
     }
@@ -29,19 +27,17 @@ public static class PdfHelper
 
     var languagePath = Path.Combine(APPPATH, "language", language);
 
-    if (!FileExists(languagePath)) return;
+    if (!file_exists(languagePath)) return;
     // self.Lang.Load(language + "_lang", language);
-    helper.load_custom_lang_file(language);
+    load_custom_lang_file(language);
     // self.Lang.SetLastLoadedLanguage(language);
-    self.hooks.do_action("load_pdf_language", new { language });
+    hooks.do_action("load_pdf_language", new { language });
   }
 
-  public static string pdf_logo_url(this HelperBase helper)
+  public static string pdf_logo_url(this MyContext db)
   {
-    var (self, db) = getInstance();
-
     var custom_pdf_logo_url = db.get_option("custom_pdf_logo_image_url");
-    var companyUploadPath = helper.get_upload_path_by_type("company");
+    var companyUploadPath = get_upload_path_by_type("company");
     var logoUrl = "";
     var width = int.TryParse(db.get_option("pdf_logo_width"), out var w) ? w : 120;
 
@@ -61,12 +57,11 @@ public static class PdfHelper
 
     return !string.IsNullOrEmpty(logoUrl)
       ? $"<img width='{width}px' src='{logoUrl}'>"
-      : self.hooks.apply_filters("pdf_logo_url", logoUrl);
+      : hooks.apply_filters("pdf_logo_url", logoUrl);
   }
 
   public static List<string> get_pdf_fonts_list(this HelperBase helper)
   {
-    var (self, db) = getInstance();
     var fontList = new List<string>();
     // string fontsDir = TCPDF_FONTS.GetFontPath();
     var fontsDir = string.Empty;
@@ -74,13 +69,12 @@ public static class PdfHelper
     if (Directory.Exists(fontsDir))
       fontList.AddRange(Directory.EnumerateFiles(fontsDir, "*.json").Select(file => Path.GetFileNameWithoutExtension(file).ToLower()).Where(name => !name.EndsWith("i")));
 
-    return self.hooks.apply_filters("pdf_fonts_list", fontList);
+    return hooks.apply_filters("pdf_fonts_list", fontList);
   }
 
 
-  public static (string orientation, string format) get_pdf_format(this HelperBase helper, string optionName)
+  public static (string orientation, string format) get_pdf_format(this MyContext db, string optionName)
   {
-    var (self, db) = getInstance();
     var optionValue = db.get_option(optionName).ToUpper();
     var (orientation, format) = ("", "");
 
@@ -171,9 +165,8 @@ public static class PdfHelper
   /// <param name="path">Full class path</param>
   /// <param name="parameters">Parameters to pass in class constructor</param>
   /// <returns>Instance of the document object after preparation</returns>
-  public static PdfDocumentGenerator app_pdf(this HelperBase helper, string type, string path, params object[] parameters)
+  public static PdfDocumentGenerator app_pdf(this object obj, string type, string path, params object[] parameters)
   {
-    var (self, db) = getInstance();
     // Initialize the PDF generator
     var pdfGenerator = new PdfDocumentGenerator(path);
     // Add a title and some content
@@ -196,8 +189,8 @@ public static class PdfHelper
     if (!path.EndsWith(fileExtension)) path += fileExtension;
 
     // Apply hooks or filters to the path (assuming hook functionality is implemented)
-    // path = self.hooks.apply_filters($"{type}_pdf_class_path", path, parameters);
-    path = self.hooks.apply_filters($"{type}_pdf_class_path", path);
+    // path = hooks.apply_filters($"{type}_pdf_class_path", path, parameters);
+    path = hooks.apply_filters($"{type}_pdf_class_path", path);
 
     // Load the class via reflection
     Type classType;
@@ -241,19 +234,19 @@ public static class PdfHelper
 * For example this function is used for custom fields, pdf language loading etc...
 * @return boolean
 */
-  public static bool is_data_for_customer(this HelperBase helper)
+  public static bool is_data_for_customer(this MyContext db)
   {
-    return helper.is_client_logged_in()
-           || (!helper.is_staff_logged_in() && !helper.is_client_logged_in())
-           || helper.defined("SEND_MAIL_TEMPLATE")
-           || helper.defined("CLIENTS_AREA")
-           || helper.defined("GDPR_EXPORT");
+    return db.is_client_logged_in()
+           || (!db.is_staff_logged_in() && !db.is_client_logged_in())
+           || defined("SEND_MAIL_TEMPLATE")
+           || defined("CLIENTS_AREA")
+           || defined("GDPR_EXPORT");
   }
 
 
-  public static void load_custom_lang_file(this HelperBase helper, string language)
+  public static void load_custom_lang_file( string language)
   {
-    if (!helper.file_exists($"language/{language}/custom_lang.json")) return;
+    if (! file_exists($"language/{language}/custom_lang.json")) return;
     // if (array_key_exists('custom_lang.php',  $CI->lang->is_loaded)) {
     //   unset($CI->lang->is_loaded['custom_lang.php']);
     // }
@@ -296,9 +289,8 @@ public static class PdfHelper
     return helper.app_pdf("payment", $"{LIBSPATH}pdf/Payment_pdf", payment, tag);
   }
 
-  public static void BulkPdfExportMaybeTag(this HelperBase helper, string tag, ref object pdf)
+  public static void BulkPdfExportMaybeTag(this MyContext db, string tag, ref object pdf)
   {
-    var (self, db) = getInstance();
     if (string.IsNullOrEmpty(tag)) return;
     var fontName = db.get_option("pdf_font");
     var fontSize = int.TryParse(db.get_option("pdf_font_size"), out var fs) ? fs : 10;
@@ -369,10 +361,9 @@ public static class PdfHelper
  * @param  string $tag tag for bulk pdf exporter
  * @return mixed object
  */
-  public static PdfDocumentGenerator estimate_pdf(this LibraryBase libs, List<Estimate> estimate, string tag = "")
+  public static PdfDocumentGenerator estimate_pdf(this LibraryBase libs, Estimate estimate, string tag = "")
   {
-    var (self, db) = getInstance();
-    return self.helper.app_pdf("estimate", LIBSPATH + "pdf/Estimate_pdf", estimate, tag);
+    return libs.app_pdf("estimate", LIBSPATH + "pdf/Estimate_pdf", estimate, tag);
   }
 
   /**
@@ -383,7 +374,6 @@ public static class PdfHelper
  */
   public static PdfDocumentGenerator proposal_pdf(this LibraryBase libs, Proposal proposal, string tag = "")
   {
-    var (self, db) = getInstance();
-    return self.helper.app_pdf("proposal", LIBSPATH + "pdf/Proposal_pdf", proposal, tag);
+    return libs.app_pdf("proposal", LIBSPATH + "pdf/Proposal_pdf", proposal, tag);
   }
 }

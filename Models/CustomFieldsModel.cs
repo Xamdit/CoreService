@@ -1,11 +1,11 @@
-using Global.Entities;
-using Global.Entities.Tools;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers.Entities;
 
 namespace Service.Models;
 
-public class CustomFieldsModel(MyInstance self, MyContext db) : MyModel(self)
+public class CustomFieldsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   private List<string> pdfFields = new() { "estimate", "invoice", "credit_note", "items" };
   private List<string> clientPortalFields = new() { "customers", "estimate", "invoice", "proposal", "contracts", "tasks", "projects", "contacts", "tickets", "company", "credit_note" };

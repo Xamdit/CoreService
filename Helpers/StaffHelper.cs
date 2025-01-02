@@ -1,10 +1,9 @@
 using System.Web;
-using Global.Entities;
 using Microsoft.AspNetCore.Components;
 using Service.Core.Extensions;
 using Service.Core.Synchronus;
+using Service.Entities;
 using Service.Framework.Core.Engine;
-using Service.Framework.Helpers;
 using Service.Helpers.Tags;
 using Service.Schemas;
 
@@ -16,9 +15,9 @@ public static class StaffHelper
 
   [Inject] private static SyncBuilder builder { get; set; }
 
-  public static string get_staff_full_name(this HelperBase helper, int? userid = null)
+  public static string get_staff_full_name(this MyContext db, int? userid = null)
   {
-    var tmpStaffUserId = helper.get_staff_user_id();
+    var tmpStaffUserId = db.get_staff_user_id();
     if (!userid.HasValue || userid == tmpStaffUserId)
     {
       if (CurrentUser != null)
@@ -42,15 +41,14 @@ public static class StaffHelper
  * @param  string  $staff_id staff id
  * @return boolean
  */
-  public static bool is_staff_member(this HelperBase helper)
+  public static bool is_staff_member(this MyContext db)
   {
-    var staff_id = helper.get_staff_user_id();
-    return helper.is_staff_member(staff_id);
+    var staff_id = db.get_staff_user_id();
+    return db.is_staff_member(staff_id);
   }
 
-  public static bool is_staff_member(this HelperBase helper, int staff_id)
+  public static bool is_staff_member(this MyContext db, int staff_id)
   {
-    var db = new MyContext();
     return db.Staff
       .Any(x => x.Id == staff_id && x.IsNotStaff == 0);
   }
@@ -63,17 +61,16 @@ public static class StaffHelper
  * @param  array   $img_attrs additional <img /> attributes
  * @return string
  */
-  public static string staff_profile_image(this HelperBase helper, int staff_id, string classes = null, string type = "small", Dictionary<string, string> imgAttrs = null)
+  public static string staff_profile_image(this MyContext db, int staff_id, string? classes = null, string type = "small", Dictionary<string, string> imgAttrs = null)
   {
-    return helper.staff_profile_image(staff_id, new List<string> { classes }, type, imgAttrs);
+    return db.staff_profile_image(staff_id, new List<string> { classes }, type, imgAttrs);
   }
 
-  public static string staff_profile_image(this HelperBase helper, int staff_id, List<string> classes = null, string type = "small", Dictionary<string, string> imgAttrs = null)
+  public static string staff_profile_image(this MyContext db, int staff_id, List<string> classes = null, string type = "small", Dictionary<string, string> imgAttrs = null)
   {
-    var (self, db) = getInstance();
-    var url = helper.site_url("assets/images/user-placeholder.jpg");
+    var url = site_url("assets/images/user-placeholder.jpg");
     var staff = new Staff();
-    if (staff_id == helper.get_staff_user_id() && CurrentUser.Id > 0)
+    if (staff_id == db.get_staff_user_id() && CurrentUser.Id > 0)
     {
       var user = CurrentUser;
       staff = db.Staff.FirstOrDefault(x => x.Id == user.Id);
@@ -86,7 +83,7 @@ public static class StaffHelper
     if (staff == null) return url;
     if (string.IsNullOrEmpty(staff.ProfileImage)) return url;
     var profileImagePath = "uploads/staff_profile_images/" + staff_id + "/" + type + "_" + staff.ProfileImage;
-    if (helper.file_exists(profileImagePath)) url = helper.site_url(profileImagePath);
+    if (file_exists(profileImagePath)) url = site_url(profileImagePath);
 
     return url;
   }
@@ -96,24 +93,22 @@ public static class StaffHelper
  * @param  mixed $id staff id
  * @return mixed
  */
-  public static Staff get_staff(this HelperBase helper, int? id = null)
+  public static Staff? get_staff(this MyModel model, int? id = null)
   {
-    var (self, db) = getInstance();
-    var staff_model = self.model.staff_model();
-    if (!id.HasValue && self.cache.has("current_user"))
-    {
-      var current_user = self.cache.get("current_user");
-      if (current_user != null)
-      {
-        var rows = staff_model.get(x => x.Id == number(current_user));
-        return rows.FirstOrDefault();
-      }
-    }
+    var (self, db) = model.getInstance();
+    var staff_model = self.staff_model(db);
+    if (id.HasValue || !self.cache.has("current_user"))
+      return id.HasValue
+        ? staff_model.get(x => x.Id == id.Value).FirstOrDefault()
+        : null;
 
-    // Staff not logged in
-    return id.HasValue
-      ? staff_model.get(x => x.Id == id.Value).FirstOrDefault()
-      : null;
+    var current_user = self.cache.get("current_user");
+    if (current_user == null)
+      return id.HasValue
+        ? staff_model.get(x => x.Id == id.Value).FirstOrDefault()
+        : null;
+    var rows = staff_model.get(x => x.Id == number(current_user));
+    return rows.FirstOrDefault();
   }
 
   /**
@@ -122,17 +117,16 @@ public static class StaffHelper
  * @param  string $type
  * @return string
  */
-  public static string staff_profile_image_url(int staff_id, string type = "small")
+  public static string staff_profile_image_url(this MyContext db, int staff_id, string type = "small")
   {
-    var (self, db) = getInstance();
-    var url = self.helper.base_url("assets/images/user-placeholder.jpg");
-    var staff = staff_id == self.helper.get_staff_user_id() && self.globals<Staff?>("current_user") != null
-      ? self.globals<Staff?>("current_user")
+    var url = base_url("assets/images/user-placeholder.jpg");
+    var staff = staff_id == db.get_staff_user_id() && globals<Staff?>("current_user") != null
+      ? globals<Staff?>("current_user")
       : db.Staff.FirstOrDefault(x => x.Id == staff_id);
     if (staff == null) return url;
     if (string.IsNullOrEmpty(staff.ProfileImage)) return url;
     var profileImagePath = $"uploads/staff_profile_images/{staff_id}/{type}_{staff.ProfileImage}";
-    if (self.file_exists(profileImagePath)) url = self.helper.base_url(profileImagePath);
+    if (file_exists(profileImagePath)) url = base_url(profileImagePath);
     return url;
   }
 }

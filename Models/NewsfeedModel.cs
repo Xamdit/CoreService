@@ -1,24 +1,25 @@
 using System.Dynamic;
-using Global.Entities;
-using Global.Entities.Tools;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
+using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Models.Users;
+using File = Service.Entities.File;
 
 
 namespace Service.Models;
 
-public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
+public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private const int post_likes_limit = 6;
   private const int post_comment_likes_limit = 6;
   private const int post_comments_limit = 6;
   private const int newsfeed_posts_limit = 10;
-  private DepartmentsModel departments_model = self.model.departments_model();
-  private StaffModel staff_model = self.model.staff_model();
+  private DepartmentsModel departments_model = self.departments_model(db);
+  private StaffModel staff_model = self.staff_model(db);
 
 
   public bool pin_post(int id)
@@ -41,7 +42,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
     return true;
   }
 
-  public List<Global.Entities.File> get_post_attachments(int id, bool images = false)
+  public List<File> get_post_attachments(int id, bool images = false)
   {
     var query = db.Files.Where(f => f.RelId == id && f.RelType == "newsfeed_post");
 
@@ -55,7 +56,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
   public List<NewsfeedPostLike> get_post_likes(int id)
   {
     var rows = db.NewsfeedPostLikes
-      .Where(l => l.PostId == id && l.UserId != staff_user_id)
+      .Where(l => l.PostId == id && l.UserId != db.get_staff_user_id())
       .OrderBy(l => l.DateLiked)
       .ToList();
     return rows;
@@ -135,7 +136,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
   {
     post.DateCreated = DateTime.Now;
     post.Content = post.Content.nl2br();
-    post.Creator = staff_user_id;
+    post.Creator = db.get_staff_user_id();
 
 
     // if (!string.IsNullOrEmpty(post.Visibility))
@@ -157,11 +158,11 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
       {
         // if (!staff_deparments.Contains(Convert.ToInt32(i))) return;
         // Allow admin to view all posts
-        if (member.Id.is_admin()) return;
+        if (db.is_admin(member.Id)) return;
         // continue 2;
       });
       if (post.Creator == member.Id) return;
-      var notified = self.helper.add_notification(new Notification
+      var notified = db.add_notification(new Notification
       {
         Description = "not_published_new_post",
         ToUserId = member.Id,
@@ -170,7 +171,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
 
       if (notified) notifiedUsers.Add(member.Id);
     });
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
     return postid;
   }
 
@@ -181,7 +182,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
     var like = new NewsfeedPostLike
     {
       PostId = id,
-      UserId = staff_user_id,
+      UserId = db.get_staff_user_id(),
       DateLiked = DateTime.Now
     };
 
@@ -196,7 +197,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
   public bool unlike_post(int id)
   {
     var like = db.NewsfeedPostLikes
-      .FirstOrDefault(l => l.PostId == id && l.UserId == staff_user_id);
+      .FirstOrDefault(l => l.PostId == id && l.UserId == db.get_staff_user_id());
 
     if (like == null) return false;
     db.NewsfeedPostLikes.Remove(like);
@@ -210,7 +211,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
       .Where(l =>
         l.CommentId == id &&
         l.PostId == postid &&
-        l.UserId == staff_user_id
+        l.UserId == db.get_staff_user_id()
       )
       .Delete();
 
@@ -220,39 +221,39 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
   public bool user_liked_post(int id)
   {
     return db.NewsfeedPostLikes
-      .Any(l => l.PostId == id && l.UserId == staff_user_id);
+      .Any(l => l.PostId == id && l.UserId == db.get_staff_user_id());
   }
 
   public bool user_liked_comment(int id)
   {
     return db.NewsfeedCommentLikes
-      .Any(l => l.CommentId == id && l.UserId == staff_user_id);
+      .Any(l => l.CommentId == id && l.UserId == db.get_staff_user_id());
   }
 
   public int add_comment(NewsfeedPostComment comment)
   {
     comment.DateCreated = DateTime.Now;
-    comment.UserId = staff_user_id;
+    comment.UserId = db.get_staff_user_id();
     comment.Content = comment.Content?.nl2br();
     var result = db.NewsfeedPostComments.Add(comment);
     var insert_id = result.Entity.Id;
     if (!result.IsAdded()) return 0;
     // var post = this.get_post(post['postid']);
     dynamic post = new ExpandoObject();
-    if (post.creator == self.helper.get_staff_user_id()) return insert_id;
-    var notified = self.helper.add_notification(new Notification
+    if (post.creator == db.get_staff_user_id()) return insert_id;
+    var notified = db.add_notification(new Notification
     {
       Description = "not_commented_your_post",
       ToUserId = post.creator,
       Link = "#postid=" + comment.PostId,
       AdditionalData = JsonConvert.SerializeObject(new[]
       {
-        self.helper.get_staff_full_name(self.helper.get_staff_user_id()),
+        db.get_staff_full_name(db.get_staff_user_id()),
         $"{post.content}"[..50]
       })
     });
     if (notified)
-      self.helper.pusher_trigger_notification(new List<int> { post.creator });
+      db.pusher_trigger_notification(new List<int> { post.creator });
     return insert_id;
   }
 
@@ -264,7 +265,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
     {
       CommentId = id,
       PostId = postid,
-      UserId = staff_user_id,
+      UserId = db.get_staff_user_id(),
       DateLiked = today()
     };
 
@@ -279,7 +280,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
   public bool remove_post_comment(int id, int postid)
   {
     var comment = db.NewsfeedPostComments
-      .FirstOrDefault(c => c.Id == id && c.PostId == postid && c.UserId == staff_user_id);
+      .FirstOrDefault(c => c.Id == id && c.PostId == postid && c.UserId == db.get_staff_user_id());
 
     if (comment == null) return false;
     db.NewsfeedPostComments.Remove(comment);
@@ -290,11 +291,11 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
   public bool delete_post(int postid)
   {
     var post = db.NewsfeedPosts
-      .FirstOrDefault(p => p.Id == postid && (p.Creator == staff_user_id || is_admin));
+      .FirstOrDefault(p => p.Id == postid && (p.Creator == db.get_staff_user_id() || db.is_admin()));
 
     if (post == null) return false;
     db.NewsfeedPosts
-      .Where(p => p.Id == postid && (p.Creator == staff_user_id || is_admin))
+      .Where(p => p.Id == postid && (p.Creator == db.get_staff_user_id() || db.is_admin()))
       .Delete();
 
     db.NewsfeedPostLikes.RemoveRange(

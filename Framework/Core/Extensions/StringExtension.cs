@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json;
 using Service.Framework.Core.Engine;
 
 namespace Service.Framework.Core.Extensions;
@@ -34,7 +35,7 @@ public static class StringExtension
     return !string.IsNullOrEmpty(str) && !string.IsNullOrEmpty(substr) && str.IndexOf(substr, StringComparison.Ordinal) > 0;
   }
 
-  public static string uuid(this HelperBase helper)
+  public static string uuid()
   {
     return Guid.NewGuid().ToString("n");
   }
@@ -56,7 +57,7 @@ public static class StringExtension
     return haystack.EndsWith(needle);
   }
 
-  public static string strafter(this HelperBase helperBase, string str, string substring)
+  public static string strafter(string str, string substring)
   {
     var index = str.IndexOf(substring, StringComparison.OrdinalIgnoreCase);
     return index >= 0 ? str[(index + substring.Length)..] : str;
@@ -88,7 +89,7 @@ public static class StringExtension
     return pos < 0 ? subject : subject[..pos] + replace + subject[(pos + search.Length)..];
   }
 
-  public static string get_string_between(this HelperBase self, string str, string start, string end)
+  public static string get_string_between(string str, string start, string end)
   {
     var startIndex = str.IndexOf(start, StringComparison.OrdinalIgnoreCase);
     if (startIndex < 0) return string.Empty;
@@ -136,9 +137,31 @@ public static class StringExtension
     return result;
   }
 
-  public static object array_to_object<T>(this HelperBase self, T[] array)
+  public static Dictionary<string, object> array_to_object(this HelperBase self, params object[] array)
   {
-    return array.Cast<object>().ToArray();
+    var output = new Dictionary<string, object>();
+    array.ToList()
+      .ForEach(x =>
+      {
+        var jsonString = JsonConvert.SerializeObject(x);
+        var item = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+        foreach (var kvp in item)
+        {
+          var key = kvp.Key;
+          var value = kvp.Value;
+          if (output.ContainsKey(key)) output.Remove(key);
+          output[key] = value;
+        }
+      });
+    return output;
+  }
+
+  public static T? array_to_object<T>(this HelperBase helper, T[] array) where T : class
+  {
+    var output = helper.array_to_object(array);
+    var jsonString = JsonConvert.SerializeObject(output);
+    var dataset = JsonConvert.DeserializeObject<T>(jsonString);
+    return dataset;
   }
 
   public static IEnumerable<T> array_flatten<T>(this HelperBase self, IEnumerable<IEnumerable<T>> array)
@@ -309,24 +332,24 @@ public static class StringExtension
   }
 
   // Method to format double
-  public static string number_format(this HelperBase helper, double number, int digit = 2)
+  public static string number_format(double number, int digit = 2)
   {
-    return helper.number_format((decimal)number, digit);
+    return number_format((decimal)number, digit);
   }
 
   // Method to format int
-  public static string number_format(this HelperBase helper, decimal percentage, int number, int digit = 2)
+  public static string number_format(decimal percentage, int number, int digit = 2)
   {
-    return helper.number_format((decimal)number, digit);
+    return number_format((decimal)number, digit);
   }
 
   // Method to format float
-  public static string number_format(this HelperBase helper, float number, int digit = 2)
+  public static string number_format(float number, int digit = 2)
   {
-    return helper.number_format((decimal)number, digit);
+    return number_format((decimal)number, digit);
   }
 
-  public static string number_format(this HelperBase helper, decimal number, int digit = 2)
+  public static string number_format(decimal number, int digit = 2)
   {
     // Create a custom NumberFormatInfo object
     var customFormat = new NumberFormatInfo

@@ -1,10 +1,9 @@
-using Global.Entities;
+using Service.Entities;
 using Service.Framework;
-using Service.Helpers;
 
 namespace Service.Models;
 
-public class UserAutoLoginModel(MyInstance self, MyContext db) : MyModel(self)
+public class UserAutoLoginModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   /**
  * Check if autologin found
@@ -14,7 +13,6 @@ public class UserAutoLoginModel(MyInstance self, MyContext db) : MyModel(self)
  */
   public async Task<UserAutoLogin> get(int userId, string key)
   {
-    var db = self.db();
     // Check if user exists in `UserAutoLogin` table
     var userAutoLogin = db.UserAutoLogins.FirstOrDefault(u => u.UserId == userId && u.Key == key);
 
@@ -79,7 +77,6 @@ public class UserAutoLoginModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool set(int user_id, string key, bool is_staff)
   {
-    var db = self.db();
     db.UserAutoLogins.Add(new UserAutoLogin
     {
       UserId = user_id,
@@ -100,7 +97,6 @@ public class UserAutoLoginModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public void delete(int user_id, string key, bool is_staff)
   {
-    var db = self.db();
     db.UserAutoLogins.RemoveRange(
       db.UserAutoLogins.Where(x => x.UserId == user_id && x.Key == key && x.IsStaff == is_staff)
     );

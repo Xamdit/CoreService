@@ -1,16 +1,16 @@
-using Global.Entities;
-using Service.Entities.Extras;
+using Service.Entities;
 using Service.Framework;
+using Service.Framework.Helpers.Entities.Extras;
 using Service.Helpers;
 using Service.Models.Invoices;
 
 namespace Service.Models;
 
-public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self)
+public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public async Task<bool> AddOrUpdateEvent(Event eventData)
   {
-    eventData.UserId = staff_user_id;
+    eventData.UserId = db.get_staff_user_id();
     // eventData.Start = ToSqlDate(eventData.Start);
     eventData.End ??= today();
     eventData.Public = eventData.Public == 1 ? 1 : 0;
@@ -26,13 +26,13 @@ public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self)
       if (existingEvent.IsStartNotified == 1 && DateTime.Parse(eventData.Start) > DateTime.Parse(existingEvent.Start))
         eventData.IsStartNotified = 0;
 
-      eventData = self.hooks.apply_filters("event_update_data", eventData);
+      eventData = hooks.apply_filters("event_update_data", eventData);
 
       db.Entry(existingEvent).CurrentValues.SetValues(eventData);
       return true;
     }
 
-    eventData = self.hooks.apply_filters("event_create_data", eventData);
+    eventData = hooks.apply_filters("event_create_data", eventData);
 
     db.Events.Add(eventData);
 
@@ -49,8 +49,8 @@ public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self)
 
   public async Task<List<Event>> GetAllEvents(DateTime start, DateTime end)
   {
-    var userId = staff_user_id;
-    var isStaffMember = self.helper.is_staff_member();
+    var userId = db.get_staff_user_id();
+    var isStaffMember = db.is_staff_member();
 
     return db.Events
       .Where(e => (DateTime.Parse(e.Start) >= start && DateTime.Parse(e.Start) <= end && e.UserId == userId) || (isStaffMember && e.Public == 1))

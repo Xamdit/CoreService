@@ -1,14 +1,9 @@
-using Service.Framework.Helpers;
 using Service.Framework.Library.DataStores;
+using Service.Framework.Schemas;
 
 namespace Service.Framework.Sessions;
 
-public class Item
-{
-  public int Id { get; set; }
-  public string? Name { get; set; }
-  public object? Value { get; set; }
-}
+
 
 public class Session
 {
@@ -18,10 +13,8 @@ public class Session
 
   public Session(MyInstance instance, string session_id)
   {
-    var (self, db) = getInstance();
-    self = instance;
-    self.helper.create_file_if_not_exists(session_dir);
-    self.helper.create_json_file($"{session_dir}/{session_id}.json");
+    // self.helper.create_file_if_not_exists(session_dir);
+    // self.helper.create_json_file($"{session_dir}/{session_id}.json");
     var store = new DataStore($"{session_dir}/{session_id}.json");
     collection = store.GetCollection<Item>();
   }
@@ -78,5 +71,15 @@ public class Session
   public string? user_data(string key)
   {
     return string.Empty;
+  }
+
+  public string get_string(string key)
+  {
+    return key;
+  }
+
+  public string get_userdata(string key)
+  {
+    return key;
   }
 }

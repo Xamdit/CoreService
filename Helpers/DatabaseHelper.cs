@@ -1,7 +1,7 @@
-using Global.Entities;
-using Global.Entities.Tools;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework.Core.Engine;
+using Service.Framework.Helpers.Entities;
 
 namespace Service.Helpers;
 
@@ -52,25 +52,23 @@ public static class DatabaseHelper
    * Add user notifications
    * @param array values array of values [description,fromuserid,touserid,fromcompany,isread]
    */
-  public static bool add_notification(this HelperBase helper, Notification data)
+  public static bool add_notification(this MyContext db, Notification data)
   {
-    var (self, db) = getInstance();
-
-    var staff_user_id = helper.get_staff_user_id();
+    var staff_user_id = db.get_staff_user_id();
     // var staff_user_id =Convert.ToByte( await get_staff_user_id());
-    var _is_client_logged_in = self.helper.is_client_logged_in();
+    var _is_client_logged_in = db.is_client_logged_in();
     if (_is_client_logged_in)
     {
       data.FromUserId = 0;
 
-      data.FromClientId = helper.get_contact_user_id();
-      data.FromFullname = helper.get_contact_full_name(helper.get_contact_user_id());
+      data.FromClientId = db.get_contact_user_id();
+      data.FromFullname = db.get_contact_full_name(db.get_contact_user_id());
     }
     else
     {
       data.FromUserId = staff_user_id;
       data.FromClientId = 0;
-      data.FromFullname = helper.get_staff_full_name(staff_user_id);
+      data.FromFullname = db.get_staff_full_name(staff_user_id);
     }
 
     if (data.FromCompany.HasValue)
@@ -81,7 +79,7 @@ public static class DatabaseHelper
 
     data.Date = DateTime.Now;
 
-    data = self.hooks.apply_filters("notification_data", data);
+    data = hooks.apply_filters("notification_data", data);
     var query = db.Staff.AsQueryable();
     // Prevent sending notification to non active users.
     if (data.ToUserId != 0)
@@ -94,7 +92,7 @@ public static class DatabaseHelper
     var result = db.Notifications.Add(data);
     if (!result.IsAdded()) return true;
     var notification_id = result.Entity.Id;
-    self.hooks.do_action("notification_created", notification_id);
+    hooks.do_action("notification_created", notification_id);
     return true;
   }
 
@@ -106,10 +104,10 @@ public static class DatabaseHelper
    * @param  string field field to check
    * @return string
    */
-  private static string prefixed_table_fields_wildcard(this HelperBase helper, string table, string alias, string field)
+  private static string prefixed_table_fields_wildcard(this MyModel model, string table, string alias, string field)
   {
-    var (self, db) = getInstance();
-    var columns = self.db().ColumnInfos.FromSql($"SHOW COLUMNS FROM {table}").ToList();
+    var (self, db) = model.getInstance();
+    var columns = db.ColumnInfos.FromSql($"SHOW COLUMNS FROM {table}").ToList();
     var field_names = columns.Select(x => x.Field).ToList();
 
     var prefixed = field_names.Select(field_name =>
@@ -128,9 +126,8 @@ public static class DatabaseHelper
    * @param  mixed id department id
    * @return mixed
    */
-  private static string get_department_email(this HelperBase helper, int id)
+  private static string get_department_email(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var row = db.Departments.FirstOrDefault(x => x.Id == id);
     return row == null ? string.Empty : row.Email;
   }
@@ -193,14 +190,13 @@ public static class DatabaseHelper
 * @param  array  users id of users to receive notifications
 * @return null
 */
-  public static bool pusher_trigger_notification(this HelperBase helper, List<int> users)
+  public static bool pusher_trigger_notification(this MyContext db, List<int> users)
   {
-    return helper.pusher_trigger_notification(users.ToArray());
+    return db.pusher_trigger_notification(users.ToArray());
   }
 
-  public static bool pusher_trigger_notification(this HelperBase helper, params int[] users)
+  public static bool pusher_trigger_notification(this MyContext db, params int[] users)
   {
-    var (self, db) = getInstance();
     if (db.get_option_compare("pusher_realtime_notifications", 0)) return false;
     if (!users.ToList().Any()) return false;
     var channels = users.Select(x => $"notifications-channel-{x}")

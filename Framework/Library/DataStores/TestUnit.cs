@@ -1,4 +1,4 @@
-using Service.Framework.Sessions;
+using Service.Framework.Schemas;
 
 namespace Service.Framework.Library.DataStores;
 

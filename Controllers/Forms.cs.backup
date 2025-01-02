@@ -1,0 +1,457 @@
+
+
+
+
+
+
+
+
+using System.Dynamic;
+using Global.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Service.Controllers.Core;
+using Service.Core.Extensions;
+using Service.Framework;
+using Service.Framework.Core.Extensions;
+using Service.Helpers;
+
+namespace Service.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class FormsController(ILogger<FormsController> logger, MyInstance self) : ClientControllerBase(logger, self)
+{
+  [HttpGet]
+  public IActionResult Index()
+  {
+    return NotFound();
+  }
+
+  /**
+   * Web to lead form
+   * User no need to see anything like LEAD in the url, this is the reason the method is named wtl
+   * @param  string key web to lead form key identifier
+   * @return mixed
+   */
+  [HttpGet("wtl/{key}")]
+  public IActionResult wtl(string key)
+  {
+    var leads_model = self.leads_model(db);
+    var form = leads_model.get_form(x => x.FormKey == key);
+
+    if (form == null) return NotFound();
+
+    var formFields = JsonConvert.DeserializeObject<List<FormField>>(form.FormData);
+    if (formFields == null) formFields = new List<FormField>();
+
+    if (self.input.post().ContainsKey("key") && self.input.post("key") == key)
+    {
+      var postData = self.input.post();
+      var required = new List<string>();
+
+      foreach (var field in formFields)
+        if (field.Required)
+          required.Add(field.Name);
+
+      if (db.is_gdpr() && db.get_option<int>("gdpr_enable_terms_and_conditions_lead_form") == 1)
+        required.Add("accept_terms_and_conditions");
+
+      if (required.Any(field => !postData.ContainsKey(field) || string.IsNullOrEmpty(postData[field])))
+      {
+        self.output.SetStatusHeader(422);
+        return MakeError("This page is currently disabled, check back later.");
+      }
+
+      if (!string.IsNullOrEmpty(db.get_option("recaptcha_secret_key")) && !string.IsNullOrEmpty(db.get_option("recaptcha_site_key")) && form.Recaptcha == 1)
+        if (!self.helper.DoRecaptchaValidation(postData["g-recaptcha-response"]))
+          return MakeSuccess(new
+          {
+            success = false,
+            message = label("recaptcha_error")
+          });
+
+      var regularFields = new Dictionary<string, string>();
+      var customFields = new List<object>();
+
+      foreach (var kvp in postData)
+      {
+        var name = kvp.Key;
+        var value = kvp.Value;
+
+        if (name.Contains("form-cf-"))
+        {
+          customFields.Add(new { name, value });
+        }
+        else
+        {
+          // if (!this.db.FieldExists(name, "leads")) continue;
+
+          if (name == "country")
+          {
+            if (!int.TryParse(value, out var countryId))
+            {
+              if (string.IsNullOrEmpty(value))
+              {
+                value = "0";
+              }
+              else
+              {
+                var country = db.Countries.FirstOrDefault(x => x.Iso2 == value || x.ShortName == value || x.LongName == value);
+                value = country != null ? country.Id.ToString() : "0";
+              }
+            }
+          }
+          else if (name == "address")
+          {
+            value = value.Trim().nl2br();
+          }
+
+          regularFields[name] = value;
+        }
+      }
+
+      var success = false;
+      var insertToDb = true;
+      var tasks_model = self.tasks_model(db);
+      if (form.AllowDuplicate == 0)
+      {
+        var where = CreateCondition<Lead>();
+
+        if (!string.IsNullOrEmpty(form.TrackDuplicateField) && regularFields.ContainsKey(form.TrackDuplicateField))
+          where[form.TrackDuplicateField] = regularFields[form.TrackDuplicateField];
+        if (!string.IsNullOrEmpty(form.TrackDuplicateFieldAnd) && regularFields.ContainsKey(form.TrackDuplicateFieldAnd))
+          where[form.TrackDuplicateFieldAnd] = regularFields[form.TrackDuplicateFieldAnd];
+
+        var total = db.Leads.Count(where);
+
+        if (total > 0)
+        {
+          success = true;
+          insertToDb = false;
+
+          if (form.CreateTaskOnDuplicate == 1)
+          {
+            var taskName = GetTaskName(regularFields, form);
+            var description = GetTaskDescription(form, customFields, formFields, regularFields);
+            var taskData = new Global.Entities.Task
+            {
+              Name = taskName,
+              Priority = db.get_option<int>("default_task_priority"),
+              DateCreated = DateTime.Now,
+              StartDate = DateTime.Now.Date,
+              AddedFrom = form.Responsible,
+              Status = 1,
+              Description = description
+            };
+
+            taskData = hooks.apply_filters("before_add_task", taskData);
+            db.Tasks.Add(taskData);
+            var taskId = db.SaveChanges();
+
+            if (taskId != 0)
+            {
+              var attachment = HandleTaskAttachmentsArray(taskId, "file-input");
+
+              if (attachment != null && attachment.Count > 0)
+                tasks_model.AddAttachmentToDatabase(taskId, attachment, false, false);
+
+              var assigneeData = new
+              {
+                TaskId = taskId,
+                Assignee = form.Responsible
+              };
+              tasks_model.AddTaskAssignees(assigneeData, true);
+              hooks.do_action("after_add_task", taskId);
+
+              var duplicateLead = db.GetLeadByCondition(where);
+              if (!string.IsNullOrEmpty(duplicateLead?.Email))
+                SendMailTemplate("lead_web_form_submitted", duplicateLead);
+            }
+          }
+        }
+      }
+
+      if (insertToDb)
+      {
+        regularFields["status"] = form.LeadStatus.ToString();
+        if (string.IsNullOrEmpty(regularFields["Name"]))
+          regularFields["Name"] = "Unknown";
+        regularFields["source"] = form.LeadSource.ToString();
+        regularFields["addedfrom"] = "0";
+        regularFields["lastcontact"] = null;
+        regularFields["assigned"] = form.Responsible.ToString();
+        regularFields["dateadded"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        regularFields["from_form_id"] = form.Id.ToString();
+        regularFields["is_public"] = form.MarkPublic.ToString();
+        db.Leads.Add(regularFields);
+        var leadId = db.AddId();
+
+        hooks.do_action("lead_created", new { leadId, web_to_lead_form = true });
+
+        success = leadId != 0;
+
+        if (success)
+        {
+          leads_model.LogLeadActivity(leadId, "not_lead_imported_from_form", true, JsonConvert.SerializeObject(form.Name));
+
+          var customFieldsBuild = new Dictionary<string, Dictionary<string, string>>
+          {
+            { "leads", customFields.ToDictionary(cf => cf.Name, cf => cf.Value.ToString()) }
+          };
+
+          leads_model.LeadAssignedMemberNotification(leadId, form.Responsible, true);
+          HandleCustomFieldsPost(leadId, customFieldsBuild);
+          HandleLeadAttachments(leadId, "file-input", form.Name);
+
+          NotifyAssignedStaff(form, leadId);
+
+          if (!string.IsNullOrEmpty(regularFields["email"]))
+          {
+            var lead = leads_model.Get(leadId);
+            SendMailTemplate("lead_web_form_submitted", lead);
+          }
+        }
+      }
+
+      if (success) hooks.do_action("web_to_lead_form_submitted", new { leadId = 0, formId = form.Id, taskId = 0 });
+
+      return MakeSuccess(new { success, message = form.SuccessSubmitMsg });
+    }
+
+    var data = new
+    {
+      form,
+      form_fields = formFields
+    };
+
+    return MakeSuccess(data);
+  }
+
+  /**
+   * Web to lead form
+   * User no need to see anything like LEAD in the url, this is the reason the method is named eq lead
+   * @param  string hash lead unique identifier
+   * @return mixed
+   */
+  [HttpGet("l/{hash}")]
+  public IActionResult Lead(string hash)
+  {
+    var gdprModel = self.GdprModel();
+    var leads_model = self.leads_model(db);
+
+    if (db.get_option("gdpr_enable_lead_public_form") == "0")
+      return NotFound();
+
+    var lead = leads_model.Get(x => x.Hash == hash).FirstOrDefault();
+
+    if (lead == null || db.GetLeadCount(lead) > 1)
+      return NotFound();
+
+    self.helper.loadLeadLanguage(lead.Id);
+
+    if (self.input.post().ContainsKey("update"))
+    {
+      var data = self.input.post();
+      data.Remove("update");
+      leads_model.Update(data, lead.Id);
+      return Redirect(Request.Headers["Referer"].ToString());
+    }
+    else if (self.input.post("export") && db.get_option("gdpr_data_portability_leads") == "1")
+    {
+      self.load.Library("gdpr/gdpr_lead");
+      self.GdprLead.Export(lead.Id);
+    }
+    else if (self.input.post("removal_request"))
+    {
+      var success = gdprModel.AddRemovalRequest(new
+      {
+        description = self.helper.nl2br(self.input.post("removal_description")),
+        request_from = lead.Name,
+        lead_id = lead.Id
+      });
+
+      if (success)
+      {
+        SendGdprEmailTemplate("gdpr_removal_request_by_lead", lead.Id);
+        SetAlert("success", label("data_removal_request_sent"));
+      }
+
+      return Redirect(Request.Headers["Referer"].ToString());
+    }
+
+    lead.Attachments = leads_model.GetLeadAttachments(lead.Id);
+    self.DisableNavigation();
+    self.DisableSubMenu();
+
+    var viewData = new
+    {
+      title = lead.Name,
+      lead
+    };
+
+    return View("forms/lead", viewData);
+  }
+
+  [HttpGet("ticket")]
+  public async Task<IActionResult> Ticket()
+  {
+    var ticketsModel = self.TicketsModel();
+    dynamic form = new ExpandoObject();
+    form.language = db.get_option("active_language");
+    form.Recaptcha = 1;
+
+    self.lang.Load("ticket_form_lang", form.language);
+    self.lang.Load($"{form.language}_lang", form.language);
+
+    if (self.helper.FileExists($"{AppContext.BaseDirectory}language/{form.language}/custom_lang.php"))
+      self.lang.Load("custom_lang", form.language);
+
+    form.SuccessSubmitMsg = label("success_submit_msg");
+    form = hooks.apply_filters("ticket_form_settings", form);
+
+
+    if (self.input.post() && self.input.IsAjaxRequest())
+    {
+      var postData = self.input.post();
+
+      var requiredFields = new[] { "subject", "department", "email", "name", "message", "priority" }.ToList();
+
+      if (self.helper.IsGdpr() && db.get_option<int>("gdpr_enable_terms_and_conditions_ticket_form") == 1)
+        requiredFields.Add("accept_terms_and_conditions");
+
+      if (requiredFields.Any(field => !postData.ContainsKey(field) || string.IsNullOrEmpty(postData[field])))
+      {
+        self.output.SetStatusHeader(422);
+        return MakeError();
+      }
+
+      if (!string.IsNullOrEmpty(db.get_option("recaptcha_secret_key")) && !string.IsNullOrEmpty(db.get_option("recaptcha_site_key")) && form.Recaptcha == 1)
+        if (!self.helper.do_recaptcha_validation(postData["g-recaptcha-response"]))
+          return MakeSuccess(new
+          {
+            success = false,
+            message = label("recaptcha_error")
+          });
+
+      var ticketData = new Ticket()
+      {
+        Email = postData["email"],
+        Name = postData["name"],
+        Subject = postData["subject"],
+        Department = postData["department"],
+        CustomFields = postData.ContainsKey("custom_fields") ? JsonConvert.DeserializeObject<Dictionary<string, string>>(postData["custom_fields"]) : new Dictionary<string, string>(),
+        Priority = postData["priority"],
+        Service = postData.ContainsKey("service") && int.TryParse(postData["service"], out var service) ? service : (int?)null,
+        Message = postData["message"]
+      };
+
+      var success = false;
+
+      var existingContact = db.Contacts.FirstOrDefault(x => x.Email == postData["email"]);
+      if (existingContact != null)
+      {
+        ticketData.userid = existingContact.UserId;
+        ticketData.contactid = existingContact.Id;
+        ticketData.email = null;
+        ticketData.name = null;
+      }
+
+      ticketData = hooks.apply_filters("ticket_external_form_insert_data", ticketData);
+      var ticketId = await ticketsModel.AddTicketAsync(ticketData);
+      if (ticketId > 0)
+      {
+        success = true;
+        hooks.do_action("ticket_form_submitted", new { ticketId });
+      }
+
+      return MakeSuccess(new { success, message = form.SuccessSubmitMsg });
+    }
+
+    var departments_model = self.departments_model(db);
+
+    var viewModel = new
+    {
+      departments = departments_model.get_departments(),
+      priorities = ticketsModel.GetPriorities(),
+      services = ticketsModel.GetServices(),
+      form
+    };
+    // return View("forms/ticket", viewModel);
+    return MakeSuccess(viewModel);
+  }
+
+  private string GetTaskName(Dictionary<string, string> regularFields, LeadForm form)
+  {
+    if (regularFields.ContainsKey("Name"))
+      return regularFields["Name"];
+    if (regularFields.ContainsKey("email"))
+      return regularFields["email"];
+    if (regularFields.ContainsKey("company"))
+      return regularFields["company"];
+    return form.Name;
+  }
+
+  private string get_task_description(LeadForm form, List<object> customFields, List<FormField> formFields, Dictionary<string, string> regularFields)
+  {
+    var description = $"{form.Name}<br /><br />";
+    var customFieldsParsed = customFields.ToDictionary(cf => cf.Name, cf => cf.Value.ToString());
+    var allFields = regularFields.Concat(customFieldsParsed).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+    var fieldLabels = formFields.Where(ff => ff.Type != "header" && ff.Type != "paragraph" && ff.Type != "file")
+      .ToDictionary(ff => ff.Name, ff => ff.Label);
+
+    foreach (var field in allFields)
+      if (fieldLabels.ContainsKey(field.Key))
+      {
+        var value = field.Value;
+        if (field.Key == "country" && int.TryParse(value, out int countryId))
+        {
+          var country = GetCountry(countryId);
+          value = country?.ShortName ?? "Unknown";
+        }
+
+        description += $"{fieldLabels[field.Key]}: {value}<br />";
+      }
+
+    return description;
+  }
+
+  private void NotifyAssignedStaff(LeadForm form, int leadId)
+  {
+    var ids = new List<int>();
+
+    if (form.NotifyLeadImported == 0) return;
+    var toResponsible = form.NotifyType == "assigned";
+
+    if (!toResponsible) ids = JsonConvert.DeserializeObject<List<int>>(form.NotifyIds);
+
+    var staff = toResponsible
+      ? [new Staff { Id = form.Responsible }]
+      : db.Staff.Where(x => x.Active == true && ids.Contains(x.Id)).ToList();
+
+    var notifiedUsers = staff.Where(member => member.Id != 0)
+      .Select(member =>
+      {
+        var result = self.helper.add_notification(new
+        {
+          description = "not_lead_imported_from_form",
+          touserid = member.Id,
+          fromcompany = 1,
+          fromuserid = (int?)null,
+          additional_data = JsonConvert.SerializeObject(new[] { form.Name }),
+          link = $"#leadid={leadId}"
+        });
+        return result ? member.Id : 0;
+      })
+      .Where(x => x != 0)
+      .ToList();
+
+    self.helper.pusher_trigger_notification(notifiedUsers);
+  }
+
+  private Country? GetCountry(int countryId)
+  {
+    return db.Countries.FirstOrDefault(c => c.Id == countryId);
+  }
+}

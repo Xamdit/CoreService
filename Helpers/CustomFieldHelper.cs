@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using Global.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
 
@@ -60,21 +60,24 @@ public static class CustomFieldHelper
  * @param  Dictionary<string, Dictionary<int, string>> customFields  All custom fields with id and values
  * @return bool             True if any rows were affected
  */
+  public static bool handle_custom_fields_post(this HelperBase helper, int relId, object customField, bool isCfItems = false)
+  {
+    return false;
+  }
+
   public static bool handle_custom_fields_post(this HelperBase helper, int relId, CustomField customField, bool isCfItems = false)
   {
     return helper.handle_custom_fields_post(relId, new List<CustomField> { customField }, isCfItems);
   }
 
-  public static bool handle_custom_fields_post(this HelperBase helper, int relId, List<CustomField> customFields, bool isCfItems = false)
+  public static bool handle_custom_fields_post(this MyContext db, int relId, List<CustomField> customFields, bool isCfItems = false)
   {
-    var (self, db) = getInstance();
     var affectedRows = 0;
-
     var isClientLoggedIn = false;
-    self.ignore(() =>
+    ignore(() =>
     {
       // Fetch the existing record for the custom field
-      isClientLoggedIn = is_client_logged_in();
+      isClientLoggedIn = db.is_client_logged_in();
       //
     });
     Thread.Sleep(500);
@@ -148,10 +151,9 @@ public static class CustomFieldHelper
  * @param  boolean $exclude_only_admin
  * @return array
  */
-  public static List<CustomField> get_custom_fields(this HelperBase helper, string fieldTo, Expression<Func<CustomField, bool>> condition = null, bool excludeOnlyAdmin = false)
+  public static List<CustomField> get_custom_fields(this MyContext db, string fieldTo, Expression<Func<CustomField, bool>> condition = null, bool excludeOnlyAdmin = false)
   {
-    var (self, db) = getInstance();
-    var _isAdmin = helper.is_admin();
+    var _isAdmin = db.is_admin();
     var query = db
       .CustomFields
       .Where(cf => cf.FieldTo == fieldTo && cf.Active == true)
@@ -165,7 +167,7 @@ public static class CustomFieldHelper
       .OrderBy(cf => cf.FieldOrder)
       .ToList().Select(x =>
       {
-        x.Name = helper.maybe_translate_custom_field_name(x.Name, x.Slug);
+        x.Name = db.maybe_translate_custom_field_name(x.Name, x.Slug);
         return x;
       })
       .ToList();
@@ -180,14 +182,13 @@ public static class CustomFieldHelper
    * @param  string $format             format date values
    * @return string
    */
-  public static string get_custom_field_value(this HelperBase helper, int relId, int FieldIdOrSlug, string fieldTo, bool format = true)
+  public static string get_custom_field_value(this MyContext db, int relId, int FieldIdOrSlug, string fieldTo, bool format = true)
   {
-    return helper.get_custom_field_value(relId, $"{FieldIdOrSlug}", fieldTo, format);
+    return db.get_custom_field_value(relId, $"{FieldIdOrSlug}", fieldTo, format);
   }
 
-  public static string get_custom_field_value(this HelperBase helper, int relId, string FieldIdOrSlug, string fieldTo, bool format = true)
+  public static string get_custom_field_value(this MyContext db, int relId, string FieldIdOrSlug, string fieldTo, bool format = true)
   {
-    var (self, db) = getInstance();
     db.CustomFieldsValues
       .Include(x => x.Field)
       .Where(x => x.RelId == relId && x.FieldTo == fieldTo)
@@ -238,7 +239,7 @@ public static class CustomFieldHelper
     return DateTime.TryParse(value, out var dateTime) ? dateTime.ToString("yyyy-MM-dd HH:mm:ss") : value;
   }
 
-  private static string maybe_translate_custom_field_name(this HelperBase help, string name, string slug)
+  private static string maybe_translate_custom_field_name(this MyContext db, string name, string slug)
   {
     // Translation logic for the custom field name can be implemented here
     // For simplicity, just returning the name as-is for now
@@ -247,8 +248,6 @@ public static class CustomFieldHelper
 
   public static bool is_custom_fields_smart_transfer_enabled(this HelperBase helper)
   {
-    if (!helper.defined("CUSTOM_FIELDS_SMART_TRANSFER")) return true;
-    if (helper.defined("CUSTOM_FIELDS_SMART_TRANSFER")) return true;
-    return false;
+    return !defined("CUSTOM_FIELDS_SMART_TRANSFER") || defined("CUSTOM_FIELDS_SMART_TRANSFER");
   }
 }

@@ -1618,7 +1618,7 @@ class Invoices_model extends App_Model
                 $statement    = $this->clients_model->get_statement($invoice->clientid, $attachStatement['from'], $attachStatement['to']);
                 $statementPdf = statement_pdf($statement);
 
-                $statementPdfFileName = slug_it(_l('customer_statement') . '-' . $statement['client']->company);
+                $statementPdfFileName = db.slug_it(_l('customer_statement') . '-' . $statement['client']->company);
 
                 $attachStatementPdf = $statementPdf->Output($statementPdfFileName . '.pdf', 'S');
             }

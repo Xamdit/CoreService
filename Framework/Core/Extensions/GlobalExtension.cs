@@ -1,47 +1,47 @@
 using System.Net;
-using Newtonsoft.Json;
+using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Library.DataStores;
-using Service.Framework.Sessions;
 
 namespace Service.Framework.Core.Extensions;
 
 public static class GlobalExtension
 {
-  public static string globals(this MyInstance self, string key)
+  public static string globals(  string key)
   {
-    return self.config.get(key);
+    // return self.config.get(key);
+    return string.Empty;
   }
 
-  public static T? globals<T>(this MyInstance self, string key)
+  public static T? globals<T>(  string key)
   {
-    return (T?)Convert.ChangeType(self.config.get(key), typeof(T));
+    // return (T?)Convert.ChangeType( config.get(key), typeof(T));
+    return default;
   }
 
-  public static void log_message(this HelperBase helper, string message)
-  {
-  }
-
-  public static void log_message(this HelperBase helper, string type, string message)
+  public static void log_message(this MyContext db,string message)
   {
   }
 
-  public static void log_error(this HelperBase helper, string message)
+  public static void log_message(this MyContext db,string type, string message)
+  {
+  }
+
+  public static void log_error(this MyContext db,string message)
   {
     Console.WriteLine($"ERROR: {message}"); // Replace with your error logging mechanism
   }
 
-  public static void show_error(this HelperBase helper, string message, HttpStatusCode code = HttpStatusCode.BadRequest)
+  public static void show_error(this MyContext db, string message, HttpStatusCode code = HttpStatusCode.BadRequest)
   {
-    var (self, db) = getInstance();
-    self.helper.log_message("error", message);
-    self.context.Response.StatusCode = (int)code;
+    // log_message("error", message);
+    // self.context.Response.StatusCode = (int)code;
     var errorResponse = new { error = message, statusCode = (int)code };
-    self.context.Response.ContentType = "application/json";
-    self.context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
+    // self.context.Response.ContentType = "application/json";
+    // self.context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
   }
 
-  public static void ignore(this MyInstance self, Action action)
+  public static void ignore(Action action)
   {
     try
     {
@@ -49,9 +49,9 @@ public static class GlobalExtension
     }
     catch (Exception e)
     {
-      var instance = MyInstance.Instance;
+      var instance = new MyInstance();
       Console.WriteLine("Framework.Core.Extensions.GlobalExtension.ignore : " + e.Message);
-      self.helper.log_error(e.Message);
+      // log_error(e.Message);
     }
   }
 
@@ -65,15 +65,14 @@ public static class GlobalExtension
       : $"{row.Value}";
   }
 
-  public static IDocumentCollection<Item> document(string currentPath)
+  public static IDocumentCollection<Service.Framework.Schemas.Item> document(string currentPath)
   {
     var folder = Path.GetDirectoryName(currentPath);
     if (!Directory.Exists(folder))
       Directory.CreateDirectory(folder);
-    if (!File.Exists(currentPath))
-      File.Create(currentPath).Close();
+    file_exists(currentPath,true);
     var store = new DataStore(currentPath);
-    var collection = store.GetCollection<Item>();
+    var collection = store.GetCollection<Service.Framework.Schemas.Item>();
     return collection;
   }
 
@@ -83,7 +82,6 @@ public static class GlobalExtension
  */
   public static void redirect_after_login_to_current_url(this HelperBase helper)
   {
-    var (self, db) = getInstance();
     var redirectTo = current_full_url();
 
     // This can happen if at the time you received a notification but your session was expired the system stored this as last accessed URL so after login can redirect you to this URL.
