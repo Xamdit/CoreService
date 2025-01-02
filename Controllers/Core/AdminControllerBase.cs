@@ -4,7 +4,7 @@ using Service.Framework.Core.Engine;
 
 namespace Service.Controllers.Core;
 
-public class AdminControllerBase(ILogger<MyControllerBase> logger, MyInstance self, MyContext db) : MyControllerBase(logger, self)
+public class AdminControllerBase(ILogger<MyControllerBase> logger, MyInstance self, MyContext db) : AppControllerBase(logger, self, db)
 {
   public override void Init()
   {

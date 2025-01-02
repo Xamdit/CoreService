@@ -415,4 +415,14 @@ public static class GeneralHelper
     self.input.session.unset_userdata("red_url");
     return controller.Redirect(red_url);
   }
+
+  /**
+ * Set debug message - message wont be hidden in X seconds from javascript
+ * @since  Version 1.0.1
+ * @param string $message debug message
+ */
+  public static void set_debug_alert(string message)
+  {
+    // get_instance()->session->set_flashdata('debug', $message);
+  }
 }

@@ -5,6 +5,9 @@ namespace Service.Framework;
 
 public static class AppGlobal
 {
+  public static IServiceProvider ServiceProvider { get; set; }
+
+
   public static WebApplication? Instance { get; private set; }
 
   public static MyInstance self =>
@@ -29,5 +32,6 @@ public static class AppGlobal
   public static void SetInstance(WebApplication app)
   {
     Instance = app;
+    ServiceProvider = app.Services;
   }
 }

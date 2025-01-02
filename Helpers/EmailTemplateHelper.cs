@@ -1,6 +1,12 @@
 using System.Reflection;
+using Newtonsoft.Json;
+using Service.Controllers.Core;
 using Service.Core.Extensions;
 using Service.Entities;
+using Service.Framework;
+using Service.Framework.Core.InputSet;
+using Service.Framework.Library.MergeFields;
+using Service.Framework.Library.Merger;
 using Service.Models;
 
 namespace Service.Helpers;
@@ -15,7 +21,7 @@ public static class EmailTemplateHelper
   public static bool send_mail_template(this MyContext db, params object[] args)
   {
     // $params = func_get_args();
-    // return mail_template(...$params)->send();
+    // return mail_template(...$params).send();
     return true;
   }
 
@@ -77,5 +83,64 @@ public static class EmailTemplateHelper
     // Logic to check if this is a cron job
     // This is an approximation, you can implement based on your environment
     return Environment.GetEnvironmentVariable("IS_CRON_JOB") == "true";
+  }
+
+
+  /**
+ * Parse email template with the merge fields
+ * @param  mixed  template     template
+ * @param  array  $merge_fields
+ * @return object
+ */
+  public static EmailTemplate parse_email_template(this AppControllerBase controller, EmailTemplate template, Dictionary<string, string> merge_fields = default)
+  {
+    var (self, db) = controller.getInstance();
+    if (string.IsNullOrEmpty(template.Name) || self.input.post_has("template_name"))
+    {
+      var original_template = template;
+      var emails_model = self.emails_model(db);
+      if (self.input.post_has("template_name"))
+        template.Name = self.input.post("template_name");
+
+      var row = emails_model.get(x => x.Slug == template.Slug).First();
+      if (self.input.post_has("email_template_custom"))
+      {
+        row.Message = self.input.post<string>("email_template_custom");
+        // Replace the subject too
+        row.Subject = original_template.Subject;
+      }
+    }
+
+    template = parse_email_template_merge_fields(template, merge_fields);
+
+    // Used in hooks eq for emails tracking
+    // template.tmp_id = uuid();
+
+    return hooks.apply_filters("email_template_parsed", template);
+  }
+
+  /**
+ * This function will parse email template merge fields and replace with the corresponding merge fields passed before sending email
+ * @param  object $template     template from database
+ * @param  array $merge_fields available merge fields
+ * @return object
+ */
+  public static EmailTemplate? parse_email_template_merge_fields(EmailTemplate template, Dictionary<string, string> merge_fields)
+  {
+    var other_merge_fields = self.library.other_merge_fields(AppGlobal.ServiceProvider);
+    merge_fields = (Dictionary<string, string>)TypeMerger.Merge(merge_fields, other_merge_fields.format());
+    var template_checker = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(template));
+    var temp = new Dictionary<string, object>();
+    foreach (var key in merge_fields.Keys.ToList())
+    {
+      var items = new List<string>() { "message", "fromname", "subject" };
+      var val = merge_fields[key];
+      foreach (var replacer in items)
+        temp[replacer] = Convert.ToString(template_checker[replacer]).Contains(key)
+          ? Convert.ToString(template_checker[replacer])!.Replace(key, val)
+          : Convert.ToString(template_checker[replacer])!.Replace(key, "");
+    }
+
+    return JsonConvert.DeserializeObject<EmailTemplate>(JsonConvert.SerializeObject(temp));
   }
 }

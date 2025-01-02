@@ -8,7 +8,7 @@ using File = Service.Entities.File;
 
 namespace Service.Models;
 
-public class EmailsModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class EmailsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private readonly List<MailAttachment> _attachments = new();
 
@@ -45,19 +45,19 @@ public class EmailsModel(MyInstance self, MyContext db) : MyModel(self,db)
     return template.Id;
   }
 
-  public bool update(Dictionary<int, EmailTemplate> templatesData)
+  public bool update(params EmailTemplate[] template_datas)
   {
     var affectedRows = 0;
-    foreach (var entry in templatesData)
+    foreach (var templateData in template_datas)
     {
-      var template = db.EmailTemplates.Find(entry.Key);
+      var template = db.EmailTemplates.Find(templateData.Id);
       if (template == null) continue;
-      template.Subject = entry.Value.Subject;
-      template.FromName = entry.Value.FromName;
-      template.FromEmail = entry.Value.FromEmail ?? string.Empty;
-      template.Message = entry.Value.Message;
-      template.PlainText = entry.Value.PlainText;
-      template.Active = entry.Value.Active;
+      template.Subject = templateData.Subject;
+      template.FromName = templateData.FromName;
+      template.FromEmail = templateData.FromEmail ?? string.Empty;
+      template.Message = templateData.Message;
+      template.PlainText = templateData.PlainText;
+      template.Active = templateData.Active;
       db.EmailTemplates.Update(template);
       affectedRows += db.SaveChanges();
     }
@@ -65,7 +65,7 @@ public class EmailsModel(MyInstance self, MyContext db) : MyModel(self,db)
     return affectedRows > 0;
   }
 
-  public bool MarkAs(string slug, bool enabled)
+  public bool mark_as(string slug, bool enabled)
   {
     var template = db.EmailTemplates.FirstOrDefault(t => t.Slug == slug);
     if (template == null) return false;
@@ -74,7 +74,7 @@ public class EmailsModel(MyInstance self, MyContext db) : MyModel(self,db)
     return true;
   }
 
-  public bool MarkAsByType(string type, bool enabled)
+  public bool mark_as_by_type(string type, bool enabled)
   {
     var templates = db.EmailTemplates.Where(t => t.Type == type && t.Slug != "two-factor-authentication");
     foreach (var template in templates)

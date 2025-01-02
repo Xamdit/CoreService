@@ -7,27 +7,34 @@ namespace Service.Framework.Core.Extensions;
 
 public static class GlobalExtension
 {
-  public static string globals(  string key)
+  public static string globals(string key)
   {
     // return self.config.get(key);
     return string.Empty;
   }
 
-  public static T? globals<T>(  string key)
+  public static T? globals<T>(string key)
   {
     // return (T?)Convert.ChangeType( config.get(key), typeof(T));
     return default;
   }
 
-  public static void log_message(this MyContext db,string message)
+  public static string globals(string key, object value)
+  {
+    // return self.config.get(key);
+    return string.Empty;
+  }
+
+
+  public static void log_message(this MyContext db, string message)
   {
   }
 
-  public static void log_message(this MyContext db,string type, string message)
+  public static void log_message(this MyContext db, string type, string message)
   {
   }
 
-  public static void log_error(this MyContext db,string message)
+  public static void log_error(this MyContext db, string message)
   {
     Console.WriteLine($"ERROR: {message}"); // Replace with your error logging mechanism
   }
@@ -70,7 +77,7 @@ public static class GlobalExtension
     var folder = Path.GetDirectoryName(currentPath);
     if (!Directory.Exists(folder))
       Directory.CreateDirectory(folder);
-    file_exists(currentPath,true);
+    file_exists(currentPath, true);
     var store = new DataStore(currentPath);
     var collection = store.GetCollection<Service.Framework.Schemas.Item>();
     return collection;
