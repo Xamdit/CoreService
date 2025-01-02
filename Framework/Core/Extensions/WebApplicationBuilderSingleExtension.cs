@@ -23,6 +23,7 @@ public static class WebApplicationBuilderSingleExtension
     {
       var httpClient = sp.GetRequiredService<HttpClient>(); // Resolve dependencies if needed
       var app = new MyApp(httpClient);
+      SetMyApp(app);
       return app;
     });
     builder.Services.AddSingleton<MyContext>(sp =>
