@@ -57,7 +57,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self,db)
 
     // Invalid or missing payment mode
     if (string.IsNullOrEmpty(data.PaymentMode)) return 0;
-    if (is_staff_logged_in() && self.helper.has_permission("payments", "", "create") && option.DoNotRedirect)
+    if (is_staff_logged_in() && db.has_permission("payments", "", "create") && option.DoNotRedirect)
       return add((data, option));
     invoiceId = invoiceId switch
     {

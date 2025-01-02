@@ -1,14 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Service.Entities;
-using Service.Framework.Core.AppHook;
 using Service.Framework.Core.Cache;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Entities;
-using Service.Framework.Core.Extensions;
 using Service.Framework.Core.InputSet;
-using Service.Framework.Entities;
-using Service.Framework.Helpers;
 using Service.Libraries.Documents;
 
 namespace Service.Framework;
@@ -41,7 +37,6 @@ public class MyInstance : IMyInstance
   }
 
 
-
   public HttpContext context
   {
     get => _context;
@@ -65,7 +60,7 @@ public class MyInstance : IMyInstance
     ignore(() =>
     {
       if (file_exists("./framework.sqlite")) return;
-      helper.create_file_if_not_exists("./framework.sqlite");
+      create_file_if_not_exists("./framework.sqlite");
       var frameworkContext = new FrameworkContext();
       // frameworkContext.SeedData();
     });

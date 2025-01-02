@@ -6,7 +6,6 @@ using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Core.InputSet;
-using Service.Framework.Helpers;
 using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Pdf;
@@ -339,8 +338,8 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
       Overdue = new List<double>()
     };
 
-    var hasPermissionView = self.helper.has_permission("invoices", "view");
-    var hasPermissionViewOwn = self.helper.has_permission("invoices", "view_own");
+    var hasPermissionView = db.has_permission("invoices", "view");
+    var hasPermissionViewOwn = db.has_permission("invoices", "view_own");
     var allowStaffViewInvoicesAssigned = db.get_option("allow_staff_view_invoices_assigned");
     var noPermissionsQuery = self.helper.get_invoices_where_sql_for_staff(staff_user_id);
 
@@ -400,7 +399,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
   {
     // var where = 'billable=1 AND client_id='. $client_id. ' AND invoiceid IS NULL';
     var where = CreateCondition<Expense>(x => x.Billable == true && x.ClientId == client_id && x.InvoiceId == null);
-    var can_view_expenses = self.helper.has_permission("expenses", "", "view");
+    var can_view_expenses = db.has_permission("expenses", "", "view");
     var output = expenses_model.get(where);
     if (!can_view_expenses) output = output.Where(x => x.AddedFrom == staff_user_id).ToList();
     return output;

@@ -89,7 +89,7 @@ public static class StringExtension
     return pos < 0 ? subject : subject[..pos] + replace + subject[(pos + search.Length)..];
   }
 
-  public static string get_string_between(this HelperBase self, string str, string start, string end)
+  public static string get_string_between(  string str, string start, string end)
   {
     var startIndex = str.IndexOf(start, StringComparison.OrdinalIgnoreCase);
     if (startIndex < 0) return string.Empty;

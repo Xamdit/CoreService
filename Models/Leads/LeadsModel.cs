@@ -5,7 +5,6 @@ using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
-using Service.Framework.Helpers;
 using Service.Framework.Helpers.Entities;
 using Service.Framework.Helpers.Security;
 using Service.Helpers;
@@ -551,7 +550,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
   public bool staff_can_access_lead(int id, int? staff_id = null)
   {
     staff_id = staff_id.HasValue ? staff_user_id : staff_id;
-    var view_lead = self.helper.has_permission("leads", staff_id, "view");
+    var view_lead = db.has_permission("leads", staff_id, "view");
     if (view_lead) return true;
     var output = db.Leads
       .Any(x => x.Id == id &&

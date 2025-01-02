@@ -1,11 +1,7 @@
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Engine;
-using Service.Framework.Core.Extensions;
-using Service.Framework.Helpers;
-using Service.Helpers.Pdf;
 
 namespace Service.Helpers.Tags;
 
@@ -59,8 +55,8 @@ public static class LeadsHelper
   public static List<LeadStatusSummary> get_leads_summary(this MyContext db)
   {
     var statuses = db.LeadsStatuses.ToList();
-    var staffUserId = helper.get_staff_user_id();
-    var hasPermissionView = helper.has_permission("leads", "view");
+    var staffUserId = db.get_staff_user_id();
+    var hasPermissionView = db.has_permission("leads", "view");
 
     statuses.Add(new LeadStatusSummary
     {

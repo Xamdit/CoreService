@@ -1,7 +1,5 @@
 using System.Text.RegularExpressions;
 using Service.Framework.Core.Engine;
-using Service.Framework.Core.Extensions;
-using Service.Framework.Helpers.Context;
 
 namespace Service.Helpers.Template;
 

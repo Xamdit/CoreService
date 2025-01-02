@@ -1552,7 +1552,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     // Some users don"t want to fill the email
     if (string.IsNullOrEmpty(email)) return false;
 
-    var customer_id = self.helper.get_user_id_by_contact_id(contact_id);
+    var customer_id = db.get_user_id_by_contact_id(contact_id);
     db.Tickets
       .Where(x => x.UserId == 0)
       .Where(x => x.ContactId == 0)

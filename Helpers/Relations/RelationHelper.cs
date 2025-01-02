@@ -49,8 +49,8 @@ public static class RelationHelper
         if (isset(extra, "client_id") && self.helper.value<int>(extra, "client_id") != null)
           where_contacts = where_contacts.And(x => x.UserId == self.helper.value<int>(extra, "client_id"));
         if (self.input.post_has("tickets_contacts"))
-          if (!helper.has_permission("customers", "", "view") && db.get_option_compare("staff_members_open_tickets_to_all_contacts", 0))
-            where_contacts = where_contacts.And(x => db.CustomerAdmins.Any(y => y.StaffId == helper.get_staff_user_id() && y.CustomerId == x.UserId));
+          if (!db.has_permission("customers", "", "view") && db.get_option_compare("staff_members_open_tickets_to_all_contacts", 0))
+            where_contacts = where_contacts.And(x => db.CustomerAdmins.Any(y => y.StaffId == db.get_staff_user_id() && y.CustomerId == x.UserId));
         if (self.input.post_has("contact_user_id"))
         {
           var contact_user_id = self.input.post("contact_user_id");
@@ -483,20 +483,18 @@ public static class RelationHelper
    * @param  string rel_id rel_id
    * @return string
    */
-  public static List<object> init_relation_options(this HelperBase helper, List<RelationValues> data, string type, int rel_id = 0)
+  public static List<object> init_relation_options(this MyContext db, List<RelationValues> data, string type, int rel_id = 0)
   {
     var self = new MyInstance();
-
     var _data = new List<object>();
-
-    var has_permission_projects_view = helper.has_permission("projects", "", "view");
-    var has_permission_customers_view = helper.has_permission("customers", "", "view");
-    var has_permission_contracts_view = helper.has_permission("contracts", "", "view");
-    var has_permission_invoices_view = helper.has_permission("invoices", "", "view");
-    var has_permission_estimates_view = helper.has_permission("estimates", "", "view");
-    var has_permission_expenses_view = helper.has_permission("expenses", "", "view");
-    var has_permission_proposals_view = helper.has_permission("proposals", "", "view");
-    var is_admin = helper.is_admin();
+    var has_permission_projects_view = db.has_permission("projects", "", "view");
+    var has_permission_customers_view = db.has_permission("customers", "", "view");
+    var has_permission_contracts_view = db.has_permission("contracts", "", "view");
+    var has_permission_invoices_view = db.has_permission("invoices", "", "view");
+    var has_permission_estimates_view = db.has_permission("estimates", "", "view");
+    var has_permission_expenses_view = db.has_permission("expenses", "", "view");
+    var has_permission_proposals_view = db.has_permission("proposals", "", "view");
+    var is_admin = db.is_admin();
     var projects_model = self.projects_model(db);
     foreach (var relation in data)
     {
@@ -512,25 +510,25 @@ public static class RelationHelper
         }
         case "lead":
         {
-          if (!helper.has_permission("leads", "", "view"))
-            if (relation.assigned != helper.get_staff_user_id() && relation.addedfrom != helper.get_staff_user_id() && relation.is_public != true && rel_id != relation_values.id)
+          if (!db.has_permission("leads", "", "view"))
+            if (relation.assigned != db.get_staff_user_id() && relation.addedfrom != db.get_staff_user_id() && relation.is_public != true && rel_id != relation_values.id)
               continue;
           break;
         }
-        case "customer" when !has_permission_customers_view && !helper.have_assigned_customers() && rel_id != relation_values.id:
+        case "customer" when !has_permission_customers_view && !db.have_assigned_customers() && rel_id != relation_values.id:
           continue;
         case "customer":
         {
-          if (helper.have_assigned_customers() && rel_id != relation_values.id && !has_permission_customers_view)
-            if (!helper.is_customer_admin(relation_values.id))
+          if (db.have_assigned_customers() && rel_id != relation_values.id && !has_permission_customers_view)
+            if (!db.is_customer_admin(relation_values.id))
               continue;
           break;
         }
-        case "contract" when !has_permission_contracts_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
-        case "invoice" when !has_permission_invoices_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
-        case "estimate" when !has_permission_estimates_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
-        case "expense" when !has_permission_expenses_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
-        case "proposal" when !has_permission_proposals_view && rel_id != relation_values.id && relation_values.addedfrom != helper.get_staff_user_id():
+        case "contract" when !has_permission_contracts_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
+        case "invoice" when !has_permission_invoices_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
+        case "estimate" when !has_permission_estimates_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
+        case "expense" when !has_permission_expenses_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
+        case "proposal" when !has_permission_proposals_view && rel_id != relation_values.id && relation_values.addedfrom != db.get_staff_user_id():
           continue;
       }
 

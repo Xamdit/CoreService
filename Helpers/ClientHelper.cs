@@ -1,7 +1,5 @@
-using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Engine;
-using Service.Framework.Helpers;
 using Service.Helpers.Tags;
 using Service.Schemas.Ui.Entities;
 
@@ -16,9 +14,9 @@ public static class ClientHelper
  * @param  mixed staff_id staff id
  * @return boolean
  */
-  public static bool have_assigned_customers(this HelperBase helper, int? staff_id = null)
+  public static bool have_assigned_customers(this MyContext db, int? staff_id = null)
   {
-    staff_id ??= helper.get_staff_user_id();
+    staff_id ??= db.get_staff_user_id();
     var cache = Convert.ToInt32(app_object_cache.get<string>($"staff-total-assigned-customers-{staff_id}"));
     var result = 0;
     if (cache != null)
@@ -48,14 +46,13 @@ public static class ClientHelper
    * @param  string $contact_id Optional
    * @return string Firstname and Lastname
    */
-  public static string get_contact_full_name(this HelperBase helper)
+  public static string get_contact_full_name(this MyContext db)
   {
-    return helper.get_contact_full_name(helper.get_contact_user_id());
+    return db.get_contact_full_name(db.get_contact_user_id());
   }
 
-  public static string get_contact_full_name(this HelperBase helper, int contact_id)
+  public static string get_contact_full_name(this MyContext db, int contact_id)
   {
-    var (self, db) = getInstance();
     var contact = app_object_cache.get<Contact>("contact-full-name-data-" + contact_id);
     if (contact != null) return contact != null ? $"{contact.FirstName} {contact.LastName}" : "";
     contact = db.Contacts.FirstOrDefault(x => x.Id == contact_id);
@@ -69,7 +66,6 @@ public static class ClientHelper
      */
   public static List<ContactPermissionOption> get_contact_permissions(this HelperBase helper)
   {
-    var (self, db) = getInstance();
     var permissions = new List<ContactPermissionOption>
     {
       new()
@@ -118,9 +114,8 @@ public static class ClientHelper
  * Check whether the user disabled verification emails for contacts
  * @return boolean
  */
-  public static bool is_email_verification_enabled(this HelperBase helper)
+  public static bool is_email_verification_enabled(this MyContext db)
   {
-    var (self, db) = getInstance();
     var exist = db.EmailTemplates.Any(x => x.Slug == "contact-verification-email" && x.Active == 0);
     return exist;
   }
@@ -133,10 +128,9 @@ public static class ClientHelper
  * @param  [type] $userid [description]
  * @return [type]         [description]
  */
-  public static string get_company_name(this HelperBase helper, int? userid = null, bool prevent_empty_company = false)
+  public static string get_company_name(this MyContext db, int? userid = null, bool prevent_empty_company = false)
   {
-    var (self, db) = getInstance();
-    var _userid = helper.get_client_user_id();
+    var _userid = db.get_client_user_id();
     if (userid.HasValue) _userid = userid.Value;
     // var select = (prevent_empty_company == false ? get_sql_select_client_company() : "company");
     var client = db.Clients.FirstOrDefault(x => x.Id == _userid);
@@ -153,9 +147,8 @@ public static class ClientHelper
     return new List<Tab>();
   }
 
-  public static int? get_user_id_by_contact_id(this HelperBase helper, int id)
+  public static int? get_user_id_by_contact_id(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     // Simulate dependency injection or retrieve the necessary services (e.g., caching and database)
     var cacheKey = $"user-id-by-contact-id-{id}";
     var cachedUserId = Convert.ToInt32(_cacheService.get<string>(cacheKey));
@@ -176,10 +169,9 @@ public static class ClientHelper
  * @param  staff_id  $staff_id staff id to check
  * @return boolean
  */
-  public static bool is_customer_admin(this HelperBase helper, int id, int staff_id = 0)
+  public static bool is_customer_admin(this MyContext db, int id, int staff_id = 0)
   {
-    var (self, db) = getInstance();
-    staff_id = staff_id > 0 ? staff_id : helper.get_staff_user_id();
+    staff_id = staff_id > 0 ? staff_id : db.get_staff_user_id();
     var cache = app_object_cache.get<Dictionary<string, object>>($"{id}-is-customer-admin-{staff_id}");
     if (cache.Keys.Any())
       return cache.ContainsKey("retval");
@@ -194,11 +186,9 @@ public static class ClientHelper
  * @param  string $type
  * @return string
  */
-  public static string contact_profile_image_url(int contact_id, string type = "small")
+  public static string contact_profile_image_url(this MyContext db, int contact_id, string type = "small")
   {
-    var (self, db) = getInstance();
-    var helper = self.helper;
-    var url = helper.base_url("assets/images/user-placeholder.jpg");
+    var url = base_url("assets/images/user-placeholder.jpg");
     var app_object_cache = new AppObjectCache();
     var path = app_object_cache.get<string>("contact-profile-image-path-" + contact_id);
 
@@ -223,9 +213,8 @@ public static class ClientHelper
  * @param  mixed  $id contact id
  * @return boolean
  */
-  public static bool is_contact_email_verified(this HelperBase helper, int? id = null)
+  public static bool is_contact_email_verified(this MyContext db, int? id = null)
   {
-    var (self, db) = getInstance();
     id ??= db.get_contact_user_id();
     var contact = new Contact();
     if (self.globals<Contact>("contact") != null && self.globals<Contact>("contact").Id == id.Value)

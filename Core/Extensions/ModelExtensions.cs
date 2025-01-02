@@ -20,7 +20,6 @@ using Service.Models.Statements;
 using Service.Models.Tasks;
 using Service.Models.Tickets;
 using Service.Models.Users;
-using static Service.Core.GlobalConstants;
 
 namespace Service.Core.Extensions;
 

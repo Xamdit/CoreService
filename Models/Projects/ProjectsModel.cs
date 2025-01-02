@@ -349,7 +349,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
   // public async Task<bool> get_tasks(int id,Expression<Func<object,true>> where ,bool apply_restrictions = false,bool count = false,Action callback = null){
   public async Task<List<Task>> get_tasks(Expression<Func<Task, bool>> condition, bool apply_restrictions = false, bool count = false, Action<(int? count, int page, int limit)> action = null)
   {
-    var can_view_tasks = self.helper.has_permission("tasks", "", "view");
+    var can_view_tasks = db.has_permission("tasks", "", "view");
     var show_all_tasks_for_project_member = db.get_option<bool>("show_all_tasks_for_project_member");
     var query = db.Tasks
       .Include(x => x.Milestone)

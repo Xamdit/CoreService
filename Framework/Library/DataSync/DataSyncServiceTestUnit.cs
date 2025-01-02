@@ -1,6 +1,5 @@
 using iTextSharp.text.pdf;
 using Newtonsoft.Json;
-using Service.Entities;
 using Service.Framework.Schemas;
 using Task = System.Threading.Tasks.Task;
 

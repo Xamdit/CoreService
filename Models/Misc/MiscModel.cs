@@ -185,8 +185,8 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     var result = new SearchResult<Expense>();
 
-    var hasPermissionExpensesView = self.helper.has_permission("expenses", "view");
-    var hasPermissionExpensesViewOwn = self.helper.has_permission("expenses", "view_own");
+    var hasPermissionExpensesView = db.has_permission("expenses", "view");
+    var hasPermissionExpensesViewOwn = db.has_permission("expenses", "view_own");
 
     if (!hasPermissionExpensesView && !hasPermissionExpensesViewOwn) return result;
     var expensesQuery = db.Expenses
@@ -236,8 +236,8 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     var result = new SearchResult<Estimate>();
 
-    var hasPermissionViewEstimates = self.helper.has_permission("estimates", "view");
-    var hasPermissionViewEstimatesOwn = self.helper.has_permission("estimates", "view_own");
+    var hasPermissionViewEstimates = db.has_permission("estimates", "view");
+    var hasPermissionViewEstimatesOwn = db.has_permission("estimates", "view_own");
     var allowStaffViewEstimatesAssigned = db.get_option("allow_staff_view_estimates_assigned") == "1";
 
     if (!hasPermissionViewEstimates && !hasPermissionViewEstimatesOwn && !allowStaffViewEstimatesAssigned) return result;
@@ -304,7 +304,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
   public SearchResult<Staff> search_staff(string query, int limit = 0)
   {
     var output = new SearchResult<Staff>();
-    var staff_can_view = self.helper.has_permission("staff", "", "view");
+    var staff_can_view = db.has_permission("staff", "", "view");
     if (!staff_can_view) return output;
     var staffQuery = db.Staff
       .Where(s =>
@@ -337,7 +337,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
       SearchHeading = self.helper.label("projects")
     };
 
-    var hasPermissionViewProject = self.helper.has_permission("projects", "", "view");
+    var hasPermissionViewProject = db.has_permission("projects", "", "view");
     // Projects
     var query = db.Projects
       .Include(p => p.Client)
@@ -383,8 +383,8 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
     var result = new SearchResult<Proposal> { SearchHeading = "Proposals" };
 
     // Simulated permission checks
-    var hasPermissionViewProposals = self.helper.has_permission("proposals", "", "view");
-    var hasPermissionViewProposalsOwn = self.helper.has_permission("proposals", "", "view_own");
+    var hasPermissionViewProposals = db.has_permission("proposals", "", "view");
+    var hasPermissionViewProposalsOwn = db.has_permission("proposals", "", "view_own");
     var allowStaffViewProposalsAssigned = db.get_option<bool>("allow_staff_view_proposals_assigned");
 
     if (!hasPermissionViewProposals && !hasPermissionViewProposalsOwn && !allowStaffViewProposalsAssigned) return result;
@@ -445,8 +445,8 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
       SearchHeading = "Credit Notes"
     };
 
-    var hasPermissionViewCreditNotes = self.helper.has_permission("credit_notes", "view");
-    var hasPermissionViewOwnCreditNotes = self.helper.has_permission("credit_notes", "view_own");
+    var hasPermissionViewCreditNotes = db.has_permission("credit_notes", "view");
+    var hasPermissionViewOwnCreditNotes = db.has_permission("credit_notes", "view_own");
 
     if (!hasPermissionViewCreditNotes && !hasPermissionViewOwnCreditNotes) return result;
     query = SanitizeQuery(query);

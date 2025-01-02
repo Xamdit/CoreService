@@ -41,3 +41,4 @@ global using static Service.Framework.Core.Extensions.GlobalExtension;
 global using static Service.Framework.Helpers.UrlHelper;
 global using static Service.Core.GlobalConstants;
 global using static Service.Framework.Helpers.FileHelper;
+global using static Service.Framework.Core.Extensions.StringExtension;

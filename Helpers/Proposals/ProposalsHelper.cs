@@ -12,7 +12,7 @@ public static class ProposalHelper
   public static string get_proposal_short_link(this HelperBase helper, Proposal proposal)
   {
     var db = new MyContext();
-    var longUrl = $"{helper.site_url()}/proposal/{proposal.Id}/{proposal.Hash}";
+    var longUrl = $"{site_url()}/proposal/{proposal.Id}/{proposal.Hash}";
     var bitlyToken = db.get_option("bitly_access_token");
     if (string.IsNullOrEmpty(bitlyToken)) return longUrl;
 
@@ -134,9 +134,9 @@ public static class ProposalHelper
   public static ProposalPercentByStatus get_proposals_percent_by_status(this HelperBase helper, int status, int? totalProposals = null)
   {
     var db = new MyContext();
-    var staffId = helper.get_staff_user_id();
-    var hasPermissionView = helper.has_permission("proposals", "view");
-    var hasPermissionViewOwn = helper.has_permission("proposals", "view_own");
+    var staffId = db.get_staff_user_id();
+    var hasPermissionView = db.has_permission("proposals", "view");
+    var hasPermissionViewOwn = db.has_permission("proposals", "view_own");
     var allowViewAssigned = bool.Parse(db.get_option("allow_staff_view_proposals_assigned"));
 
     IQueryable<Proposal> proposalsQuery = db.Proposals;

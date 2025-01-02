@@ -1,8 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
-using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers.Entities;
 using Service.Helpers.Proposals;
@@ -194,7 +192,7 @@ public static class TaskHelper
   public static Expression<Func<Task, bool>> get_tasks_where_string(this HelperBase helper, bool table = true)
   {
     var (self, db) = getInstance();
-    var staffUserId = helper.get_staff_user_id(); // Assuming a method to get the staff user ID like get_staff_user_id()
+    var staffUserId = db.get_staff_user_id(); // Assuming a method to get the staff user ID like get_staff_user_id()
     var showAllTasksForProjectMember = db.get_option_compare("show_all_tasks_for_project_member", 1); // Assuming a GetOption method
 
     // Building the expression tree to match the conditions

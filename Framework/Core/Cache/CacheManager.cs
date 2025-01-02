@@ -1,5 +1,3 @@
-using Service.Framework.Helpers;
-
 namespace Service.Framework.Core.Cache;
 
 public class CacheItem
@@ -22,9 +20,9 @@ public class CacheManager(MyInstance self)
   public void Init(string uuid)
   {
     var session_folder = "sessions";
-    self.helper.create_folder_if_not_exists(session_folder);
+    create_folder_if_not_exists(session_folder);
     var temp_path = $"{session_folder}/{uuid}.json";
-    self.helper.create_json_file(temp_path);
+    create_json_file(temp_path);
   }
 
   public bool has(string key)

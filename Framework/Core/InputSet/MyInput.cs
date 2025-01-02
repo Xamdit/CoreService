@@ -1,6 +1,4 @@
 using System.Net;
-using Service.Core.Extensions;
-using Service.Framework.Core.Extensions;
 using Service.Framework.Library.Net;
 using Service.Framework.Sessions;
 

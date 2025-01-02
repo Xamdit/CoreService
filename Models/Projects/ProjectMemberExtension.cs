@@ -131,8 +131,8 @@ public static class ProjectMemberExtension
       .Select(x => new DataSet<ProjectActivity>() { Data = x })
       .Select(activity =>
       {
-        var seconds = helper.get_string_between(activity.Data.AdditionalData, "<seconds>", "</seconds>");
-        var other_lang_keys = helper.get_string_between(activity.Data.AdditionalData, "<lang>", "</lang>");
+        var seconds = get_string_between(activity.Data.AdditionalData, "<seconds>", "</seconds>");
+        var other_lang_keys = get_string_between(activity.Data.AdditionalData, "<lang>", "</lang>");
         var _additional_data = activity.Data.AdditionalData;
         if (seconds != "")
           _additional_data = $"<seconds>{seconds}</seconds>".Replace(seconds_to_time_format(Convert.ToInt32(seconds)), _additional_data);

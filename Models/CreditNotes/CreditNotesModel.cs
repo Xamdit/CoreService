@@ -5,7 +5,6 @@ using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Extensions;
-using Service.Framework.Helpers;
 using Service.Framework.Library.Merger;
 using Service.Helpers;
 using Service.Helpers.Pdf;
@@ -61,7 +60,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
   public async Task<List<CreditNoteResult>> get_available_creditable_invoices(int credit_note_id)
   {
-    var has_permission_view = self.helper.has_permission("invoices", "", "view");
+    var has_permission_view = db.has_permission("invoices", "", "view");
     var _invoices_statuses_available_for_credits = self.helper.invoices_statuses_available_for_credits();
     var credit_note = db.CreditNotes.FirstOrDefault(x => x.Id == credit_note_id);
     var invoice_query = db.Invoices
@@ -437,7 +436,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
   public string total_remaining_credits_by_customer(int customer_id)
   {
-    var has_permission_view = self.helper.has_permission("credit_notes", "", "view");
+    var has_permission_view = db.has_permission("credit_notes", "", "view");
     var query = db.CreditNotes.Where(x => x.ClientId == customer_id && x.Status == 1);
     if (!has_permission_view)
       query = query.Where(x => x.AddedFrom == staff_user_id);
@@ -724,7 +723,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
   public async Task<List<CreditNote>> get_open_credits(int customer_id)
   {
     var query = db.CreditNotes.Where(x => x.ClientId == customer_id && x.Status == 1).AsQueryable();
-    var has_permission_view = self.helper.has_permission("credit_notes", "", "view");
+    var has_permission_view = db.has_permission("credit_notes", "", "view");
 
     if (!has_permission_view) query = query.Where(x => x.AddedFrom == staff_user_id);
 

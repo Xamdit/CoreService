@@ -2,7 +2,6 @@ using System.Net;
 using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Library.DataStores;
-using Service.Framework.Sessions;
 
 namespace Service.Framework.Core.Extensions;
 

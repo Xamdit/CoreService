@@ -3,8 +3,6 @@ using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
-using Service.Helpers.Database;
-using SqlKata.Execution;
 
 namespace Service.Helpers.Sale;
 

@@ -92,7 +92,7 @@ public class EstimatesPipeline(MyInstance instance, int status) : AbstractKanban
 
   protected AbstractKanban initiate_query()
   {
-    var has_permission_view = self.helper.has_permission("estimates", "", "view");
+    var has_permission_view = db.has_permission("estimates", "", "view");
     var noPermissionQuery = self.helper.get_estimates_where_sql_for_staff(db.get_staff_user_id());
     var query = db.Estimates
       .Include(e => e.Client)

@@ -135,7 +135,7 @@ public static class EstimatesHelper
   public static Expression<Func<Estimate, bool>> get_estimates_where_sql_for_staff(this HelperBase helper, int staff_id)
   {
     var (self, db) = getInstance();
-    var has_permission_view_own = helper.has_permission("estimates", "", "view_own");
+    var has_permission_view_own = db.has_permission("estimates", "", "view_own");
     var allow_staff_view_estimates_assigned = db.get_option<bool>("allow_staff_view_estimates_assigned");
     // Build the expression
     Expression<Func<Estimate, bool>> whereUser;

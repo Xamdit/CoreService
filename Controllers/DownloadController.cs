@@ -114,7 +114,7 @@ public class DownloadController(ILogger<DownloadController> logger, MyInstance s
 
       case "client":
         var clientAttachment = db.Files.FirstOrDefault(x => x.AttachmentKey == attachmentId.ToString());
-        if (clientAttachment != null && (self.helper.has_permission("customers", "", "view") || self.helper.is_customer_admin(clientAttachment.RelId) || db.is_client_logged_in())) path = get_upload_path_by_type("customer") + clientAttachment.RelId + "/" + clientAttachment.FileName;
+        if (clientAttachment != null && (db.has_permission("customers", "", "view") || self.helper.is_customer_admin(clientAttachment.RelId) || db.is_client_logged_in())) path = get_upload_path_by_type("customer") + clientAttachment.RelId + "/" + clientAttachment.FileName;
         break;
     }
 

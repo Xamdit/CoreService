@@ -7,7 +7,6 @@ using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Core.InputSet;
 using Service.Framework.Entities.Dto;
-using Service.Framework.Helpers;
 using Service.Framework.Helpers.Entities.Tools;
 using Service.Helpers;
 using Service.Helpers.Sale;
@@ -385,7 +384,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
   public List<object> get_estimates_total(Dictionary<string, object> data)
   {
     var statuses = get_statuses();
-    var hasPermissionView = self.helper.has_permission("estimates", "view");
+    var hasPermissionView = db.has_permission("estimates", "view");
 
     int currencyId;
     if (data.ContainsKey("currency"))

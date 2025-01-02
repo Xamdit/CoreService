@@ -1,10 +1,8 @@
 using System.Linq.Expressions;
-using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
 using Service.Framework.Library.Merger;
-using Service.Helpers.Sale;
 using Service.Models.Invoices;
 
 
@@ -281,7 +279,7 @@ public static class InvoiceHelper
   public static async Task<Expression<Func<Invoice, bool>>> get_invoices_where_sql_for_staff(this HelperBase helper, int staff_id)
   {
     var (self, db) = getInstance();
-    var has_permission_view_own = helper.has_permission("invoices", "", "view_own");
+    var has_permission_view_own = db.has_permission("invoices", "", "view_own");
     var allow_staff_view_invoices_assigned = db.get_option("allow_staff_view_invoices_assigned");
 
     // Expression that will hold our condition

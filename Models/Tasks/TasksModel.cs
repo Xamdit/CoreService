@@ -296,7 +296,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
 
   public List<DataSet<Task>> get_billable_tasks(int? customer_id = null, int project_id = 0)
   {
-    var has_permission_view = self.helper.has_permission("tasks", "", "view");
+    var has_permission_view = db.has_permission("tasks", "", "view");
     var noPermissionsQuery = self.helper.get_tasks_where_string(false);
 
 
@@ -1342,7 +1342,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var comment = db.TaskComments.FirstOrDefault(x => x.Id == data.Id);
 
-    var edit_tasks = self.helper.has_permission("tasks", "", "edit");
+    var edit_tasks = db.has_permission("tasks", "", "edit");
     if (comment.StaffId != staff_user_id && !edit_tasks && comment.ContactId != db.get_contact_user_id())
       return false;
 
@@ -1377,7 +1377,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     if (comment == null) return true;
 
-    var task_delete = self.helper.has_permission("tasks", "", "delete");
+    var task_delete = db.has_permission("tasks", "", "delete");
     var contact_user_id = db.get_contact_user_id();
     if (comment.StaffId != staff_user_id && !task_delete && comment.ContactId != contact_user_id && force != true) return false;
     {

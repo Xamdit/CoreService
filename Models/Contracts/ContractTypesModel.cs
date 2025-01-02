@@ -90,7 +90,7 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self, d
       }
       else
       {
-        var view_contract = self.helper.has_permission("contracts", 0, "view");
+        var view_contract = db.has_permission("contracts", 0, "view");
         if (!view_contract) total_rows_where = total_rows_where.And(x => x.AddedFrom == db.get_staff_user_id());
       }
 
@@ -132,7 +132,7 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self, d
     {
       labels.Add(type.Name);
       var query = db.Contracts.Where(x => x.ContractType == (type.Id == 1) && x.Trash == false).AsQueryable();
-      var view_contract = self.helper.has_permission("contracts", 0, "view");
+      var view_contract = db.has_permission("contracts", 0, "view");
       if (!view_contract)
       {
         var staff_user_id = this.staff_user_id;
