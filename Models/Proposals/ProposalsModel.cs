@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
@@ -14,17 +13,16 @@ using Service.Helpers.Proposals;
 using Service.Helpers.Sale;
 using Service.Helpers.Sms;
 using Service.Helpers.Tags;
-using Service.Helpers.Template;
 using Service.Models.Client;
 using Service.Models.Estimates;
 using Service.Models.Leads;
 using Service.Models.Projects;
 using File = Service.Entities.File;
-
+using static Service.Helpers.Template.TemplateHelper;
 
 namespace Service.Models.Proposals;
 
-public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private readonly List<int> statuses = hooks.apply_filters("before_set_proposal_statuses", new List<int> { 6, 4, 1, 5, 2, 3 });
   private EstimateRequestModel estimate_request_model = self.estimate_request_model(db);
@@ -115,20 +113,20 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
     db.handle_tags_save(tags, insert_id, "proposal");
     items.ForEach(item =>
     {
-      var itemid = self.helper.add_new_sales_item_post(item, insert_id, "proposal");
+      var itemid = db.add_new_sales_item_post(item, insert_id, "proposal");
       if (itemid > 0)
-        self.helper.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "proposal");
+        db.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "proposal");
     });
 
-    foreach (var item in items.Where(item => item.Id == self.helper.add_new_sales_item_post(item, insert_id, "proposal")))
-      self.helper.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), insert_id, "proposal");
+    foreach (var item in items.Where(item => item.Id == db.add_new_sales_item_post(item, insert_id, "proposal")))
+      db.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), insert_id, "proposal");
 
     foreach (var item in items)
     {
-      var itemid = self.helper.add_new_sales_item_post(item, insert_id, "proposal");
+      var itemid = db.add_new_sales_item_post(item, insert_id, "proposal");
       //key => item
       if (itemid > 0)
-        self.helper.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "proposal");
+        db.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "proposal");
     }
 
     var proposal = get(x => x.Id == insert_id);
@@ -155,7 +153,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
       {
         $"<a href='{self.navigation.admin_url($"proposals/list_proposals/{insert_id}")}' target='_blank'>{dataset.Data.Subject}</a>"
       }));
-    self.helper.update_sales_total_tax_column(insert_id, "proposal", "proposals");
+    db.update_sales_total_tax_column(insert_id, "proposal", "proposals");
     log_activity($"New Proposal Created [ID: {insert_id}]");
     if (save_and_send) send_proposal_to_email(insert_id);
     hooks.do_action("proposal_created", insert_id);
@@ -227,10 +225,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
     items.Clear();
 
     // Delete items checked to be removed from database
-    foreach (var remove_item_id in data.removed_items.Select(x => x.Id).ToList())
-      if (self.helper.handle_removed_sales_item_post(remove_item_id, "proposal"))
-        affectedRows++;
-
+    affectedRows += data.removed_items.Select(x => x.Id).Count(remove_item_id => db.handle_removed_sales_item_post(remove_item_id, "proposal"));
 
     var affected_rows = db.Proposals.Where(x => x.Id == id).Update(x => data);
     if (affected_rows > 0)
@@ -258,7 +253,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
     // foreach (var itemTaxes in items.Select(x => x.ItemTaxes).ToList())
     foreach (var item in items.ToList())
     {
-      if (self.helper.update_sales_item_post(item.Id, item)) affectedRows++;
+      if (db.update_sales_item_post(item.Id, item)) affectedRows++;
       if (item.CustomFields.Items.Any())
       {
         var temp = db.CustomFields.Where(x => item.CustomFields.Items.Contains(x.Name)).ToList();
@@ -271,7 +266,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
       {
         if (!string.IsNullOrEmpty(name))
         {
-          if (self.helper.delete_taxes_from_item(item.Id, "proposal"))
+          if (db.delete_taxes_from_item(item.Id, "proposal"))
             affectedRows++;
         }
         else
@@ -283,22 +278,22 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
             .ToList();
           db.ItemTaxes.RemoveRange(_item_taxes_names);
           db.SaveChanges();
-          self.helper.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), id, "proposal");
+          db.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), id, "proposal");
         }
       });
     }
 
     foreach (var item in NewItems)
     {
-      var new_item_added = self.helper.add_new_sales_item_post(convert<Itemable>(item), id, "proposal");
+      var new_item_added = db.add_new_sales_item_post(convert<Itemable>(item), id, "proposal");
       if (new_item_added <= 0) continue;
-      self.helper.maybe_insert_post_item_tax(new_item_added, convert<PostItem>(item), id, "proposal");
+      db.maybe_insert_post_item_tax(new_item_added, convert<PostItem>(item), id, "proposal");
       affectedRows++;
     }
 
     if (affectedRows > 0)
     {
-      self.helper.update_sales_total_tax_column(id, "proposal", "proposals");
+      db.update_sales_total_tax_column(id, "proposal", "proposals");
       log_activity($"Proposal Updated [ID:{id}]");
     }
 
@@ -570,7 +565,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
     foreach (var item in items)
     {
       insert_data.NewItems[key].Description = (string)item["description"];
-      insert_data.NewItems[key].LongDescription = self.helper.clear_textarea_breaks((string)item["long_description"]);
+      insert_data.NewItems[key].LongDescription = clear_textarea_breaks((string)item["long_description"]);
       insert_data.NewItems[key].Qty = (int)item["qty"];
       insert_data.NewItems[key].Unit = (string)item["unit"];
       insert_data.NewItems[key].Names = new List<string>();
@@ -784,7 +779,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
       }
 
       data.Company = _data.Company;
-      data.Address = self.helper.clear_textarea_breaks(_data.Address);
+      data.Address = clear_textarea_breaks(_data.Address);
       data.Zip = _data.Zip;
       data.Country = _data.Country!.Id;
       data.State = _data.State;

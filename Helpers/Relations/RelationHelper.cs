@@ -262,7 +262,7 @@ public static class RelationHelper
           name = $"{relation.firstname} {relation.lastname}";
         }
 
-        subtext = self.helper.get_company_name(userid);
+        subtext = db.get_company_name(userid);
         link = nav.admin_url($"clients/client/{userid}?contactid={id}");
         break;
       }

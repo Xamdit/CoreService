@@ -601,7 +601,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
     var diff2 = DateTime.Now.AddDays(+days);
     var query = db.Contracts.AsQueryable();
     // if (staffId.HasValue && !self.helper.staff_can("view", "contracts", staffId.Value))
-    if (staffId.HasValue && !self.helper.staff_can(view: "contracts", staffId: staffId.Value))
+    if (staffId.HasValue && !db.staff_can(view: "contracts", staffId: staffId.Value))
       query.Where(x => x.AddedFrom == staffId);
     var rows = query
       .Where(x =>

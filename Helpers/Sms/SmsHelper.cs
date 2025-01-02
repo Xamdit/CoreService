@@ -1,23 +1,23 @@
 using Newtonsoft.Json;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.InputSet;
-using Service.Helpers.Template;
-
+using static Service.Helpers.Template.TemplateHelper;
 
 namespace Service.Helpers.Sms;
 
 public static class SmsHelper
 {
   // hooks().add_action("admin_init", "maybe_test_sms_gateway");
-  public static string maybe_test_sms_gateway(this HelperBase helper, SmsTestRequest request)
+  public static string maybe_test_sms_gateway(this MyContext db, SmsTestRequest request)
   {
-    if (!is_staff_logged_in() || !request.SmsGatewayTest) return string.Empty;
-    var gateway = helper.get_sms_gateway(request.Id);
+    if (!db.is_staff_logged_in() || !request.SmsGatewayTest) return string.Empty;
+    var gateway = db.get_sms_gateway(request.Id);
     if (gateway == null) return JsonConvert.SerializeObject(new { success = false, error = "SMS gateway not found." });
     gateway.SetTestMode(true);
     // Send the SMS
-    var result = gateway.Send(request.Number, helper.clear_textarea_breaks(request.Message));
+    var result = gateway.Send(request.Number, clear_textarea_breaks(request.Message));
     // Prepare the response
     var response = new { success = false };
 

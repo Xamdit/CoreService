@@ -327,7 +327,7 @@ public static class InvoiceHelper
     var credits = credit_notes_model.get_applied_invoice_credits(id);
     payments = (List<InvoicePaymentRecord>)TypeMerger.Merge(payments, credits);
     var totalPayments = payments.Select(payment => Convert.ToDouble(payment.Amount)).ToList().Sum();
-    // return helper.number_format(invoice_total - totalPayments, get_decimal_places());
+    // return number_format(invoice_total - totalPayments, get_decimal_places());
     return invoice_total - totalPayments;
   }
 }

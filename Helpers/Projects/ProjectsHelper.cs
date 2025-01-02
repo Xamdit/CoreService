@@ -52,11 +52,9 @@ public static class ProjectsHelper
  * @param  mixed $id project id
  * @return array
  */
-  public static ProjectSettingOption get_project_status_by_id(this HelperBase helper, int id)
+  public static ProjectSettingOption get_project_status_by_id(this ProjectsModel model, int id)
   {
-    var projects_model = self.projects_model(db);
-    var statuses = projects_model.get_project_statuses();
-
+    var statuses = model.get_project_statuses();
     var status = new ProjectSettingOption()
     {
       Id = 0,

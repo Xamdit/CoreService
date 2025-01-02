@@ -26,7 +26,7 @@ using TaskStatus = Service.Models.Tasks.TaskStatus;
 
 namespace Service.Models.Invoices;
 
-public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private PaymentsModel payments_model = self.payments_model(db);
   private ClientsModel clients_model = self.clients_model(db);
@@ -78,7 +78,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
   public async Task<List<Invoice>> get_unpaid_invoices()
   {
     // Step 1: Check if the user has permission to view all invoices or only their own
-    var canViewAllInvoices = self.helper.staff_can(view: "invoices");
+    var canViewAllInvoices = db.staff_can(view: "invoices");
 
 
     // Step 2: Build the query dynamically
@@ -747,7 +747,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
     {
       var key = "";
       var item = itemable(kvp);
-      var itemid = self.helper.add_new_sales_item_post(item, insert_id, "invoice");
+      var itemid = db.add_new_sales_item_post(item, insert_id, "invoice");
       if (itemid <= 0) continue;
       // if (isset(billed_tasks, key))
       //   foreach (var _task_id in billed_tasks[key])
@@ -766,10 +766,10 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
       //       RelType = "expense"
       //     });
 
-      self.helper.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "invoice");
+      db.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "invoice");
     }
 
-    self.helper.update_sales_total_tax_column(insert_id, "invoice", "invoices");
+    db.update_sales_total_tax_column(insert_id, "invoice", "invoices");
     var lang_key = "";
     if (!defined("CRON") && expense == false)
       lang_key = "invoice_activity_created";

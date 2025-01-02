@@ -16,7 +16,6 @@ using Service.Models.Client;
 using Service.Models.Tasks;
 using Service.Models.Users;
 using Chart = Service.Framework.Helpers.Entities.Chart;
-using static Service.Framework.Core.Extensions.StringExtension;
 
 
 namespace Service.Models.Tickets;

@@ -3,6 +3,8 @@ using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
+using Service.Helpers.Database;
+using SqlKata.Execution;
 
 namespace Service.Helpers.Sale;
 
@@ -73,7 +75,7 @@ public static class SaleHelper
  * @since  2.3.2
  * @return object
  */
-  public static Currency get_base_currency(this HelperBase helper)
+  public static Currency get_base_currency(this MyContext db)
   {
     var self = new MyInstance();
     var currencies_model = self.currencies_model(db);
@@ -171,10 +173,10 @@ public static class SaleHelper
     return new List<Taxis>();
   }
 
-  public static void update_sales_total_tax_column(this HelperBase helper, int id, string type, string table)
+  public static void update_sales_total_tax_column(this MyContext db, int id, string type, string table)
   {
     var data = db.kata(table).Where("id", id).Get().FirstOrDefault();
-    var items = helper.get_items_by_type(type, id);
+    var items = db.get_items_by_type(type, id);
 
     double total_tax = 0;
     // var taxes = new List<TaxInfo>();
@@ -243,7 +245,7 @@ public static class SaleHelper
  */
   public static int add_new_sales_item_post(this MyContext db, Itemable item, int rel_id, string rel_type)
   {
-    var custom_fields = new CustomField();
+    var custom_fields = new List<CustomField>();
     // if (item["custom_fields"])
     //   custom_fields = item["custom_fields"];
 
@@ -274,7 +276,7 @@ public static class SaleHelper
  * @param  string$field   field is require to be passed for long_description,rate,item_order to do some additional checkings
  * @return boolean
  */
-  public static bool update_sales_item_post(this HelperBase helper, int item_id, Itemable data, string field = "")
+  public static bool update_sales_item_post(this MyContext db, int item_id, Itemable data, string field = "")
   {
     // Initialize a new Itemable object to store the updates
     var update = new Itemable();
@@ -287,7 +289,7 @@ public static class SaleHelper
           update.LongDescription = data.LongDescription.nl2br();
           break;
         case "rate":
-          update.Rate = Convert.ToDouble(helper.number_format(data.Rate, get_decimal_places()));
+          update.Rate = Convert.ToDouble(number_format(data.Rate, get_decimal_places()));
           break;
         case "item_order":
           update.ItemOrder = data.ItemOrder;
@@ -309,7 +311,7 @@ public static class SaleHelper
         ItemOrder = data.ItemOrder,
         Description = data.Description,
         LongDescription = data.LongDescription!.nl2br(),
-        Rate = Convert.ToDouble(helper.number_format(data.Rate, get_decimal_places())),
+        Rate = Convert.ToDouble(number_format(data.Rate, get_decimal_places())),
         Qty = data.Qty,
         Unit = data.Unit
       };
@@ -337,7 +339,7 @@ public static class SaleHelper
 * @param  mixed $rel_id    rel_id
 * @param  string rel_type  where this item tax is related
 */
-  public static bool maybe_insert_post_item_tax(this HelperBase helper, int itemId, PostItem? itemTax, int relId, string relType)
+  public static bool maybe_insert_post_item_tax(this MyContext db, int itemId, PostItem? itemTax, int relId, string relType)
   {
     var affectedRows = 0;
 
@@ -386,7 +388,7 @@ public static class SaleHelper
  * @param  string rel_type relation type eq. invoice, estimate etc.
  * @return boolean
  */
-  public static bool delete_taxes_from_item(this HelperBase helper, int item_id, string rel_type)
+  public static bool delete_taxes_from_item(this MyContext db, int item_id, string rel_type)
   {
     var result = db.ItemTaxes
       .Where(x => x.ItemId == item_id)
@@ -401,14 +403,14 @@ public static class SaleHelper
  * @param  string rel_type item relation eq. invoice, estimate
  * @return boolean
  */
-  public static bool handle_removed_sales_item_post(this HelperBase helper, int id, string rel_type)
+  public static bool handle_removed_sales_item_post(this MyContext db, int id, string rel_type)
   {
     var affected_rows = db.Itemables
       .Where(x => x.Id == id)
       .Delete();
     if (affected_rows <= 0) return false;
 
-    helper.delete_taxes_from_item(id, rel_type);
+    db.delete_taxes_from_item(id, rel_type);
     db.CustomFieldsValues
       .Where(x => x.RelId == id && x.FieldTo == "items")
       .Delete();
@@ -421,7 +423,7 @@ public static class SaleHelper
  * @param  boolean $foce_check_zero_decimals whether to force check
  * @return mixed
  */
-  public static object app_format_number(this HelperBase helper, object total, bool force_check_zero_decimals = false)
+  public static object app_format_number(this MyContext db, object total, bool force_check_zero_decimals = false)
   {
     // Ensure the input is convertible to a decimal
     if (!decimal.TryParse(total?.ToString(), out var numericTotal)) return total; // Return the original input if it's not numeric

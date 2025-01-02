@@ -8,7 +8,6 @@ using Service.Framework.Helpers;
 using Service.Framework.Helpers.Entities;
 using Service.Helpers;
 using Service.Helpers.Relations;
-using Service.Helpers.Sale;
 using Service.Helpers.Tags;
 using Service.Helpers.Tasks;
 using Service.Models.Client;
@@ -17,7 +16,6 @@ using Service.Models.Misc;
 using Service.Models.Projects;
 using Service.Models.Users;
 using static Service.Models.Tasks.TaskStatus;
-using static Service.Framework.Core.Extensions.StringExtension;
 using File = Service.Entities.File;
 using Task = Service.Entities.Task;
 

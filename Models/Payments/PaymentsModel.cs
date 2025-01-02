@@ -6,13 +6,12 @@ using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers.Entities;
 using Service.Helpers;
-using Service.Helpers.Sale;
 using Service.Models.Client;
 using Service.Models.Invoices;
 
 namespace Service.Models.Payments;
 
-public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private readonly ClientsModel clients_model = self.clients_model(db);
   private readonly InvoicesModel invoices_model = self.invoices_model(db);
@@ -158,11 +157,11 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self,db)
 
     invoices_model.log(invoiceId, activityLangKey, isClient, JsonConvert.SerializeObject(new List<string>
     {
-      self.helper.app_format_money(amount, invoice.Currency.Name),
+      db.app_format_money(amount, invoice.Currency.Name),
       $"<a href='{self.navigation.admin_url($"payments/payment/{paymentId}")}' target='_blank'>#{paymentId}</a>"
     }));
 
-    log_activity($"Payment Recorded [ID : {paymentId}, Invoice Number: {self.helper.format_invoice_number(invoiceId)}, Total: {self.helper.app_format_money(amount, invoice.Currency.Name)}]");
+    log_activity($"Payment Recorded [ID : {paymentId}, Invoice Number: {self.helper.format_invoice_number(invoiceId)}, Total: {db.app_format_money(amount, invoice.Currency.Name)}]");
   }
 
   private void NotifyStaffAndCustomers(InvoicePaymentRecord data, int paymentId)
@@ -207,7 +206,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self,db)
     invoices_model.log(current.InvoiceId.Value, "invoice_activity_payment_deleted", false, JsonConvert.SerializeObject(new[]
     {
       $"{current.Id}",
-      self.helper.app_format_money(Convert.ToDecimal(current.Amount), current.Invoice.Currency.Name)
+      db.app_format_money(Convert.ToDecimal(current.Amount), current.Invoice.Currency.Name)
     }));
 
     log_activity($"Payment Deleted [ID : {id}, Invoice Number: {self.helper.format_invoice_number(current.InvoiceId.Value)}]");

@@ -222,7 +222,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var log = $"ID: {client_id}";
 
-    if (log == "" && contact_id == 0) log = self.helper.get_contact_full_name(contact_id);
+    if (log == "" && contact_id == 0) log = db.get_contact_full_name(contact_id);
 
     var isStaff = 0;
 
@@ -490,7 +490,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
       // If client register set this contact as primary
       data.IsPrimary = true;
 
-      if (self.helper.is_email_verification_enabled() && !string.IsNullOrEmpty(data.Email))
+      if (db.is_email_verification_enabled() && !string.IsNullOrEmpty(data.Email))
       {
         // Verification is required on register
         data.EmailVerifiedAt = null;
@@ -643,11 +643,11 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
     send_set_password_email = !send_set_password_email.HasValue || !send_set_password_email.Value;
     // unset(data.CustomField);
 
-    if (!self.helper.is_email_verification_enabled())
+    if (!db.is_email_verification_enabled())
     {
       data.EmailVerifiedAt = today();
     }
-    else if (self.helper.is_email_verification_enabled() && !string.IsNullOrEmpty(data.Email))
+    else if (db.is_email_verification_enabled() && !string.IsNullOrEmpty(data.Email))
     {
       // Verification is required on register
       data.EmailVerifiedAt = null;
@@ -829,7 +829,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     hooks.do_action("before_client_deleted", id);
     var last_activity = self.helper.get_last_system_activity_id();
-    var company = self.helper.get_company_name(id);
+    var company = db.get_company_name(id);
     db.Clients.RemoveRange(db.Clients.Where(x => x.Id == id));
     var affected_rows = db.SaveChanges();
     if (affected_rows > 0)

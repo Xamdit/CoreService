@@ -3,7 +3,6 @@ using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Helpers.Entities;
 using Service.Helpers;
-using static Service.Framework.Core.Extensions.StringExtension;
 using Task = Service.Entities.Task;
 
 namespace Service.Models.Projects;

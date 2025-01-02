@@ -14,7 +14,7 @@ public class VerificationController(ILogger<ClientControllerBase> logger, MyInst
   [HttpGet]
   public IActionResult Index()
   {
-    if (self.helper.is_contact_email_verified())
+    if (db.is_contact_email_verified())
       return Redirect(self.helper.site_url("clients"));
 
     var data = new
@@ -74,7 +74,7 @@ public class VerificationController(ILogger<ClientControllerBase> logger, MyInst
   {
     var clients_model = self.clients_model(db);
 
-    if (self.helper.is_contact_email_verified() || !db.is_client_logged_in())
+    if (db.is_contact_email_verified() || !db.is_client_logged_in())
       return Redirect(self.helper.site_url("clients"));
 
     if (clients_model.send_verification_email(db.get_contact_user_id()))

@@ -12,7 +12,6 @@ using Service.Helpers;
 using Service.Helpers.Sale;
 using Service.Helpers.Sms;
 using Service.Helpers.Tags;
-using Service.Helpers.Template;
 using Service.Models.Client;
 using Service.Models.Contracts;
 using Service.Models.Invoices;
@@ -21,6 +20,7 @@ using Service.Models.Projects;
 using Service.Models.Tasks;
 using static Service.Helpers.Pdf.PdfHelper;
 using File = Service.Entities.File;
+using static Service.Helpers.Template.TemplateHelper;
 
 namespace Service.Models.Estimates;
 
@@ -152,12 +152,12 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     new_invoice_data.DiscountType = _estimate.DiscountType;
     new_invoice_data.SaleAgentNavigation = _estimate.SaleAgentNavigation;
     // Since version 1.0.6
-    new_invoice_data.BillingStreet = self.helper.clear_textarea_breaks(_estimate.BillingStreet);
+    new_invoice_data.BillingStreet = clear_textarea_breaks(_estimate.BillingStreet);
     new_invoice_data.BillingCity = _estimate.BillingCity;
     new_invoice_data.BillingState = _estimate.BillingState;
     new_invoice_data.BillingZip = _estimate.BillingZip;
     new_invoice_data.BillingCountry = _estimate.BillingCountry;
-    new_invoice_data.ShippingStreet = self.helper.clear_textarea_breaks(_estimate.ShippingStreet);
+    new_invoice_data.ShippingStreet = clear_textarea_breaks(_estimate.ShippingStreet);
     new_invoice_data.ShippingCity = _estimate.ShippingCity;
     new_invoice_data.ShippingState = _estimate.ShippingState;
     new_invoice_data.ShippingZip = _estimate.ShippingZip;
@@ -183,7 +183,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     foreach (var item in items)
     {
       new_invoice_data.newitems[key].Description = item.Description;
-      new_invoice_data.newitems[key].LongDescription = self.helper.clear_textarea_breaks(item.LongDescription);
+      new_invoice_data.newitems[key].LongDescription = clear_textarea_breaks(item.LongDescription);
       new_invoice_data.newitems[key].Qty = item.Qty;
       new_invoice_data.newitems[key].Unit = item.Unit;
       new_invoice_data.newitems[key].TaxNames = new List<string>();
@@ -316,12 +316,12 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     new_estimate_data.SaleAgent = _estimate.SaleAgentNavigation.Id;
     new_estimate_data.ReferenceNo = _estimate.ReferenceNo;
     // Since version 1.0.6
-    new_estimate_data.BillingStreet = self.helper.clear_textarea_breaks(_estimate.BillingStreet);
+    new_estimate_data.BillingStreet = clear_textarea_breaks(_estimate.BillingStreet);
     new_estimate_data.BillingCity = _estimate.BillingCity;
     new_estimate_data.BillingState = _estimate.BillingState;
     new_estimate_data.BillingZip = _estimate.BillingZip;
     new_estimate_data.BillingCountry = _estimate.BillingCountry;
-    new_estimate_data.ShippingStreet = self.helper.clear_textarea_breaks(_estimate.ShippingStreet);
+    new_estimate_data.ShippingStreet = clear_textarea_breaks(_estimate.ShippingStreet);
     new_estimate_data.ShippingCity = _estimate.ShippingCity;
     new_estimate_data.ShippingState = _estimate.ShippingState;
     new_estimate_data.ShippingZip = _estimate.ShippingZip;
@@ -340,7 +340,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     foreach (var item in items)
     {
       new_estimate_data.newitems[key].Description = item.Description;
-      new_estimate_data.newitems[key].LongDescription = self.helper.clear_textarea_breaks(item.LongDescription!);
+      new_estimate_data.newitems[key].LongDescription = clear_textarea_breaks(item.LongDescription!);
       new_estimate_data.newitems[key].Qty = item.Qty;
       new_estimate_data.newitems[key].Unit = item.Unit;
       var taxes = self.helper.get_estimate_item_taxes(item.Id);
@@ -510,12 +510,12 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     foreach (var item in items)
     {
-      var itemid = self.helper.add_new_sales_item_post(item, insert_id, "'estimate");
+      var itemid = db.add_new_sales_item_post(item, insert_id, "'estimate");
       if (itemid > 0)
-        self.helper.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "'estimate");
+        db.maybe_insert_post_item_tax(itemid, convert<PostItem>(item), insert_id, "'estimate");
     }
 
-    self.helper.update_sales_total_tax_column(insert_id, "'estimate", "estimates");
+    db.update_sales_total_tax_column(insert_id, "'estimate", "estimates");
     log_estimate_activity(insert_id, "estimate_activity_created");
 
     hooks.do_action("after_estimate_added", insert_id);
@@ -599,7 +599,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     data.RemovedItems.ForEach(remove_item_id =>
     {
       var original_item = get_estimate_item(remove_item_id.Id);
-      if (!self.helper.handle_removed_sales_item_post(remove_item_id.Id, "estimate")) return;
+      if (!db.handle_removed_sales_item_post(remove_item_id.Id, "estimate")) return;
       affectedRows++;
       log_estimate_activity(
         id,
@@ -644,9 +644,9 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       var original_item = get_estimate_item(item.Id);
 
-      if (self.helper.update_sales_item_post(item.Id, item, "item_order")) affectedRows++;
-      if (self.helper.update_sales_item_post(item.Id, item, "unit")) affectedRows++;
-      if (self.helper.update_sales_item_post(item.Id, item, "rate"))
+      if (db.update_sales_item_post(item.Id, item, "item_order")) affectedRows++;
+      if (db.update_sales_item_post(item.Id, item, "unit")) affectedRows++;
+      if (db.update_sales_item_post(item.Id, item, "rate"))
       {
         log_estimate_activity(id, "invoice_estimate_activity_updated_item_rate", false, JsonConvert.SerializeObject(new[]
         {
@@ -656,7 +656,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
         affectedRows++;
       }
 
-      if (self.helper.update_sales_item_post(item.Id, item, "qty"))
+      if (db.update_sales_item_post(item.Id, item, "qty"))
       {
         log_estimate_activity(id, "invoice_estimate_activity_updated_qty_item", false, JsonConvert.SerializeObject(new
         {
@@ -667,7 +667,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
         affectedRows++;
       }
 
-      if (self.helper.update_sales_item_post(item.Id, item, "description"))
+      if (db.update_sales_item_post(item.Id, item, "description"))
       {
         log_estimate_activity(id, "invoice_estimate_activity_updated_item_short_description", false, JsonConvert.SerializeObject(new[]
         {
@@ -677,7 +677,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
         affectedRows++;
       }
 
-      if (self.helper.update_sales_item_post(item.Id, item, "long_description"))
+      if (db.update_sales_item_post(item.Id, item, "long_description"))
       {
         log_estimate_activity(id, "invoice_estimate_activity_updated_item_long_description", false, JsonConvert.SerializeObject(new[]
         {
@@ -693,7 +693,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
       if (!item.TaxNames.Any())
       {
-        if (self.helper.delete_taxes_from_item(item.Id, "estimate")) affectedRows++;
+        if (db.delete_taxes_from_item(item.Id, "estimate")) affectedRows++;
       }
       else
       {
@@ -713,17 +713,17 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
           i++;
         }
 
-        if (self.helper.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), id, "estimate")) affectedRows++;
+        if (db.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item), id, "estimate")) affectedRows++;
       }
 
 
       newitems
-        // .Where(newitems => newitems.new_item_added = self.helper.add_new_sales_item_post(itemable(newitems), id, "estimate"))
-        .Select(newitem => self.helper.add_new_sales_item_post(itemable(newitem), id, "estimate"))
+        // .Where(newitems => newitems.new_item_added = db.add_new_sales_item_post(itemable(newitems), id, "estimate"))
+        .Select(newitem => db.add_new_sales_item_post(itemable(newitem), id, "estimate"))
         .ToList()
         .ForEach(x =>
         {
-          self.helper.maybe_insert_post_item_tax(x, convert<PostItem>(item), id, "estimate");
+          db.maybe_insert_post_item_tax(x, convert<PostItem>(item), id, "estimate");
           log_estimate_activity(id, "invoice_estimate_activity_added_item", false, JsonConvert.SerializeObject(new[]
           {
             item.Description
@@ -732,8 +732,8 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
         });
 
 
-      if (affectedRows > 0) self.helper.update_sales_total_tax_column(id, "estimate", "estimates");
-      if (save_and_send == true) send_estimate_to_client(id, "", true, "", true);
+      if (affectedRows > 0) db.update_sales_total_tax_column(id, "estimate", "estimates");
+      if (save_and_send) send_estimate_to_client(id, "", true, "", true);
       if (affectedRows <= 0) return false;
       hooks.do_action("after_estimate_updated", id);
     }
@@ -1233,7 +1233,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     var staffid = $"{staff_user_id}";
     var full_name = db.get_staff_full_name(staff_user_id);
-    if (self.is_cron())
+    if (is_cron())
     {
       staffid = "[CRON]";
       full_name = "[CRON]";

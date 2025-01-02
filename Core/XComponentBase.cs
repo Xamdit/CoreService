@@ -163,10 +163,7 @@ public abstract class XComponentBase : MyComponentBase
     return string.Empty;
   }
 
-  public string Clear_textarea_breaks(string? item = null)
-  {
-    return string.Empty;
-  }
+
 
   public bool Is_empty_customer_company(int id)
   {

@@ -5,7 +5,7 @@ namespace Service.Helpers.Template;
 
 public static class TemplateHelper
 {
-  public static string clear_textarea_breaks(this HelperBase helper, string text, string replace = "")
+  public static string clear_textarea_breaks(  string text, string replace = "")
   {
     if (string.IsNullOrEmpty(text)) return text;
     var breaks = new[] { "<br />", "<br>", "<br/>" };
@@ -13,7 +13,7 @@ public static class TemplateHelper
     return text.Trim();
   }
 
-  public static string Nl2BrSaveHtml(this HelperBase helper, string content)
+  public static string Nl2BrSaveHtml(  string content)
   {
     if (!Regex.IsMatch(content, @"<\/.*>")) return content.Replace("\n", "<br />");
     var lines = content.Split(new[] { "\n", "\r\n", "\r" }, StringSplitOptions.None);

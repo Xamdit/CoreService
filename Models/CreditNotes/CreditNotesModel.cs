@@ -9,14 +9,13 @@ using Service.Framework.Library.Merger;
 using Service.Helpers;
 using Service.Helpers.Pdf;
 using Service.Helpers.Sale;
-using Service.Helpers.Template;
 using Service.Models.Client;
 using Service.Models.Contracts;
 using Service.Models.Invoices;
 using Service.Models.Misc;
 using Service.Models.Payments;
 using File = Service.Entities.File;
-
+using static Service.Helpers.Template.TemplateHelper;
 
 namespace Service.Models.CreditNotes;
 
@@ -226,7 +225,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(insert_id, custom_fields);
 
-    foreach (var item in items.Where(item => item.Id == self.helper.add_new_sales_item_post(item!, insert_id, "credit_note")))
+    foreach (var item in items.Where(item => item.Id == db.add_new_sales_item_post(item!, insert_id, "credit_note")))
     {
       var item_taxes = item.ItemTaxes.ToList().Select(x => x.TaxName).ToList();
       var postItem = new PostItem
@@ -234,10 +233,10 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
         // TaxNames = items.Select(x => x.ItemTaxes.ToList()).ToList();
         TaxNames = item_taxes
       };
-      self.helper.maybe_insert_post_item_tax(item.Id, postItem, insert_id, "credit_note");
+      db.maybe_insert_post_item_tax(item.Id, postItem, insert_id, "credit_note");
     }
 
-    self.helper.update_sales_total_tax_column(insert_id, "credit_note", "creditnotes");
+    db.update_sales_total_tax_column(insert_id, "credit_note", "creditnotes");
 
     log_activity($"Credit Note Created [ID: {insert_id}]");
 
@@ -284,7 +283,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     data.remove_items
       .Select(x => x.Id)
       .ToList()
-      .ForEach(x => self.helper.handle_removed_sales_item_post(x, "credit_note"))
+      .ForEach(x => db.handle_removed_sales_item_post(x, "credit_note"))
       ;
 
     var affected_rows = db.CreditNotes.Where(x => x.Id == id).Update(x => data);
@@ -299,7 +298,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
       var itemTax = item.ItemTaxes.FirstOrDefault();
       if (!string.IsNullOrEmpty(itemTax.TaxName))
       {
-        self.helper.delete_taxes_from_item(itemTax.Id, "credit_note");
+        db.delete_taxes_from_item(itemTax.Id, "credit_note");
       }
       else
       {
@@ -314,16 +313,16 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
         });
 
         var i = 0;
-        self.helper.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item.ItemTaxes), id, "credit_note");
+        db.maybe_insert_post_item_tax(item.Id, convert<PostItem>(item.ItemTaxes), id, "credit_note");
       }
     }
 
 
     var result = newitems.Select(item =>
       {
-        var new_item_added = self.helper.add_new_sales_item_post(item, id, "credit_note");
+        var new_item_added = db.add_new_sales_item_post(item, id, "credit_note");
         if (new_item_added <= 1) return false;
-        self.helper.maybe_insert_post_item_tax(new_item_added, convert<PostItem>(item), id, "credit_note");
+        db.maybe_insert_post_item_tax(new_item_added, convert<PostItem>(item), id, "credit_note");
         return true;
       })
       .Where(x => x)
@@ -335,7 +334,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (result.Any())
     {
       update_credit_note_status(id);
-      self.helper.update_sales_total_tax_column(id, "credit_note", "creditnotes");
+      db.update_sales_total_tax_column(id, "credit_note", "creditnotes");
     }
 
     log_activity($"Credit Note Updated [ID:{id}]");
@@ -499,12 +498,12 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     new_credit_note_data.DiscountPercent = _invoice.DiscountPercent;
     new_credit_note_data.DiscountTotal = _invoice.DiscountTotal;
     new_credit_note_data.DiscountType = _invoice.DiscountType;
-    new_credit_note_data.BillingStreet = self.helper.clear_textarea_breaks(_invoice.BillingStreet);
+    new_credit_note_data.BillingStreet = clear_textarea_breaks(_invoice.BillingStreet);
     new_credit_note_data.BillingCity = _invoice.BillingCity;
     new_credit_note_data.BillingState = _invoice.BillingState;
     new_credit_note_data.BillingZip = _invoice.BillingZip;
     new_credit_note_data.BillingCountry = _invoice.BillingCountry;
-    new_credit_note_data.ShippingStreet = self.helper.clear_textarea_breaks(_invoice.ShippingStreet);
+    new_credit_note_data.ShippingStreet = clear_textarea_breaks(_invoice.ShippingStreet);
     new_credit_note_data.ShippingCity = _invoice.ShippingCity;
     new_credit_note_data.ShippingState = _invoice.ShippingState;
     new_credit_note_data.ShippingZip = _invoice.ShippingZip;
@@ -525,7 +524,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     {
       new_credit_note_data.NewItems[key].Description = item.Description;
-      new_credit_note_data.NewItems[key].LongDescription = self.helper.clear_textarea_breaks(item.LongDescription);
+      new_credit_note_data.NewItems[key].LongDescription = clear_textarea_breaks(item.LongDescription);
       new_credit_note_data.NewItems[key].Qty = item.Qty;
       new_credit_note_data.NewItems[key].Unit = item.Unit;
       var taxes = self.helper.get_invoice_item_taxes(item.Id);
@@ -679,7 +678,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     var credit_note_number = self.helper.format_credit_note_number(id);
     invoices_model.log(data.InvoiceId, "invoice_activity_applied_credits", false, JsonConvert.SerializeObject(new[]
     {
-      self.helper.app_format_money(data.Amount, invoice.Currency.Name),
+      db.app_format_money(data.Amount, invoice.Currency.Name),
       credit_note_number
     }));
 
