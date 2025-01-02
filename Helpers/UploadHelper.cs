@@ -1,3 +1,5 @@
+using Service.Controllers.Core;
+using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers.Entities;
@@ -158,11 +160,12 @@ public static class UploadHelper
   /// <param name="insertData">Data to be updated after processing the file.</param>
   /// <returns>Updated insert data with file information.</returns>
   public static DataSet<ProjectDiscussionComment> handle_project_discussion_comment_attachments(
+    this MyModel model,
     int discussionId,
     DataSet<ProjectDiscussionComment> postData,
     DataSet<ProjectDiscussionComment> insertData)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var file = self.context.Request.Form.Files["file"];
     if (file == null) return insertData; // No file uploaded
     if (file.Length > 0 && !IsUploadValid(file))
@@ -178,7 +181,7 @@ public static class UploadHelper
     var path = Path.Combine(globals("PROJECT_DISCUSSION_ATTACHMENT_FOLDER"), $"{discussionId}");
 
     // Check if the file extension is allowed
-    if (!upload_extension_allowed(file.FileName))
+    if (!db.upload_extension_allowed(file.FileName))
     {
       self.context.Response.StatusCode = 400; // Bad Request
       self.context.Response.WriteAsJsonAsync(new { message = "File extension is blocked." });
@@ -196,7 +199,7 @@ public static class UploadHelper
     insertData["file_name"] = filename;
     insertData["file_mime_type"] = !string.IsNullOrWhiteSpace(file.ContentType)
       ? file.ContentType
-      :  get_mime_by_extension(filename);
+      : get_mime_by_extension(filename);
 
     return insertData;
   }
@@ -244,9 +247,9 @@ public static class UploadHelper
     return "An error occurred during the upload.";
   }
 
-  public static List<Service.Entities.File> handle_task_attachments_array(this HelperBase helper, int taskId, string indexName = "attachments")
+  public static List<Service.Entities.File> handle_task_attachments_array(this AppControllerBase controller, int taskId, string indexName = "attachments")
   {
-    var (self, db) = getInstance();
+    var (self, db) = controller.getInstance();
     var context = self.input.context;
     var uploadedFiles = new List<Service.Entities.File>();
     var path = Path.Combine(get_upload_path_by_type("task"), taskId.ToString());
@@ -312,9 +315,9 @@ public static class UploadHelper
  * @param  mixed leadid
  * @return boolean
  */
-  public static bool handle_lead_attachments(this HelperBase helper, int leadId, string indexName = "file", bool formActivity = false)
+  public static bool handle_lead_attachments(this AppControllerBase controller, int leadId, string indexName = "file", bool formActivity = false)
   {
-    var (self, db) = getInstance();
+    var (self, db) = controller.getInstance();
     var files = self.input.context.Request.Form.Files;
 
     // Check if the file exists in the form and handle form activity

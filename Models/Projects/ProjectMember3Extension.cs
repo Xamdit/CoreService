@@ -258,7 +258,7 @@ public static class ProjectMember3Extension
       _data.Data.FullName = db.get_staff_full_name(_data.Data.StaffId);
     }
 
-    _data = handle_project_discussion_comment_attachments(discussion_id, data, _data);
+    _data = model.handle_project_discussion_comment_attachments(discussion_id, data, _data);
     _data.Data.DateCreated = DateTime.Now;
     _data = hooks.apply_filters("before_add_project_discussion_comment", _data, discussion_id);
 

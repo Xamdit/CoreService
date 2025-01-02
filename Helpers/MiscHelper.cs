@@ -52,7 +52,6 @@ public static class MiscHelper
 
   public static bool process_digital_signature_image(string partBase64, string path)
   {
-    var (self, db) = getInstance();
     if (string.IsNullOrEmpty(partBase64)) return false;
 
     var filename = unique_filename(path, "signature.png");

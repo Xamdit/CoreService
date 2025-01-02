@@ -11,10 +11,10 @@ public static class LeadsHelper
 * @param  mixed $id lead id
 * @return string
 */
-  public static string leads_public_url(this HelperBase helper, int id)
+  public static string leads_public_url(this MyModel model, int id)
   {
-    var hash = helper.get_lead_hash(id);
-    return helper.site_url($"forms/l/{hash}");
+    var hash = model.get_lead_hash(id);
+    return site_url($"forms/l/{hash}");
   }
 
   /**
@@ -22,9 +22,9 @@ public static class LeadsHelper
  * @param  mixed $id  lead id
  * @return string
  */
-  public static string get_lead_hash(this HelperBase helper, int id)
+  public static string get_lead_hash(this MyModel model, int id)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var hash = string.Empty;
     var lead = db.Leads.FirstOrDefault(x => x.Id == id);
     if (lead == null) return hash;
