@@ -163,7 +163,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self,
     db.add_notification(notification);
     var email = db.Staff
       .FirstOrDefault(x => x.Id == assigned);
-    self.helper.send_mail_template("estimate_request_assigned", estimateRequestId, email);
+    db.send_mail_template("estimate_request_assigned", estimateRequestId, email);
     return true;
   }
 

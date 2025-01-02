@@ -647,7 +647,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       var staff = await get_staff_members_for_ticket_notification(ticket.Department!, ticket.Assigned ?? 0);
       var notifiedUsers = staff.Select(member =>
       {
-        self.helper.send_mail_template("ticket_new_reply_to_staff", ticket, member, _attachments);
+        db.send_mail_template("ticket_new_reply_to_staff", ticket, member, _attachments);
         if (!db.get_option_compare("receive_notification_on_new_ticket_replies", 1)) return 0;
         var notified = db.add_notification(new Notification
         {
@@ -682,7 +682,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       }
 
       var sendEmail = !(isContact && db.Contacts.Count(x => x.TicketEmails == 1 && x.Id == ticket.ContactId) == 0);
-      if (sendEmail) self.helper.send_mail_template("ticket_new_reply_to_customer", ticket, email, _attachments, cc);
+      if (sendEmail) db.send_mail_template("ticket_new_reply_to_customer", ticket, email, _attachments, cc);
     }
 
     if (string.IsNullOrEmpty(cc))
@@ -939,7 +939,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
         if (notified)
           db.pusher_trigger_notification(new List<int> { data.Assigned.Value });
-        self.helper.send_mail_template("ticket_assigned_to_staff", self.helper.get_staff(data.Assigned).Email, data.Assigned, ticketid, data.UserId, data.ContactId);
+        db.send_mail_template("ticket_assigned_to_staff", self.helper.get_staff(data.Assigned).Email, data.Assigned, ticketid, data.UserId, data.ContactId);
       }
 
     if (pipe_attachments.Any())
@@ -971,7 +971,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       var staffToNotify = await get_staff_members_for_ticket_notification(data.Department, data.Assigned ?? 0);
       foreach (var member in staffToNotify)
       {
-        self.helper.send_mail_template("ticket_created_to_staff", ticketid, data.UserId, data.ContactId, member, _attachments);
+        db.send_mail_template("ticket_created_to_staff", ticketid, data.UserId, data.ContactId, member, _attachments);
         if (!db.get_option_compare("receive_notification_on_new_ticket", 1)) continue;
         var notified = db.add_notification(new Notification
         {
@@ -1001,7 +1001,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       var ticket = get_ticket_by_id(ticketid);
       // admin == null ? [] : _attachments - Admin opened ticket from admin area add the attachments to the email
-      self.helper.send_mail_template(
+      db.send_mail_template(
         template,
         ticket,
         email,
@@ -1212,7 +1212,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       var row = db.Staff.FirstOrDefault(x => x.Id == data.Assigned);
       var assignedEmail = row.Email;
-      self.helper.send_mail_template("ticket_assigned_to_staff", assignedEmail, data.Assigned, data.Id, data.UserId, data.ContactId);
+      db.send_mail_template("ticket_assigned_to_staff", assignedEmail, data.Assigned, data.Id, data.UserId, data.ContactId);
     }
 
     if (affectedRows <= 0) return false;

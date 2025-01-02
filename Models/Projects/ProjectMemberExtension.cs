@@ -157,7 +157,7 @@ public static class ProjectMemberExtension
 
   public static bool new_project_file_notification(this ProjectsModel model, int file_id, int project_id)
   {
-    var (self, db) = model.getInstance();
+    var (_, db) = model.getInstance();
     var file = model.get_file(file_id);
 
     var additional_data = file.FileName;

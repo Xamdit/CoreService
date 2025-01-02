@@ -445,7 +445,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var slug = $"{data.FirstName} {data.LastName}";
     if (string.IsNullOrEmpty(slug)) slug = $"unknown-{staffid}";
-    if (send_welcome_email) self.helper.send_mail_template("staff_created", data.Email, staffid, original_password);
+    if (send_welcome_email) db.send_mail_template("staff_created", data.Email, staffid, original_password);
     var mediaPathSlug = self.helper.slug_it(slug);
     await db.Staff.Where(x => x.Id == staffid).UpdateAsync(x => new Staff { MediaPathSlug = mediaPathSlug });
     await db.SaveChangesAsync();

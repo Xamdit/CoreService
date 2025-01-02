@@ -664,14 +664,14 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
       // Send thank you to the customer email template
       if (status == 3)
       {
-        staff_proposal.ForEach(x => self.helper.send_mail_template("proposal_accepted_to_staff", original_proposal, x.Email));
-        self.helper.send_mail_template("proposal_accepted_to_customer", original_proposal);
+        staff_proposal.ForEach(x => db.send_mail_template("proposal_accepted_to_staff", original_proposal, x.Email));
+        db.send_mail_template("proposal_accepted_to_customer", original_proposal);
         hooks.do_action("proposal_accepted", id);
       }
       else
       {
         // Client declined send template to admin
-        staff_proposal.ForEach(member => self.helper.send_mail_template("proposal_declined_to_staff", original_proposal, member.Email));
+        staff_proposal.ForEach(member => db.send_mail_template("proposal_declined_to_staff", original_proposal, member.Email));
         hooks.do_action("proposal_declined", id);
       }
     }
@@ -848,7 +848,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
     // Proposal status is draft update to sent
     if (db.Proposals.Any(x => x.Id == id && x.Status == 6)) db.Proposals.Where(x => x.Id == id).Update(x => new Proposal { Status = 4 });
     var proposal = get(x => x.Id == id);
-    var sent = self.helper.send_mail_template("proposal_send_to_customer", proposal, attachpdf, cc);
+    var sent = db.send_mail_template("proposal_send_to_customer", proposal, attachpdf, cc);
     if (!sent) return false;
 
     // Set to status sent

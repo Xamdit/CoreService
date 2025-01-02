@@ -856,7 +856,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
       db.pusher_trigger_notification(new List<int> { assigned });
     var row = db.Staff.First(x => x.Id == assigned);
     var email = row.Email;
-    self.helper.send_mail_template("lead_assigned", lead_id, email);
+    db.send_mail_template("lead_assigned", lead_id, email);
     await db.Leads
       .Where(x => x.Id == lead_id)
       .UpdateAsync(x => new Lead

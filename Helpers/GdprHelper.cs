@@ -13,7 +13,7 @@ public static class GdprHelper
     ignore(() =>
     {
       var staff = staff_model.get(x => x.Active.Value && x.IsAdmin);
-      staff.ForEach(member => { self.helper.send_mail_template(template, member, user_id); });
+      staff.ForEach(member => { db.send_mail_template(template, member, user_id); });
     });
   }
 

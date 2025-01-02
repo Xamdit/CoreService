@@ -88,7 +88,7 @@ public static class ContractsHelper
             "<b>" + contract.Subject + "</b>"
           })
         });
-        self.helper.send_mail_template("contract_signed_to_staff", contract, member);
+        db.send_mail_template("contract_signed_to_staff", contract, member);
         return notified ? member.Id : 0;
       })
       .ToList();

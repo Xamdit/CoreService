@@ -607,7 +607,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
 
     if (send_welcome_email && !string.IsNullOrEmpty(data.Email))
-      self.helper.send_mail_template(
+      db.send_mail_template(
         "customer_created_welcome_mail",
         data.Email,
         data.UserId,
@@ -684,7 +684,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
       });
 
     if (send_welcome_email)
-      self.helper.send_mail_template(
+      db.send_mail_template(
         "customer_created_welcome_mail",
         data.Email,
         customer_id,
@@ -1493,7 +1493,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
       });
     var contact = get_contact(contact_id);
     if (contact == null) return false;
-    self.helper.send_mail_template("customer_registration_confirmed", contact);
+    db.send_mail_template("customer_registration_confirmed", contact);
     return true;
   }
 
@@ -1501,7 +1501,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     var contact = get_contact(id);
     if (string.IsNullOrEmpty(contact.Email)) return false;
-    var success = self.helper.send_mail_template("customer_contact_verification", contact);
+    var success = db.send_mail_template("customer_contact_verification", contact);
     if (success != null)
       db.Contacts.Where(x => x.Id == id).Update(x => new Contact
       {

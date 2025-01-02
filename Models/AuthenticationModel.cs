@@ -287,7 +287,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
     contact.NewPassKey = new_pass_key;
     contact.UserId = user.Id;
     contact.Email = user.Email;
-    var sent = self.helper.send_mail_template("customer_contact_set_password", user, contact);
+    var sent = db.send_mail_template("customer_contact_set_password", user, contact);
     if (sent == null) return false;
     hooks.do_action("set_password_email_sent", new { is_staff_member = false, user });
     return true;
@@ -331,8 +331,8 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
       // data.UserId = user.Id;
       var merge_fields = new List<object>();
       var sent = is_staff == false
-        ? self.helper.send_mail_template("customer_contact_forgot_password", user.Email, user.UserId, user.Id)
-        : self.helper.send_mail_template("staff_forgot_password", user.Email, user.Id);
+        ? db.send_mail_template("customer_contact_forgot_password", user.Email, user.UserId, user.Id)
+        : db.send_mail_template("staff_forgot_password", user.Email, user.Id);
       if (sent == null) return (false, false);
       log_activity($"Password Reset Email sent [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
       hooks.do_action("forgot_password_email_sent", new { is_staff_member = is_staff, user });
@@ -455,7 +455,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
       staff.NewPassKeyRequested = null;
       staff.LastPasswordChange = DateTime.Now;
       GoUpdate(staff);
-      var sent = self.helper.send_mail_template("staff_password_resetted", staff.Email, staff.Id);
+      var sent = db.send_mail_template("staff_password_resetted", staff.Email, staff.Id);
       if (sent != null) return (true, false);
     }
     else
@@ -466,7 +466,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
       contact.NewPassKeyRequested = null;
       contact.LastPasswordChange = DateTime.Now;
       GoUpdate(contact);
-      var sent = self.helper.send_mail_template("customer_contact_password_resetted", contact.Email, contact.UserId, contact.Id);
+      var sent = db.send_mail_template("customer_contact_password_resetted", contact.Email, contact.UserId, contact.Id);
       if (sent != null) return (true, false);
     }
 

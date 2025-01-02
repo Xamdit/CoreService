@@ -232,7 +232,7 @@ public static class ClientHelper
   {
     var staff_model = self.staff_model(db);
     var admins = staff_model.get(x => x.Active == true && x.IsAdmin == true);
-    admins.ForEach(admin => { self.helper.send_mail_template("customer_new_registration_to_admins", admin.Email, client_id, admin.Id); });
+    admins.ForEach(admin => { db.send_mail_template("customer_new_registration_to_admins", admin.Email, client_id, admin.Id); });
   }
 
   public static bool client_logged_in(this MyContext db)

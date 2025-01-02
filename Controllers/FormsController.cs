@@ -171,7 +171,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
                 tasks_model.add_task_assignees(db.task_assigned(new TaskAssigned { TaskId = taskId.Value, AssignedFrom = form.Responsible }), true);
                 hooks.do_action("after_add_task", taskId);
 
-                if (string.IsNullOrEmpty(duplicateLead.Email)) self.helper.send_mail_template("lead_web_form_submitted", duplicateLead);
+                if (string.IsNullOrEmpty(duplicateLead.Email)) db.send_mail_template("lead_web_form_submitted", duplicateLead);
               }
             }
           }
@@ -243,7 +243,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
           if (!string.IsNullOrEmpty(regularFields.Email))
           {
             var lead = leads_model.get(x => x.Id == leadId);
-            self.helper.send_mail_template("lead_web_form_submitted", lead);
+            db.send_mail_template("lead_web_form_submitted", lead);
           }
         }
       }

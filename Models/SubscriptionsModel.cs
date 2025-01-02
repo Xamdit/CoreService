@@ -93,7 +93,7 @@ public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self,db
 
     if (contact == null) return false;
 
-    var sent = self.helper.send_mail_template(template, subscription, contact, cc);
+    var sent = db.send_mail_template(template, subscription, contact, cc);
     if (!sent || template != "subscription_send_to_customer") return false;
     subscription.LastSentAt = DateTime.UtcNow;
     db.Subscriptions.Update(subscription);

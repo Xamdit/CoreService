@@ -785,7 +785,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
         // Send thank you email to all contacts with permission estimates
         var contacts = clients_model.get_contacts(x => x.Id == estimate.ClientId, x => x.Active && x.EstimateEmails == 1);
-        contacts.ForEach(contact => { self.helper.send_mail_template("estimate_accepted_to_customer", estimate, contact); });
+        contacts.ForEach(contact => { db.send_mail_template("estimate_accepted_to_customer", estimate, contact); });
         staff_estimate.ForEach(member =>
         {
           var notified = db.add_notification(new Notification
@@ -800,7 +800,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
             })
           });
           if (notified != null) notifiedUsers.Add(member.Id);
-          self.helper.send_mail_template("estimate_accepted_to_staff", estimate, member.Email, contact_id);
+          db.send_mail_template("estimate_accepted_to_staff", estimate, member.Email, contact_id);
         });
         db.pusher_trigger_notification(notifiedUsers);
         hooks.do_action("estimate_accepted", id);
@@ -825,7 +825,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
         });
         if (notified != null) notifiedUsers.Add(member.Id);
         // Send staff email notification that customer declined estimate
-        self.helper.send_mail_template("estimate_declined_to_staff", estimate, member.Email, contact_id);
+        db.send_mail_template("estimate_declined_to_staff", estimate, member.Email, contact_id);
       });
 
       db.pusher_trigger_notification(notifiedUsers);

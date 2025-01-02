@@ -20,7 +20,7 @@ public class Generals
   {
   }
 
-  public static void log_activity(int id, params string[] message)
+  public static void log_activity(int id, params object[] message)
   {
   }
 

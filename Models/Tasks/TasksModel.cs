@@ -988,7 +988,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
 
       var member = staff_model.get(x => x.TaskFollowers == data.Task.TaskFollowers).First();
 
-      self.helper.send_mail_template(
+      db.send_mail_template(
         "task_added_as_follower_to_staff",
         member.Email,
         data.Task.TaskFollowers,
@@ -1081,7 +1081,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
 
       var member = staff_model.get(x => x.Id == data.AssignedFrom).FirstOrDefault();
 
-      self.helper.send_mail_template("task_assigned_to_staff", member.Email, data.AssignedFrom, data.TaskId);
+      db.send_mail_template("task_assigned_to_staff", member.Email, data.AssignedFrom, data.TaskId);
     }
 
     var description = "not_task_assigned_someone";
@@ -1641,7 +1641,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
 
         if (notified != null) notifiedUsers.Add(x.Id);
 
-        if (email_template != "") self.helper.send_mail_template(email_template, x.Email, x.Id, taskid);
+        if (email_template != "") db.send_mail_template(email_template, x.Email, x.Id, taskid);
       });
 
     db.pusher_trigger_notification(notifiedUsers);
@@ -1662,7 +1662,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
         .ForEach(x =>
         {
           if (db.is_client_logged_in() && db.get_contact_user_id() == x.Id) return;
-          self.helper.send_mail_template(template_name, x.Email, 0, taskid);
+          db.send_mail_template(template_name, x.Email, 0, taskid);
         });
   }
 
@@ -2166,7 +2166,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
 
       if (notified != null) notifiedUsers.Add(member.Id);
 
-      if (email_template != "") self.helper.send_mail_template(email_template, member.Email, member.Id, taskid);
+      if (email_template != "") db.send_mail_template(email_template, member.Email, member.Id, taskid);
     }
 
     db.pusher_trigger_notification(notifiedUsers);
