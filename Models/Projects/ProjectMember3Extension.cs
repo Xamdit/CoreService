@@ -95,7 +95,8 @@ public static class ProjectMember3Extension
     if (db.client_logged_in())
       query = query.Where(x =>
         x.ShowToCustomer &&
-        db.Projects.Any(y => y.ClientId == model.client_user_id)
+        db.Projects.Any(y => y.ClientId == db.get_client_user_id())
+
       );
     var discussion = query.FirstOrDefault();
     return discussion ?? null;

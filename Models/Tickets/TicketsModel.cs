@@ -1033,7 +1033,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     query = userid.HasValue
       ? query.Where(x => x.UserId == userid)
-      : query.Where(x => x.UserId == client_user_id);
+      : query.Where(x => x.UserId == db.get_client_user_id());
 
 
     var rows = query.Take(limit)

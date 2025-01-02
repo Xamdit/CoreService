@@ -166,7 +166,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
               if (taskId.HasValue)
               {
                 var tasks_model = self.tasks_model(db);
-                var attachments = self.helper.handle_task_attachments_array(taskId.Value, "file-input");
+                var attachments = this.handle_task_attachments_array(taskId.Value, "file-input");
                 attachments.ForEach(x => tasks_model.add_attachment_to_database(taskId.Value, x, null, false));
                 tasks_model.add_task_assignees(db.task_assigned(new TaskAssigned { TaskId = taskId.Value, AssignedFrom = form.Responsible }), true);
                 hooks.do_action("after_add_task", taskId);
@@ -207,7 +207,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
 
           leads_model.lead_assigned_member_notification(leadId, form.Responsible, true);
           self.helper.handle_custom_fields_post(leadId, customFieldsBuild);
-          self.helper.handle_lead_attachments(leadId, "file-input", string.IsNullOrEmpty(form.Name));
+          this.handle_lead_attachments(leadId, "file-input", string.IsNullOrEmpty(form.Name));
 
           if (form.NotifyLeadImported != 0)
           {

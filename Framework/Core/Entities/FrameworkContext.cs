@@ -22,6 +22,7 @@ public partial class FrameworkContext : DbContext
   {
     var currentDirectory = Directory.GetCurrentDirectory();
     var connectionString = $"Data Source={currentDirectory}/framework.sqlite;Cache=Shared;";
+    Console.WriteLine(connectionString);
     optionsBuilder.UseSqlite(connectionString);
   }
 

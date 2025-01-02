@@ -4,34 +4,20 @@ using Service.Core.Synchronus;
 
 namespace Service.Components.Pages.Auth;
 
-/// <summary>
-/// Represents the sign-in component.
-/// </summary>
 public class SignInComponent : XComponentBase
 {
-  /// <summary>
-  /// Gets or sets the user type.
-  /// </summary>
   protected string UserType { get; set; }
 
 
-  /// <summary>
-  /// Gets or sets the email.
-  /// </summary>
   protected string Email { get; set; }
 
-  /// <summary>
-  /// Gets or sets the password.
-  /// </summary>
+
   protected string Password { get; set; }
 
   protected bool socialSignup = false;
   protected bool canSignup = false;
 
-  /// <summary>
-  /// Handles the submit action.
-  /// </summary>
-  /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
+
   protected async Task HandleSubmit()
   {
     Console.WriteLine($"User Type: {UserType}");
@@ -64,10 +50,7 @@ public class SignInComponent : XComponentBase
     }
   }
 
-  /// <summary>
-  /// Performs actions after the component has been rendered.
-  /// </summary>
-  /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
+
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
     await base.OnAfterRenderAsync(firstRender);
