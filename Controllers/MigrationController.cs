@@ -88,7 +88,7 @@ public class MigrationController(ILogger<MigrationController> logger, MyInstance
     {
       // var query = $"UPDATE `{t.table}` SET `{t.field}` = REPLACE({t.field}, @oldBaseUrl, @newBaseUrl)";
       // db.query(query, new { oldBaseUrl, newBaseUrl });
-      var kata = self.db.kata(t.table);
+      var kata = db.kata(t.table);
       // affectedRows += kata
       //   .Update(t.field, kata.Raw($"REPLACE({t.field}, @oldBaseUrl, @newBaseUrl)"),
       //     new { oldBaseUrl, newBaseUrl });

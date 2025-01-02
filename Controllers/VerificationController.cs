@@ -45,7 +45,7 @@ public class VerificationController(ILogger<ClientControllerBase> logger, MyInst
 
     if (contact.EmailVerificationKey != key)
     {
-      self.helper.show_error(self.helper.label("invalid_verification_key"));
+      show_error(self.helper.label("invalid_verification_key"));
       return MakeError(self.helper.label("invalid_verification_key"));
     }
 
@@ -54,7 +54,7 @@ public class VerificationController(ILogger<ClientControllerBase> logger, MyInst
 
     if (contactRegistered < timestampNowMinus2Days)
     {
-      self.helper.show_error(self.helper.label("verification_key_expired"));
+      show_error(self.helper.label("verification_key_expired"));
       return MakeError(self.helper.label("verification_key_expired"));
     }
 

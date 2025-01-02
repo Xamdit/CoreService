@@ -58,7 +58,7 @@ public static class DatabaseHelper
 
     var staff_user_id = helper.get_staff_user_id();
     // var staff_user_id =Convert.ToByte( await get_staff_user_id());
-    var _is_client_logged_in = self.db.is_client_logged_in();
+    var _is_client_logged_in = db.is_client_logged_in();
     if (_is_client_logged_in)
     {
       data.FromUserId = 0;

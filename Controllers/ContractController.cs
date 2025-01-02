@@ -25,7 +25,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
       return NotFound();
     var row = rows.First();
 
-    if (!self.db.is_client_logged_in())
+    if (!db.is_client_logged_in())
       self.helper.load_client_language(row.contract.Client);
 
     // DisableNavigation();
@@ -61,7 +61,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
 
     var row = contract.First();
 
-    if (!self.db.is_client_logged_in())
+    if (!db.is_client_logged_in())
       self.helper.load_client_language(row.contract.Client);
 
     switch (action)

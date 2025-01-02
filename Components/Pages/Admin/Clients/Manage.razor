@@ -257,7 +257,7 @@
                       <li>
                         <a href="#" data-cview="@($"responsible_admin_{cadmin.StaffId}")"
                            onclick="dt_custom_view('responsible_admin_@cadmin.StaffId', '.table-clients', 'responsible_admin_@cadmin.StaffId'); return false;">
-                          @self.helper.get_staff_full_name(cadmin.StaffId)
+                          @db.get_staff_full_name(cadmin.StaffId)
                         </a>
                       </li>
                     }

@@ -72,10 +72,10 @@ public class ManageRazor : AdminComponentBase
   protected override async Task OnInitializedAsync()
   {
     await base.OnInitializedAsync();
-    customer_create = self.helper.has_permission("customers", 0, "create");
-    customer_edit = self.helper.has_permission("customers", 0, "edit");
-    customers_view = self.helper.has_permission("customers", 0, "edit");
-    customers_delete = self.helper.has_permission("customers", 0, "delete");
+    customer_create = db.has_permission("customers", 0, "create");
+    customer_edit = db.has_permission("customers", 0, "edit");
+    customers_view = db.has_permission("customers", 0, "edit");
+    customers_delete = db.has_permission("customers", 0, "delete");
   }
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
