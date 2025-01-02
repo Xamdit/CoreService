@@ -894,7 +894,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     // CC is only from admin area
     var cc = data.Cc;
     data.Date = date("Y-m-d H:i:s");
-    data.TicketKey = self.helper.uuid();
+    data.TicketKey = uuid();
     data.Status = 1;
     data.Message = data.Message.Trim();
     data.Subject = data.Subject.Trim();

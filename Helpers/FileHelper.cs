@@ -93,7 +93,6 @@ public static class FileHelper
  */
   public static List<string> get_html5_video_extensions(this HelperBase helper)
   {
-    var (self, db) = getInstance();
     var output = new List<string>() { "mp4", "m4v", "webm", "ogv", "ogg", "flv" };
     output = hooks.apply_filters<List<string>>("html5_video_extensions", output);
     return output;

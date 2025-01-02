@@ -212,7 +212,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
         .Delete();
       invoices_model.log(id, "invoice_activity_auto_converted_from_estimate", true, JsonConvert.SerializeObject(new string[]
       {
-        $"<a href='{self.navigation.admin_url($"estimates/list_estimates/{_estimate.Id}")}'>{self.helper.format_estimate_number(_estimate.Id)}</a>"
+        $"<a href='{self.navigation.admin_url($"estimates/list_estimates/{_estimate.Id}")}'>{db.format_estimate_number(_estimate.Id)}</a>"
       }));
     }
 
@@ -376,7 +376,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     var temps = db.get_tags_in(_estimate.Id, "estimate");
     var tags = db.Taggables.Where(x => temps.Select(taggable => taggable.RelType).Contains(x.RelType)).ToList();
     db.handle_tags_save(tags, id, "estimate");
-    log_activity($"Copied Estimate {self.helper.format_estimate_number(_estimate.Id)}");
+    log_activity($"Copied Estimate {db.format_estimate_number(_estimate.Id)}");
     return id;
   }
 
@@ -470,7 +470,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     var estimateRequestID = 0;
     estimateRequestID = data.EstimateRequestId;
     var custom_fields = data.CustomFields;
-    data.Hash = self.helper.uuid();
+    data.Hash = uuid();
     var tags = data.Tags.Any() ? data.Tags : new List<Taggable>();
     var items = data.newitems;
 
@@ -556,7 +556,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var original_number = original_estimate.Number;
 
-    var original_number_formatted = self.helper.format_estimate_number(id);
+    var original_number_formatted = db.format_estimate_number(id);
 
     var save_and_send = data.saveAndSend.HasValue && data.saveAndSend.Value;
 
@@ -634,7 +634,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
         log_estimate_activity(original_estimate.Id, "estimate_activity_number_changed", false, JsonConvert.SerializeObject(new[]
         {
           original_number_formatted,
-          self.helper.format_estimate_number(original_estimate.Id)
+          db.format_estimate_number(original_estimate.Id)
         }));
 
       affectedRows++;
@@ -796,7 +796,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
             Link = $"estimates/list_estimates/{id}",
             AdditionalData = JsonConvert.SerializeObject(new[]
             {
-              self.helper.format_estimate_number(estimate.Id)
+              db.format_estimate_number(estimate.Id)
             })
           });
           if (notified != null) notifiedUsers.Add(member.Id);
@@ -820,7 +820,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
           Link = $"estimates/list_estimates/{id}",
           AdditionalData = JsonConvert.SerializeObject(new[]
           {
-            self.helper.format_estimate_number(estimate.Id)
+            db.format_estimate_number(estimate.Id)
           })
         });
         if (notified != null) notifiedUsers.Add(member.Id);
@@ -925,7 +925,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
       // return new { is_invoiced_estimate_delete_error = true };
       return true;
     hooks.do_action("before_estimate_deleted", id);
-    var number = self.helper.format_estimate_number(id);
+    var number = db.format_estimate_number(id);
     clear_signature(id);
 
 
@@ -1040,7 +1040,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
   public bool send_expiry_reminder(int id)
   {
     var estimate = get(x => x.Id == id).First();
-    var estimate_number = self.helper.format_estimate_number(estimate.Id);
+    var estimate_number = db.format_estimate_number(estimate.Id);
     self.helper.set_mailing_constant();
     var pdf = self.library.estimate_pdf(estimate);
     var attach = pdf.Output($"{estimate_number}.pdf");
@@ -1113,7 +1113,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (string.IsNullOrEmpty(template_name))
       template_name = estimate.Sent == 0 ? "estimate_send_to_customer" : "estimate_send_to_customer_already_sent";
 
-    var estimate_number = self.helper.format_estimate_number(estimate.Id);
+    var estimate_number = db.format_estimate_number(estimate.Id);
 
     var emails_sent = new List<string>();
     var send_to = new List<int>();

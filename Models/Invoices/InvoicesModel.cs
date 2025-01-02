@@ -623,7 +623,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
     var custom_fields = new List<CustomField>();
     if (isset(data, "custom_fields")) custom_fields = data.custom_fields;
 
-    insert.Hash = self.helper.uuid();
+    insert.Hash = uuid();
     var items = new List<ItemableOption>();
 
     if (isset(data, "newitems"))
@@ -840,7 +840,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         var statement = convert<StatementResult>(clients_model.get_statement(invoice.ClientId, attachStatement.from, attachStatement.to));
         var statementPdf = PdfHelper.statement_pdf(self.helper, statement);
-        statementPdfFileName = slug_it(self.helper.label("customer_statement") + "-" + statement.Client.company);
+        statementPdfFileName = db.slug_it(self.helper.label("customer_statement") + "-" + statement.Client.company);
 
         attachStatementPdf = statementPdf.Output(statementPdfFileName + ".pdf");
       }

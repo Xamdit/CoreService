@@ -81,7 +81,7 @@ class Knowledge_base_model extends App_Model
             $data['staff_article'] = 0;
         }
         $data['datecreated'] = date('Y-m-d H:i:s');
-        $data['slug']        = slug_it($data['subject']);
+        $data['slug']        = db.slug_it($data['subject']);
         $this->db->like('slug', $data['slug']);
         $slug_total = $this->db->count_all_results( 'knowledge_base');
         if ($slug_total > 0) {
@@ -236,7 +236,7 @@ class Knowledge_base_model extends App_Model
             $data['active'] = 1;
         }
 
-        $data['group_slug'] = slug_it($data['name']);
+        $data['group_slug'] = db.slug_it($data['name']);
         $this->db->like('group_slug', $data['group_slug']);
         $slug_total = $this->db->count_all_results( 'knowledge_base_groups');
         if ($slug_total > 0) {

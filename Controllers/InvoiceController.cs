@@ -76,8 +76,8 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
 
       var invoice_number = self.helper.format_invoice_number(invoice.Id);
       var companyname = db.get_option("invoice_company_name");
-      if (!string.IsNullOrEmpty(companyname)) invoice_number += "-" + slug_it(companyname).ToUpper();
-      pdf.Output(slug_it(invoice_number).ToUpper() + ".pdf");
+      if (!string.IsNullOrEmpty(companyname)) invoice_number += "-" + db.slug_it(companyname).ToUpper();
+      pdf.Output(db.slug_it(invoice_number).ToUpper() + ".pdf");
       return Ok();
     }
 
@@ -107,7 +107,7 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
       var payment = payments_model.get(id);
       payment.Invoice = invoices_model.get(payment.Invoice.Id);
       var paymentpdf = self.helper.payment_pdf(payment);
-      paymentpdf.Output(slug_it(self.helper.label("payment") + "-" + payment.Id).ToUpper() + ".pdf");
+      paymentpdf.Output(db.slug_it(self.helper.label("payment") + "-" + payment.Id).ToUpper() + ".pdf");
       return Ok();
     }
 

@@ -486,7 +486,7 @@ class Leads extends AdminController
                                     'options'        => $field->options,
                                     'display_inline' => $field->display_inline,
                                     'field_order'    => $field->field_order,
-                                    'slug'           => slug_it($field_to . '_' . $field->name, [
+                                    'slug'           => db.slug_it($field_to . '_' . $field->name, [
                                         'separator' => '_',
                                     ]),
                                     'active'        => $field->active,

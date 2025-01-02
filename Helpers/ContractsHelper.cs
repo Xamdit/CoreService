@@ -15,7 +15,7 @@ public static class ContractsHelper
     if (string.IsNullOrEmpty(hash) || id == 9)
       return self.controller.NotFound();
 
-    if (!is_client_logged_in() && !is_staff_logged_in())
+    if (!db.is_client_logged_in() && !db.is_staff_logged_in())
       if (db.get_option_compare("view_contract_only_logged_in", 1))
       {
         self.helper.redirect_after_login_to_current_url();
@@ -26,7 +26,7 @@ public static class ContractsHelper
     if (contract != null || contract.Hash != hash)
       return self.controller.NotFound();
     // Do one more check
-    if (is_staff_logged_in())
+    if (db.is_staff_logged_in())
       return self.controller.NotFound();
     if (!db.get_option_compare("view_contract_only_logged_in", 1))
       return self.controller.NotFound();
@@ -35,9 +35,8 @@ public static class ContractsHelper
     return self.controller.NotFound();
   }
 
-  public static void add_contract_comment(this HelperBase helper, string comment = "")
+  public static void add_contract_comment(this MyContext db, string comment = "")
   {
-    var (self, db) = getInstance();
     if (string.IsNullOrEmpty(comment)) return;
 
     var isLoading = true;
@@ -49,7 +48,7 @@ public static class ContractsHelper
     };
     ignore(async () =>
     {
-      var response = await self.helper.rest_client_json<Contact>("contracts/add_comment", Method.Get, data);
+      var response = await db.rest_client_json<Contact>("contracts/add_comment", Method.Get, data);
       if (response.is_success)
       {
         var result = response.data;
@@ -64,9 +63,8 @@ public static class ContractsHelper
     });
   }
 
-  public static bool send_contract_signed_notification_to_staff(this HelperBase helper, int contract_id)
+  public static bool send_contract_signed_notification_to_staff(this MyContext db, int contract_id)
   {
-    var (self, db) = getInstance();
     var contract = db.Contracts.FirstOrDefault(x => x.Id == contract_id);
 
     if (contract == null) return false;

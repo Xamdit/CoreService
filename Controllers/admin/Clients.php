@@ -253,7 +253,7 @@ class Clients extends AdminController
                 : get_contact_full_name(get_primary_contact_user_id($client->userid))
             );
 
-            $data['zip_in_folder'] = slug_it($slug_zip_folder);
+            $data['zip_in_folder'] = db.slug_it($slug_zip_folder);
         }
 
         $data['bodyclass'] = 'customer-profile dynamic-create-groups';

@@ -183,7 +183,7 @@ public class StatementModel(MyInstance self, MyContext db) : MyModel(self,db)
     var statement = await get_statement(customerId, DateTime.Parse(from), DateTime.Parse(to));
     self.helper.set_mailing_constant();
     var pdf = self.helper.statement_pdf(statement);
-    var pdfFileName = slug_it($"customer_statement-{statement.Client.Company}");
+    var pdfFileName = db.slug_it($"customer_statement-{statement.Client.Company}");
     var attach = pdf.Output($"{pdfFileName}.pdf");
 
     var i = 0;

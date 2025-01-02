@@ -494,7 +494,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         // Verification is required on register
         data.EmailVerifiedAt = null;
-        data.EmailVerificationKey = self.helper.uuid();
+        data.EmailVerificationKey = uuid();
       }
     }
 
@@ -651,7 +651,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       // Verification is required on register
       data.EmailVerifiedAt = null;
-      data.EmailVerificationKey = self.helper.uuid();
+      data.EmailVerificationKey = uuid();
     }
 
     var password_before_hash = data.Password;
@@ -823,9 +823,9 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
   public bool delete(int id)
   {
     var affectedRows = 0;
-    // if (!self.helper.is_gdpr() && is_reference_in_table('clientid', 'invoices', id)) return new { referenced = true };
-    // if (!self.helper.is_gdpr() && is_reference_in_table('clientid', 'estimates', id)) return new { referenced = true };
-    // if (!self.helper.is_gdpr() && is_reference_in_table('clientid', 'creditnotes', id)) return new { referenced = true };
+    // if (!db.is_gdpr() && is_reference_in_table('clientid', 'invoices', id)) return new { referenced = true };
+    // if (!db.is_gdpr() && is_reference_in_table('clientid', 'estimates', id)) return new { referenced = true };
+    // if (!db.is_gdpr() && is_reference_in_table('clientid', 'creditnotes', id)) return new { referenced = true };
 
     hooks.do_action("before_client_deleted", id);
     var last_activity = self.helper.get_last_system_activity_id();
@@ -851,7 +851,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
       db.Notes.Where(x => x.RelId == id && x.RelType == "customer").Delete();
 
-      if (self.helper.is_gdpr() && db.get_option_compare("gdpr_on_forgotten_remove_invoices_credit_notes", 1))
+      if (db.is_gdpr() && db.get_option_compare("gdpr_on_forgotten_remove_invoices_credit_notes", 1))
       {
         db.Invoices
           .Where(x => x.ClientId == id)
@@ -865,7 +865,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
           credit_notes_model.delete(x.Id, true)
         );
       }
-      else if (self.helper.is_gdpr())
+      else if (db.is_gdpr())
       {
         db.Invoices.Where(x => x.ClientId == id).Delete();
         db.CreditNotes.Where(x => x.ClientId == id).Delete();
@@ -896,9 +896,9 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
         });
 
 
-      if (self.helper.is_gdpr() && db.get_option_compare("gdpr_on_forgotten_remove_estimates", 1))
+      if (db.is_gdpr() && db.get_option_compare("gdpr_on_forgotten_remove_estimates", 1))
         db.Estimates.Where(x => x.ClientId == id).ToList().ForEach(x => estimates_model.delete(x.Id, true));
-      else if (self.helper.is_gdpr())
+      else if (db.is_gdpr())
         db.Estimates
           .Where(x => x.ClientId == id)
           .Update(x => new Estimate
@@ -1072,7 +1072,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
       .Where(x => x.Email == result.Email || x.Bcc.Contains(result.Email) || x.Cc.Contains(result.Email))
       .DeleteAsync();
 
-    if (self.helper.is_gdpr())
+    if (db.is_gdpr())
     {
       // db.ListEmails.Where(x => x.Email == result.Email).Delete();
 

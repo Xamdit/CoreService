@@ -79,7 +79,7 @@ public class ProposalController(ILogger<ClientControllerBase> logger, MyInstance
         var proposal_number = self.helper.format_proposal_number(id);
         var companyname = db.get_option("invoice_company_name");
         if (companyname != "")
-          proposal_number += "-" + slug_it(companyname).ToUpper();
+          proposal_number += "-" + db.slug_it(companyname).ToUpper();
         PdfDocumentGenerator pdf;
         try
         {

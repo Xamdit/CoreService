@@ -91,7 +91,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
     if (db.get_option_compare("company_is_required", 1))
       form_validation.set_rules("company", self.helper.label("client_company"), "required");
 
-    if (self.helper.is_gdpr() && db.get_option_compare("gdpr_enable_terms_and_conditions", 1))
+    if (db.is_gdpr() && db.get_option_compare("gdpr_enable_terms_and_conditions", 1))
       form_validation.set_rules(
         "accept_terms_and_conditions",
         self.helper.label("terms_and_conditions"),
@@ -145,7 +145,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
     if (db.get_option_compare("company_is_required", 1))
       form_validation.set_rules("company", self.helper.label("client_company"), "required");
 
-    if (self.helper.is_gdpr() && db.get_option_compare("gdpr_enable_terms_and_conditions", 1))
+    if (db.is_gdpr() && db.get_option_compare("gdpr_enable_terms_and_conditions", 1))
       form_validation.set_rules(
         "accept_terms_and_conditions",
         self.helper.label("terms_and_conditions"),

@@ -74,7 +74,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
     dataset.Data.Address = dataset.Data.Address.Trim().nl2br();
     dataset.Data.DateCreated = DateTime.Now;
     dataset.Data.AddedFrom = staff_user_id;
-    dataset.Data.Hash = self.helper.uuid();
+    dataset.Data.Hash = uuid();
 
 
     var items = new List<ItemableOption>();
@@ -543,7 +543,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
     insert_data.Data.DateCreated = DateTime.Now;
     insert_data.Data.Date = DateTime.Now;
     insert_data.Data.Status = 6;
-    insert_data.Data.Hash = self.helper.uuid();
+    insert_data.Data.Hash = uuid();
 
     // in case open till is expired set new 7 days starting from current date
     if (insert_data.Data.OpenTill.HasValue && !db.get_option_compare("proposal_due_after", 0))

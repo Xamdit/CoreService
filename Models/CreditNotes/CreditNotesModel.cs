@@ -60,7 +60,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
   public async Task<List<CreditNoteResult>> get_available_creditable_invoices(int credit_note_id)
   {
     var has_permission_view = db.has_permission("invoices", "", "view");
-    var _invoices_statuses_available_for_credits = self.helper.invoices_statuses_available_for_credits();
+    var _invoices_statuses_available_for_credits = this.invoices_statuses_available_for_credits();
     var credit_note = db.CreditNotes.FirstOrDefault(x => x.Id == credit_note_id);
     var invoice_query = db.Invoices
       .Include(x => x.Currency)

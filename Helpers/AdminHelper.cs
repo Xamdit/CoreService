@@ -1,5 +1,6 @@
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json;
 using Service.Core.Synchronus;
 using Service.Entities;
 using Service.Schemas;
@@ -34,20 +35,20 @@ public static class AdminHelper
     return db.staff_can(capability, feature, staffId);
   }
 
+  private static async Task<List<StaffPermission>> get_staff_permissions(int? staffId)
+  {
+    var result = await syncBuilder.get_where("/users/permissions/{staffId}");
+    return result.Success ? JsonConvert.DeserializeObject<List<StaffPermission>>(result.Content) : default;
+  }
+
   public static async Task<bool> staff_can(this MyContext db, string capability, string? feature = null, int? staffId = null)
   {
-
     staffId ??= db.get_staff_user_id();
-    if (staffId.is_admin()) return true;
+    if (db.is_admin()) return true;
     var permissions = new List<StaffPermission>();
-    if (!permissions.Any())
-    {
-      var staffModel = self.staff_model(db);
-      permissions = await staffModel.get_staff_permissions(staffId);
-    }
+    if (!permissions.Any()) permissions = await get_staff_permissions(staffId);
 
-    // if (!string.IsNullOrEmpty(feature)) return Hooks.apply_filters("staff_can", permissions.Any(permission => feature == permission.feature && capability == permission.capability), capability, feature, staffId);
-    var retVal = helper.in_array_multidimensional(permissions, "capability", capability);
+    var retVal = db.in_array_multidimensional(permissions, "capability", capability);
     // return hooks.apply_filters("staff_can", retVal, capability, feature, staffId);
     return false;
   }
@@ -76,10 +77,14 @@ public static class AdminHelper
   //
   //   return self.helper.is_admin(staffid);
   // }
-
-  public static bool is_admin(this object staffid)
+  // read from token
+  public static bool is_admin(this MyContext db)
   {
+    return false;
+  }
 
+  public static bool is_admin(this MyContext db, int staffid)
+  {
     var staff_id = Convert.ToInt32(staffid);
 
     if (staff_id > 0)

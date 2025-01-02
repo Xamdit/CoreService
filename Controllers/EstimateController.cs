@@ -79,17 +79,17 @@ public class EstimateController(ILogger<EstimateController> logger, MyInstance s
         return MakeError(e.Message);
       }
 
-      var estimate_number = self.helper.format_estimate_number(estimate.Id);
+      var estimate_number = db.format_estimate_number(estimate.Id);
       var companyname = db.get_option("invoice_company_name");
-      if (companyname != "") estimate_number += "-" + slug_it(companyname).ToUpper();
-      pdf.Output(slug_it(estimate_number).ToUpper() + ".pdf");
+      if (companyname != "") estimate_number += "-" + db.slug_it(companyname).ToUpper();
+      pdf.Output(db.slug_it(estimate_number).ToUpper() + ".pdf");
       return MakeError();
     }
 
     self.library.app_number_to_word(new Estimate() { ClientId = estimate.ClientId }, "numberword");
     //self.app_scripts.theme("sticky-js", "assets/plugins/sticky/sticky.js");
 
-    data.title = self.helper.format_estimate_number(estimate.Id);
+    data.title = db.format_estimate_number(estimate.Id);
     // this.disableNavigation();
     // this.disableSubMenu();
     data.hash = hash;

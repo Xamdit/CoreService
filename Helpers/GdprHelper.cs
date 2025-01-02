@@ -1,3 +1,4 @@
+using Service.Entities;
 using Service.Framework.Core.Engine;
 
 
@@ -17,9 +18,8 @@ public static class GdprHelper
     });
   }
 
-  public static bool is_gdpr(this HelperBase helper)
+  public static bool is_gdpr(this MyContext db)
   {
-    var (self, db) = getInstance();
     return db.get_option_compare("enable_gdpr", "1");
   }
 }

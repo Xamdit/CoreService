@@ -8,7 +8,7 @@ namespace Service.Helpers;
 
 public static class RestSharpHelper
 {
-  public static RestClient rest_client(this HelperBase helper, string url)
+  public static RestClient rest_client(this MyContext db, string url)
   {
     var options = new RestClientOptions(url)
     {
@@ -38,9 +38,9 @@ public static class RestSharpHelper
     return client;
   }
 
-  public static async Task<(bool is_success, T data)> rest_client_json<T>(this HelperBase helper, string route, Method method, object data = null) where T : class
+  public static async Task<(bool is_success, T data)> rest_client_json<T>(this MyContext db, string route, Method method, object data = null) where T : class
   {
-    var client = helper.rest_client("https://localhost:5000");
+    var client = db.rest_client("https://localhost:5000");
     var request = new RestRequest(route, method);
     request.AddHeader("Content-Type", "application/json");
     if (data != null)

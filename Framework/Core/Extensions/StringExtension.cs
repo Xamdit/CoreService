@@ -35,7 +35,7 @@ public static class StringExtension
     return !string.IsNullOrEmpty(str) && !string.IsNullOrEmpty(substr) && str.IndexOf(substr, StringComparison.Ordinal) > 0;
   }
 
-  public static string uuid(this HelperBase helper)
+  public static string uuid( )
   {
     return Guid.NewGuid().ToString("n");
   }
@@ -233,7 +233,7 @@ public static class StringExtension
   //   return timeSpan.TotalMilliseconds < 0 ? "0" : timeSpan.Hours.ToString();
   // }
 
-  public static string slug_it(this HelperBase self, string str, string lang = "")
+  public static string db.slug_it(this HelperBase self, string str, string lang = "")
   {
     return string.Empty;
   }

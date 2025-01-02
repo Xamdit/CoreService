@@ -30,7 +30,7 @@ public static class LeadsHelper
     if (lead == null) return hash;
     hash = lead.Hash;
     if (!string.IsNullOrEmpty(hash)) return hash;
-    hash = self.helper.uuid();
+    hash = uuid();
     db.Leads
       .Where(x => x.Id == id)
       .UpdateAsync(x => new Lead

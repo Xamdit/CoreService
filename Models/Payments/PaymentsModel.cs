@@ -80,7 +80,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var paymentAttempt = new PaymentAttempt
     {
-      Reference = self.helper.uuid(),
+      Reference = uuid(),
       Amount = Convert.ToInt32(data.Amount),
       Fee = gateway.get_fee(Convert.ToInt32(data.Amount)),
       InvoiceId = data.InvoiceId,

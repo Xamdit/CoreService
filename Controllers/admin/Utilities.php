@@ -219,7 +219,7 @@ class Utilities extends AdminController
             $path = set_realpath($media_folder . '/' . $user->media_path_slug);
             if (empty($user->media_path_slug)) {
                 $this->db->where('staffid', $user->staffid);
-                $slug = slug_it($user->firstname . ' ' . $user->lastname);
+                $slug = db.slug_it($user->firstname . ' ' . $user->lastname);
                 $this->db->update(db_prefix() . 'staff', [
                     'media_path_slug' => $slug,
                 ]);

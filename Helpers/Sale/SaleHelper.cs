@@ -101,7 +101,7 @@ public static class SaleHelper
       _ => number.ToString()
     };
 
-    // Assuming ApplyFilters is a method similar to the hooks()->apply_filters in PHP
+
     hooks.apply_filters("sales_number_format", new
     {
       formattedNumber,

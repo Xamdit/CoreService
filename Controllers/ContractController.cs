@@ -68,13 +68,13 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
     {
       case "contract_pdf":
         var pdf = self.helper.contract_pdf(contract);
-        pdf.Output(slug_it(row.contract.Subject + "-" + db.get_option("companyname")) + ".pdf");
+        pdf.Output(db.slug_it(row.contract.Subject + "-" + db.get_option("companyname")) + ".pdf");
         break;
       case "sign_contract":
         process_digital_signature_image(self.input.post("signature"), CONTRACTS_UPLOADS_FOLDER + id);
         var dataset = TypeMerger.Merge(get_acceptance_info_array<Contract>(), new Contract() { Signed = true });
         db.Contracts.Where(x => x.Id == id).Update(x => dataset);
-        self.helper.send_contract_signed_notification_to_staff(id);
+        db.send_contract_signed_notification_to_staff(id);
         set_alert("success", "Document signed successfully");
         return Redirect(Request.Headers["Referer"]);
 

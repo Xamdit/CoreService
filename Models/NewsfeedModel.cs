@@ -158,7 +158,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         // if (!staff_deparments.Contains(Convert.ToInt32(i))) return;
         // Allow admin to view all posts
-        if (member.Id.is_admin()) return;
+        if (db.is_admin(member.Id)) return;
         // continue 2;
       });
       if (post.Creator == member.Id) return;

@@ -313,7 +313,7 @@ public static class RelationHelper
           addedfrom = relation.addedfrom;
         }
 
-        name = self.helper.format_estimate_number(id);
+        name = db.format_estimate_number(id);
         link = nav.admin_url($"estimates/list_estimates/{id}");
         break;
       }
@@ -458,7 +458,7 @@ public static class RelationHelper
           clientId = relation.client_id;
         }
 
-        name = $"#{id} - {name} - {self.helper.get_company_name(clientId)}";
+        name = $"#{id} - {name} - {db.get_company_name(clientId)}";
         link = nav.admin_url($"projects/view/{id}");
         break;
       }

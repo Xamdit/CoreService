@@ -106,7 +106,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
       DateCreated = DateTime.Now,
       RelId = rel_id,
       RelType = rel_type,
-      AttachmentKey = self.helper.uuid(),
+      AttachmentKey = uuid(),
       StaffId = !attachment.StaffId.HasValue
         ? staff_user_id
         // Replace with your actual method to get staff user ID

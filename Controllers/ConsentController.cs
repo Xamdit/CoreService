@@ -10,7 +10,7 @@ namespace Service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ConsentController(ILogger<MyControllerBase> logger, MyInstance self,MyContext db) : ClientControllerBase(logger, self,db)
+public class ConsentController(ILogger<MyControllerBase> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   [HttpGet]
   public IActionResult Index()
@@ -23,7 +23,7 @@ public class ConsentController(ILogger<MyControllerBase> logger, MyInstance self
   {
     var db = new MyContext();
     var clientsModel = self.clients_model(db);
-    if ((self.helper.is_gdpr() && db.get_option_compare("gdpr_enable_consent_for_contacts", "0")) || !self.helper.is_gdpr())
+    if ((db.is_gdpr() && db.get_option_compare("gdpr_enable_consent_for_contacts", "0")) || !db.is_gdpr())
       return MakeError("This page is currently disabled, check back later.");
     var meta = db.UserMeta.FirstOrDefault(x => x.MetaKey == "consent_key" && x.MetaValue == key);
 
@@ -81,7 +81,7 @@ public class ConsentController(ILogger<MyControllerBase> logger, MyInstance self
     var db = new MyContext();
     var gdpr_model = self.gdpr_model(db);
 
-    if ((self.helper.is_gdpr() && db.get_option("gdpr_enable_consent_for_leads") == "0") || !self.helper.is_gdpr())
+    if ((db.is_gdpr() && db.get_option("gdpr_enable_consent_for_leads") == "0") || !db.is_gdpr())
       return MakeError("This page is currently disabled, check back later.");
 
     var lead = db.Leads.FirstOrDefault(x => x.Hash == hash);

@@ -486,7 +486,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     data = hooks.apply_filters("before_update_staff_member", data);
 
-    if (self.helper.is_admin())
+    if (db.is_admin())
     {
       if (data.IsAdmin)
       {

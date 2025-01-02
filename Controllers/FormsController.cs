@@ -57,7 +57,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
         if (field.Contains("required"))
           required.Add(field);
 
-      if (self.helper.is_gdpr() && db.get_option<int>("gdpr_enable_terms_and_conditions_lead_form") == 1)
+      if (db.is_gdpr() && db.get_option<int>("gdpr_enable_terms_and_conditions_lead_form") == 1)
         required.Add("accept_terms_and_conditions");
 
       if (required.Any(field => !postData.ContainsKey(field) || string.IsNullOrEmpty(Convert.ToString(postData[field]))))
@@ -344,7 +344,7 @@ public class FormsController(ILogger<EstimateController> logger, MyInstance self
     {
       var postData = self.input.post<Dictionary<string, object>>();
       var required = new List<string> { "subject", "department", "email", "name", "message", "priority" };
-      if (self.helper.is_gdpr() && db.get_option_compare("gdpr_enable_terms_and_conditions_ticket_form", 1))
+      if (db.is_gdpr() && db.get_option_compare("gdpr_enable_terms_and_conditions_ticket_form", 1))
         required.Add("accept_terms_and_conditions");
 
       if (required.Any(field => !postData.ContainsKey(field) || string.IsNullOrEmpty(Convert.ToString(postData[field]))))

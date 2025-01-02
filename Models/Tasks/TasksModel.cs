@@ -618,7 +618,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
               FileType = ticket_attachment.FileType,
               StaffId = staff_user_id,
               DateCreated = DateTime.Now,
-              AttachmentKey = self.helper.uuid()
+              AttachmentKey = uuid()
             });
           }
         }

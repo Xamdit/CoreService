@@ -103,7 +103,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self,
   public int AddForm(EstimateRequestForm data)
   {
     data.SuccessSubmitMsg = data.SuccessSubmitMsg.Replace("\n", "<br>");
-    data.FormKey = self.helper.uuid();
+    data.FormKey = uuid();
     data.DateCreated = DateTime.Now;
 
     db.EstimateRequestForms.Add(data);

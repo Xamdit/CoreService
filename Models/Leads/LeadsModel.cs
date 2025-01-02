@@ -213,7 +213,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
         .ForEach(x => { proposals_model.delete(x.Id); });
       var tasks = db.Tasks.Where(x => x.RelId == id && x.RelType == "lead").ToList();
       tasks.ForEach(task => { tasks_model.delete_task(task.Id); });
-      if (self.helper.is_gdpr())
+      if (db.is_gdpr())
         db.ActivityLogs
           .Where(x =>
             x.Description.Contains(result.lead.Email) ||
@@ -674,7 +674,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     data = _do_lead_web_to_form_responsibles(data);
     data.webToLead.SuccessSubmitMsg = data.webToLead.SuccessSubmitMsg!.nl2br();
-    data.webToLead.FormKey = self.helper.uuid();
+    data.webToLead.FormKey = uuid();
     // Convert boolean values to integers
     // data.CreateTaskOnDuplicate = data.CreateTaskOnDuplicate ? 1 : 0;
     // data.MarkPublic = data.MarkPublic ? 1 : 0;

@@ -9,7 +9,7 @@ using Service.Models.Invoices;
 
 namespace Service.Models;
 
-public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private readonly InvoicesModel invoices_model = self.invoices_model(db);
 
@@ -61,7 +61,7 @@ public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self,db
     {
       // Assign values from the data dictionary
       DateCreated = DateTime.Now,
-      Hash = self.helper.uuid(),
+      Hash = uuid(),
       CreatedFrom = staff_user_id
     };
 

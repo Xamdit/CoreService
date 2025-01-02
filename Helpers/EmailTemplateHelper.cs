@@ -62,7 +62,6 @@ public static class EmailTemplateHelper
 
     // Optionally call the send method or return the instance
     sendMethod.Invoke(instance, null);
-
     return instance;
   }
 

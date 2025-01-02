@@ -334,7 +334,7 @@ public static class GeneralHelper
     request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
     request.AddParameter("secret", db.get_option("recaptcha_secret_key")); // Replace with your method for retrieving the secret key
     request.AddParameter("response", str);
-    request.AddParameter("remoteip", ip()); // Assuming this retrieves the user's IP address
+    request.AddParameter("remoteip", self.ip()); // Assuming this retrieves the user's IP address
     var response = await client.ExecuteAsync(request);
     if (!response.IsSuccessful) return controller.NotFound();
     var jsonResponse = response.Content;

@@ -54,7 +54,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
         if (field.Required)
           required.Add(field.Name);
 
-      if (self.helper.is_gdpr() && db.get_option<int>("gdpr_enable_terms_and_conditions_lead_form") == 1)
+      if (db.is_gdpr() && db.get_option<int>("gdpr_enable_terms_and_conditions_lead_form") == 1)
         required.Add("accept_terms_and_conditions");
 
       if (required.Any(field => !postData.ContainsKey(field) || string.IsNullOrEmpty(postData[field])))

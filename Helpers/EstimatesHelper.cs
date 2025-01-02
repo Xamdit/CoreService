@@ -12,12 +12,11 @@ public static class EstimatesHelper
    * @param  mixed $id
    * @return string
    */
-  public static string format_estimate_number(this HelperBase helper, int id)
+  public static string format_estimate_number(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var estimate = db.Estimates.FirstOrDefault(x => x.Id == id);
     if (estimate == null) return "";
-    var number = helper.sales_number_format(estimate.Number, estimate.NumberFormat, estimate.Prefix, estimate.Date);
+    var number = db.sales_number_format(estimate.Number, estimate.NumberFormat, estimate.Prefix, estimate.Date);
     hooks.apply_filters("format_estimate_number", new { id, number, estimate });
     return number;
   }
@@ -72,7 +71,7 @@ public static class EstimatesHelper
         break;
     }
 
-    return helper.hooks().ApplyFilters("estimate_status_label", status, id);
+    return hooks.apply_filters("estimate_status_label", status, id);
   }
 
   /**
@@ -107,7 +106,7 @@ public static class EstimatesHelper
         break;
     }
 
-    return helper.hooks().ApplyFilters("estimate_status_color_class", @class, id);
+    return hooks.apply_filters("estimate_status_color_class", @class, id);
   }
 
   // Simulated helper methods (you'll need to implement these)
@@ -117,24 +116,15 @@ public static class EstimatesHelper
     return key; // Replace with actual translation logic
   }
 
-  public  static bool is_numeric(this HelperBase helper, object value)
+  public static bool is_numeric(this HelperBase helper, object value)
   {
     // Check if the value is numeric
     return int.TryParse(value.ToString(), out _);
   }
 
-  private static dynamic hooks(this HelperBase helper)
-  {
-    // Simulate hooks method, needs actual implementation
-    return new
-    {
-      ApplyFilters = new Func<string, string, int, string>((filterName, input, id) => input)
-    };
-  }
 
-  public static Expression<Func<Estimate, bool>> get_estimates_where_sql_for_staff(this HelperBase helper, int staff_id)
+  public static Expression<Func<Estimate, bool>> get_estimates_where_sql_for_staff(this MyContext db, int staff_id)
   {
-    var (self, db) = getInstance();
     var has_permission_view_own = db.has_permission("estimates", "", "view_own");
     var allow_staff_view_estimates_assigned = db.get_option<bool>("allow_staff_view_estimates_assigned");
     // Build the expression
@@ -161,9 +151,8 @@ public static class EstimatesHelper
  * @param  mixed $itemid
  * @return array
  */
-  public static List<ItemTax> get_estimate_item_taxes(this HelperBase helper, int itemid)
+  public static List<ItemTax> get_estimate_item_taxes(this MyContext db, int itemid)
   {
-    var (self, db) = getInstance();
     var taxes = db.ItemTaxes
       .Where(x => x.ItemId == itemid && x.RelType == "estimate")
       .ToList()
@@ -181,9 +170,8 @@ public static class EstimatesHelper
  * @param  mixed  $id estimateid
  * @return boolean
  */
-  public static bool is_last_estimate(this HelperBase helper, int id)
+  public static bool is_last_estimate(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var row = db.Estimates.OrderByDescending(x => x.Id).First();
     var last_estimate_id = row.Id;
     return last_estimate_id == id;
