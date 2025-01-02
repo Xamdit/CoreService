@@ -1,9 +1,10 @@
 using Service.Entities;
 using Service.Framework;
+using Service.Helpers.Database;
 
 namespace Service.Models;
 
-public class CurrenciesModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class CurrenciesModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   /**
    * @param  integer ID (optional)
@@ -80,27 +81,22 @@ public class CurrenciesModel(MyInstance self, MyContext db) : MyModel(self,db)
    * @return mixed
    * Delete currency from database, if used return array with key referenced
    */
-  public dynamic delete(int id)
+  public (bool is_success, bool referenced, bool is_default) delete(int id)
   {
-    // foreach (var tt in app.get_tables_with_currency())
-    //   if (db.is_reference_in_table(tt['field'], tt['table'], id))
-    //     return new { referenced = true };
-
+    foreach (var tt in my_app.get_tables_with_currency())
+      if (db.kata().is_reference_in_table(tt.field, tt.table, id))
+        return (false, true, false);
     var currency = get(id);
-    if (currency.IsDefault) return new { is_default = true };
-
-
+    if (currency.IsDefault) return (false, false, true);
     db.Currencies.Where(x => x.Id == id).Delete();
     var affected_rows = db.SaveChanges();
-
-
-    if (affected_rows <= 0) return false;
+    if (affected_rows <= 0) return (false, false, false);
     // var columns = db.list_fields('items');
     // foreach (var column in columns)
     //   if (column == "rate_currency_" + id)
     //     this.dbforge.drop_column("items", $"rate_currency_{id}");
     log_activity($"Currency Deleted [{id}]");
-    return true;
+    return (true, true, false);
   }
 
   /**
@@ -108,18 +104,18 @@ public class CurrenciesModel(MyInstance self, MyContext db) : MyModel(self,db)
    * @return boolean
    * Make currency your base currency for better using reports if found invoices with more then 1 currency
    */
-  public object make_base_currency(int id)
+  public (bool is_success, bool has_transactions_currency) make_base_currency(int id)
   {
     var @base = get_base_currency();
-    // foreach (var tt in db.get_tables_with_currency())
-    //   if (db.is_reference_in_table(tt.field, tt.table, @base.Id))
-    //     return new { has_transactions_currency = true };
+    foreach (var tt in my_app.get_tables_with_currency())
+      if (db.kata().is_reference_in_table(tt.field, tt.table, @base.Id))
+        return (false, true);
     db.Currencies.Where(x => x.Id == id).Update(x => new Currency { IsDefault = true });
     var affected_rows = db.SaveChanges();
-    if (affected_rows <= 0) return false;
+    if (affected_rows <= 0) return (false, false);
     db.Currencies.Where(x => x.Id != id).Update(x => new Currency { IsDefault = false });
     db.SaveChanges();
-    return true;
+    return (false, true);
   }
 
   /**

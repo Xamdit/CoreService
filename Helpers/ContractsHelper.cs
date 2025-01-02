@@ -4,7 +4,6 @@ using RestSharp;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
 using Service.Entities;
-using Service.Framework.Core.Engine;
 
 namespace Service.Helpers;
 

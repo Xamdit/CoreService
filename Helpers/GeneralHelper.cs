@@ -147,7 +147,7 @@ public static class GeneralHelper
   {
   }
 
-  public static string label(string message)
+  public static string label(string message, dynamic args = default)
   {
     return message;
   }
@@ -155,6 +155,65 @@ public static class GeneralHelper
   public static bool is_cron()
   {
     return false;
+  }
+
+  /**
+   * Return server temporary directory
+   * @return string
+   */
+  public static bool is_writable(string directoryPath)
+  {
+    try
+    {
+      var testFile = Path.Combine(directoryPath, Path.GetRandomFileName());
+      System.IO.File.WriteAllText(testFile, "test");
+      System.IO.File.Delete(testFile);
+      return true;
+    }
+    catch
+    {
+      return false;
+    }
+  }
+
+  /// <summary>
+  /// Returns the application's specific temporary directory.
+  /// </summary>
+  /// <returns>Path to the application-specific temp directory.</returns>
+  private static string AppTempDir()
+  {
+    // Define your application's temp directory logic here
+    var appTempDir = Path.Combine(AppContext.BaseDirectory, "Temp");
+    if (!Directory.Exists(appTempDir)) Directory.CreateDirectory(appTempDir);
+    return appTempDir;
+  }
+
+  /// <summary>
+  /// Ensures the path ends with a slash.
+  /// </summary>
+  /// <param name="path">The directory path.</param>
+  /// <returns>Path with a trailing slash.</returns>
+  private static string EnsureTrailingSlash(string path)
+  {
+    return path.EndsWith(Path.DirectorySeparatorChar.ToString()) ? path : path + Path.DirectorySeparatorChar;
+  }
+
+  public static string get_temp_dir()
+  {
+    // Try to get the system temporary directory
+    var temp = Path.GetTempPath();
+    if (Directory.Exists(temp) && is_writable(temp)) return EnsureTrailingSlash(temp);
+
+    // Fallback: Check if a custom temporary directory is configured (similar to upload_tmp_dir in PHP)
+    temp = Environment.GetEnvironmentVariable("UPLOAD_TMP_DIR");
+    if (!string.IsNullOrEmpty(temp) && Directory.Exists(temp) && is_writable(temp)) return EnsureTrailingSlash(temp);
+
+    // Fallback: Use application-specific temp directory
+    temp = AppTempDir();
+    if (Directory.Exists(temp) && is_writable(temp)) return EnsureTrailingSlash(temp);
+
+    // Default to /tmp
+    return "/tmp/";
   }
 
   /**

@@ -5,7 +5,7 @@ using Service.Schemas;
 
 namespace Service.Models;
 
-public class AuthModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class AuthModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public UserSchema? Signin(string email, string password, bool isStaff = false)
   {
@@ -45,8 +45,6 @@ public class AuthModel(MyInstance self, MyContext db) : MyModel(self,db)
       self.cache.assign("uuid", user.Uuid);
       // await self.Cache.Set("user_type", isStaff ? "admin" : "user");
       return user;
-
-
     }
     catch (Exception ex)
     {

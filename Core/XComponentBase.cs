@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Components;
 using Service.Core.Engine;
 using Service.Core.Extensions;
 using Service.Entities;
-using Service.Framework;
 using Task = System.Threading.Tasks.Task;
 
 namespace Service.Core;
@@ -179,9 +178,8 @@ public abstract class XComponentBase : MyComponentBase
   protected override async Task OnInitializedAsync()
   {
     await base.OnInitializedAsync();
-    self.navigation = NavigationManager;
+    // self.navigation = NavigationManager;
     var httpContext = HttpContextAccessor.HttpContext;
-    self.context = httpContext;
   }
 
   public string text(string key)

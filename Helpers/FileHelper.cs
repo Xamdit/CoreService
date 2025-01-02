@@ -91,10 +91,22 @@ public static class FileHelper
  * Supported html5 video extensions
  * @return array
  */
-  public static List<string> get_html5_video_extensions(this HelperBase helper)
+  public static List<string> get_html5_video_extensions()
   {
     var output = new List<string>() { "mp4", "m4v", "webm", "ogv", "ogg", "flv" };
     output = hooks.apply_filters<List<string>>("html5_video_extensions", output);
     return output;
+  }
+
+  public static string app_temp_dir()
+  {
+    var TEMP_FOLDER = ".";
+    // Ensure TEMP_FOLDER exists
+    if (!Directory.Exists(TEMP_FOLDER)) Directory.CreateDirectory(TEMP_FOLDER);
+    // Ensure index.html exists in the TEMP_FOLDER
+    var indexFilePath = Path.Combine(TEMP_FOLDER, "index.html");
+    if (!File.Exists(indexFilePath)) File.WriteAllText(indexFilePath, string.Empty); // Create an empty index.html file
+
+    return TEMP_FOLDER;
   }
 }

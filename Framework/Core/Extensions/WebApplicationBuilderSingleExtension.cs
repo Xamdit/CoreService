@@ -2,6 +2,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using Service.Entities;
+using Service.Framework.Library;
 using Service.Framework.Library.Locales;
 using Service.Framework.Library.Themes;
 using Service.Framework.Library.Themes.Partials;
@@ -16,6 +19,20 @@ public static class WebApplicationBuilderSingleExtension
     // Add services to the container.
     builder.Services.AddRazorPages();
     builder.Services.AddServerSideBlazor();
+    builder.Services.AddSingleton<MyApp>(sp =>
+    {
+      var httpClient = sp.GetRequiredService<HttpClient>(); // Resolve dependencies if needed
+      var app = new MyApp(httpClient);
+      return app;
+    });
+    builder.Services.AddSingleton<MyContext>(sp =>
+    {
+      var options = new DbContextOptionsBuilder<MyContext>()
+        .UseMySql("server=localhost;user=root;password=password;database=crm;convert zero datetime=True;treattinyasboolean=True", ServerVersion.Parse("8.3.0-mysql"))
+        .Options;
+      return new MyContext(options);
+    });
+    builder.Services.AddSingleton<MyInstance>();
     builder.AddWithResource<Program>();
     // builder.MakeDefault();
     builder.Services.AddSingleton<ITheme, Theme>();
@@ -26,7 +43,6 @@ public static class WebApplicationBuilderSingleExtension
       options.Cookie.HttpOnly = true;
       options.Cookie.IsEssential = true;
     });
-
 
     builder.Services.AddHttpClient();
 
@@ -51,6 +67,8 @@ public static class WebApplicationBuilderSingleExtension
 
     // Now build the application
     var app = builder.Build();
+    SetInstance(app);
+    app.UseMiddleware<FinalMiddlewares>();
     // Resolve MyInstance from the built app
     // var self = app.Services.GetRequiredService<MyInstance>();
     // Constants.Instance = self;

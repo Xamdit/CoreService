@@ -151,4 +151,24 @@ public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self, d
     else if (db.is_staff_logged_in()) query.Where(x => x.ShowToStaff);
     return query.OrderByDescending(x => x.DateCreated);
   }
+
+  public Announcement? FindOne(int id)
+  {
+    var row = db.Announcements.FirstOrDefault(x => x.Id == id);
+    return row;
+  }
+
+  public Announcement? get(int id)
+  {
+    var row = db.Announcements.FirstOrDefault(x => x.Id == id);
+    return row;
+  }
+
+  public List<Announcement> get(Expression<Func<Announcement, bool>> condition, int take = 0)
+  {
+    var rows = db.Announcements.Where(condition).ToList();
+    if (take > 0)
+      rows = rows.Take(take).ToList();
+    return rows;
+  }
 }

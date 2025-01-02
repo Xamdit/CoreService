@@ -3,8 +3,6 @@ using Service.Framework.Schemas;
 
 namespace Service.Framework.Sessions;
 
-
-
 public class Session
 {
   private string session_dir = "sessions";
@@ -13,8 +11,6 @@ public class Session
 
   public Session(MyInstance instance, string session_id)
   {
-    // self.helper.create_file_if_not_exists(session_dir);
-    // self.helper.create_json_file($"{session_dir}/{session_id}.json");
     var store = new DataStore($"{session_dir}/{session_id}.json");
     collection = store.GetCollection<Item>();
   }

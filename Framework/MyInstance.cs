@@ -27,6 +27,8 @@ public class MyInstance : IMyInstance
   public IHttpContextAccessor httpContextAccessor { get; set; }
   public HttpDocument output { get; set; } = new();
 
+  public bool is_logged_in => context.User.Identity.IsAuthenticated;
+
   public NavigationManager navigation
   {
     get =>
@@ -47,8 +49,6 @@ public class MyInstance : IMyInstance
     }
   }
 
-
-  private static MyInstance _instance;
 
   public ControllerBase controller { get; set; }
   public Language lang { get; set; }

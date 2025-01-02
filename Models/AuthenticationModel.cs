@@ -350,14 +350,10 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
    * @param string new_pass_key the password generate key
    * @param string password     new password
    */
-  public object set_password(bool is_staff, int user_id, string new_pass_key, string password)
+  public (bool is_success, bool expired) set_password(bool is_staff, int user_id, string new_pass_key, string password)
   {
     if (!can_set_password(is_staff, user_id, new_pass_key))
-      return new
-      {
-        expired = true
-      };
-
+      return (false, true);
     password = self.HashPassword(password);
     var jsonString = JsonConvert.SerializeObject(is_staff
       ? db.Staff.FirstOrDefault(x => x.Id == user_id && x.NewPassKey == new_pass_key)
@@ -384,7 +380,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
     }
 
     var affected_rows = db.SaveChanges();
-    if (affected_rows <= 0) return false;
+    if (affected_rows <= 0) return (false, false);
     log_activity($"User Set Password [User ID: {user_id}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
     if (is_staff)
     {
@@ -414,7 +410,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
 
     db.SaveChanges();
 
-    return true;
+    return (true, false);
   }
 
   /**
@@ -577,7 +573,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
    * @param  string  email email of staff login in
    * @return boolean
    */
-  public bool is_two_factor_code_valid(string code, string email)
+  public bool is_two_factor_code_valid(string code, string email = "")
   {
     var user = db.Staff.FirstOrDefault(x => x.Email == email && x.TwoFactorAuthCode == code);
     // Code not exists because no user is found

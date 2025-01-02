@@ -16,7 +16,6 @@ public class MyInput
   public CookiesManager cookies = new();
   public Session session { get; set; }
 
-
   public MyInput()
   {
     // SanitizeGlobals();

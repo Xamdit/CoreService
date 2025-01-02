@@ -4,7 +4,7 @@ using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Engine;
 
-namespace Service.Controllers.admin;
+namespace Service.Controllers.Admin;
 
 [ApiController]
 [Route("api/[controller]")]

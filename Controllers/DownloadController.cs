@@ -3,17 +3,18 @@ using Service.Controllers.Core;
 using Service.Entities;
 using Service.Framework;
 using Service.Helpers;
+using static Service.Helpers.FileHelper;
 
 namespace Service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DownloadController(ILogger<DownloadController> logger, MyInstance self,MyContext db) : ClientControllerBase(logger, self,db)
+public class DownloadController(ILogger<DownloadController> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   [HttpPost("preview_video")]
   public IActionResult PreviewVideo([FromForm] string path, [FromForm] string fileType)
   {
-    var allowedExtensions = self.helper.get_html5_video_extensions();
+    var allowedExtensions = get_html5_video_extensions();
     if (!file_exists(path) ||
         string.IsNullOrEmpty(Path.GetExtension(path)) ||
         !allowedExtensions.Contains(Path.GetExtension(path)))

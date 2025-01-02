@@ -6,7 +6,11 @@ public partial class Session
 
     public string IpAddress { get; set; } = null!;
 
-    public DateTime Timestamp { get; set; }
+    public string Data { get; set; } = null!;
 
-    public byte[] Data { get; set; } = null!;
+    public string Uuid { get; set; } = null!;
+
+    public DateTime ExpiresAt { get; set; }
+
+    public bool IsSerialize { get; set; }
 }
