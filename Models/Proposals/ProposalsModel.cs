@@ -73,7 +73,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     dataset.Data.Address = dataset.Data.Address.Trim().nl2br();
     dataset.Data.DateCreated = DateTime.Now;
-    dataset.Data.AddedFrom = staff_user_id;
+    dataset.Data.AddedFrom = db.get_staff_user_id();
     dataset.Data.Hash = uuid();
 
 
@@ -131,13 +131,13 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var proposal = get(x => x.Id == insert_id);
     if (proposal.Assigned != 0)
-      if (proposal.Assigned != staff_user_id)
+      if (proposal.Assigned != db.get_staff_user_id())
       {
         var notified = db.add_notification(new Notification
         {
           Description = "not_proposal_assigned_to_you",
           ToUserId = proposal.Assigned,
-          FromUserId = staff_user_id,
+          FromUserId = db.get_staff_user_id(),
           Link = $"proposals/list_proposals/{insert_id}",
           AdditionalData = JsonConvert.SerializeObject(new[]
           {
@@ -233,13 +233,13 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
       affectedRows++;
       var proposal_now = get(x => x.Id == id);
       if (current_proposal.Assigned != proposal_now.Assigned)
-        if (proposal_now.Assigned != staff_user_id)
+        if (proposal_now.Assigned != db.get_staff_user_id())
         {
           var notified = db.add_notification(new Notification
           {
             Description = "not_proposal_assigned_to_you",
             ToUserId = proposal_now.Assigned,
-            FromUserId = staff_user_id,
+            FromUserId = db.get_staff_user_id(),
             Link = $"proposals/list_proposals/{id}",
             AdditionalData = JsonConvert.SerializeObject(new[]
             {
@@ -409,7 +409,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     data.DateCreated = DateTime.Now;
     if (client == false)
-      data.StaffId = staff_user_id;
+      data.StaffId = db.get_staff_user_id();
     data.Content = data.Content.nl2br();
     var result = db.ProposalComments.Add(data);
     if (!result.IsAdded()) return false;
@@ -539,7 +539,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
     // foreach (var field in fields )
     //   if (!in_array(field, not_copy_fields))
     //     insert_data[field] = proposal.field;
-    insert_data.Data.AddedFrom = staff_user_id;
+    insert_data.Data.AddedFrom = db.get_staff_user_id();
     insert_data.Data.DateCreated = DateTime.Now;
     insert_data.Data.Date = DateTime.Now;
     insert_data.Data.Status = 6;

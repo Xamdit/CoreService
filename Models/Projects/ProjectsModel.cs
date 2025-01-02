@@ -164,13 +164,13 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       db.PinnedProjects.Add(new PinnedProject
       {
-        StaffId = staff_user_id,
+        StaffId = db.get_staff_user_id(),
         ProjectId = id
       });
       return true;
     }
 
-    db.PinnedProjects.Where(x => x.StaffId == staff_user_id && x.ProjectId == id).Delete();
+    db.PinnedProjects.Where(x => x.StaffId == db.get_staff_user_id() && x.ProjectId == id).Delete();
 
     return true;
   }
@@ -361,10 +361,10 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (db.client_logged_in()) query.Where(x => x.VisibleToClient);
     if (!db.client_logged_in() && !can_view_tasks && !show_all_tasks_for_project_member)
       query = query.Where(x =>
-        db.TaskAssigneds.Any(a => a.StaffId == staff_user_id && a.TaskId == x.Id) ||
-        db.TaskFollowers.Any(f => f.StaffId == staff_user_id && f.TaskId == x.Id) ||
+        db.TaskAssigneds.Any(a => a.StaffId == db.get_staff_user_id() && a.TaskId == x.Id) ||
+        db.TaskFollowers.Any(f => f.StaffId == db.get_staff_user_id() && f.TaskId == x.Id) ||
         x.IsPublic ||
-        (x.AddedFrom == staff_user_id && !x.IsAddedFromContact)
+        (x.AddedFrom == db.get_staff_user_id() && !x.IsAddedFromContact)
       );
 
     // if (where["milestones.hide_from_customer"])
@@ -711,7 +711,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       dataset.Data.ProjectCost = false;
     }
 
-    dataset.Data.AddedFrom = staff_user_id;
+    dataset.Data.AddedFrom = db.get_staff_user_id();
     var items_to_convert = new List<Itemable>();
     int? estimate_id = null;
     var items_assignees = new List<int>();
@@ -1015,7 +1015,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
       else if (db.is_staff_logged_in())
       {
         activity.ContactId = 0;
-        activity.StaffId = staff_user_id;
+        activity.StaffId = db.get_staff_user_id();
         activity.FullName = db.get_staff_full_name(activity.StaffId);
       }
     }
@@ -1062,24 +1062,20 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
     //var notifiedUsers = new List<int>();
     var notifiedUsers = members.Select(member =>
       {
-        if (member.Id != staff_user_id)
+        if (member.Id == db.get_staff_user_id()) return 0;
+        var notified = db.add_notification(new Notification()
         {
-          var notified = db.add_notification(new Notification()
+          FromUserId = db.get_staff_user_id(),
+          Description = "not_project_status_updated",
+          Link = "projects/view/" + id,
+          ToUserId = member.Id,
+          AdditionalData = JsonConvert.SerializeObject(new List<string>()
           {
-            FromUserId = staff_user_id,
-            Description = "not_project_status_updated",
-            Link = "projects/view/" + id,
-            ToUserId = member.Id,
-            AdditionalData = JsonConvert.SerializeObject(new List<string>()
-            {
-              "<lang>project_status_" + old_status + "</lang>",
-              "<lang>project_status_" + new_status + "</lang>"
-            })
-          });
-          if (notified) return member.Id;
-        }
-
-        return 0;
+            "<lang>project_status_" + old_status + "</lang>",
+            "<lang>project_status_" + new_status + "</lang>"
+          })
+        });
+        return notified ? member.Id : 0;
       })
       .ToList();
 

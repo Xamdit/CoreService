@@ -5,7 +5,7 @@ using Service.Libraries.FormValidations;
 
 namespace Service.Controllers.Core;
 
-public class AppControllerBase(ILogger<MyControllerBase> logger, MyInstance self,MyContext db) : MyControllerBase(logger, self )
+public class AppControllerBase(ILogger<MyControllerBase> logger, MyInstance self, MyContext db) : MyControllerBase(logger, self)
 {
   public FormValidation form_validation { get; set; }
 
@@ -20,5 +20,4 @@ public class AppControllerBase(ILogger<MyControllerBase> logger, MyInstance self
   {
     return (self, db);
   }
-
 }
