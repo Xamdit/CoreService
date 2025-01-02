@@ -22,7 +22,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private List<ProjectSettingOption> statuses = new();
   private CurrenciesModel currencies_model = self.currencies_model(db);
-  private ClientsModel clients_model = self.clients_model(db);
+  public ClientsModel clients_model = self.clients_model(db);
   private TasksModel tasks_model = self.tasks_model(db);
   private ProjectsModel projects_model = self.projects_model(db);
   private StaffModel staff_model = self.staff_model(db);

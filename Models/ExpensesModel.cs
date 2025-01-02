@@ -74,7 +74,7 @@ public class ExpensesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
   public decimal GetExpensesTotal(Expense queryData)
   {
-    var currency = db.get_currency(queryData.Currency) ?? self.helper.get_base_currency();
+    var currency = db.get_currency(queryData.Currency) ?? db.get_base_currency();
     var expenses = db.Expenses
       .Where(e => e.Currency == currency.Id)
       .ToList();

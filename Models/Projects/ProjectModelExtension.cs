@@ -53,13 +53,13 @@ public static class ProjectModelExtension
  */
   public static bool send_project_customer_email(this ProjectsModel model, int id, string template)
   {
-    var (self, db) = model.getInstance();
+    var (_, db) = model.getInstance();
     var sent = false;
-    var clients_model = model.clients_model(db);
+    var clients_model = model.clients_model;
     var contacts = clients_model.get_contacts_for_project_notifications(id, "project_emails");
     contacts.ForEach(contact =>
     {
-      if (helper.send_mail_template(template, id, contact.UserId, contact))
+      if (db.send_mail_template(template, id, contact.UserId, contact))
         sent = true;
     });
 
@@ -134,7 +134,7 @@ public static class ProjectModelExtension
       .ToList()
       .Select(member =>
       {
-        var notified = helper.add_notification(new Notification
+        var notified = db.add_notification(new Notification
         {
           FromUserId = model.staff_user_id,
           Description = "not_project_status_updated",
@@ -151,7 +151,7 @@ public static class ProjectModelExtension
       .Where(x => x != 0)
       .ToList();
 
-    helper.pusher_trigger_notification(notifiedUsers);
+    db.pusher_trigger_notification(notifiedUsers);
     return true;
   }
 
@@ -211,7 +211,7 @@ public static class ProjectModelExtension
         var affected_rows = db.ProjectMembers.Where(x => x.ProjectId == id && x.StaffId == project_member.StaffId).Delete();
         if (affected_rows <= 0) return;
         db.PinnedProjects.Where(x => x.StaffId == project_member.StaffId && x.ProjectId == id).Delete();
-        model.log(id, "project_activity_removed_team_member", helper.get_staff_full_name(project_member.StaffId));
+        model.log(id, "project_activity_removed_team_member", db.get_staff_full_name(project_member.StaffId));
         affectedRows++;
       });
 
@@ -231,7 +231,7 @@ public static class ProjectModelExtension
             if (affected_rows.IsAdded()) return 0;
             if (staff_id != model.staff_user_id)
             {
-              var notified = helper.add_notification(new Notification
+              var notified = db.add_notification(new Notification
               {
                 FromUserId = model.staff_user_id,
                 Description = "not_staff_added_as_project_member",
@@ -246,12 +246,12 @@ public static class ProjectModelExtension
               return notified != null ? staff_id : 0;
             }
 
-            log_activity(id, "project_activity_added_team_member", helper.get_staff_full_name(staff_id));
+            log_activity(id, "project_activity_added_team_member", db.get_staff_full_name(staff_id));
             affectedRows++;
             return 0;
           })
           .ToList();
-        helper.pusher_trigger_notification(notifiedUsers);
+        db.pusher_trigger_notification(notifiedUsers);
       }
     }
     else
@@ -267,7 +267,7 @@ public static class ProjectModelExtension
           if (!result.IsAdded()) return 0;
           if (staff_id != model.staff_user_id)
           {
-            var notified = helper.add_notification(new Notification
+            var notified = db.add_notification(new Notification
             {
               FromUserId = model.staff_user_id,
               Description = "not_staff_added_as_project_member",
@@ -281,19 +281,19 @@ public static class ProjectModelExtension
             return staff_id;
           }
 
-          model.log(id, "project_activity_added_team_member", helper.get_staff_full_name(staff_id));
+          model.log(id, "project_activity_added_team_member", db.get_staff_full_name(staff_id));
           return 0;
         })
         .ToList();
       if (notifiedUsers.Any())
-        helper.pusher_trigger_notification(notifiedUsers);
+        db.pusher_trigger_notification(notifiedUsers);
     }
 
     if (!new_project_members_to_receive_email.Any()) return affectedRows > 0;
     var all_members = model.get_project_members(id);
     all_members.Where(data => new_project_members_to_receive_email.Contains(data.StaffId))
       .ToList()
-      .Select(data => helper.send_mail_template("project_staff_added_as_member", data, id, client_id))
+      .Select(data => db.send_mail_template("project_staff_added_as_member", data, id, client_id))
       .ToList();
     return affectedRows > 0;
   }

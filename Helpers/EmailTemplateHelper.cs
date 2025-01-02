@@ -12,7 +12,7 @@ public static class EmailTemplateHelper
 * @since  2.3.0
 * @return mixed
 */
-  public static bool send_mail_template(this HelperBase helper, params object[] args)
+  public static bool send_mail_template(this MyContext db, params object[] args)
   {
     // $params = func_get_args();
     // return mail_template(...$params)->send();
@@ -32,7 +32,7 @@ public static class EmailTemplateHelper
  */
   public static EmailsModel mail_template(string className, params object[] parameters)
   {
-    var (self, db) = getInstance();
+    // var (self, db) = getInstance();
     // Get the path of the mail template class file
     var path = GetMailTemplatePath(className, parameters);
 

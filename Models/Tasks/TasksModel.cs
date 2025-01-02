@@ -364,7 +364,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
     var data = get_billable_task_data(taskId);
     // var total_hours = total_hours(data);
     var total_hours = 0;
-    return self.helper.app_format_number(total_hours * data.HourlyRate);
+    return db.app_format_number(total_hours * data.HourlyRate);
   }
 
   public Task get_billable_task_data(int task_id)
