@@ -26,7 +26,7 @@ public static class WebApplicationBuilderSingleExtension
       SetMyApp(app);
       return app;
     });
-    builder.Services.AddSingleton<MyContext>(sp =>
+    builder.Services.AddSingleton<MyContext>(_ =>
     {
       var options = new DbContextOptionsBuilder<MyContext>()
         .UseMySql("server=localhost;user=root;password=password;database=crm;convert zero datetime=True;treattinyasboolean=True", ServerVersion.Parse("8.3.0-mysql"))
