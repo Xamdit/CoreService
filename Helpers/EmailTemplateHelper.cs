@@ -1,4 +1,5 @@
 using System.Reflection;
+using Service.Core.Extensions;
 using Service.Entities;
 using Service.Models;
 
@@ -29,9 +30,9 @@ public static class EmailTemplateHelper
  * @param  string $class mail template class name
  * @return mixed
  */
-  public static EmailsModel mail_template(string className, params object[] parameters)
+  public static EmailsModel mail_template(this MyModel model, string className, params object[] parameters)
   {
-    // var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     // Get the path of the mail template class file
     var path = GetMailTemplatePath(className, parameters);
 

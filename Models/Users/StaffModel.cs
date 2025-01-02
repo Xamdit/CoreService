@@ -343,16 +343,16 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         Staff = staff,
         FullName = $"{staff.FirstName} {staff.LastName}",
-        TotalUnreadNotifications = isStaffLoggedIn && id != 0 && id == staff_user_id
+        TotalUnreadNotifications = isStaffLoggedIn && id != 0 && id == db.get_staff_user_id()
           ? db.Notifications.Count(n => n.ToUserId == id && !n.IsRead)
           : (int?)null,
-        TotalUnfinishedTodos = isStaffLoggedIn && id != 0 && id == staff_user_id
+        TotalUnfinishedTodos = isStaffLoggedIn && id != 0 && id == db.get_staff_user_id()
           ? db.Todos.Count(t => t.StaffId == id && t.Finished != 0)
           : (int?)null
       });
 
     // Check if we are fetching a specific staff member by id
-    if (id == 0 || id != staff_user_id)
+    if (id == 0 || id != db.get_staff_user_id())
       return await db.Staff
         .Where(where)
         .OrderByDescending(s => s.FirstName)
@@ -495,7 +495,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self, db)
       }
       else
       {
-        if (id != staff_user_id)
+        if (id != db.get_staff_user_id())
         {
           if (id == 1) return new { cant_remove_main_admin = true };
         }
@@ -718,7 +718,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self, db)
 
   public async Task<LoggedTimeData> get_logged_time_data(int? staffId = null, Dictionary<string, string> filterData = null)
   {
-    staffId ??= staff_user_id;
+    staffId ??= db.get_staff_user_id();
     var result = new LoggedTime();
     var now = DateTime.UtcNow;
 

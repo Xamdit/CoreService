@@ -85,7 +85,7 @@ public static class GeneralHelper
  * @param  array $data
  * @return mixed Url
  */
-  public static string app_generate_short_link(  dynamic data)
+  public static string app_generate_short_link(dynamic data)
   {
     // hooks.do_action("before_generate_short_link", data);
     // $accessToken = db.get_option('bitly_access_token');
@@ -210,13 +210,13 @@ public static class GeneralHelper
   {
     return new List<string>
     {
-      helper.label("wd_monday"),
-      helper.label("wd_tuesday"),
-      helper.label("wd_wednesday"),
-      helper.label("wd_thursday"),
-      helper.label("wd_friday"),
-      helper.label("wd_saturday"),
-      helper.label("wd_sunday")
+      label("wd_monday"),
+      label("wd_tuesday"),
+      label("wd_wednesday"),
+      label("wd_thursday"),
+      label("wd_friday"),
+      label("wd_saturday"),
+      label("wd_sunday")
     };
   }
 

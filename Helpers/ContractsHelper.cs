@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RestSharp;
+using Service.Controllers.Core;
+using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Engine;
 
@@ -8,7 +10,7 @@ namespace Service.Helpers;
 
 public static class ContractsHelper
 {
-  public static IActionResult check_contract_restrictions(this MyControllerBase controller, int id, string hash)
+  public static IActionResult check_contract_restrictions(this AppControllerBase controller, int id, string hash)
   {
     var (self, db) = controller.getInstance();
     var contracts_model = self.contracts_model(db);
@@ -30,9 +32,7 @@ public static class ContractsHelper
       return self.controller.NotFound();
     if (!db.get_option_compare("view_contract_only_logged_in", 1))
       return self.controller.NotFound();
-    if (contract.Client != self.helper.get_client_user_id())
-      return self.controller.NotFound();
-    return self.controller.NotFound();
+    return contract.Client != db.get_client_user_id() ? self.controller.NotFound() : self.controller.NotFound();
   }
 
   public static void add_contract_comment(this MyContext db, string comment = "")

@@ -1,3 +1,4 @@
+using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Engine;
 
@@ -7,9 +8,9 @@ namespace Service.Helpers;
 // info : complete
 public static class GdprHelper
 {
-  public static void send_gdpr_email_template(this HelperBase helper, string template, int user_id)
+  public static void send_gdpr_email_template(this MyModel model, string template, int user_id)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var staff_model = self.staff_model(db);
     ignore(() =>
     {

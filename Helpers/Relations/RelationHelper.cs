@@ -498,7 +498,7 @@ public static class RelationHelper
     var projects_model = self.projects_model(db);
     foreach (var relation in data)
     {
-      var relation_values = db.get_relation_values(relation, type);
+      var relation_values = db.get_relation_values(null, relation, type);
       switch (type)
       {
         case "project":

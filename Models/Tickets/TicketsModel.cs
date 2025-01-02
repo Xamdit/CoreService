@@ -36,7 +36,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     var query = db.Tickets.Where(x => x.MergedTicketId == null).AsQueryable();
     if (!db.is_admin())
     {
-      var staff_deparments_ids = departments_model.get_staff_departments(staff_user_id)
+      var staff_deparments_ids = departments_model.get_staff_departments(db.get_staff_user_id())
         .Select(x => x.Id)
         .ToList();
       if (db.get_option("staff_access_only_assigned_departments") == "1")
@@ -57,7 +57,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
         if (departments_ids.Any())
         {
           var temp_items = db.StaffDepartments
-            .Where(x => departments_ids.Contains(x.DepartmentId!.Value) && x.StaffId == staff_user_id)
+            .Where(x => departments_ids.Contains(x.DepartmentId!.Value) && x.StaffId == db.get_staff_user_id())
             .Select(x => x.DepartmentId)
             .ToList();
           query = query.Where(x =>
@@ -925,7 +925,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
       self.helper.handle_custom_fields_post(ticketid, custom_fields);
 
     if (!data.Assigned.HasValue && data.Assigned != 0)
-      if (data.Assigned != staff_user_id)
+      if (data.Assigned != db.get_staff_user_id())
       {
         var notified = db.add_notification(new Notification
         {
@@ -939,7 +939,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
         if (notified)
           db.pusher_trigger_notification(new List<int> { data.Assigned.Value });
-        db.send_mail_template("ticket_assigned_to_staff", self.helper.get_staff(data.Assigned).Email, data.Assigned, ticketid, data.UserId, data.ContactId);
+        db.send_mail_template("ticket_assigned_to_staff", this.get_staff(data.Assigned).Email, data.Assigned, ticketid, data.UserId, data.ContactId);
       }
 
     if (pipe_attachments.Any())
@@ -1172,7 +1172,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (current_assigned != 0)
     {
       if (current_assigned != data.Assigned)
-        if (data.Assigned != 0 && data.Assigned != staff_user_id)
+        if (data.Assigned != 0 && data.Assigned != db.get_staff_user_id())
         {
           sendAssignedEmail = true;
           var notified = db.add_notification(new Notification
@@ -1191,7 +1191,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     }
     else
     {
-      if (data.Assigned != 0 && data.Assigned != staff_user_id)
+      if (data.Assigned != 0 && data.Assigned != db.get_staff_user_id())
       {
         sendAssignedEmail = true;
         var notified = db.add_notification(new Notification
@@ -1479,7 +1479,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (!db.is_admin())
       if (db.get_option_compare("staff_access_only_assigned_departments", 1))
       {
-        var staff_deparments_ids = departments_model.get_staff_departments(staff_user_id).Select(x => x.Id).ToList();
+        var staff_deparments_ids = departments_model.get_staff_departments(db.get_staff_user_id()).Select(x => x.Id).ToList();
         departments_ids.Clear();
         departments_ids = !staff_deparments_ids.Any()
           ? departments_model.get().Select(x => x.Id).ToList()

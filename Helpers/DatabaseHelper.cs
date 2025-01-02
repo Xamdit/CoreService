@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Service.Entities;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers.Entities;
@@ -103,9 +104,9 @@ public static class DatabaseHelper
    * @param  string field field to check
    * @return string
    */
-  private static string prefixed_table_fields_wildcard(this HelperBase helper, string table, string alias, string field)
+  private static string prefixed_table_fields_wildcard(this MyModel model, string table, string alias, string field)
   {
-    var (self, db) = getInstance();
+    var (self, db) = model.getInstance();
     var columns = db.ColumnInfos.FromSql($"SHOW COLUMNS FROM {table}").ToList();
     var field_names = columns.Select(x => x.Field).ToList();
 

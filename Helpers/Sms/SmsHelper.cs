@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.Engine;
+using Service.Framework.Core.InputSet;
 using static Service.Helpers.Template.TemplateHelper;
 
 namespace Service.Helpers.Sms;
@@ -28,7 +29,7 @@ public static class SmsHelper
     return "Unauthorized or invalid request";
   }
 
-  private static ISmsGateway get_sms_gateway(this HelperBase helper, string gatewayId)
+  private static ISmsGateway get_sms_gateway(this MyContext db, string gatewayId)
   {
     // Retrieve the correct SMS gateway based on the ID
     // Example: return _smsGatewayFactory.GetGatewayById(gatewayId);

@@ -10,7 +10,7 @@ public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public async Task<bool> AddOrUpdateEvent(Event eventData)
   {
-    eventData.UserId = staff_user_id;
+    eventData.UserId = db.get_staff_user_id();
     // eventData.Start = ToSqlDate(eventData.Start);
     eventData.End ??= today();
     eventData.Public = eventData.Public == 1 ? 1 : 0;
@@ -49,7 +49,7 @@ public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self, db)
 
   public async Task<List<Event>> GetAllEvents(DateTime start, DateTime end)
   {
-    var userId = staff_user_id;
+    var userId = db.get_staff_user_id();
     var isStaffMember = db.is_staff_member();
 
     return db.Events

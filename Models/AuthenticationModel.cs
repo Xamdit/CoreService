@@ -630,7 +630,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, 
 
   public bool set_google_two_factor(string secret)
   {
-    var id = staff_user_id;
+    var id = db.get_staff_user_id();
     secret = encrypt(secret);
     db.Staff.Where(x => x.Id == id).Update(x => new Staff
     {

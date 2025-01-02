@@ -69,7 +69,7 @@ public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self, d
   public int add(Announcement data)
   {
     data.DateCreated = DateTime.Now;
-    var staff = db.Staff.Find(staff_user_id);
+    var staff = db.Staff.Find(db.get_staff_user_id());
     data.Staff = staff;
     data.StaffId = staff.Id;
     // data = hooks.apply_filters("before_announcement_added", data);

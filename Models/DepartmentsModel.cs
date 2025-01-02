@@ -5,7 +5,7 @@ using Service.Framework.Helpers.Entities;
 
 namespace Service.Models;
 
-public class DepartmentsModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class DepartmentsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   /**
        * @param  integer ID (optional)
@@ -121,7 +121,7 @@ public class DepartmentsModel(MyInstance self, MyContext db) : MyModel(self,db)
   public List<Department> get_staff_departments(int userid = 0)
   {
     var query = db.Departments.AsQueryable();
-    if (userid == 0) userid = staff_user_id;
+    if (userid == 0) userid = db.get_staff_user_id();
     var departments = query.Where(x => x.StaffDepartments.Any(y => y.StaffId == userid)).ToList();
     return departments;
   }

@@ -21,7 +21,7 @@ public class TodoModel(MyInstance self, MyContext db) : MyModel(self, db)
 
   public List<Todo> get()
   {
-    var id = staff_user_id;
+    var id = db.get_staff_user_id();
     return db.Todos.Where(x => x.StaffId == id).ToList();
   }
 
@@ -38,7 +38,7 @@ public class TodoModel(MyInstance self, MyContext db) : MyModel(self, db)
    */
   public async Task<List<Todo>> get_todo_items(int finished, int page = 0)
   {
-    var staffId = staff_user_id;
+    var staffId = db.get_staff_user_id();
     var query = db.Todos
       .Where(x => x.Finished == finished && x.StaffId == staffId)
       .OrderBy(x => x.ItemOrder)
@@ -71,7 +71,7 @@ public class TodoModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     data.DateCreated = DateTime.Now;
     data.Description = data.Description.nl2br();
-    var staffId = staff_user_id;
+    var staffId = db.get_staff_user_id();
     if (staffId != null) data.StaffId = staffId;
     var result = await db.Todos.AddAsync(data);
     await db.SaveChangesAsync();
@@ -110,7 +110,7 @@ public class TodoModel(MyInstance self, MyContext db) : MyModel(self, db)
    */
   public async Task<bool> delete_todo_item(int id)
   {
-    var staffId = staff_user_id;
+    var staffId = db.get_staff_user_id();
     db.RemoveRange(db.Todos.Where(x => x.Id == id && x.StaffId == staffId));
     var affectedRows = await db.SaveChangesAsync();
     return affectedRows > 0;
@@ -124,7 +124,7 @@ public class TodoModel(MyInstance self, MyContext db) : MyModel(self, db)
    */
   public async Task<dynamic> change_todo_status(int id, int status)
   {
-    var staffId = staff_user_id;
+    var staffId = db.get_staff_user_id();
     await db.Todos.Where(x => x.Id == id && x.StaffId == staffId)
       .UpdateAsync(x => new Todo { Finished = status, DateFinished = today() });
     var affectedRows = await db.SaveChangesAsync();

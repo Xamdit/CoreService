@@ -61,7 +61,7 @@ public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self, d
       // Assign values from the data dictionary
       DateCreated = DateTime.Now,
       Hash = uuid(),
-      CreatedFrom = staff_user_id
+      CreatedFrom = db.get_staff_user_id()
     };
 
     db.Subscriptions.Add(subscription);

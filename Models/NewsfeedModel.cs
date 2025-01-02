@@ -56,7 +56,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
   public List<NewsfeedPostLike> get_post_likes(int id)
   {
     var rows = db.NewsfeedPostLikes
-      .Where(l => l.PostId == id && l.UserId != staff_user_id)
+      .Where(l => l.PostId == id && l.UserId != db.get_staff_user_id())
       .OrderBy(l => l.DateLiked)
       .ToList();
     return rows;
@@ -136,7 +136,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
   {
     post.DateCreated = DateTime.Now;
     post.Content = post.Content.nl2br();
-    post.Creator = staff_user_id;
+    post.Creator = db.get_staff_user_id();
 
 
     // if (!string.IsNullOrEmpty(post.Visibility))
@@ -182,7 +182,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
     var like = new NewsfeedPostLike
     {
       PostId = id,
-      UserId = staff_user_id,
+      UserId = db.get_staff_user_id(),
       DateLiked = DateTime.Now
     };
 
@@ -197,7 +197,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
   public bool unlike_post(int id)
   {
     var like = db.NewsfeedPostLikes
-      .FirstOrDefault(l => l.PostId == id && l.UserId == staff_user_id);
+      .FirstOrDefault(l => l.PostId == id && l.UserId == db.get_staff_user_id());
 
     if (like == null) return false;
     db.NewsfeedPostLikes.Remove(like);
@@ -211,7 +211,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
       .Where(l =>
         l.CommentId == id &&
         l.PostId == postid &&
-        l.UserId == staff_user_id
+        l.UserId == db.get_staff_user_id()
       )
       .Delete();
 
@@ -221,19 +221,19 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
   public bool user_liked_post(int id)
   {
     return db.NewsfeedPostLikes
-      .Any(l => l.PostId == id && l.UserId == staff_user_id);
+      .Any(l => l.PostId == id && l.UserId == db.get_staff_user_id());
   }
 
   public bool user_liked_comment(int id)
   {
     return db.NewsfeedCommentLikes
-      .Any(l => l.CommentId == id && l.UserId == staff_user_id);
+      .Any(l => l.CommentId == id && l.UserId == db.get_staff_user_id());
   }
 
   public int add_comment(NewsfeedPostComment comment)
   {
     comment.DateCreated = DateTime.Now;
-    comment.UserId = staff_user_id;
+    comment.UserId = db.get_staff_user_id();
     comment.Content = comment.Content?.nl2br();
     var result = db.NewsfeedPostComments.Add(comment);
     var insert_id = result.Entity.Id;
@@ -265,7 +265,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       CommentId = id,
       PostId = postid,
-      UserId = staff_user_id,
+      UserId = db.get_staff_user_id(),
       DateLiked = today()
     };
 
@@ -280,7 +280,7 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
   public bool remove_post_comment(int id, int postid)
   {
     var comment = db.NewsfeedPostComments
-      .FirstOrDefault(c => c.Id == id && c.PostId == postid && c.UserId == staff_user_id);
+      .FirstOrDefault(c => c.Id == id && c.PostId == postid && c.UserId == db.get_staff_user_id());
 
     if (comment == null) return false;
     db.NewsfeedPostComments.Remove(comment);
@@ -291,11 +291,11 @@ public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self, db)
   public bool delete_post(int postid)
   {
     var post = db.NewsfeedPosts
-      .FirstOrDefault(p => p.Id == postid && (p.Creator == staff_user_id || db.is_admin()));
+      .FirstOrDefault(p => p.Id == postid && (p.Creator == db.get_staff_user_id() || db.is_admin()));
 
     if (post == null) return false;
     db.NewsfeedPosts
-      .Where(p => p.Id == postid && (p.Creator == staff_user_id || db.is_admin()))
+      .Where(p => p.Id == postid && (p.Creator == db.get_staff_user_id() || db.is_admin()))
       .Delete();
 
     db.NewsfeedPostLikes.RemoveRange(
