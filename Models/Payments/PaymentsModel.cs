@@ -53,11 +53,11 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self,db)
 
   public int process_payment(InvoicePaymentRecord data, int invoiceId = 0, PaymentOption option = default)
   {
-    if (!string.IsNullOrEmpty(data.PaymentMode)) return !is_staff_logged_in() ? 0 : add((data, option));
+    if (!string.IsNullOrEmpty(data.PaymentMode)) return !db.is_staff_logged_in() ? 0 : add((data, option));
 
     // Invalid or missing payment mode
     if (string.IsNullOrEmpty(data.PaymentMode)) return 0;
-    if (is_staff_logged_in() && db.has_permission("payments", "", "create") && option.DoNotRedirect)
+    if (db.is_staff_logged_in() && db.has_permission("payments", "", "create") && option.DoNotRedirect)
       return add((data, option));
     invoiceId = invoiceId switch
     {
@@ -117,7 +117,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self,db)
       self.input.session.unset_userdata("do_not_send_email_template");
     }
 
-    if (is_staff_logged_in())
+    if (db.is_staff_logged_in())
     {
       data.invoicePaymentRecord.Date = string.IsNullOrEmpty(data.invoicePaymentRecord.Date) ? today() : data.invoicePaymentRecord.Date;
       data.invoicePaymentRecord.Note = string.IsNullOrEmpty(data.invoicePaymentRecord.Note) ? data.invoicePaymentRecord.Note.nl2br() : self.input.session.user_data("payment_admin_note");
@@ -145,7 +145,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self,db)
 
     self.helper.update_invoice_status(data.invoicePaymentRecord.InvoiceId!.Value, forceUpdate);
 
-    LogPaymentActivity(invoice.Id, Convert.ToDecimal(data.invoicePaymentRecord.Amount), result.Entity.Id, !is_staff_logged_in());
+    LogPaymentActivity(invoice.Id, Convert.ToDecimal(data.invoicePaymentRecord.Amount), result.Entity.Id, !db.is_staff_logged_in());
     NotifyStaffAndCustomers(data.invoicePaymentRecord, result.Entity.Id);
     hooks.do_action("after_payment_added", result.Entity.Id);
     return result.Entity.Id;

@@ -81,7 +81,7 @@ public static class SaleHelper
   }
 
 
-  public static string sales_number_format(this HelperBase helper, int number, int format, string appliedPrefix, DateTime date)
+  public static string sales_number_format(this MyContext db, int number, int format, string appliedPrefix, DateTime date)
   {
     var originalNumber = number;
     var prefixPadding = db.get_option<int>("number_padding_prefixes"); // Assuming GetOption is a method to fetch options
@@ -119,10 +119,10 @@ public static class SaleHelper
    * @param  boolean $excludeSymbol   whether to exclude to symbol from the format
    * @return string
    */
-  public static string app_format_money(this HelperBase helper, decimal amount, object id_or_name, bool excludeSymbol = false)
+  public static string app_format_money(this MyContext db, decimal amount, object id_or_name, bool excludeSymbol = false)
   {
     var currency = new Currency();
-    var dbCurrency = helper.get_currency(currency);
+    var dbCurrency = db.get_currency(currency);
     if (dbCurrency != null)
       currency = dbCurrency;
     else
@@ -139,7 +139,7 @@ public static class SaleHelper
     var symbol = !excludeSymbol ? currency.Symbol : "";
     var d = db.get_option_compare("remove_decimals_on_zero", 1) && !(amount is decimal) ? 0 : get_decimal_places();
 
-    var amountFormatted = helper.number_format(
+    var amountFormatted = number_format(
       amount,
       d
       // currency.DecimalSeparator,
@@ -241,7 +241,7 @@ public static class SaleHelper
  * @param mixed $rel_id   relation id eq. invoice id
  * @param string rel_type relation type eq invoice
  */
-  public static int add_new_sales_item_post(this HelperBase helper, Itemable item, int rel_id, string rel_type)
+  public static int add_new_sales_item_post(this MyContext db, Itemable item, int rel_id, string rel_type)
   {
     var custom_fields = new CustomField();
     // if (item["custom_fields"])
@@ -262,7 +262,7 @@ public static class SaleHelper
       });
     var id = result.Entity.Id;
     if (custom_fields != null)
-      helper.handle_custom_fields_post(id, custom_fields);
+      db.handle_custom_fields_post(id, custom_fields);
 
     return id;
   }

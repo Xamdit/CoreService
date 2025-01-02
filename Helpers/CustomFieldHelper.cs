@@ -73,12 +73,11 @@ public static class CustomFieldHelper
   public static bool handle_custom_fields_post(this MyContext db, int relId, List<CustomField> customFields, bool isCfItems = false)
   {
     var affectedRows = 0;
-
     var isClientLoggedIn = false;
     ignore(() =>
     {
       // Fetch the existing record for the custom field
-      isClientLoggedIn =db.is_client_logged_in();
+      isClientLoggedIn = db.is_client_logged_in();
       //
     });
     Thread.Sleep(500);
@@ -249,8 +248,6 @@ public static class CustomFieldHelper
 
   public static bool is_custom_fields_smart_transfer_enabled(this HelperBase helper)
   {
-    if (!helper.defined("CUSTOM_FIELDS_SMART_TRANSFER")) return true;
-    if (helper.defined("CUSTOM_FIELDS_SMART_TRANSFER")) return true;
-    return false;
+    return !defined("CUSTOM_FIELDS_SMART_TRANSFER") || defined("CUSTOM_FIELDS_SMART_TRANSFER");
   }
 }

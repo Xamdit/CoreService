@@ -230,7 +230,6 @@ public static class ClientHelper
 
   public static void send_customer_registered_email_to_administrators(this HelperBase helper, int client_id)
   {
-    var (self, db) = getInstance();
     var staff_model = self.staff_model(db);
     var admins = staff_model.get(x => x.Active == true && x.IsAdmin == true);
     admins.ForEach(admin => { self.helper.send_mail_template("customer_new_registration_to_admins", admin.Email, client_id, admin.Id); });

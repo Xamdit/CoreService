@@ -139,7 +139,7 @@ public static class ProjectMemberExtension
         if (other_lang_keys != "") _additional_data = $"<lang>{other_lang_keys}</lang>".Replace(helper.label(other_lang_keys), _additional_data);
         if (_additional_data.Contains("project_status_"))
         {
-          var row = db.get_project_status_by_id(Convert.ToInt32(helper.strafter(_additional_data, "project_status_")));
+          var row = db.get_project_status_by_id(Convert.ToInt32(strafter(_additional_data, "project_status_")));
           if (string.IsNullOrEmpty(row.Name))
             _additional_data = row.Name;
         }

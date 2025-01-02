@@ -57,7 +57,7 @@ public static class StringExtension
     return haystack.EndsWith(needle);
   }
 
-  public static string strafter(this HelperBase helperBase, string str, string substring)
+  public static string strafter(  string str, string substring)
   {
     var index = str.IndexOf(substring, StringComparison.OrdinalIgnoreCase);
     return index >= 0 ? str[(index + substring.Length)..] : str;
@@ -332,24 +332,24 @@ public static class StringExtension
   }
 
   // Method to format double
-  public static string number_format(this HelperBase helper, double number, int digit = 2)
+  public static string number_format( double number, int digit = 2)
   {
-    return helper.number_format((decimal)number, digit);
+    return number_format((decimal)number, digit);
   }
 
   // Method to format int
-  public static string number_format(this HelperBase helper, decimal percentage, int number, int digit = 2)
+  public static string number_format( decimal percentage, int number, int digit = 2)
   {
-    return helper.number_format((decimal)number, digit);
+    return number_format((decimal)number, digit);
   }
 
   // Method to format float
-  public static string number_format(this HelperBase helper, float number, int digit = 2)
+  public static string number_format( float number, int digit = 2)
   {
-    return helper.number_format((decimal)number, digit);
+    return number_format((decimal)number, digit);
   }
 
-  public static string number_format(this HelperBase helper, decimal number, int digit = 2)
+  public static string number_format( decimal number, int digit = 2)
   {
     // Create a custom NumberFormatInfo object
     var customFormat = new NumberFormatInfo
