@@ -30,7 +30,7 @@ public static class CreditNoteHelper
   public static List<int> invoices_statuses_available_for_credits(this HelperBase helper)
   {
     var (self, db) = getInstance();
-    return self.hooks.apply_filters("invoices_statuses_available_for_credits", new List<int>
+    return hooks.apply_filters("invoices_statuses_available_for_credits", new List<int>
     {
       InvoiceStatus.STATUS_UNPAID,
       InvoiceStatus.STATUS_PARTIALLY,
@@ -63,7 +63,7 @@ public static class CreditNoteHelper
     // var number = sales_number_format(creditNote.Number, creditNote.NumberFormat, creditNote.Prefix, creditNote.Date);
     var number = helper.sales_number_format(creditNote.Number, $"{creditNote.NumberFormat}", creditNote.Prefix, creditNote.Date);
 
-    self.hooks.apply_filters("format_credit_note_number", new { id, number, creditNote });
+    hooks.apply_filters("format_credit_note_number", new { id, number, creditNote });
     return number;
   }
 
@@ -71,7 +71,7 @@ public static class CreditNoteHelper
   public static string FormatCreditNoteStatus(this HelperBase helper, int status, bool text = false)
   {
     var (self, db) = getInstance();
-    var credit_notes_model = self.model.credit_notes_model();
+    var credit_notes_model = self.credit_notes_model(db);
 
     var statuses = credit_notes_model.get_statuses();
     var statusArray = statuses.FirstOrDefault(s => s.id == status);
@@ -90,7 +90,7 @@ public static class CreditNoteHelper
   public static List<ItemTax> GetCreditNoteItemTaxes(this HelperBase helper, int itemId)
   {
     var (self, db) = getInstance();
-    var taxes = self.db().ItemTaxes
+    var taxes = db.ItemTaxes
       .Where(x => x.ItemId == itemId && x.RelType == "credit_note")
       .ToList()
       .Select(x =>

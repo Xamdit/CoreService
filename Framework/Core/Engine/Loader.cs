@@ -1,11 +1,14 @@
 using DotLiquid;
 using Microsoft.AspNetCore.Components;
+using Service.Entities;
 using Service.Framework.Helpers;
 using Service.Framework.Helpers.Context;
+using File = System.IO.File;
+using Template = DotLiquid.Template;
 
 namespace Service.Framework.Core.Engine;
 
-public class Loader(MyInstance self)
+public class Loader(MyInstance self, MyContext db)
 {
   public MarkupString markup(string route, object data = default)
   {
@@ -19,12 +22,11 @@ public class Loader(MyInstance self)
 
   public string view(string route, object data = default)
   {
-    var (self, db) = getInstance();
     var theme = db.config("theme", "defaults");
     var path = Path.Combine(
       $"templates/{theme}/{route}"
     );
-    if (!self.helper.file_exists(path)) return string.Empty;
+    if (!file_exists(path)) return string.Empty;
     if (!route.Contains("."))
       path = $"{path}.html";
     if (!File.Exists(path)) File.Create(path);

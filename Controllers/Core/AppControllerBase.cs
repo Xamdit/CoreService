@@ -5,18 +5,10 @@ using Service.Libraries.FormValidations;
 
 namespace Service.Controllers.Core;
 
-public class AppControllerBase(ILogger<MyControllerBase> logger, MyInstance self) : MyControllerBase(logger, self)
+public class AppControllerBase(ILogger<MyControllerBase> logger, MyInstance self,MyContext db) : MyControllerBase(logger, self )
 {
   public FormValidation form_validation { get; set; }
 
-  public MyContext db
-  {
-    get
-    {
-      var (s, _db) = getInstance();
-      return _db;
-    }
-  }
 
   public override void Init()
   {

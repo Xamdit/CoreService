@@ -3,7 +3,7 @@ using Service.Framework;
 
 namespace Service.Models;
 
-public class CurrenciesModel(MyInstance self, MyContext db) : MyModel(self)
+public class CurrenciesModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   /**
    * @param  integer ID (optional)

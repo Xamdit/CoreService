@@ -38,3 +38,6 @@ global using System.Threading.Tasks;
 global using System.IO;
 global using static Service.Helpers.FormHelper;
 global using static Service.Framework.Core.Extensions.GlobalExtension;
+global using static Service.Framework.Helpers.UrlHelper;
+global using static Service.Core.GlobalConstants;
+global using static Service.Framework.Helpers.FileHelper;

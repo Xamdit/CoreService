@@ -11,10 +11,8 @@ namespace Service.Helpers.Tags;
 
 public static class LeadsHelper
 {
-  public static void add_leads_admin_head_data(this HelperBase helper)
+  public static void add_leads_admin_head_data(this MyContext db)
   {
-    var (self, db) = getInstance();
-
     var leadUniqueValidationFields = db.get_option("lead_unique_validation");
     var leadAttachmentsDropzone = "";
 
@@ -26,27 +24,25 @@ public static class LeadsHelper
                 </script>");
   }
 
-  public static bool IsLeadCreator(this HelperBase helper, int leadId, int? staffId = null)
+  public static bool is_lead_creator(this MyContext db, int leadId, int? staffId = null)
   {
-    var (self, db) = getInstance();
-    var staffIdToCheck = staffId ?? helper.get_staff_user_id();
+    var staffIdToCheck = staffId ?? db.get_staff_user_id();
     var output = db.Leads.Any(x => x.AddedFrom == staffIdToCheck && x.Id == leadId);
     return output;
   }
 
   public static string GetLeadConsentUrl(this HelperBase helper, int id)
   {
-    return $"{helper.site_url()}/consent/l/{helper.get_lead_hash(id)}";
+    return $"{site_url()}/consent/l/{helper.get_lead_hash(id)}";
   }
 
   public static string GetLeadsPublicUrl(this HelperBase helper, int id)
   {
-    return $"{helper.site_url()}/forms/l/{helper.get_lead_hash(id)}";
+    return $"{site_url()}/forms/l/{helper.get_lead_hash(id)}";
   }
 
-  public static string get_lead_hash(this HelperBase helper, int id)
+  public static string get_lead_hash(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var hash = "";
 
     var lead = db.Leads.FirstOrDefault(x => x.Id == id);
@@ -54,15 +50,14 @@ public static class LeadsHelper
 
     hash = lead.Hash;
     if (!string.IsNullOrEmpty(hash)) return hash;
-    hash = $"{helper.uuid()}-{helper.uuid()}";
+    hash = $"{uuid()}-{uuid()}";
     db.Leads.Where(x => x.Id == id).Update(x => new Lead { Hash = hash });
 
     return hash;
   }
 
-  public static List<LeadStatusSummary> get_leads_summary(this HelperBase helper)
+  public static List<LeadStatusSummary> get_leads_summary(this MyContext db)
   {
-    var (self, db) = getInstance();
     var statuses = db.LeadsStatuses.ToList();
     var staffUserId = helper.get_staff_user_id();
     var hasPermissionView = helper.has_permission("leads", "view");
@@ -112,7 +107,6 @@ public static class LeadsHelper
 
   public static string render_leads_status_select(this HelperBase helper, List<LeadsStatus> statuses, string? selected = null, string langKey = "", string name = "status", Dictionary<string, string> selectAttrs = null, bool excludeDefault = false)
   {
-    var (self, db) = getInstance();
     var sender = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(
       JsonConvert.SerializeObject(statuses));
 
@@ -161,21 +155,20 @@ public static class LeadsHelper
     return select;
   }
 
-  public static bool load_lead_language(this HelperBase helper, int leadId)
+  public static bool load_lead_language(this MyContext db, int leadId)
   {
-    var (self, db) = getInstance();
     var lead = db.Leads.FirstOrDefault(x => x.Id == leadId);
 
     if (lead != null || string.IsNullOrEmpty(lead.DefaultLanguage)) return false;
     var language = lead.DefaultLanguage;
 
-    if (!helper.file_exists("language/" + language)) return false;
+    if (!file_exists("language/" + language)) return false;
 
 
     // self.Lang.IsLoaded.Clear();
     // self.Lang.Language.Clear();
     // self.Lang.Load(language + "_lang", language);
-    helper.load_custom_lang_file(language);
+    load_custom_lang_file(language);
     // self.Lang.set_last_loaded_language(language);
 
     return true;
@@ -188,8 +181,7 @@ public static class LeadsHelper
 
   private static List<LeadsStatus> get_leads_statuses(this HelperBase helper)
   {
-    var (self, db) = getInstance();
-    var leads_model = self.model.leads_model();
+    var leads_model = self.leads_model(db);
     var output = leads_model.get_status(x => true);
     return output;
   }

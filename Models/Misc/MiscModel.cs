@@ -12,10 +12,10 @@ using File = Service.Entities.File;
 
 namespace Service.Models.Misc;
 
-public class MiscModel(MyInstance self, MyContext db) : MyModel(self)
+public class MiscModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public int notifications_limit = 5;
-  private TasksModel taxes_model = self.model.tasks_model();
+  private TasksModel taxes_model = self.tasks_model(db);
 
   public string get_taxes_dropdown_template(string name, string taxname, Taxis? type = null, int item_id = 0, bool is_edit = false, bool manual = false)
   {

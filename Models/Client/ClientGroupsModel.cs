@@ -4,7 +4,7 @@ using Service.Framework.Schemas;
 
 namespace Service.Models.Client;
 
-public class ClientGroupsModel(MyInstance self, MyContext db) : MyModel(self)
+public class ClientGroupsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public async Task<DeletedResult> Delete(int id)
   {
@@ -15,7 +15,7 @@ public class ClientGroupsModel(MyInstance self, MyContext db) : MyModel(self)
     if (affectedRows <= 0) return DeletedResult.Compile();
     db.CustomerGroups.Where(x => x.GroupId == id).ToList().ForEach(x => db.CustomerGroups.Remove(x));
     await db.SaveChangesAsync();
-    self.hooks.do_action("customer_group_deleted", id);
+    hooks.do_action("customer_group_deleted", id);
     log_activity($"Customer Group Deleted [ID:{id}]");
     output.Success = true;
     return output;

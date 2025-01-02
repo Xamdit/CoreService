@@ -33,20 +33,12 @@ public abstract class XComponentBase : MyComponentBase
   {
     get
     {
-      var (self, db) = getInstance();
       self.navigation = NavigationManager;
       return self;
     }
   }
 
-  public MyContext db
-  {
-    get
-    {
-      var (self, db) = getInstance();
-      return db;
-    }
-  }
+  public MyContext db => db;
 
   protected MarkupString GetTemplatePart(string section, params dynamic[] args)
   {
@@ -86,7 +78,6 @@ public abstract class XComponentBase : MyComponentBase
 
   public string? GetFragment()
   {
-    var (self, db) = getInstance();
     self.navigation = NavigationManager;
     var uri = self.navigation.Uri;
     var fragment = NavigationManager.ToAbsoluteUri(uri).Fragment;
@@ -165,10 +156,7 @@ public abstract class XComponentBase : MyComponentBase
     return string.Empty;
   }
 
-  public bool Is_client_logged_in()
-  {
-    return false;
-  }
+
 
   public string Get_project_name_by_id(int id)
   {
@@ -190,10 +178,7 @@ public abstract class XComponentBase : MyComponentBase
     return string.Empty;
   }
 
-  public string Get_upload_path_by_type(string path)
-  {
-    return string.Empty;
-  }
+
 
   public string Optimize_dropbox_thumbnail(string path)
   {
@@ -208,7 +193,6 @@ public abstract class XComponentBase : MyComponentBase
   /// <inheritdoc/>
   protected override async Task OnInitializedAsync()
   {
-    var (self, db) = getInstance();
     await base.OnInitializedAsync();
     var httpContext = HttpContextAccessor.HttpContext;
     self.context = httpContext;

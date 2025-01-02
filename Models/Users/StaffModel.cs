@@ -14,9 +14,9 @@ using Task = Service.Entities.Task;
 
 namespace Service.Models.Users;
 
-public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
+public class StaffModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  private DepartmentsModel departments_model = self.model.departments_model();
+  private DepartmentsModel departments_model = self.departments_model(db);
 
   public async Task<List<StaffPermission>> get_staff_permissions(int? staffId)
   {
@@ -28,7 +28,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
   {
     if (id == transfer_data_to) return false;
 
-    self.hooks.do_action("before_delete_staff_member", new { id, transfer_data_to });
+    hooks.do_action("before_delete_staff_member", new { id, transfer_data_to });
 
     var name = self.helper.get_staff_full_name(id);
     var transferred_to = self.helper.get_staff_full_name(transfer_data_to);
@@ -308,7 +308,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
 
     db.SaveChanges();
     log_activity($"Staff Member Deleted [Name: {name}, Data Transferred To: {transferred_to}]");
-    self.hooks.do_action("staff_member_deleted", new { id, transfer_data_to });
+    hooks.do_action("staff_member_deleted", new { id, transfer_data_to });
     return true;
   }
 
@@ -334,7 +334,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
   {
     // Query to select staff including the full name as a concatenated field
 
-    var isStaffLoggedIn = self.helper.is_staff_logged_in();
+    var isStaffLoggedIn = db.is_staff_logged_in();
 
     // Create a query with conditional fields for notifications and todos if the user is logged in
     var query = db.Staff
@@ -382,7 +382,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
   public List<StaffPermission> get_staff_permissions(int id)
   {
     // Fix for version 2.3.1 tables upgrade
-    if (self.helper.defined("DOING_DATABASE_UPGRADE")) return new List<StaffPermission>();
+    if (defined("DOING_DATABASE_UPGRADE")) return new List<StaffPermission>();
 
     var permissions = app_object_cache.get<List<StaffPermission>>($"staff-{id}-permissions");
 
@@ -400,7 +400,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
   public async Task<int> add(Staff data)
   {
     // First check for all cases if the email exists.
-    data = self.hooks.apply_filters("before_create_staff_member", data);
+    data = hooks.apply_filters("before_create_staff_member", data);
     var email = db.Staff.Any(x => x.Email == data.Email);
 
     if (email) self.helper.die("Email already exists");
@@ -472,7 +472,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
             UserId = staffid
           }).ToList());
     db.SaveChanges();
-    self.hooks.do_action("staff_member_created", staffid);
+    hooks.do_action("staff_member_created", staffid);
     return staffid;
   }
 
@@ -484,7 +484,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public async Task<dynamic> update(Staff data, int id)
   {
-    data = self.hooks.apply_filters("before_update_staff_member", data);
+    data = hooks.apply_filters("before_update_staff_member", data);
 
     if (self.helper.is_admin())
     {
@@ -611,7 +611,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
       affectedRows++;
 
     if (affectedRows <= 0) return false;
-    self.hooks.do_action("staff_member_updated", id);
+    hooks.do_action("staff_member_updated", id);
     log_activity($"Staff Member Updated [ID: {id}, {data.FirstName} {data.LastName}]");
     return true;
   }
@@ -646,7 +646,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
   public bool update_profile(Staff data)
   {
     var id = data.Id;
-    data = self.hooks.apply_filters("before_staff_update_profile", data);
+    data = hooks.apply_filters("before_staff_update_profile", data);
 
     if (!string.IsNullOrEmpty(data.Password))
     {
@@ -664,7 +664,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
     db.Staff.Where(x => x.Id == id).Update(x => data);
     var affected_rows = db.SaveChanges();
     if (affected_rows <= 0) return false;
-    self.hooks.do_action("staff_member_profile_updated", id);
+    hooks.do_action("staff_member_profile_updated", id);
     log_activity($"Staff Profile Updated [Staff: {self.helper.get_staff_full_name(id)}]");
     return true;
   }
@@ -677,8 +677,8 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public async Task<object> change_password(Staff data, int userid)
   {
-    // data = self.hooks.apply_filters("before_staff_change_password", data, userid);
-    data = self.hooks.apply_filters("before_staff_change_password", data);
+    // data = hooks.apply_filters("before_staff_change_password", data, userid);
+    data = hooks.apply_filters("before_staff_change_password", data);
     var member = get(x => x.Id == userid).First();
     // CHeck if member is active
     if (member.Active.Value)
@@ -710,7 +710,7 @@ public class StaffModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public void change_staff_status(int id, int status)
   {
-    status = self.hooks.apply_filters("before_staff_status_change", status);
+    status = hooks.apply_filters("before_staff_status_change", status);
     db.Staff.Where(x => x.Id == id).Update(x => new Staff { Active = status == 1 });
     db.SaveChanges();
     log_activity($"Staff Status Changed [StaffID: {id} - Status(Active/Inactive): {status}]");

@@ -222,7 +222,7 @@ public abstract class MyControllerBase : ControllerBase
     return new JsonResult(json) { ContentType = "application/json" };
   }
 
-  public MyControllerBase(ILogger<MyControllerBase> logger, MyInstance self)
+  public MyControllerBase(ILogger<MyControllerBase> logger, MyInstance self )
   {
     Init();
   }

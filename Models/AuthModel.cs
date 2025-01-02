@@ -5,7 +5,7 @@ using Service.Schemas;
 
 namespace Service.Models;
 
-public class AuthModel(MyInstance self, MyContext db) : MyModel(self)
+public class AuthModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public UserSchema? Signin(string email, string password, bool isStaff = false)
   {

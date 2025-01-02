@@ -14,9 +14,9 @@ public static class UploadHelper
  * @param  string  type
  * @return string
  */
-  public static string get_upload_path_by_type(this HelperBase helper, string type)
+  public static string get_upload_path_by_type(  string type)
   {
-    var (self, db) = getInstance();
+
     var path = type switch
     {
       "lead" => LEAD_ATTACHMENTS_FOLDER,
@@ -38,7 +38,7 @@ public static class UploadHelper
       _ => string.Empty
     };
 
-    return self.hooks.apply_filters("get_upload_path_by_type", path, type);
+    return hooks.apply_filters("get_upload_path_by_type", path, type);
   }
 
   /**
@@ -60,7 +60,7 @@ public static class UploadHelper
 
     for (var i = 0; i < files.Length; i++)
     {
-      self.hooks.do_action("before_upload_ticket_attachment", ticketId);
+      hooks.do_action("before_upload_ticket_attachment", ticketId);
 
       if (i > maxAllowedAttachments) continue;
       // Get the temp file path
@@ -286,10 +286,7 @@ public static class UploadHelper
   }
 
 
-  private static string get_upload_path_by_type(string type)
-  {
-    return Path.Combine("uploads", type);
-  }
+
 
   private static string generate_unique_filename(string path, string fileName)
   {
@@ -341,7 +338,7 @@ public static class UploadHelper
     }
 
     // Execute hooks before upload
-    self.hooks.do_action("before_upload_lead_attachment", leadId);
+    hooks.do_action("before_upload_lead_attachment", leadId);
 
     // Define the upload path
     var path = Path.Combine(get_upload_path_by_type("lead"), leadId.ToString());
@@ -358,7 +355,7 @@ public static class UploadHelper
     }
 
     // Add attachment details to the database
-    var leads_model = self.model.leads_model();
+    var leads_model = self.leads_model(db);
     var dataset = new Service.Entities.File
     {
       FileName = filename,

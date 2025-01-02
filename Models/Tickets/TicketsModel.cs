@@ -21,20 +21,21 @@ using static Service.Framework.Core.Extensions.StringExtension;
 
 namespace Service.Models.Tickets;
 
-public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
+public class TicketsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private bool piping = false;
 
-  private DepartmentsModel departments_model = self.model.departments_model();
-  private SpamFiltersModel spam_filters_model = self.model.spam_filters_model();
-  private StaffModel staff_model = self.model.staff_model();
-  private ClientsModel clients_model = self.model.clients_model();
-  private TasksModel tasks_model = self.model.tasks_model();
+
+  private DepartmentsModel departments_model = self.departments_model(db);
+  public SpamFiltersModel spam_filters_model = self.spam_filters_model(db);
+  private StaffModel staff_model = self.staff_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
+  private TasksModel tasks_model = self.tasks_model(db);
 
   public async Task<int> ticket_count(int? status = null)
   {
     var query = db.Tickets.Where(x => x.MergedTicketId == null).AsQueryable();
-    if (!is_admin)
+    if (!db.is_admin())
     {
       var staff_deparments_ids = departments_model.get_staff_departments(staff_user_id)
         .Select(x => x.Id)
@@ -77,7 +78,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   // {
   //   var body = string.Empty;
   //   var subject = string.Empty;
-  //   data = self.hooks.apply_filters("piped_ticket_data", body, subject);
+  //   data = hooks.apply_filters("piped_ticket_data", body, subject);
   //   piping = true;
   //   var attachments = data.TicketAttachments;
   //   subject = data.Subject;
@@ -334,7 +335,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
       Console.WriteLine(filename); // Output: example_filename
       if (string.IsNullOrEmpty(filename)) filename = "attachment";
-      if (!self.helper.file_exists(path))
+      if (!file_exists(path))
         self.helper.file_create($"{path}index.html");
       filename = self.helper.unique_filename(path, $"{filename}.{extension}");
       self.helper.file_put_contents(path + filename, arg.data);
@@ -363,7 +364,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
     query = query.Where(where).OrderBy(x => x.LastReply);
 
-    var _is_client_logged_in = self.helper.is_client_logged_in();
+    var _is_client_logged_in = db.is_client_logged_in();
     if (_is_client_logged_in) query = query.Where(x => x.MergedTicketId == null);
     return query.ToList();
   }
@@ -546,7 +547,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (piping) data.Message = preg_replace("/\v+/u", "<br>", data.Message);
 
     // admin can have html
-    if (admin == null && self.hooks.apply_filters("ticket_message_without_html_for_non_admin", true))
+    if (admin == null && hooks.apply_filters("ticket_message_without_html_for_non_admin", true))
     {
       data.Message = self.helper.strip_tags(data.Message);
       data.Message = nl2br_save_html(data.Message);
@@ -556,7 +557,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
       data.UserId = 0;
 
     data.Message = self.helper.remove_emojis(data.Message);
-    data = self.hooks.apply_filters("before_ticket_reply_add", data, id, admin);
+    data = hooks.apply_filters("before_ticket_reply_add", data, id, admin);
     var sender = self.helper.convert<TicketReply>(data);
     var result = db.TicketReplies.Add(sender);
     var insert_id = result.Entity.Id;
@@ -567,7 +568,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     var old_ticket_status = row.Status;
 
 
-    var newStatus = self.hooks.apply_filters(
+    var newStatus = hooks.apply_filters(
       "ticket_reply_status",
       new
       {
@@ -616,7 +617,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     await db.SaveChangesAsync();
 
     if (old_ticket_status != newStatus.OldStatus)
-      self.hooks.do_action("after_ticket_status_changed", new
+      hooks.do_action("after_ticket_status_changed", new
       {
         id,
         status = newStatus
@@ -638,8 +639,8 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (admin == null)
     {
-      var departments_model = self.model.departments_model();
-      var staff_model = self.model.staff_model();
+      var departments_model = self.departments_model(db);
+      var staff_model = self.staff_model(db);
       // this.load.model("departments_model");
       // this.load.model("staff_model");
 
@@ -664,7 +665,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     }
     else
     {
-      self.ignore(async () => await update_staff_replying(id));
+      ignore(async () => await update_staff_replying(id));
       var total_staff_replies = db.TicketReplies.Count(x => x.Admin != null && x.Id == ticket.Id);
       if (
         ticket.Assigned == 0 &&
@@ -704,7 +705,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
       await db.Tickets.Where(x => x.Id == id).UpdateAsync(x => new Ticket { Cc = cc });
     }
 
-    self.hooks.do_action("after_ticket_reply_added", new
+    hooks.do_action("after_ticket_reply_added", new
     {
       data,
       id,
@@ -724,7 +725,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool delete_ticket_reply(int ticket_id, int reply_id)
   {
-    self.hooks.do_action("before_delete_ticket_reply", new { ticket_id, reply_id });
+    hooks.do_action("before_delete_ticket_reply", new { ticket_id, reply_id });
     var affected_rows = db.TicketReplies.Where(x => x.Id == reply_id).Delete();
     if (affected_rows <= 0) return false;
     // Get the reply attachments by passing the reply_id to get_ticket_attachments method
@@ -745,16 +746,16 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     var deleted = false;
     var attachment = db.TicketAttachments.FirstOrDefault(x => x.Id == id);
     if (attachment == null) return deleted;
-    if (self.helper.unlink($"{self.helper.get_upload_path_by_type("ticket")}{attachment.TicketId}/{attachment.FileName}"))
+    if (self.helper.unlink($"{get_upload_path_by_type("ticket")}{attachment.TicketId}/{attachment.FileName}"))
     {
       db.TicketAttachments.Where(x => x.Id == id).Delete();
       deleted = true;
     }
 
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("ticket") + attachment.TicketId);
+    var other_attachments = self.helper.list_files(get_upload_path_by_type("ticket") + attachment.TicketId);
     if (!other_attachments.Any())
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("ticket") + attachment.TicketId);
+      self.helper.delete_dir(get_upload_path_by_type("ticket") + attachment.TicketId);
 
     return deleted;
   }
@@ -815,7 +816,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   {
     var ticket_replies_order = db.get_option("ticket_replies_order");
 
-    ticket_replies_order = self.hooks.apply_filters("ticket_replies_order", ticket_replies_order);
+    ticket_replies_order = hooks.apply_filters("ticket_replies_order", ticket_replies_order);
 
     var replies = db.TicketReplies
       .Include(x => x.Contact)
@@ -878,7 +879,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         // Opened from customer portal otherwise is passed from pipe or admin area
         if (data.UserId == 0 && data.ContactId == 0)
         {
-          data.UserId = self.helper.get_client_user_id();
+          data.UserId = db.get_client_user_id();
           data.ContactId = self.helper.get_contact_user_id();
         }
       }
@@ -901,7 +902,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (piping) data.Message = preg_replace("/\v+/u", "<br>", data.Message);
 
     // Admin can have html
-    if (admin == null && self.hooks.apply_filters("ticket_message_without_html_for_non_admin", true))
+    if (admin == null && hooks.apply_filters("ticket_message_without_html_for_non_admin", true))
     {
       data.Message = self.helper.strip_tags(data.Message);
       data.Subject = self.helper.strip_tags(data.Subject);
@@ -913,14 +914,14 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
 
     var tags = data.Tags;
     data.Message = self.helper.remove_emojis(data.Message);
-    // data = self.hooks.apply_filters("before_ticket_created", data, admin);
-    data = self.hooks.apply_filters("before_ticket_created", data);
+    // data = hooks.apply_filters("before_ticket_created", data, admin);
+    data = hooks.apply_filters("before_ticket_created", data);
 
     var result = db.Tickets.Add(data);
     var ticketid = result.Entity.Id;
 
     if (ticketid == 0) return 0;
-    self.helper.handle_tags_save(tags, ticketid, "ticket");
+    db.handle_tags_save(tags, ticketid, "ticket");
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(ticketid, custom_fields);
 
@@ -1009,7 +1010,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         cc);
     }
 
-    self.hooks.do_action("ticket_created", ticketid);
+    hooks.do_action("ticket_created", ticketid);
     log_activity($"New Ticket Created [ID: {ticketid}]");
     return ticketid;
   }
@@ -1050,7 +1051,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   public bool delete(int ticketid)
   {
     var affectedRows = 0;
-    self.hooks.do_action("before_ticket_deleted", ticketid);
+    hooks.do_action("before_ticket_deleted", ticketid);
     // final delete ticket
 
     var affected_rows = db.Tickets.Where(x => x.Id == ticketid).Delete();
@@ -1068,8 +1069,8 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
         .ToList()
         .ForEach(attachment =>
         {
-          if (self.helper.is_dir(self.helper.get_upload_path_by_type("ticket") + ticketid))
-            if (self.helper.delete_dir(self.helper.get_upload_path_by_type("ticket") + ticketid))
+          if (self.helper.is_dir(get_upload_path_by_type("ticket") + ticketid))
+            if (self.helper.delete_dir(get_upload_path_by_type("ticket") + ticketid))
             {
               db.TicketAttachments.Where(x => x.Id == attachment.Id).Delete();
               if (affected_rows > 0) affectedRows++;
@@ -1106,7 +1107,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (affectedRows <= 0) return false;
     log_activity($"Ticket Deleted [ID: {ticketid}]");
 
-    self.hooks.do_action("after_ticket_deleted", ticketid);
+    hooks.do_action("after_ticket_deleted", ticketid);
 
     return true;
   }
@@ -1119,7 +1120,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   public bool update_single_ticket_settings(TicketOption data)
   {
     var affectedRows = 0;
-    data = self.hooks.apply_filters("before_ticket_settings_updated", data);
+    data = hooks.apply_filters("before_ticket_settings_updated", data);
 
     var ticketBeforeUpdate = get_ticket_by_id(data.Id);
 
@@ -1139,7 +1140,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (data.Tags.Any())
       tags = data.Tags;
 
-    if (self.helper.handle_tags_save(tags, data.Id, "ticket")) affectedRows++;
+    if (db.handle_tags_save(tags, data.Id, "ticket")) affectedRows++;
 
     // if ((data.Priority && data.Priority == "") || !data.Priority)
     //   data.Priority = 0;
@@ -1155,7 +1156,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     var affected_rows = db.Tickets.Where(x => x.Id == data.Id).Update(x => data);
     if (affected_rows > 0)
     {
-      self.hooks.do_action(
+      hooks.do_action(
         "ticket_settings_updated",
         new
         {
@@ -1234,7 +1235,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
     if (affected_rows <= 0) return (alert, message);
     alert = "success";
     message = self.helper.label("ticket_status_changed_successfully");
-    self.hooks.do_action("after_ticket_status_changed", new
+    hooks.do_action("after_ticket_status_changed", new
     {
       id,
       status
@@ -1476,7 +1477,7 @@ public class TicketsModel(MyInstance self, MyContext db) : MyModel(self)
   public Chart get_weekly_tickets_opening_statistics()
   {
     var departments_ids = new List<int>();
-    if (!is_admin)
+    if (!db.is_admin())
       if (db.get_option_compare("staff_access_only_assigned_departments", 1))
       {
         var staff_deparments_ids = departments_model.get_staff_departments(staff_user_id).Select(x => x.Id).ToList();

@@ -18,7 +18,7 @@ public static class EstimatesHelper
     var estimate = db.Estimates.FirstOrDefault(x => x.Id == id);
     if (estimate == null) return "";
     var number = helper.sales_number_format(estimate.Number, estimate.NumberFormat, estimate.Prefix, estimate.Date);
-    self.hooks.apply_filters("format_estimate_number", new { id, number, estimate });
+    hooks.apply_filters("format_estimate_number", new { id, number, estimate });
     return number;
   }
 

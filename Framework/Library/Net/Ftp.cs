@@ -1,9 +1,11 @@
 using System.Net;
+using Service.Entities;
 using Service.Framework.Core.Extensions;
+using File = System.IO.File;
 
 namespace Service.Framework.Library.Net;
 
-public class Ftp
+public class Ftp(MyInstance instance,MyContext db, Dictionary<string, object> config = null)
 {
   public string Hostname { get; set; } = string.Empty;
   public string Username { get; set; } = string.Empty;
@@ -16,12 +18,12 @@ public class Ftp
   private FtpWebResponse _response;
   private MyInstance self { get; set; }
 
-  public Ftp(MyInstance instance, Dictionary<string, object> config = null)
-  {
-    self = instance;
-    if (config != null) Initialize(config);
-    self.helper.log_message("FTP Class Initialized");
-  }
+  // public Ftp(MyInstance instance, Dictionary<string, object> config = null)
+  // {
+  //   self = instance;
+  //   if (config != null) Initialize(config);
+  //   db.log_message("FTP Class Initialized");
+  // }
 
   public void Initialize(Dictionary<string, object> config)
   {
@@ -65,14 +67,14 @@ public class Ftp
 
       using (_response = (FtpWebResponse)_request.GetResponse())
       {
-        self.helper.log_message($"Connected, status: {_response.StatusDescription}");
+        db.log_message($"Connected, status: {_response.StatusDescription}");
         return true;
       }
     }
     catch (WebException ex)
     {
       if (Debug)
-        self.helper.log_error($"Connection error: {ex.Message}");
+        db.log_error($"Connection error: {ex.Message}");
       return false;
     }
   }
@@ -89,13 +91,13 @@ public class Ftp
 
       using (_response = (FtpWebResponse)_request.GetResponse())
       {
-        self.helper.log_message($"Changed directory to {path}, status: {_response.StatusDescription}");
+        db.log_message($"Changed directory to {path}, status: {_response.StatusDescription}");
         return true;
       }
     }
     catch (WebException ex)
     {
-      if (Debug && !suppressDebug) self.helper.log_error($"Unable to change directory: {ex.Message}");
+      if (Debug && !suppressDebug) db.log_error($"Unable to change directory: {ex.Message}");
       return false;
     }
   }
@@ -112,14 +114,14 @@ public class Ftp
 
       using (_response = (FtpWebResponse)_request.GetResponse())
       {
-        self.helper.log_message($"Directory created: {path}, status: {_response.StatusDescription}");
+        db.log_message($"Directory created: {path}, status: {_response.StatusDescription}");
         return true;
       }
     }
     catch (WebException ex)
     {
       if (Debug)
-        self.helper.log_error($"Unable to create directory: {ex.Message}");
+        db.log_error($"Unable to create directory: {ex.Message}");
       return false;
     }
   }
@@ -130,7 +132,7 @@ public class Ftp
 
     if (!File.Exists(locPath))
     {
-      self.helper.log_error("No source file found for upload");
+      db.log_error("No source file found for upload");
       return false;
     }
 
@@ -154,7 +156,7 @@ public class Ftp
 
     using (_response = (FtpWebResponse)_request.GetResponse())
     {
-      self.helper.log_message($"Upload complete, status: {_response.StatusDescription}");
+      db.log_message($"Upload complete, status: {_response.StatusDescription}");
       return true;
     }
   }
@@ -176,12 +178,12 @@ public class Ftp
         responseStream.CopyTo(fs);
       }
 
-      self.helper.log_message($"Download complete: {locPath}, status: {_response.StatusDescription}");
+      db.log_message($"Download complete: {locPath}, status: {_response.StatusDescription}");
       return true;
     }
     catch (WebException ex)
     {
-      if (Debug) self.helper.log_error($"Unable to download file: {ex.Message}");
+      if (Debug) db.log_error($"Unable to download file: {ex.Message}");
       return false;
     }
   }
@@ -199,14 +201,14 @@ public class Ftp
     {
       using (_response = (FtpWebResponse)_request.GetResponse())
       {
-        self.helper.log_message($"Renamed {oldFile} to {newFile}, status: {_response.StatusDescription}");
+        db.log_message($"Renamed {oldFile} to {newFile}, status: {_response.StatusDescription}");
         return true;
       }
     }
     catch (WebException ex)
     {
       if (Debug)
-        self.helper.log_error($"Unable to rename file: {ex.Message}");
+        db.log_error($"Unable to rename file: {ex.Message}");
       return false;
     }
   }
@@ -223,14 +225,14 @@ public class Ftp
     {
       using (_response = (FtpWebResponse)_request.GetResponse())
       {
-        self.helper.log_message($"Deleted file: {filepath}, status: {_response.StatusDescription}");
+        db.log_message($"Deleted file: {filepath}, status: {_response.StatusDescription}");
         return true;
       }
     }
     catch (WebException ex)
     {
       if (Debug)
-        self.helper.log_error($"Unable to delete file: {ex.Message}");
+        db.log_error($"Unable to delete file: {ex.Message}");
       return false;
     }
   }
@@ -258,7 +260,7 @@ public class Ftp
     catch (WebException ex)
     {
       if (Debug)
-        self.helper.log_error($"Unable to list files: {ex.Message}");
+        db.log_error($"Unable to list files: {ex.Message}");
       return false;
     }
   }
@@ -267,13 +269,13 @@ public class Ftp
   {
     // In C#, FtpWebRequest does not need a close method as resources are released automatically
     _response?.Close();
-    self.helper.log_message("FTP connection closed.");
+    db.log_message("FTP connection closed.");
   }
 
   private bool IsConn()
   {
     if (_response != null) return true;
-    if (Debug) self.helper.log_error("No FTP connection.");
+    if (Debug) db.log_error("No FTP connection.");
     return false;
   }
 

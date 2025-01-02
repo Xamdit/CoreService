@@ -14,9 +14,8 @@ public static class ProjectsHelper
  * @param  mixed id project id
  * @return mixed
  */
-  public static int get_client_id_by_project_id(this HelperBase helper, int id)
+  public static int get_client_id_by_project_id(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var project = db.Projects.FirstOrDefault(x => x.Id == id);
     return project?.ClientId ?? 0;
   }
@@ -26,10 +25,9 @@ public static class ProjectsHelper
  * @param  mixed $project_id
  * @return mixed
  */
-  public static int get_project_billing_type(this HelperBase helper, int project_id)
+  public static int get_project_billing_type(this MyContext db, int project_id)
   {
-    var (self, db) = getInstance();
-    var project = db.Projects.Where(x => x.Id == project_id).FirstOrDefault();
+    var project = db.Projects.FirstOrDefault(x => x.Id == project_id);
     return project?.BillingType ?? 0;
   }
 
@@ -57,8 +55,7 @@ public static class ProjectsHelper
  */
   public static ProjectSettingOption get_project_status_by_id(this HelperBase helper, int id)
   {
-    var (self, db) = getInstance();
-    var projects_model = self.model.projects_model();
+    var projects_model = self.projects_model(db);
     var statuses = projects_model.get_project_statuses();
 
     var status = new ProjectSettingOption()

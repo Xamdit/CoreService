@@ -2,7 +2,7 @@ namespace Service.Framework.Core.AppHook;
 
 public class HooksTests
 {
-  private readonly Hooks _hooks = new(MyInstance.Instance);
+  private readonly Hooks _hooks = new();
 
   [Test]
   public void AddFilter_ShouldAddFilterSuccessfully()

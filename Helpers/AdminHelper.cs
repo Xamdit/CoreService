@@ -44,13 +44,13 @@ public static class AdminHelper
     var permissions = new List<StaffPermission>();
     if (!permissions.Any())
     {
-      var staffModel = self.model.staff_model();
+      var staffModel = self.staff_model(db);
       permissions = await staffModel.get_staff_permissions(staffId);
     }
 
     // if (!string.IsNullOrEmpty(feature)) return Hooks.apply_filters("staff_can", permissions.Any(permission => feature == permission.feature && capability == permission.capability), capability, feature, staffId);
     var retVal = helper.in_array_multidimensional(permissions, "capability", capability);
-    // return self.hooks.apply_filters("staff_can", retVal, capability, feature, staffId);
+    // return hooks.apply_filters("staff_can", retVal, capability, feature, staffId);
     return false;
   }
 

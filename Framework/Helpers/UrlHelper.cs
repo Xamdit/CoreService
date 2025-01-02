@@ -5,32 +5,32 @@ namespace Service.Framework.Helpers;
 
 public static class UrlHelper
 {
-  public static string admin_url(this HelperBase helper, string uri = "", string protocol = null)
+  public static string admin_url(string uri = "", string protocol = null)
   {
     var output = new List<string> { "admin" };
     uri
       .Split("/").ToList().Where(x => !string.IsNullOrEmpty(x)).ToList()
       .ForEach(output.Add);
-    return helper.site_url(string.Join("/", output), protocol);
+    return site_url(string.Join("/", output), protocol);
   }
 
-  public static string client_url(this HelperBase helper, string uri = "", string protocol = null)
+  public static string client_url(string uri = "", string protocol = null)
   {
     var output = new List<string> { "client" };
     uri
       .Split("/").ToList().Where(x => !string.IsNullOrEmpty(x)).ToList()
       .ForEach(output.Add);
-    return helper.site_url(string.Join("/", output), protocol);
+    return site_url(string.Join("/", output), protocol);
   }
 
-  public static string site_url(this HelperBase helper, string uri = "", string protocol = null)
+  public static string site_url(string uri = "", string protocol = null)
   {
-    return helper.get_base_url() + uri;
+    return get_base_url() + uri;
   }
 
-  public static string base_url(this HelperBase helper, string uri = "", string protocol = null)
+  public static string base_url(string uri = "", string protocol = null)
   {
-    return helper.get_base_url() + uri;
+    return get_base_url() + uri;
   }
 
   /**
@@ -58,14 +58,14 @@ public static class UrlHelper
 
   public static string current_url(this HelperBase helper)
   {
-    var self = MyInstance.Instance;
+    var self = new MyInstance();
     var context = self.context;
     return context.Request.Path;
   }
 
   public static string uri_string(this HelperBase helper)
   {
-    var self = MyInstance.Instance;
+    var self = new MyInstance();
     var context = self.context;
     return context.Request.Path.Value;
   }
@@ -157,9 +157,9 @@ public static class UrlHelper
     // Redirect logic here
   }
 
-  private static string get_base_url(this HelperBase helper)
+  private static string get_base_url()
   {
-    var self = MyInstance.Instance;
+    var self = new MyInstance();
     var request = self.context.Request;
     var currentUrl = $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
 

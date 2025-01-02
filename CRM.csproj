@@ -8,52 +8,63 @@
     <RootNamespace>Service</RootNamespace>
     <LangVersion>default</LangVersion>
   </PropertyGroup>
+
   <ItemGroup>
+    <!-- UI and Toast Notifications -->
     <PackageReference Include="Blazored.Toast" Version="4.2.1"/>
     <PackageReference Include="CurrieTechnologies.Razor.SweetAlert2" Version="5.6.0"/>
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0"/>
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0"/>
-    <PackageReference Include="DotLiquid" Version="2.2.692"/>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.70"/>
-    <PackageReference Include="ICSharpCode.SharpZipLib.dll" Version="0.85.4.369"/>
-    <PackageReference Include="iTextSharp" Version="5.5.13.4"/>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.10"/>
+
+    <!-- Entity Framework Core -->
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10"/>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2"/>
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="8.103.6.4"/>
+
+    <!-- SignalR -->
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.10"/>
+
+    <!-- Testing Libraries -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
-    <PackageReference Include="Moq" Version="4.20.72"/>
-    <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.8"/>
+    <PackageReference Include="NUnit" Version="4.3.0"/>
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0"/>
+    <PackageReference Include="Moq" Version="4.18.3"/>
+
+    <!-- Utility Libraries -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
-    <PackageReference Include="PDFsharp" Version="6.1.1"/>
+    <PackageReference Include="DotLiquid" Version="2.2.692"/>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.70"/>
+    <PackageReference Include="SqlKata" Version="2.4.0"/>
+    <PackageReference Include="SqlKata.Execution" Version="2.4.0"/>
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1"/>
     <PackageReference Include="RestSharp" Version="112.1.0"/>
-    <!-- test unit package-->
-    <PackageReference Include="NUnit" Version="4.3.0"/>
-    <PackageReference Include="NUnit.Analyzers" Version="4.2.0">
-      <PrivateAssets>all</PrivateAssets>
-      <ExcludeAssets>All</ExcludeAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0"/>
+
+    <!-- Imaging and PDF Processing -->
     <PackageReference Include="SixLabors.Fonts" Version="2.0.4"/>
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5"/>
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.4"/>
+    <PackageReference Include="PDFsharp" Version="6.1.1"/>
+    <PackageReference Include="iTextSharp" Version="5.5.13.4"/>
     <PackageReference Include="SkiaSharp" Version="2.88.8"/>
-    <PackageReference Include="SqlKata" Version="2.4.0"/>
-    <PackageReference Include="SqlKata.Execution" Version="2.4.0"/>
     <PackageReference Include="System.Drawing.Common" Version="8.0.10"/>
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4"/>
-    <PackageReference Include="SkiaSharp" Version="2.88.8"/>
-    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="8.103.6.4"/>
     <PackageReference Include="ZXing.Net" Version="0.16.9"/>
-    <!-- end test unit package-->
+
+    <!-- Compression -->
+    <PackageReference Include="ICSharpCode.SharpZipLib.dll" Version="0.85.4.369"/>
+    <!-- Test Unit Analyzer -->
+    <PackageReference Include="NUnit.Analyzers" Version="4.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <ExcludeAssets>All</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
-   
 
 </Project>

@@ -1,5 +1,8 @@
 using Newtonsoft.Json;
+using Service.Entities;
 using Service.Framework.Core.Engine;
+using Service.Framework.Helpers.Context;
+using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 
 namespace Service.Framework.Helpers;
@@ -9,7 +12,7 @@ public static class FileHelper
   private static Dictionary<string, string> Mimes = new();
   private static bool hour12 = true;
 
-  public static bool file_exists(this HelperBase helper, string path, bool createIfNotExists = false)
+  public static bool file_exists( string path, bool createIfNotExists = false)
   {
     var output = File.Exists(path);
     if (!createIfNotExists || output) return output;
@@ -46,8 +49,7 @@ public static class FileHelper
 
   public static string get_mime_by_extension(this HelperBase helper, string path)
   {
-    var (self, db) = getInstance();
-    var extension = self.helper.file_extension(path);
+    var extension = helper.file_extension(path);
     return mimetype(extension);
   }
 
@@ -95,9 +97,8 @@ public static class FileHelper
 
   public static string _dt(this HelperBase helper, DateTime parsedDate, bool isTimesheet = false)
   {
-    var self = MyInstance.Instance;
-
-    var dateFormat = self.config.get("date_format", "HH:mm:ss tt");
+    var db = new MyContext();
+    var dateFormat = db.config("date_format", "HH:mm:ss tt");
     var timeFormat = isTimesheet ? "HH:mm" : "HH:mm:ss tt";
     var formattedDate = hour12
       ? parsedDate.ToString($"{dateFormat} {timeFormat}")
@@ -107,7 +108,7 @@ public static class FileHelper
 
   public static string _dt(this HelperBase helper, string date, bool isTimesheet = false)
   {
-    var self = MyInstance.Instance;
+    var self = new MyInstance();
     var dateFormat = self.config.get("date_format", "HH:mm:ss tt");
     if (string.IsNullOrWhiteSpace(date) || date == "0000-00-00 00:00:00") return "";
     var parsedDate = DateTime.Parse(date);
@@ -211,11 +212,6 @@ public static class FileHelper
     if (if_not_exists && File.Exists(path)) return false;
     File.Create(path);
     return true;
-  }
-
-  public static bool file_exists(this HelperBase helperBase, string path)
-  {
-    return File.Exists(path);
   }
 
   public static int file_put_contents(this HelperBase self, string path, string data, bool append = false)

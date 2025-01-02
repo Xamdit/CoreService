@@ -36,7 +36,7 @@ public class ManageRazor : AdminComponentBase
 
   public List<object> table_data = new();
 
-  public List<CustomField> custom_fields => self.helper.get_custom_fields("customers", x => x.ShowOnTable);
+  public List<CustomField> custom_fields => db.get_custom_fields("customers", x => x.ShowOnTable);
 
 
   public Expression<Func<Entities.Client, bool>> conditionSummary()
@@ -44,7 +44,7 @@ public class ManageRazor : AdminComponentBase
     if (!customers_view) return default;
     // Get the list of StaffIds first, outside the expression
     var staffUserId = self.helper.get_staff_user_id();
-    var staffIds = self.db().CustomerAdmins
+    var staffIds = db.CustomerAdmins
       .Where(x => x.StaffId == staffUserId)
       .Select(x => x.StaffId)
       .ToList();
@@ -59,7 +59,7 @@ public class ManageRazor : AdminComponentBase
     if (!customers_view) return default;
     // Get the list of StaffIds first, outside the expression
     var staffUserId = self.helper.get_staff_user_id();
-    var staffIds = self.db().CustomerAdmins
+    var staffIds = db.CustomerAdmins
       .Where(x => x.StaffId == staffUserId)
       .Select(x => x.StaffId)
       .ToList();

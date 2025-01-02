@@ -8,9 +8,9 @@ using Service.Models.Users;
 
 namespace Service.Models;
 
-public class RolesModel(MyInstance self, MyContext db) : MyModel(self)
+public class RolesModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  private StaffModel staff_model = self.model.staff_model();
+  private StaffModel staff_model = self.staff_model(db);
 
   /**
 * Add new employee role

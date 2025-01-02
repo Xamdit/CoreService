@@ -25,14 +25,14 @@ using Task = Service.Entities.Task;
 
 namespace Service.Models.Tasks;
 
-public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
+public class TasksModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   private List<TaskOption> statuses = new();
-  private LeadsModel leads_model = self.model.leads_model();
-  private StaffModel staff_model = self.model.staff_model();
-  private ProjectsModel projects_model = self.model.projects_model();
-  private ClientsModel clients_model = self.model.clients_model();
-  private MiscModel misc_model = self.model.misc_model();
+  private LeadsModel leads_model = self.leads_model(db);
+  private StaffModel staff_model = self.staff_model(db);
+  private ProjectsModel projects_model = self.projects_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
+  private MiscModel misc_model = self.misc_model(db);
 
   // Not used?
   public List<Task> get_user_tasks_assigned()
@@ -91,7 +91,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
         filter_default = false
       }
     };
-    statuses = self.hooks.apply_filters("before_get_task_statuses", statuses);
+    statuses = hooks.apply_filters("before_get_task_statuses", statuses);
     statuses = statuses.Aggregate(statuses, (a, b) => a.OrderBy(x => x.order).ToList());
     return statuses;
   }
@@ -108,7 +108,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     condition = condition.And(x => x.Id == id);
     task.Data = db.Tasks.FirstOrDefault(condition);
     if (task == null)
-      return self.hooks.apply_filters("get_task", task);
+      return hooks.apply_filters("get_task", task);
     task.Data.TaskComments = get_task_comments(id);
     task.Data.TaskAssigneds = get_task_assignees(id);
     task["assignees_ids"] = convert<List<TaskAssigned>>(task["task_assigneds"]).Select(x => x.Id).ToList();
@@ -119,22 +119,22 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     task["timesheets"] = get_timesheets(task.Data.Id);
     task["task_checklist_items"] = get_checklist_items(id);
 
-    if (is_staff_logged_in())
+    if (db.is_staff_logged_in())
     {
       task["current_user_is_assigned"] = is_task_assignee(staff_user_id, id);
       task["current_user_is_creator"] = is_task_creator(staff_user_id, id);
     }
 
 // task.milestone_name = string.Empty;
-    if (task.Data.RelType != "project") return self.hooks.apply_filters("get_task", task);
+    if (task.Data.RelType != "project") return hooks.apply_filters("get_task", task);
     task["project_data"] = projects_model.get(x => x.Id == task.Data.RelId);
-    if (!task.Data.Milestone.HasValue) return self.hooks.apply_filters("get_task", task);
+    if (!task.Data.Milestone.HasValue) return hooks.apply_filters("get_task", task);
     var milestone = get_milestone(task.Data.Milestone.Value);
-    if (milestone == null) return self.hooks.apply_filters("get_task", task);
+    if (milestone == null) return hooks.apply_filters("get_task", task);
     task["hide_milestone_from_customer"] = milestone.HideFromCustomer;
 // task.Milestone.name = milestone.name;
 
-    return self.hooks.apply_filters("get_task", task);
+    return hooks.apply_filters("get_task", task);
   }
 
   public Milestone? get_milestone(int id)
@@ -173,7 +173,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     _new_task_data.TotalCycles = 0;
     _new_task_data.IsRecurringFrom = null;
 
-    if (is_staff_logged_in())
+    if (db.is_staff_logged_in())
       _new_task_data.AddedFrom = staff_user_id;
     var dStart = task.StartDate;
     var dEnd = task.DueDate; // Assuming DueDate is DateTime?
@@ -202,20 +202,20 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     //     Console.WriteLine("TasksModel.copy");
 
     _new_task_data.DateFinished = null;
-    _new_task_data = self.hooks.apply_filters("before_add_task", _new_task_data);
+    _new_task_data = hooks.apply_filters("before_add_task", _new_task_data);
     var result = db.Tasks.Add(_new_task_data);
     var insert_id = result.Entity.Id;
     if (!result.IsAdded()) return null;
     var tags = db.get_tags_in(copy_from.RelId.Value, "task");
-    self.helper.handle_tags_save(tags, insert_id, "task");
+    db.handle_tags_save(tags, insert_id, "task");
     if (Convert.ToBoolean(dataset["copy_task_assignees"])) copy_task_assignees(copy_from, db.task(insert_id));
     if (Convert.ToBoolean(dataset["copy_task_followers"])) copy_task_followers(copy_from, db.task(insert_id));
     if (Convert.ToBoolean(dataset["copy_task_checklist_items"])) copy_task_checklist_items(copy_from, db.task(insert_id));
     if (Convert.ToBoolean(dataset["copy_task_attachments"]))
     {
       var attachments = get_task_attachments(x => x.Id == copy_from.Id);
-      if (self.helper.is_dir(self.helper.get_upload_path_by_type("task") + copy_from))
-        self.helper.xcopy(self.helper.get_upload_path_by_type("task") + copy_from, self.helper.get_upload_path_by_type("task") + insert_id);
+      if (self.helper.is_dir(get_upload_path_by_type("task") + copy_from))
+        self.helper.xcopy(get_upload_path_by_type("task") + copy_from, get_upload_path_by_type("task") + insert_id);
       var _at = attachments;
       var at = _at.Select(x =>
         {
@@ -233,7 +233,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     copy_task_custom_fields(copy_from, db.task(insert_id));
-    self.hooks.do_action("after_add_task", insert_id);
+    hooks.do_action("after_add_task", insert_id);
     return db.task(insert_id);
   }
 
@@ -280,10 +280,10 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
 
   public void copy_task_custom_fields(Task from_task, Task to_task)
   {
-    var custom_fields = self.helper.get_custom_fields("tasks");
+    var custom_fields = db.get_custom_fields("tasks");
     foreach (var field in custom_fields)
     {
-      var value = self.helper.get_custom_field_value(from_task.Id, field.Id, "tasks", false);
+      var value = db.get_custom_field_value(from_task.Id, field.Id, "tasks", false);
       if (!string.IsNullOrEmpty(value))
         db.CustomFieldsValues.Add(new CustomFieldsValue
         {
@@ -381,7 +381,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     if (dataset.Data.RelType == "project")
     {
       var project = db.Projects.FirstOrDefault(x => x.Id == dataset.Data.RelId);
-      var billing_type = self.helper.get_project_billing_type(dataset.Data.RelId.Value);
+      var billing_type = db.get_project_billing_type(dataset.Data.RelId.Value);
       if (project.BillingType == 2) dataset.Data.HourlyRate = project.ProjectRatePerHour;
       dataset.Data.Name = $"{project.Name} - {dataset.Data.Name}";
     }
@@ -471,7 +471,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     //      (data.repeat_every_custom);
     // }
 
-    if (is_client_logged_in() || clientRequest)
+    if (db.is_client_logged_in() || clientRequest)
       dataset.Data.VisibleToClient = true;
 
 
@@ -503,7 +503,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     if (dataset.ContainesKey("withDefaultAssignee"))
       withDefaultAssignee = (bool)dataset["withDefaultAssignee"];
 
-    dataset.Data = self.hooks.apply_filters("before_add_task", dataset.Data);
+    dataset.Data = hooks.apply_filters("before_add_task", dataset.Data);
 
     var tags = new List<Taggable>();
     if (dataset.Tags.Any()) tags = dataset.Tags;
@@ -531,7 +531,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     custom_fields.Clear();
-    self.helper.handle_tags_save(tags, insert_id, "task");
+    db.handle_tags_save(tags, insert_id, "task");
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(insert_id, custom_fields);
 
@@ -597,18 +597,18 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
 
         if (ticket_attachments.Any())
         {
-          var task_path = $"{self.helper.get_upload_path_by_type("task")}{insert_id}/";
+          var task_path = $"{get_upload_path_by_type("task")}{insert_id}/";
           self.helper.maybe_create_upload_path(task_path);
 
           foreach (var ticket_attachment in ticket_attachments)
           {
-            var path = $"{self.helper.get_upload_path_by_type("ticket")}{fromTicketId}/{ticket_attachment.FileName}";
-            if (!self.helper.file_exists(path)) continue;
+            var path = $"{get_upload_path_by_type("ticket")}{fromTicketId}/{ticket_attachment.FileName}";
+            if (!file_exists(path)) continue;
 
             var filename = self.helper.unique_filename(task_path, ticket_attachment.FileName);
 
             // var fpt = self.helper.fopen(task_path + filename, 'w');
-            // if (self.helper.file_exists(filename) && self.helper.file_put_contents(filename))
+            // if (file_exists(filename) && self.helper.file_put_contents(filename))
             // {
             // }
 // self.helper.file_put_contents(path,self.helper.get_upload_path_by_type
@@ -629,7 +629,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     log_activity($"New Task Added [ID : {insert_id}, Name : {dataset.Data.Name}]");
-    self.hooks.do_action("after_add_task", insert_id);
+    hooks.do_action("after_add_task", insert_id);
     return insert_id;
   }
 
@@ -709,7 +709,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       }
     }
 
-    data = self.hooks.apply_filters("before_update_task", data, id);
+    data = hooks.apply_filters("before_update_task", data, id);
     var custom_fields = new List<CustomField>();
     if (data.custom_fields.Any())
     {
@@ -719,7 +719,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     if (data.Tags.Any())
-      if (self.helper.handle_tags_save(data.Tags, id, "task"))
+      if (db.handle_tags_save(data.Tags, id, "task"))
         affectedRows++;
 
 
@@ -742,7 +742,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     if (result > 0) affectedRows++;
 
     if (affectedRows <= 0) return false;
-    self.hooks.do_action("after_update_task", id);
+    hooks.do_action("after_update_task", id);
     log_activity($"Task Updated [ID:{id}, Name: {data.Name}]");
     return true;
   }
@@ -803,7 +803,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
 
 
     if (result.State != EntityState.Added) return false;
-    self.hooks.do_action("task_checklist_item_created", new { task_id = data.TaskId, checklist_id = data.Id });
+    hooks.do_action("task_checklist_item_created", new { task_id = data.TaskId, checklist_id = data.Id });
     return true;
   }
 
@@ -888,7 +888,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public int add_task_comment(TaskComment data)
   {
-    if (is_client_logged_in())
+    if (db.is_client_logged_in())
     {
       data.StaffId = 0;
       data.ContactId = self.helper.get_contact_user_id();
@@ -902,7 +902,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     var result = db.TaskComments.Add(new TaskComment
     {
       TaskId = data.Id,
-      //'content'    => is_client_logged_in() ? _strip_tags(data.Content) : data.Content,
+      //'content'    =>db.is_client_logged_in() ? _strip_tags(data.Content) : data.Content,
       Content = data.Content,
       StaffId = data.StaffId,
       ContactId = data.ContactId,
@@ -958,7 +958,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       }
     }
 
-    self.hooks.do_action("task_comment_added", new { task_id = data.TaskId, comment_id = insert_id });
+    hooks.do_action("task_comment_added", new { task_id = data.TaskId, comment_id = insert_id });
     return insert_id;
   }
 
@@ -1021,7 +1021,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       additional_notification_data
     );
 
-    self.hooks.do_action("task_follower_added", new TaskFollower
+    hooks.do_action("task_follower_added", new TaskFollower
     {
       TaskId = data.TaskId,
       StaffId = data.StaffId
@@ -1113,7 +1113,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       additional_notification_data
     );
 
-    self.hooks.do_action("task_assignee_added", new TaskAssigned
+    hooks.do_action("task_assignee_added", new TaskAssigned
     {
       TaskId = data.TaskId,
       StaffId = data.AssignedFrom,
@@ -1156,13 +1156,13 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     {
       if (string.IsNullOrEmpty(attachment.External))
       {
-        var relPath = $"{self.helper.get_upload_path_by_type("task")}{attachment.RelId}/";
+        var relPath = $"{get_upload_path_by_type("task")}{attachment.RelId}/";
         var fullPath = relPath + attachment.FileName;
         self.helper.unlink(fullPath);
         var fname = self.helper.file_name(fullPath);
         var fext = self.helper.file_extension(fullPath);
         var thumbPath = $"{relPath}{fname}_thumb.{fext}";
-        if (self.helper.file_exists(thumbPath))
+        if (file_exists(thumbPath))
           self.helper.unlink(thumbPath);
       }
 
@@ -1173,13 +1173,13 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
         log_activity($"Task Attachment Deleted [TaskID: {attachment.RelId}]");
       }
 
-      if (self.helper.is_dir(self.helper.get_upload_path_by_type("task") + attachment.RelId))
+      if (self.helper.is_dir(get_upload_path_by_type("task") + attachment.RelId))
       {
         // Check if no attachments left, so we can delete the folder also
-        var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("task") + attachment.RelId);
+        var other_attachments = self.helper.list_files(get_upload_path_by_type("task") + attachment.RelId);
         if (!other_attachments.Any())
           // okey only index.html so we can delete the folder also
-          self.helper.delete_dir(self.helper.get_upload_path_by_type("task") + attachment.RelId);
+          self.helper.delete_dir(get_upload_path_by_type("task") + attachment.RelId);
       }
     }
 
@@ -1242,7 +1242,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       _send_customer_contacts_notification(rel_id, "task_new_attachment_to_customer");
     }
 
-    var task_attachment_as_comment = self.hooks.apply_filters("add_task_attachment_as_comment", true);
+    var task_attachment_as_comment = hooks.apply_filters("add_task_attachment_as_comment", true);
 
     if (task_attachment_as_comment != true) return true;
     var file = misc_model.get_file(file_id);
@@ -1300,7 +1300,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public List<TaskComment> get_task_comments(int id)
   {
-    var task_comments_order = self.hooks.apply_filters("task_comments_order", "DESC");
+    var task_comments_order = hooks.apply_filters("task_comments_order", "DESC");
 
     var comments = db.TaskComments
       .Include(x => x.Staff)
@@ -1356,7 +1356,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       .Where(x => x.Id == data.Id)
       .UpdateAsync(x => new TaskComment { Content = data.Content });
     if (affected_rows <= 0) return false;
-    self.hooks.do_action("task_comment_updated", new TaskComment
+    hooks.do_action("task_comment_updated", new TaskComment
     {
       Id = comment.Id,
       TaskId = comment.TaskId
@@ -1392,7 +1392,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       if (comment.FileId != 0) remove_task_attachment(comment.FileId ?? 0);
       var commentAttachments = get_task_attachments(x => x.Id == comment.TaskId && x.TaskCommentId == id);
       commentAttachments.ForEach(attachment => remove_task_attachment(attachment.Id));
-      self.hooks.do_action("task_comment_deleted", new { task_id = comment.TaskId, comment_id = id });
+      hooks.do_action("task_comment_deleted", new { task_id = comment.TaskId, comment_id = id });
       return true;
     }
   }
@@ -1509,7 +1509,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     _send_task_responsible_users_notification(description, task_id, null, "task_status_changed_to_staff", JsonConvert.SerializeObject(not_data));
 
     _send_customer_contacts_notification(task_id, "task_status_changed_to_customer");
-    self.hooks.do_action("task_status_changed", new Task
+    hooks.do_action("task_status_changed", new Task
     {
       Id = task_id,
       Status = status.Data.Status
@@ -1561,7 +1561,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       task.Name
     }));
 
-    self.hooks.do_action("task_status_changed", new { status, task_id = id });
+    hooks.do_action("task_status_changed", new { status, task_id = id });
 
     return true;
   }
@@ -1598,13 +1598,13 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
 
     db.RelatedItems.Where(x => x.RelId == id && x.RelType == "task").Delete();
 
-    if (self.helper.is_dir(self.helper.get_upload_path_by_type("task") + id))
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("task") + id);
+    if (self.helper.is_dir(get_upload_path_by_type("task") + id))
+      self.helper.delete_dir(get_upload_path_by_type("task") + id);
 
 
     db.UserMeta.Where(x => x.MetaKey == $"task-hide-completed-items-{id}").Delete();
 
-    self.hooks.do_action("task_deleted", id);
+    hooks.do_action("task_deleted", id);
 
     return true;
   }
@@ -1626,7 +1626,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
         if (excludeid.HasValue)
           if (excludeid == x.Id)
             return;
-        if (!is_client_logged_in())
+        if (!db.is_client_logged_in())
           if (x.Id == staff_user_id)
             return;
 
@@ -1664,7 +1664,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
         .ToList()
         .ForEach(x =>
         {
-          if (is_client_logged_in() && self.helper.get_contact_user_id() == x.Id) return;
+          if (db.is_client_logged_in() && self.helper.get_contact_user_id() == x.Id) return;
           self.helper.send_mail_template(template_name, x.Email, 0, taskid);
         });
   }
@@ -1777,7 +1777,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
       )
         mark_as(STATUS_IN_PROGRESS, task_id);
 
-      self.hooks.do_action("task_timer_started", new { id = task_id, timer_id = _new_timer_id });
+      hooks.do_action("task_timer_started", new { id = task_id, timer_id = _new_timer_id });
 
       return true;
     }
@@ -1787,7 +1787,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
     // time already ended
     if (timer.EndTime != null) return false;
 
-    // var end_time = self.hooks.apply_filters<DateTime>("before_task_timer_stopped", today(), new { timer, task_id, note });
+    // var end_time = hooks.apply_filters<DateTime>("before_task_timer_stopped", today(), new { timer, task_id, note });
     var end_time = DateTime.Now;
 
     db.TasksTimers
@@ -1848,7 +1848,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
 
       if (data.Tags.Any()) tags = data.Tags;
 
-      self.helper.handle_tags_save(tags, insert_id, "timesheet");
+      db.handle_tags_save(tags, insert_id, "timesheet");
 
       if (insert_id == 0) return false;
 
@@ -1880,7 +1880,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (result > 0) affectedRows++;
     if (!data.Tags.Any()) return affectedRows > 0;
-    if (self.helper.handle_tags_save(data.Tags, data.Id, "timesheet")) affectedRows++;
+    if (db.handle_tags_save(data.Tags, data.Id, "timesheet")) affectedRows++;
 
     return affectedRows > 0;
   }
@@ -2049,7 +2049,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
         );
       }
 
-      self.hooks.do_action("task_timer_deleted", timesheet);
+      hooks.do_action("task_timer_deleted", timesheet);
       log_activity($"Timesheet Deleted [ {id} ]");
 
       return true;
@@ -2122,7 +2122,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
   {
     if (!can_staff_access_task(staffid, taskid)) return false;
 
-    return self.hooks.apply_filters("should_staff_receive_task_notification",
+    return hooks.apply_filters("should_staff_receive_task_notification",
       is_task_assignee(staffid, taskid) ||
       is_task_follower(staffid, taskid) ||
       is_task_creator(staffid, taskid) ||
@@ -2150,7 +2150,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self)
 
     foreach (var staffId in staff)
     {
-      if (!is_client_logged_in())
+      if (!db.is_client_logged_in())
         if (staffId == staff_user_id)
           continue;
       var member = staff_model.get(x => x.Id == staffId).First();

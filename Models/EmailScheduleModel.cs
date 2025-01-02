@@ -3,7 +3,7 @@ using Service.Framework;
 
 namespace Service.Models;
 
-public class EmailScheduleModel(MyInstance self, MyContext db) : MyModel(self)
+public class EmailScheduleModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public void create(int rel_id, string rel_type, ScheduledEmail data)
   {

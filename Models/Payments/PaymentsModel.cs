@@ -12,12 +12,12 @@ using Service.Models.Invoices;
 
 namespace Service.Models.Payments;
 
-public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
+public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  private readonly ClientsModel clients_model = self.model.clients_model();
-  private readonly InvoicesModel invoices_model = self.model.invoices_model();
-  private readonly PaymentModesModel paymentmodes_model = self.model.payment_modes_model();
-  private readonly PaymentAttemptsModel paymentAttemptsModel = self.model.payment_attempts_model();
+  private readonly ClientsModel clients_model = self.clients_model(db);
+  private readonly InvoicesModel invoices_model = self.invoices_model(db);
+  private readonly PaymentModesModel paymentmodes_model = self.payment_modes_model(db);
+  private readonly PaymentAttemptsModel paymentAttemptsModel = self.payment_attempts_model(db);
 
   public InvoicePaymentRecord get(int id)
   {
@@ -129,7 +129,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     data.invoicePaymentRecord.DateRecorded = today();
-    data = self.hooks.apply_filters("before_payment_recorded", data);
+    data = hooks.apply_filters("before_payment_recorded", data);
 
     var result = db.InvoicePaymentRecords.Add(data.invoicePaymentRecord);
     if (!result.IsAdded()) return 0;
@@ -147,7 +147,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
 
     LogPaymentActivity(invoice.Id, Convert.ToDecimal(data.invoicePaymentRecord.Amount), result.Entity.Id, !is_staff_logged_in());
     NotifyStaffAndCustomers(data.invoicePaymentRecord, result.Entity.Id);
-    self.hooks.do_action("after_payment_added", result.Entity.Id);
+    hooks.do_action("after_payment_added", result.Entity.Id);
     return result.Entity.Id;
   }
 
@@ -176,7 +176,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
     var payment = get(data.Id);
     data.Note = data.Note.nl2br();
 
-    data = self.hooks.apply_filters("before_payment_updated", data);
+    data = hooks.apply_filters("before_payment_updated", data);
 
     var affectedRows = db.InvoicePaymentRecords.Where(x => x.Id == data.Id).Update(x => data);
     var updated = affectedRows > 0;
@@ -184,7 +184,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
     if (updated && data.Amount != payment.Amount)
       self.helper.update_invoice_status(payment.InvoiceId.Value);
 
-    self.hooks.do_action("after_payment_updated", new { data.Id, data, payment, updated });
+    hooks.do_action("after_payment_updated", new { data.Id, data, payment, updated });
 
     if (updated) log_activity($"Payment Updated [Number : {data.Id}]");
 
@@ -196,7 +196,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
     var current = get(id);
     if (current == null) return false;
 
-    self.hooks.do_action("before_payment_deleted", new { paymentId = id, invoiceId = current.InvoiceId });
+    hooks.do_action("before_payment_deleted", new { paymentId = id, invoiceId = current.InvoiceId });
 
     db.InvoicePaymentRecords.Remove(current);
     var affectedRows = db.SaveChanges();
@@ -212,7 +212,7 @@ public class PaymentsModel(MyInstance self, MyContext db) : MyModel(self)
 
     log_activity($"Payment Deleted [ID : {id}, Invoice Number: {self.helper.format_invoice_number(current.InvoiceId.Value)}]");
 
-    self.hooks.do_action("after_payment_deleted", new { paymentId = id, invoiceId = current.InvoiceId });
+    hooks.do_action("after_payment_deleted", new { paymentId = id, invoiceId = current.InvoiceId });
 
     return true;
   }

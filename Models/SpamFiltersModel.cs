@@ -3,7 +3,7 @@ using Service.Framework;
 
 namespace Service.Models;
 
-public class SpamFiltersModel(MyInstance self, MyContext db) : MyModel(self)
+public class SpamFiltersModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public List<SpamFilter> get(string rel_type)
   {

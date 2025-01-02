@@ -194,7 +194,7 @@ public static class InvoiceHelper
         ? invoice.Prefix + "DRAFT"
         : helper.sales_number_format(invoice.Number, invoice.NumberFormat, invoice.Prefix, DateTime.Parse(invoice.Date));
 
-    self.hooks.apply_filters("format_invoice_number", new { id, number, invoice });
+    hooks.apply_filters("format_invoice_number", new { id, number, invoice });
     return number;
   }
 
@@ -323,8 +323,8 @@ public static class InvoiceHelper
       invoice_total = row.Total;
     }
 
-    var payments_model = self.model.payments_model();
-    var credit_notes_model = self.model.credit_notes_model();
+    var payments_model = self.payments_model(db);
+    var credit_notes_model = self.credit_notes_model(db);
     var payments = payments_model.get_invoice_payments(id);
     var credits = credit_notes_model.get_applied_invoice_credits(id);
     payments = (List<InvoicePaymentRecord>)TypeMerger.Merge(payments, credits);

@@ -21,17 +21,15 @@ public class MyInput
 
   public MyInput()
   {
-    var (self, db) = getInstance();
     // SanitizeGlobals();
     if (enableCsrf && !IsCli()) Security.CsrfVerify();
-    self.helper.log_message("info", "Input Class Initialized");
+    // db.log_message("info", "Input Class Initialized");
   }
 
   public void Init(HttpContext _context)
   {
     context = _context;
   }
-
 
   public string cookie(string index = null, bool xssClean = false)
   {
@@ -81,8 +79,8 @@ public class MyInput
 
   public string ip_address()
   {
-    var (self, db) = getInstance();
-    return self.ip();
+    // return self.ip();
+    return "0.0.0.0";
   }
 
   public bool ValidIp(string ip, string type = "")

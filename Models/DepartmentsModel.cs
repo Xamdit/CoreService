@@ -5,7 +5,7 @@ using Service.Framework.Helpers.Entities;
 
 namespace Service.Models;
 
-public class DepartmentsModel(MyInstance self, MyContext db) : MyModel(self)
+public class DepartmentsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   /**
        * @param  integer ID (optional)
@@ -45,13 +45,13 @@ public class DepartmentsModel(MyInstance self, MyContext db) : MyModel(self)
   {
     if (!string.IsNullOrEmpty(data.Password)) data.Password = self.HashPassword(data.Password);
 
-    data = self.hooks.apply_filters("before_department_added", data);
+    data = hooks.apply_filters("before_department_added", data);
     db.Departments.Add(data);
     db.SaveChanges();
 
     var insert_id = data.Id;
     if (insert_id == 0) return insert_id;
-    self.hooks.do_action("after_department_added", insert_id);
+    hooks.do_action("after_department_added", insert_id);
     log_activity("New Department Added [" + data.Name + ", ID: " + insert_id + "]");
 
     return insert_id;
@@ -80,7 +80,7 @@ public class DepartmentsModel(MyInstance self, MyContext db) : MyModel(self)
     // If equal unset
     // If not encrypt and save
     if (!string.IsNullOrEmpty(data.Password)) data.Password = self.HashPassword(data.Password);
-    data = self.hooks.apply_filters("before_department_updated", data);
+    data = hooks.apply_filters("before_department_updated", data);
     db.Departments.Update(data);
     var affected_rows = db.SaveChanges();
     if (affected_rows <= 0) return false;
@@ -103,7 +103,7 @@ public class DepartmentsModel(MyInstance self, MyContext db) : MyModel(self)
         referenced = true
       };
 
-    self.hooks.do_action("before_delete_department", id);
+    hooks.do_action("before_delete_department", id);
     db.RemoveRange(db.StaffDepartments.Where(x => x.DepartmentId == id));
     var affected_rows = db.SaveChanges();
     if (affected_rows <= 0) return false;

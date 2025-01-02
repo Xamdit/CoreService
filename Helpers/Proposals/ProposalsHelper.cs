@@ -1,4 +1,5 @@
 using Service.Entities;
+using Service.Framework;
 using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
 using Service.Framework.Helpers.Entities;
@@ -10,7 +11,7 @@ public static class ProposalHelper
 {
   public static string get_proposal_short_link(this HelperBase helper, Proposal proposal)
   {
-    var (self, db) = getInstance();
+    var db = new MyContext();
     var longUrl = $"{helper.site_url()}/proposal/{proposal.Id}/{proposal.Hash}";
     var bitlyToken = db.get_option("bitly_access_token");
     if (string.IsNullOrEmpty(bitlyToken)) return longUrl;
@@ -33,14 +34,14 @@ public static class ProposalHelper
 
   public static void check_proposal_restrictions(this HelperBase helper, int id, string hash)
   {
-    var (self, db) = getInstance();
+    var db = new MyContext();
     var proposal = db.Proposals.Find(id);
     if (proposal == null || proposal.Hash != hash) throw new Exception("Proposal not found");
   }
 
   public static bool is_proposals_email_expiry_reminder_enabled(this HelperBase helper)
   {
-    var (self, db) = getInstance();
+    var db = new MyContext();
     var output = db.EmailTemplates.Any(t =>
       t.Slug == "proposal-expiry-reminder" &&
       t.Active == 1
@@ -55,7 +56,7 @@ public static class ProposalHelper
    */
   public static bool is_proposals_expiry_reminders_enabled(this HelperBase helper)
   {
-    var (self, db) = getInstance();
+    var self = new MyInstance();
     return helper.is_proposals_email_expiry_reminder_enabled() || helper.is_sms_trigger_active(self.globals<string>("SMS_TRIGGER_PROPOSAL_EXP_REMINDER"));
   }
 
@@ -112,7 +113,7 @@ public static class ProposalHelper
 
   public static string format_proposal_number(this HelperBase helper, int id)
   {
-    var (self, db) = getInstance();
+    var db = new MyContext();
     var prefix = db.get_option("proposal_number_prefix");
     var padding = int.Parse(db.get_option("number_padding_prefixes"));
     return prefix + id.ToString().PadLeft(padding, '0');
@@ -120,7 +121,7 @@ public static class ProposalHelper
 
   public static List<ProposalTax> get_proposal_item_taxes(this HelperBase helper, int itemId)
   {
-    var (self, db) = getInstance();
+    var db = new MyContext();
     return db.ItemTaxes
       .Where(t => t.ItemId == itemId && t.RelType == "proposal")
       .Select(t => new ProposalTax
@@ -132,7 +133,7 @@ public static class ProposalHelper
 
   public static ProposalPercentByStatus get_proposals_percent_by_status(this HelperBase helper, int status, int? totalProposals = null)
   {
-    var (self, db) = getInstance();
+    var db = new MyContext();
     var staffId = helper.get_staff_user_id();
     var hasPermissionView = helper.has_permission("proposals", "view");
     var hasPermissionViewOwn = helper.has_permission("proposals", "view_own");
@@ -154,7 +155,6 @@ public static class ProposalHelper
 
   public static Proposal parse_proposal_content_merge_fields(this HelperBase helper, Proposal proposal)
   {
-    var (self, db) = getInstance();
     var id = proposal.Id;
 
     // $CI->load->library('merge_fields/proposals_merge_fields');

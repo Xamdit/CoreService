@@ -44,7 +44,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
   [HttpGet("wtl/{key}")]
   public async Task<IActionResult> wtl(string key)
   {
-    var leads_model = self.model.leads_model();
+    var leads_model = self.leads_model(db);
     var form = leads_model.get_form(x => x.FormKey == key);
 
     if (form == null) return NotFound();
@@ -194,14 +194,14 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
                   Description = description
                 };
 
-                task_data = self.hooks.apply_filters("before_add_task", task_data);
+                task_data = hooks.apply_filters("before_add_task", task_data);
                 var result = await db.Tasks.AddAsync(task_data);
                 db.SaveChanges();
                 task_id = 0;
                 if (result.State == EntityState.Added)
                 {
                   task_id = task_data.Id;
-                  var tasks_model = self.model.tasks_model();
+                  var tasks_model = self.tasks_model(db);
                   var attachment = self.helper.handle_task_attachments_array(task_id.Value, "file-input");
                   if (attachment.Any())
                     attachment.ForEach(x => tasks_model.add_attachment_to_database(task_id.Value, x, null, false));
@@ -211,7 +211,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
                     assignee = form.Responsible
                   };
                   tasks_model.add_task_assignees(db.task_assigned(assignee_data.assignee), true);
-                  self.hooks.do_action("after_add_task", task_id);
+                  hooks.do_action("after_add_task", task_id);
                   if (string.IsNullOrEmpty(duplicateLead.Email)) self.helper.send_mail_template("lead_web_form_submitted", duplicateLead);
                 }
               }
@@ -234,7 +234,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
           regular_fields.IsPublic = form.MarkPublic;
           db.Leads.Add(regular_fields);
           lead_id = regular_fields.Id;
-          self.hooks.do_action("lead_created", new
+          hooks.do_action("lead_created", new
           {
             lead_id,
             web_to_lead_form = true
@@ -338,7 +338,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
           });
         lead_id ??= 0;
         task_id ??= 0;
-        self.hooks.do_action("web_to_lead_form_submitted", new
+        hooks.do_action("web_to_lead_form_submitted", new
         {
           lead_id,
           form_id = form.Id,
@@ -366,8 +366,8 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
   [HttpGet("l/{hash}")]
   public IActionResult l(string hash)
   {
-    var gdpr_model = self.model.gdpr_model();
-    var leads_model = self.model.leads_model();
+    var gdpr_model = self.gdpr_model(db);
+    var leads_model = self.leads_model(db);
 
     if (db.get_option("gdpr_enable_lead_public_form") == "0")
       return NotFound();
@@ -422,7 +422,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
   public async Task<IActionResult> ticket()
   {
     var APPPATH = string.Empty;
-    var tickets_model = self.model.tickets_model();
+    var tickets_model = self.tickets_model(db);
     dynamic form = new ExpandoObject();
     form.language = db.get_option("active_language");
     form.Recaptcha = 1;
@@ -432,7 +432,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
     //   self.lang.load("custom_lang", form.language);
 
     form.SuccessSubmitMsg = self.helper.label("success_submit_msg");
-    form = self.hooks.apply_filters("ticket_form_settings", form);
+    form = hooks.apply_filters("ticket_form_settings", form);
 
     if (self.input.is_ajax_request())
     {
@@ -482,11 +482,11 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
         // unset(post_data.Name);
       }
 
-      post_data = self.hooks.apply_filters("ticket_external_form_insert_data", post_data);
+      post_data = hooks.apply_filters("ticket_external_form_insert_data", post_data);
       var ticket_id = await tickets_model.add(convert<TicketOption>(post_data));
       if (ticket_id == 0) success = true;
       if (success)
-        self.hooks.do_action("ticket_form_submitted", new { ticket_id });
+        hooks.do_action("ticket_form_submitted", new { ticket_id });
       return MakeSuccess(new
       {
         success,
@@ -494,7 +494,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
       });
     }
 
-    var departments_model = self.model.departments_model();
+    var departments_model = self.departments_model(db);
     data.departments = departments_model.get();
     data.priorities = tickets_model.get_priority();
     data.priorities["callback_translate"] = "ticket_priority_translate";

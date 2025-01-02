@@ -10,21 +10,20 @@ using Service.Helpers.Tags;
 
 namespace Service.Controllers;
 
-public class InvoiceController(ILogger<InvoiceController> logger, MyInstance self) : ClientControllerBase(logger, self)
+public class InvoiceController(ILogger<InvoiceController> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   [HttpGet]
   public IActionResult index_get(int id, string hash)
   {
-    var (self, db) = getInstance();
-    var payments_model = self.model.payments_model();
-    var invoices_model = self.model.invoices_model();
-    var payment_modes_model = self.model.payment_modes_model();
+    var payments_model = self.payments_model(db);
+    var invoices_model = self.invoices_model(db);
+    var payment_modes_model = self.payment_modes_model(db);
     check_invoice_restrictions(id, hash);
     var invoice = invoices_model.get(id);
 
-    invoice = self.hooks.apply_filters("before_client_view_invoice", invoice);
+    invoice = hooks.apply_filters("before_client_view_invoice", invoice);
 
-    if (!is_client_logged_in())
+    if (!db.is_client_logged_in())
       self.helper.load_client_language(invoice.ClientId);
 
     // this.app_scripts.theme('sticky-js', 'assets/plugins/sticky/sticky.js');
@@ -36,12 +35,12 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
     // this.disableNavigation();
     // this.disableSubMenu();
     data.hash = hash;
-    data.invoice = self.hooks.apply_filters("invoice_html_pdf_data", invoice);
+    data.invoice = hooks.apply_filters("invoice_html_pdf_data", invoice);
     data.bodyclass = "viewinvoice";
     // data(data);
     // this.view('invoicehtml');
     // add_views_tracking('invoice', id);
-    // self.hooks.do_action('invoice_html_viewed', id);
+    // hooks.do_action('invoice_html_viewed', id);
     // no_index_customers_area();
     // this.layout();
     return Ok();
@@ -50,17 +49,16 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
   [HttpGet]
   public IActionResult index(int id, string hash)
   {
-    var (self, db) = getInstance();
-    var invoices_model = self.model.invoices_model();
-    var payments_model = self.model.payments_model();
-    var payment_modes_model = self.model.payment_modes_model();
+    var invoices_model = self.invoices_model(db);
+    var payments_model = self.payments_model(db);
+    var payment_modes_model = self.payment_modes_model(db);
 
     check_invoice_restrictions(id, hash);
     var invoice = invoices_model.get(id);
 
-    invoice = self.hooks.apply_filters("before_client_view_invoice", invoice);
+    invoice = hooks.apply_filters("before_client_view_invoice", invoice);
 
-    if (!is_client_logged_in())
+    if (!db.is_client_logged_in())
       self.helper.load_client_language(invoice.ClientId);
 
     // Handle Invoice PDF generator
@@ -121,12 +119,12 @@ public class InvoiceController(ILogger<InvoiceController> logger, MyInstance sel
     // this.disableNavigation();
     // this.disableSubMenu();
     data.hash = hash;
-    data.invoice = self.hooks.apply_filters("invoice_html_pdf_data", invoice);
+    data.invoice = hooks.apply_filters("invoice_html_pdf_data", invoice);
     data.bodyclass = "viewinvoice";
     data(data);
     // this.view('invoicehtml');
     // add_views_tracking('invoice', id);
-    self.hooks.do_action("invoice_html_viewed", id);
+    hooks.do_action("invoice_html_viewed", id);
     // no_index_customers_area();
     // this.layout();
     return Ok();

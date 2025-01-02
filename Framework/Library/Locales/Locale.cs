@@ -187,25 +187,31 @@ public class Locale : ILocale
   private void LoadLocale(string locale)
   {
     currentLocale = locale;
-    // _locales = self.fw.Texts.GroupBy(x => x.Locale).Select(x => x.First()).Select(x => x.Locale).ToList();
-    _locales = self.fw.Texts.Select(x => x.Locale).ToList().Distinct().ToList();
-    // if (!_locales.Contains(locale))
-    //   throw new I18NException($"Locale '{locale}' is not available", new KeyNotFoundException());
     try
     {
-      dataset.TryGetValue(locale, out var value);
-      // _translations = rows.Where(x => x.Locale == locale).ToList();
-    }
-    catch (Exception e)
-    {
-      // var message = $"{ErrorMessages.ReaderException}.\nReader: {reader.GetType().Name}.\nLocale: {locale}{extension}";
-      var message = "";
-      throw new I18NException(message, e);
-    }
+      // _locales = self.fw.Texts.GroupBy(x => x.Locale).Select(x => x.First()).Select(x => x.Locale).ToList();
+      _locales = self.fw.Texts.Select(x => x.Locale).ToList().Distinct().ToList();
+      // if (!_locales.Contains(locale))
+      //   throw new I18NException($"Locale '{locale}' is not available", new KeyNotFoundException());
+      try
+      {
+        dataset.TryGetValue(locale, out var value);
+        // _translations = rows.Where(x => x.Locale == locale).ToList();
+      }
+      catch (Exception e)
+      {
+        // var message = $"{ErrorMessages.ReaderException}.\nReader: {reader.GetType().Name}.\nLocale: {locale}{extension}";
+        var message = "";
+        throw new I18NException(message, e);
+      }
 
-    LogTranslations();
-    _locale = locale;
-    NotifyPropertyChanged("Item[]");
+      LogTranslations();
+      _locale = locale;
+      NotifyPropertyChanged("Item[]");
+    }
+    catch (Exception ex)
+    {
+    }
   }
 
   #endregion
@@ -218,7 +224,7 @@ public class Locale : ILocale
     var row = self.fw.Texts.FirstOrDefault(x => x.Locale == _locale && x.Key == key);
     if (row == null)
     {
-      self.ignore(() =>
+      ignore(() =>
       {
         var sender = new Text
         {

@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using Service.Core.Extensions;
 using Service.Entities;
+using Service.Framework;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
@@ -60,27 +61,11 @@ public static class GeneralHelper
     return 0;
   }
 
-  /**
- * Is staff logged in
- * @return boolean
- */
-  public static bool is_staff_logged_in()
-  {
-    // return get_instance()->session->has_userdata('staff_logged_in');
-    return false;
-  }
 
   /**
 * Is client logged in
 * @return boolean
 */
-  public static bool is_client_logged_in()
-  {
-    // var client_logged_in = session.GetItemAsync<bool>("client_logged_in").Result;
-    // return client_logged_in;
-    return false;
-  }
-
   /**
 * Get contact user id
 * @return mixed
@@ -133,24 +118,24 @@ public static class GeneralHelper
  * Is user logged in
  * @return boolean
  */
-  public static bool is_logged_in(this HelperBase helper)
+  public static bool is_logged_in(this MyContext db)
   {
-    return helper.is_client_logged_in() || helper.is_staff_logged_in();
+    return db.is_client_logged_in() || db.is_staff_logged_in();
   }
 
   /**
  * Return logged client User ID from session
  * @return mixed
  */
-  public static int get_client_user_id(this HelperBase helper)
+  public static int get_client_user_id(this MyContext db)
   {
-    var _is_client_logged_in = helper.is_client_logged_in();
+    var _is_client_logged_in = db.is_client_logged_in();
     if (!_is_client_logged_in) return 0;
     // return get_instance()->session->userdata('client_user_id');
     return 10;
   }
 
-  public static bool defined(this HelperBase helper, string key)
+  public static bool defined(string key)
   {
     return false;
   }
@@ -168,7 +153,7 @@ public static class GeneralHelper
     return message;
   }
 
-  public static bool is_cron(this HelperBase helper)
+  public static bool is_cron()
   {
     return false;
   }
@@ -180,14 +165,13 @@ public static class GeneralHelper
  * @param  string link
  * @return boolean
  */
-  public static bool app_archive_short_link(this HelperBase helper, string link)
+  public static bool app_archive_short_link(this MyContext db, string link)
   {
-    var (self, db) = getInstance();
     var accessToken = db.get_option("bitly_access_token");
 
     if (string.IsNullOrEmpty(accessToken)) return false;
 
-    self.hooks.do_action("before_archive_short_link", link);
+    hooks.do_action("before_archive_short_link", link);
 
     // link = str_replace("https://", "", link);
     link = link.Replace("https://", "");
@@ -247,7 +231,7 @@ public static class GeneralHelper
   {
     var item_taxes = new List<Taxis>();
 
-    if (helper.defined("INVOICE_PREVIEW_SUBSCRIPTION"))
+    if (defined("INVOICE_PREVIEW_SUBSCRIPTION"))
     {
       // item_taxes = item.Name;
     }
@@ -268,9 +252,8 @@ public static class GeneralHelper
  * Is client logged in
  * @return boolean
  */
-  public static bool is_client_logged_in(this HelperBase helper)
+  public static bool is_client_logged_in(this MyContext db)
   {
-    var (self, db) = getInstance();
     // return get_instance()->session->has_userdata("client_logged_in");
     return false;
   }
@@ -279,7 +262,7 @@ public static class GeneralHelper
  * Is staff logged in
  * @return boolean
  */
-  public static bool is_staff_logged_in(this HelperBase helper)
+  public static bool is_staff_logged_in(this MyContext db)
   {
     // return get_instance()->session->has_userdata('staff_logged_in');
     return false;
@@ -320,12 +303,10 @@ public static class GeneralHelper
  */
   public static void redirect_after_login_to_current_url()
   {
-    var (self, db) = getInstance();
     var redirectTo = current_full_url();
     // This can happen if at the time you received a notification but your session was expired the system stored this as last accessed URL so after login can redirect you to this URL.
     if (redirectTo.Contains("notifications_check")) return;
-    self.session.set_userdata("red_url", redirectTo);
-
+    self.input.session.set_userdata("red_url", redirectTo);
     // get_instance()->session->set_userdata([
     //   'red_url' => $redirectTo,
     //   ]);
@@ -337,10 +318,9 @@ public static class GeneralHelper
  */
   public static string current_full_url()
   {
-    var (self, db) = getInstance();
     // var url = self.helper.site_url(self.uri.uri_string();
     // return $_SERVER['QUERY_STRING'] ? $url. '?'. $_SERVER['QUERY_STRING'] : $url;
-    return self.helper.base_url();
+    return base_url();
   }
 
   /**
@@ -350,13 +330,12 @@ public static class GeneralHelper
  */
   public static async Task<IActionResult> do_recaptcha_validation(this ControllerBase controller, string str = "")
   {
-    var (self, db) = getInstance();
-    var client = self.helper.rest_client_goole();
+    var client = db.rest_client_google();
     var request = new RestRequest("/recaptcha/api/siteverify", Method.Post);
     request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
     request.AddParameter("secret", db.get_option("recaptcha_secret_key")); // Replace with your method for retrieving the secret key
     request.AddParameter("response", str);
-    request.AddParameter("remoteip", self.ip()); // Assuming this retrieves the user's IP address
+    request.AddParameter("remoteip", ip()); // Assuming this retrieves the user's IP address
     var response = await client.ExecuteAsync(request);
     if (!response.IsSuccessful) return controller.NotFound();
     var jsonResponse = response.Content;
@@ -371,10 +350,10 @@ public static class GeneralHelper
 */
   public static IActionResult maybe_redirect_to_previous_url(this ControllerBase controller)
   {
-    var (self, db) = getInstance();
-    if (!self.session.has_userdata("red_url")) return controller.Redirect("/");
-    var red_url = self.session.get_userdata("red_url");
-    self.session.unset_userdata("red_url");
+    var self = new MyInstance();
+    if (!self.input.session.has_userdata("red_url")) return controller.Redirect("/");
+    var red_url = self.input.session.get_userdata("red_url");
+    self.input.session.unset_userdata("red_url");
     return controller.Redirect(red_url);
   }
 }

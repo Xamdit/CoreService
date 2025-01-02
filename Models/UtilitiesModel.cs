@@ -6,7 +6,7 @@ using Service.Models.Invoices;
 
 namespace Service.Models;
 
-public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self)
+public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public async Task<bool> AddOrUpdateEvent(Event eventData)
   {
@@ -26,13 +26,13 @@ public class UtilitiesService(MyInstance self, MyContext db) : MyModel(self)
       if (existingEvent.IsStartNotified == 1 && DateTime.Parse(eventData.Start) > DateTime.Parse(existingEvent.Start))
         eventData.IsStartNotified = 0;
 
-      eventData = self.hooks.apply_filters("event_update_data", eventData);
+      eventData = hooks.apply_filters("event_update_data", eventData);
 
       db.Entry(existingEvent).CurrentValues.SetValues(eventData);
       return true;
     }
 
-    eventData = self.hooks.apply_filters("event_create_data", eventData);
+    eventData = hooks.apply_filters("event_create_data", eventData);
 
     db.Events.Add(eventData);
 

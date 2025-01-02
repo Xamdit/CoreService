@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.SingleSet((app) =>
 {
   app.UseStaticFiles();
-  app.UseMiddleware<WebMiddleware>();
+  //app.UseMiddleware<WebMiddleware>();
   app.MapBlazorHub();
   app.MapFallbackToPage("/_Host");
   app.Run();

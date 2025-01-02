@@ -82,7 +82,7 @@ public static class SettingHelper
    */
   public static bool delete_option(this HelperBase helper, string name)
   {
-    var (self, db) = getInstance();
+    var db = new MyContext();
     // app.Options.FirstOrDefault(row=>row.Name==name);
     if (!db.Options.Any(row => row.Name == name)) return false;
 

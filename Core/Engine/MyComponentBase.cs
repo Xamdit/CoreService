@@ -18,8 +18,7 @@ public abstract class MyComponentBase : ComponentBase
   [Inject] public IHttpContextAccessor HttpContextAccessor { get; set; }
   [Inject] public SweetAlertService swal { get; set; }
 
-  // private HubConnection? hubConnection;
-  public MyInstance self = MyInstance.Instance;
+
   public string? Env => Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
   private string _imageProfile = "./images/profile.png";
@@ -78,6 +77,6 @@ public abstract class MyComponentBase : ComponentBase
   protected override async Task OnInitializedAsync()
   {
     await base.OnInitializedAsync();
-    self.navigation = NavigationManager;
+    // self.navigation = NavigationManager;
   }
 }

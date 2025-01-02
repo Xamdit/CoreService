@@ -9,7 +9,7 @@ public class HookItem
   public string Items { get; set; }
 }
 
-public class Hooks(MyInstance self)
+public class Hooks()
 {
   public bool Enabled { get; private set; } = false;
   private readonly Dictionary<string, SortedDictionary<int, List<Filter>>> filters = new();

@@ -58,7 +58,7 @@ public static class DatabaseHelper
 
     var staff_user_id = helper.get_staff_user_id();
     // var staff_user_id =Convert.ToByte( await get_staff_user_id());
-    var _is_client_logged_in = self.helper.is_client_logged_in();
+    var _is_client_logged_in = self.db.is_client_logged_in();
     if (_is_client_logged_in)
     {
       data.FromUserId = 0;
@@ -81,7 +81,7 @@ public static class DatabaseHelper
 
     data.Date = DateTime.Now;
 
-    data = self.hooks.apply_filters("notification_data", data);
+    data = hooks.apply_filters("notification_data", data);
     var query = db.Staff.AsQueryable();
     // Prevent sending notification to non active users.
     if (data.ToUserId != 0)
@@ -94,7 +94,7 @@ public static class DatabaseHelper
     var result = db.Notifications.Add(data);
     if (!result.IsAdded()) return true;
     var notification_id = result.Entity.Id;
-    self.hooks.do_action("notification_created", notification_id);
+    hooks.do_action("notification_created", notification_id);
     return true;
   }
 
@@ -109,7 +109,7 @@ public static class DatabaseHelper
   private static string prefixed_table_fields_wildcard(this HelperBase helper, string table, string alias, string field)
   {
     var (self, db) = getInstance();
-    var columns = self.db().ColumnInfos.FromSql($"SHOW COLUMNS FROM {table}").ToList();
+    var columns = db.ColumnInfos.FromSql($"SHOW COLUMNS FROM {table}").ToList();
     var field_names = columns.Select(x => x.Field).ToList();
 
     var prefixed = field_names.Select(field_name =>

@@ -8,7 +8,7 @@ using File = Service.Entities.File;
 
 namespace Service.Models;
 
-public class EmailsModel(MyInstance self, MyContext db) : MyModel(self)
+public class EmailsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   private readonly List<MailAttachment> _attachments = new();
 

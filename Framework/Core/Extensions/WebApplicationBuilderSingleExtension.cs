@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.ResponseCompression;
+using Service.Framework.Library.Locales;
 using Service.Framework.Library.Themes.Partials;
 using Service.Framework.Middlewares;
 
@@ -14,6 +15,7 @@ public static class WebApplicationBuilderSingleExtension
     // Add services to the container.
     builder.Services.AddRazorPages();
     builder.Services.AddServerSideBlazor();
+    builder.AddWithResource<Program>();
     // builder.MakeDefault();
     builder.Services.AddSingleton<ITheme, Theme>();
     builder.Services.AddSession(options =>

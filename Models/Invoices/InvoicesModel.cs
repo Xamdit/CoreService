@@ -27,16 +27,16 @@ using TaskStatus = Service.Models.Tasks.TaskStatus;
 
 namespace Service.Models.Invoices;
 
-public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
+public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  private PaymentsModel payments_model = self.model.payments_model();
-  private ClientsModel clients_model = self.model.clients_model();
-  private ProjectsModel projects_model = self.model.projects_model();
-  private CurrenciesModel currencies_model = self.model.currencies_model();
-  private ExpensesModel expenses_model = self.model.expenses_model();
-  private EstimatesModel estimates_model = self.model.estimates_model();
-  private TasksModel tasks_model = self.model.tasks_model();
-  private CreditNotesModel credit_notes_model = self.model.credit_notes_model();
+  private PaymentsModel payments_model = self.payments_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
+  private ProjectsModel projects_model = self.projects_model(db);
+  private CurrenciesModel currencies_model = self.currencies_model(db);
+  private ExpensesModel expenses_model = self.expenses_model(db);
+  private EstimatesModel estimates_model = self.estimates_model(db);
+  private TasksModel tasks_model = self.tasks_model(db);
+  private CreditNotesModel credit_notes_model = self.credit_notes_model(db);
 
   private List<int> statuses = new()
   {
@@ -58,7 +58,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     "shipping_country"
   };
 
-  private EmailScheduleModel email_schedule_model = self.model.email_schedule_model();
+  private EmailScheduleModel email_schedule_model = self.email_schedule_model(db);
 
   public List<int> get_statuses()
   {
@@ -142,9 +142,9 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     var query = db.Invoices.Include(x => x.Currency).AsQueryable();
     query = query.Where(where);
     dynamic invoice = query.FirstOrDefault(x => x.Id == id);
-    if (invoice == null) return self.hooks.apply_filters("get_invoice", invoice);
+    if (invoice == null) return hooks.apply_filters("get_invoice", invoice);
     // invoice.total_left_to_pay = self.helper.get_invoice_total_left_to_pay(invoice.Id, (decimal)invoice.Total);
-    invoice.items = self.helper.get_items_by_type("invoice", id);
+    invoice.items = db.get_items_by_type("invoice", id);
     invoice.attachments = get_attachments(x => x.Id == id);
     if (invoice.Project != null) invoice.project_data = projects_model.get(invoice.ProjectId);
     invoice.visible_attachments_to_customer_found = false;
@@ -165,7 +165,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
 
     invoice.payments = payments_model.get_invoice_payments(id);
     invoice.scheduled_email = email_schedule_model.get(id, "invoice");
-    return self.hooks.apply_filters("get_invoice", invoice);
+    return hooks.apply_filters("get_invoice", invoice);
   }
 
   // public File? get_attachments(int id)
@@ -247,12 +247,12 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
   {
     var staffid = "";
     var full_name = "";
-    if (self.helper.defined("CRON"))
+    if (defined("CRON"))
     {
       staffid = "[CRON]";
       full_name = "[CRON]";
     }
-    else if (self.helper.defined("STRIPE_SUBSCRIPTION_INVOICE"))
+    else if (defined("STRIPE_SUBSCRIPTION_INVOICE"))
     {
       staffid = null;
       full_name = "[Stripe]";
@@ -294,7 +294,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     if (affected_rows <= 0) return false;
     if (isDraft) change_invoice_number_when_status_draft(id);
     log(id, "invoice_activity_marked_as_cancelled");
-    self.hooks.do_action("invoice_marked_as_cancelled", id);
+    hooks.do_action("invoice_marked_as_cancelled", id);
     return true;
   }
 
@@ -304,7 +304,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     var affected_rows = db.SaveChanges();
     if (affected_rows <= 0) return false;
     log(id, "invoice_activity_unmarked_as_cancelled");
-    self.hooks.do_action("invoice_unmarked_as_cancelled", id);
+    hooks.do_action("invoice_unmarked_as_cancelled", id);
     return true;
   }
 
@@ -387,7 +387,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
         else if (i == 3) result.Overdue.Add(invoice.Total);
     }
 
-    currency = self.helper.get_currency(currencyId);
+    currency = db.get_currency(currencyId);
     result.DueTotal = result.Due.Sum();
     result.PaidTotal = result.Paid.Sum();
     result.OverdueTotal = result.Overdue.Sum();
@@ -421,7 +421,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     var number = self.helper.format_invoice_number(id);
     var isDraft = is_draft(id);
 
-    self.hooks.do_action("before_invoice_deleted", id);
+    hooks.do_action("before_invoice_deleted", id);
 
     var invoice = get(id);
 
@@ -430,7 +430,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     if (affected_rows <= 0) return false;
 
     if (!string.IsNullOrEmpty(invoice.ShortLink))
-      self.helper.app_archive_short_link(invoice.ShortLink);
+      db.app_archive_short_link(invoice.ShortLink);
     if (db.get_option_compare("invoice_number_decrement_on_delete", 1) &&
         db.get_option_compare("next_invoice_number", 1) &&
         simpleDelete == false &&
@@ -483,7 +483,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
       )
       .Delete();
     db.Itemables.Where(x => x.RelId == id && x.RelType == "invoice").Delete();
-    self.helper.get_items_by_type("invoice", id).ForEach(item =>
+    db.get_items_by_type("invoice", id).ForEach(item =>
       db.RelatedItems.Where(x => x.ItemId == item.Id).Delete()
     );
     db.ScheduledEmails.Where(x => x.RelId == id && x.RelType == "invoice").Delete();
@@ -520,7 +520,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
       .ToList()
       .ForEach(task => tasks_model.delete_task(task.Id));
     if (simpleDelete == false) log_activity("Invoice Deleted [" + number + "]");
-    self.hooks.do_action("after_invoice_deleted", id);
+    hooks.do_action("after_invoice_deleted", id);
     return true;
   }
 
@@ -536,7 +536,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     var deleted = false;
     if (attachment == null) return deleted;
     if (string.IsNullOrEmpty(attachment.External))
-      self.helper.unlink(self.helper.get_upload_path_by_type("invoice") + attachment.RelId + "/" + attachment.FileName);
+      self.helper.unlink(get_upload_path_by_type("invoice") + attachment.RelId + "/" + attachment.FileName);
     var affected_rows = db.Files.Where(x => x.Id == attachment.Id).Delete();
     if (affected_rows > 0)
     {
@@ -544,12 +544,12 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
       log_activity("Invoice Attachment Deleted [InvoiceID: " + attachment.RelId + "]");
     }
 
-    if (!self.helper.is_dir(self.helper.get_upload_path_by_type("invoice") + attachment.RelId)) return deleted;
+    if (!self.helper.is_dir(get_upload_path_by_type("invoice") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("invoice") + attachment.RelId);
+    var other_attachments = self.helper.list_files(get_upload_path_by_type("invoice") + attachment.RelId);
     if (!other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("invoice") + attachment.RelId);
+      self.helper.delete_dir(get_upload_path_by_type("invoice") + attachment.RelId);
 
     return deleted;
   }
@@ -583,7 +583,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     insert.NumberFormat = db.get_option<int>("invoice_number_format");
     insert.DateCreated = DateTime.Now;
     var save_and_send = isset(data, "save_and_send");
-    insert.AddedFrom = !self.helper.defined("CRON") ? staff_user_id : 0;
+    insert.AddedFrom = !defined("CRON") ? staff_user_id : 0;
     insert.CancelOverdueReminders = isset(data, "cancel_overdue_reminders") ? 1 : 0;
     insert.AllowedPaymentModes = isset(data, "allowed_payment_modes") ? JsonConvert.SerializeObject(data.AllowedPaymentModes) : JsonConvert.SerializeObject(new { });
 
@@ -644,7 +644,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
       insert.Number = InvoiceStatus.STATUS_DRAFT_NUMBER;
 
     insert.DueDate = isset(data, "duedate") && string.IsNullOrEmpty(data.DueDate) ? null : data.DueDate;
-    var hook = self.hooks.apply_filters("before_invoice_added", new
+    var hook = hooks.apply_filters("before_invoice_added", new
     {
       data,
       items
@@ -657,7 +657,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     if (result.IsAdded()) return 0;
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(insert_id, custom_fields);
-    self.helper.handle_tags_save(tags, insert_id, "invoice");
+    db.handle_tags_save(tags, insert_id, "invoice");
 
     foreach (var m in invoices_to_merge)
     {
@@ -772,18 +772,18 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
 
     self.helper.update_sales_total_tax_column(insert_id, "invoice", "invoices");
     var lang_key = "";
-    if (!self.helper.defined("CRON") && expense == false)
+    if (!defined("CRON") && expense == false)
       lang_key = "invoice_activity_created";
-    else if (!self.helper.defined("CRON") && expense)
+    else if (!defined("CRON") && expense)
       lang_key = "invoice_activity_from_expense";
-    else if (self.helper.defined("CRON") && expense == false)
+    else if (defined("CRON") && expense == false)
       lang_key = "invoice_activity_recurring_created";
     else
       lang_key = "invoice_activity_recurring_from_expense_created";
     log_invoice_activity(insert_id, lang_key);
     if (save_and_send)
       send_invoice_to_client(insert_id, "", true, "", true);
-    self.hooks.do_action("after_invoice_added", insert_id);
+    hooks.do_action("after_invoice_added", insert_id);
 
     return insert_id;
   }
@@ -804,13 +804,13 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
       originalNumber = change_invoice_number_when_status_draft(id);
 
     var invoice = get(id);
-    invoice = self.hooks.apply_filters("invoice_object_before_send_to_client", invoice);
+    invoice = hooks.apply_filters("invoice_object_before_send_to_client", invoice);
 
     if (template_name == "")
     {
       template_name = invoice.Sent == 0 ? "invoice_send_to_customer" : "invoice_send_to_customer_already_sent";
 
-      template_name = self.hooks.apply_filters("after_invoice_sent_template_statement", template_name);
+      template_name = hooks.apply_filters("after_invoice_sent_template_statement", template_name);
     }
 
     var emails_sent = new List<int>();
@@ -818,7 +818,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
 
     // Manually is used when sending the invoice via add/edit area button Save & Send
 
-    if (!self.helper.defined("CRON") && manually == false)
+    if (!defined("CRON") && manually == false)
     {
       send_to = self.input.post<string>("sent_to").Split(",").ToList().Select(x => Convert.ToInt32(x)).ToList();
     }
@@ -912,7 +912,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     if (emails_sent.Any())
     {
       set_invoice_sent(id, false, emails_sent.Select(x => Convert.ToInt32(x)).ToList(), true);
-      self.hooks.do_action("invoice_sent", id);
+      hooks.do_action("invoice_sent", id);
       return true;
     }
 
@@ -941,12 +941,12 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
   {
     var staffid = string.Empty;
     var full_name = string.Empty;
-    if (self.helper.defined("CRON"))
+    if (defined("CRON"))
     {
       staffid = "[CRON]";
       full_name = "[CRON]";
     }
-    else if (self.helper.defined("STRIPE_SUBSCRIPTION_INVOICE"))
+    else if (defined("STRIPE_SUBSCRIPTION_INVOICE"))
     {
       staffid = null;
       full_name = "[Stripe]";
@@ -997,7 +997,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     if (marked > 0 && is_draft(id)) change_invoice_number_when_status_draft(id);
     var description = string.Empty;
     var additional_activity_data = string.Empty;
-    if (self.helper.defined("CRON"))
+    if (defined("CRON"))
     {
       additional_activity_data = JsonConvert.SerializeObject(new[]
       {
@@ -1053,7 +1053,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self)
     }
     else
     {
-      if (self.helper.defined("CRON") || expense) return data;
+      if (defined("CRON") || expense) return data;
       data.IncludeShipping = true;
       data.ShowShippingOnInvoice = data.ShowShippingOnInvoice;
     }

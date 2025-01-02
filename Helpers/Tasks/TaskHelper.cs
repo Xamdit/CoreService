@@ -21,8 +21,8 @@ public static class TaskHelper
   {
     var (self, db) = getInstance();
     status ??= helper.get_task_status_by_id(status.Data?.Id ?? 0);
-    // var statusName = self.hooks.apply_filters("task_status_name", status.Name, status);
-    var statusName = self.hooks.apply_filters("task_status_name", status.Data.Name);
+    // var statusName = hooks.apply_filters("task_status_name", status.Name, status);
+    var statusName = hooks.apply_filters("task_status_name", status.Data.Name);
 
     if (clean) return statusName;
 
@@ -47,7 +47,7 @@ public static class TaskHelper
   public static List<TaskPriority> GetTasksPriorities(this HelperBase helper)
   {
     var (self, db) = getInstance();
-    return self.hooks.apply_filters("tasks_priorities", new List<TaskPriority>
+    return hooks.apply_filters("tasks_priorities", new List<TaskPriority>
     {
       new() { Id = 1, Name = "Low", Color = "#777" },
       new() { Id = 2, Name = "Medium", Color = "#03a9f4" },
@@ -69,7 +69,7 @@ public static class TaskHelper
   public static DataSet<Task>? get_task_status_by_id(this HelperBase helper, int id)
   {
     var (self, db) = getInstance();
-    var tasks_model = self.model.tasks_model();
+    var tasks_model = self.tasks_model(db);
 
     var statuses = tasks_model.get_statuses();
 

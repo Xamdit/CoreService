@@ -4,7 +4,6 @@ using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.InputSet;
-using Service.Framework.Helpers;
 using Service.Framework.Library.Merger;
 using Service.Helpers;
 using Service.Helpers.Pdf;
@@ -14,20 +13,19 @@ namespace Service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ContractController(ILogger<ContractController> logger, MyInstance self) : ClientControllerBase(logger, self)
+public class ContractController(ILogger<ContractController> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   [HttpGet]
   public IActionResult Index([FromQuery] int id, [FromQuery] string hash)
   {
-    var (self, db) = getInstance();
-    var contractsModel = self.model.contracts_model();
+    var contractsModel = self.contracts_model(db);
     self.helper.check_contract_restrictions(id, hash);
     var rows = contractsModel.get(x => x.Id == id);
     if (rows.Count == 0)
       return NotFound();
     var row = rows.First();
 
-    if (!self.helper.is_client_logged_in())
+    if (!self.db.is_client_logged_in())
       self.helper.load_client_language(row.contract.Client);
 
     // DisableNavigation();
@@ -36,7 +34,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
     var data = new
     {
       title = row.contract.Subject,
-      contract = self.hooks.apply_filters("contract_html_pdf_data", row.contract),
+      contract = hooks.apply_filters("contract_html_pdf_data", row.contract),
       bodyclass = "contract contract-view identity-confirmation",
       identity_confirmation_enabled = true,
       comments = contractsModel.get_comments(id)
@@ -44,7 +42,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
 
     // self.app_scripts.theme("sticky-js", "assets/plugins/sticky/sticky.js");
     // self.app_css.remove("reset-css", "customers-area-default");
-    data = self.hooks.apply_filters("contract_customers_area_view_data", data);
+    data = hooks.apply_filters("contract_customers_area_view_data", data);
 
     // NoIndexCustomersArea();
     // view("contracthtml", data);
@@ -55,8 +53,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
   [HttpPost]
   public IActionResult Index([FromForm] int id, [FromForm] string hash, [FromForm] string action, [FromForm] string signature, [FromForm] string content)
   {
-    var (self, db) = getInstance();
-    var contractsModel = self.model.contracts_model();
+    var contractsModel = self.contracts_model(db);
     self.helper.check_contract_restrictions(id, hash);
     var contract = contractsModel.get(x => x.Id == id);
     if (contract.Count == 0)
@@ -64,7 +61,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
 
     var row = contract.First();
 
-    if (!self.helper.is_client_logged_in())
+    if (!self.db.is_client_logged_in())
       self.helper.load_client_language(row.contract.Client);
 
     switch (action)
@@ -84,11 +81,11 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
       case "contract_comment":
         if (string.IsNullOrEmpty(content))
           return Redirect(Request.Path);
-        var contracts_model = self.model.contracts_model();
+        var contracts_model = self.contracts_model(db);
         var contract_data = self.input.post<ContractComment>();
         contract_data.ContractId = id;
         contracts_model.add_comment(contract_data, true);
-        return Redirect(self.helper.base_url() + "?tab=discussion");
+        return Redirect(base_url() + "?tab=discussion");
     }
 
     // DisableNavigation();
@@ -97,7 +94,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
     var data = new
     {
       title = row.contract.Subject,
-      contract = self.hooks.apply_filters("contract_html_pdf_data", contract),
+      contract = hooks.apply_filters("contract_html_pdf_data", contract),
       bodyclass = "contract contract-view identity-confirmation",
       identity_confirmation_enabled = true,
       comments = contractsModel.get_comments(id)
@@ -105,7 +102,7 @@ public class ContractController(ILogger<ContractController> logger, MyInstance s
 
     // self.app_scripts.theme("sticky-js", "assets/plugins/sticky/sticky.js");
     // self.app_css.remove("reset-css", "customers-area-default");
-    data = self.hooks.apply_filters("contract_customers_area_view_data", data);
+    data = hooks.apply_filters("contract_customers_area_view_data", data);
 
     // NoIndexCustomersArea();
     // View("contracthtml", data);

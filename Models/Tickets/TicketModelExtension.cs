@@ -1,23 +1,18 @@
 using Service.Core.Extensions;
 using Service.Entities;
-using Service.Framework;
 using Service.Helpers;
 
 namespace Service.Models.Tickets;
 
 public static class TicketModelExtension
 {
-  private static MyContext db { get; set; }
-  private static MyInstance self { get; set; }
   private static TicketsModel my_model { get; set; }
 
 
   public static async Task<string> insert_piped_ticket(this TicketsModel model, (Ticket ticket, string body, string to) data)
   {
-    self = model.root;
-    db = self.db();
     my_model = model;
-    var spam_filters_model = self.model.spam_filters_model();
+    var spam_filters_model = model.spam_filters_model;
     var system_blocked_subjects = new[]
     {
       "Mail delivery failed",
@@ -26,7 +21,7 @@ public static class TicketModelExtension
       "Undelivered Mail Returned to Sender"
     };
 
-    data = self.hooks.apply_filters("piped_ticket_data", "", "");
+    data = hooks.apply_filters("piped_ticket_data", "", "");
     var piping = true;
 
     var subject = data.ticket.Subject;
@@ -41,7 +36,7 @@ public static class TicketModelExtension
     if (!string.IsNullOrEmpty(mailstatus))
       return await FinalizeLogAndReturn(data, email, cc, tid, subject, mailstatus);
 
-    var department = db.Departments.FirstOrDefault(x => x.Email == data.to.Trim());
+    var department = model.root.db.Departments.FirstOrDefault(x => x.Email == data.to.Trim());
     var departmentId = department?.Id ?? 0;
 
     if (departmentId == 0)
@@ -49,14 +44,14 @@ public static class TicketModelExtension
     if (email == data.to)
       return await FinalizeLogAndReturn(data, email, cc, tid, subject, "Blocked Potential Email Loop");
 
-    var user = db.Staff.FirstOrDefault(x => x.Active.HasValue && x.Email == email);
+    var user = model.root.db.Staff.FirstOrDefault(x => x.Active.HasValue && x.Email == email);
     if (user != null)
       return await HandleStaffResponse(data, user, tid, cc, subject);
 
-    var contact = db.Contacts.FirstOrDefault(x => x.Email == email);
+    var contact = model.root.db.Contacts.FirstOrDefault(x => x.Email == email);
     var userId = contact?.Id ?? 0;
 
-    if (userId == 0 && db.get_option("email_piping_only_registered") == "1")
+    if (userId == 0 && model.root.db.get_option("email_piping_only_registered") == "1")
       return await FinalizeLogAndReturn(data, email, cc, tid, subject, "Unregistered Email Address");
 
     return await HandleTicketCreation(data, email, cc, tid, userId, subject, departmentId);
@@ -74,6 +69,7 @@ public static class TicketModelExtension
 
   private static async Task<string> FinalizeLogAndReturn(dynamic data, string email, List<string> cc, string tid, string subject, string mailstatus)
   {
+    var db = new MyContext();
     db.TicketsPipeLogs.Add(new TicketsPipeLog
     {
       DateCreated = DateTime.Now,
@@ -95,6 +91,7 @@ public static class TicketModelExtension
 
   private static async Task<string> HandleStaffResponse(dynamic data, Staff user, string tid, List<string> cc, string subject)
   {
+    var db = new MyContext();
     if (!string.IsNullOrEmpty(tid)) return await FinalizeLogAndReturn(data, user.Email, cc, tid, subject, "Ticket ID Not Found");
     data.Status = db.get_option<int>("default_ticket_reply_status") == 0 ? 3 : db.get_option<int>("default_ticket_reply_status");
     var replyId = await my_model.add_reply(data, Convert.ToInt32(tid), user.Id, data.TicketAttachments);
@@ -103,6 +100,7 @@ public static class TicketModelExtension
 
   private static async Task<string> HandleTicketCreation(dynamic data, string email, List<string> cc, string tid, int userId, string subject, int departmentId)
   {
+    var db = new MyContext();
     var filterdate = DateTime.Now.AddMinutes(-15);
     var ticketQuery = db.Tickets
       .Where(x => DateTime.Parse(x.Date) > filterdate && x.Email == email);

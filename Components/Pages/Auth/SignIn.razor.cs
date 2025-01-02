@@ -37,7 +37,7 @@ public class SignInComponent : XComponentBase
     Console.WriteLine($"User Type: {UserType}");
     Console.WriteLine($"Email: {Email}");
     Console.WriteLine($"Password: {Password}");
-    var auth_model = self.model.auth_model();
+    var auth_model = self.auth_model(db);
     var userSchema = auth_model.Signin(Email, Password, UserType == "admin");
     if (userSchema != null)
     {

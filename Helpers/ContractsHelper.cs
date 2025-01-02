@@ -13,7 +13,7 @@ public static class ContractsHelper
   public static IActionResult check_contract_restrictions(this HelperBase helper, int id, string hash)
   {
     var (self, db) = getInstance();
-    var contracts_model = self.model.contracts_model();
+    var contracts_model = self.contracts_model(db);
     if (string.IsNullOrEmpty(hash) || id == 9)
       return self.controller.NotFound();
 
@@ -49,7 +49,7 @@ public static class ContractsHelper
       content = comment
       // contract_id = contractId
     };
-    self.ignore(async () =>
+    ignore(async () =>
     {
       var response = await self.helper.rest_client_json<Contact>("contracts/add_comment", Method.Get, data);
       if (response.is_success)

@@ -6,7 +6,7 @@ using Service.Helpers.Sale;
 
 namespace Service.Models;
 
-public class TaxesModel(MyInstance self) : MyModel(self)
+public class TaxesModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   /**
    * Get tax by id
@@ -15,13 +15,11 @@ public class TaxesModel(MyInstance self) : MyModel(self)
    */
   public List<Taxis> get()
   {
-    var db = self.db();
     return db.Taxes.OrderBy(x => x.TaxRate).ToList();
   }
 
   public Taxis? get(int id)
   {
-    var db = self.db();
     var row = db.Taxes.FirstOrDefault(x => x.Id == id);
     return row;
   }
@@ -38,12 +36,12 @@ public class TaxesModel(MyInstance self) : MyModel(self)
     data.TaxRate = data.TaxRate.Trim();
 
 
-    data = self.hooks.apply_filters("before_tax_created", data);
+    data = hooks.apply_filters("before_tax_created", data);
     var insert_id = data.Id;
 
     if (insert_id <= 0) return false;
     self.helper.log_activity("New Tax Added [ID: " + insert_id + ", " + data.Name + "]");
-    self.hooks.do_action("after_tax_created", new
+    hooks.do_action("after_tax_created", new
     {
       id = insert_id,
       data
@@ -58,18 +56,17 @@ public class TaxesModel(MyInstance self) : MyModel(self)
    */
   public object edit(Taxis data)
   {
-    var db = self.db();
     if (db.Expenses.Any(x => x.Tax == data.Id))
       return new { tax_is_using_expenses = true };
 
     var updated = false;
     var taxid = data.Id;
-    var original_tax = self.helper.get_tax_by_id(taxid);
+    var original_tax = db.get_tax_by_id(taxid);
 
     data.Name = data.Name.Trim();
     data.TaxRate = data.TaxRate.Trim();
 
-    data = self.hooks.apply_filters("before_update_tax", data);
+    data = hooks.apply_filters("before_update_tax", data);
     db.Taxes.Where(x => x.Id == taxid).Update(x => new Taxis
     {
       Name = data.Name,
@@ -94,7 +91,7 @@ public class TaxesModel(MyInstance self) : MyModel(self)
       updated = true;
     }
 
-    self.hooks.do_action("after_update_tax", new
+    hooks.do_action("after_update_tax", new
     {
       Id = taxid,
       data,
@@ -113,7 +110,6 @@ public class TaxesModel(MyInstance self) : MyModel(self)
    */
   public bool delete(int id)
   {
-    var db = self.db();
     // if (
     //   is_reference_in_table('tax', 'items', id)
     //   || is_reference_in_table('tax2', 'items', id)

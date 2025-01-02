@@ -18,11 +18,11 @@ using File = Service.Entities.File;
 
 namespace Service.Models.Contracts;
 
-public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
+public class ContractsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  private ContractTypesModel contract_types_model = self.model.contract_types_model();
-  private TasksModel tasks_model = self.model.tasks_model();
-  private ClientsModel clients_model = self.model.clients_model();
+  private ContractTypesModel contract_types_model = self.contract_types_model(db);
+  private TasksModel tasks_model = self.tasks_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
 
   /**
      * Get contract/s
@@ -110,12 +110,12 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     data.contract.Hash = Guid.NewGuid().ToString();
 
-    data = self.hooks.apply_filters("before_contract_added", data);
+    data = hooks.apply_filters("before_contract_added", data);
     var result = db.Contracts.Add(data.contract);
     if (!result.IsAdded()) return 0;
     if (custom_fields != null)
       self.helper.handle_custom_fields_post(result.Entity.Id, custom_fields);
-    self.hooks.do_action("after_contract_added", result.Entity.Id);
+    hooks.do_action("after_contract_added", result.Entity.Id);
     log_activity($"New Contract Added [{data.contract.Subject}]");
     return result.Entity.Id;
   }
@@ -135,7 +135,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
       if (data.contract.DateEnd.HasValue && data.contract.DateEnd != contract.DateEnd)
         data.contract.IsExpiryNotified = 0;
 
-    data = self.hooks.apply_filters("before_contract_updated", data, id);
+    data = hooks.apply_filters("before_contract_updated", data, id);
     if (data.customField != null)
     {
       var custom_fields = data.customField;
@@ -145,7 +145,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     var affected_rows = db.Contracts.Where(x => x.Id == id).Update(x => data);
     if (affected_rows <= 0) return affectedRows > 0;
-    self.hooks.do_action("after_contract_updated", id);
+    hooks.do_action("after_contract_updated", id);
     log_activity($"Contract Updated [{data.contract.Subject}]");
     return true;
   }
@@ -158,7 +158,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
       .Where(x => x.Id == id)
       .Update(x => new Contract { Signature = "" });
     if (!string.IsNullOrEmpty(contract.Signature))
-      self.helper.unlink($"{self.helper.get_upload_path_by_type("contract")}{id}/{contract.Signature}");
+      self.helper.unlink($"{get_upload_path_by_type("contract")}{id}/{contract.Signature}");
     return true;
   }
 
@@ -322,7 +322,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool delete(int id)
   {
-    self.hooks.do_action("before_contract_deleted", id);
+    hooks.do_action("before_contract_deleted", id);
     clear_signature(id);
     var contract = get(x => x.Id == id);
     var affected_rows = db.Contracts.Where(x => x.Id == id).Delete();
@@ -350,7 +350,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
 
     log_activity($"Contract Deleted [{id}]");
 
-    self.hooks.do_action("after_contract_deleted", id);
+    hooks.do_action("after_contract_deleted", id);
 
     return true;
   }
@@ -464,7 +464,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     var attachment = get_contract_attachments(attachment_id).FirstOrDefault();
     if (attachment == null) return deleted;
     if (string.IsNullOrEmpty(attachment.External))
-      self.helper.unlink($"{self.helper.get_upload_path_by_type("contract")}{attachment.RelId}/{attachment.FileName}");
+      self.helper.unlink($"{get_upload_path_by_type("contract")}{attachment.RelId}/{attachment.FileName}");
 
 
     var affected_rows = db.Files.Where(x => x.Id == attachment_id).Delete();
@@ -474,12 +474,12 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
       log_activity($"Contract Attachment Deleted [ContractID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(self.helper.get_upload_path_by_type("contract") + attachment.RelId)) return deleted;
+    if (!self.helper.is_dir(get_upload_path_by_type("contract") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("contract") + attachment.RelId);
+    var other_attachments = self.helper.list_files(get_upload_path_by_type("contract") + attachment.RelId);
     if (!other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("contract") + attachment.RelId);
+      self.helper.delete_dir(get_upload_path_by_type("contract") + attachment.RelId);
 
     return deleted;
   }
@@ -525,7 +525,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     {
       _data = (Contract)TypeMerger.Merge(_data, get_acceptance_info_array<Contract>(true));
       _data.Signed = false;
-      if (!string.IsNullOrEmpty(_contract.Signature)) self.helper.unlink($"{self.helper.get_upload_path_by_type("contract")}{data.ContractId}/{_contract.Signature}");
+      if (!string.IsNullOrEmpty(_contract.Signature)) self.helper.unlink($"{get_upload_path_by_type("contract")}{data.ContractId}/{_contract.Signature}");
     }
 
     if (db.Contracts.Update(_data).IsModified())
@@ -564,7 +564,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self)
     var affected_rows = db.ContractRenewals.Where(x => x.Id == id).Delete();
     if (affected_rows <= 0) return false;
     if (!string.IsNullOrEmpty(contract.ShortLink))
-      self.helper.app_archive_short_link(contract.ShortLink);
+      db.app_archive_short_link(contract.ShortLink);
 
     if (is_last)
     {

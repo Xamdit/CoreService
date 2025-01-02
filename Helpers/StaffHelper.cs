@@ -86,7 +86,7 @@ public static class StaffHelper
     if (staff == null) return url;
     if (string.IsNullOrEmpty(staff.ProfileImage)) return url;
     var profileImagePath = "uploads/staff_profile_images/" + staff_id + "/" + type + "_" + staff.ProfileImage;
-    if (helper.file_exists(profileImagePath)) url = helper.site_url(profileImagePath);
+    if (file_exists(profileImagePath)) url = helper.site_url(profileImagePath);
 
     return url;
   }
@@ -99,7 +99,7 @@ public static class StaffHelper
   public static Staff get_staff(this HelperBase helper, int? id = null)
   {
     var (self, db) = getInstance();
-    var staff_model = self.model.staff_model();
+    var staff_model = self.staff_model(db);
     if (!id.HasValue && self.cache.has("current_user"))
     {
       var current_user = self.cache.get("current_user");
@@ -125,14 +125,14 @@ public static class StaffHelper
   public static string staff_profile_image_url(int staff_id, string type = "small")
   {
     var (self, db) = getInstance();
-    var url = self.helper.base_url("assets/images/user-placeholder.jpg");
+    var url = base_url("assets/images/user-placeholder.jpg");
     var staff = staff_id == self.helper.get_staff_user_id() && self.globals<Staff?>("current_user") != null
       ? self.globals<Staff?>("current_user")
       : db.Staff.FirstOrDefault(x => x.Id == staff_id);
     if (staff == null) return url;
     if (string.IsNullOrEmpty(staff.ProfileImage)) return url;
     var profileImagePath = $"uploads/staff_profile_images/{staff_id}/{type}_{staff.ProfileImage}";
-    if (self.helper.file_exists(profileImagePath)) url = self.helper.base_url(profileImagePath);
+    if (file_exists(profileImagePath)) url = base_url(profileImagePath);
     return url;
   }
 }

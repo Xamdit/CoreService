@@ -1,5 +1,6 @@
 using Service.Core.Extensions;
 using Service.Entities;
+using Service.Framework;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
 using Service.Helpers.Database;
@@ -14,9 +15,8 @@ public static class SaleHelper
  * @param  string  type rel_type value
  * @return array
  */
-  public static List<Itemable> get_items_by_type(this HelperBase helper, string type, int id)
+  public static List<Itemable> get_items_by_type(this MyContext db, string type, int id)
   {
-    var (self, db) = getInstance();
     return db.Itemables
       .Where(x => x.RelType == type && x.RelId == id)
       .OrderBy(x => x.ItemOrder)
@@ -29,12 +29,8 @@ public static class SaleHelper
    * @param  mixed id_or_name
    * @return object
    */
-  public static Currency? get_currency(this HelperBase helper, object id_or_name)
+  public static Currency? get_currency(this MyContext db, object id_or_name)
   {
-    var (self, db) = getInstance();
-
-    var currencies_model = self.model.currencies_model();
-
     return id_or_name is int
       ? db.Currencies.FirstOrDefault(x => x.Id == Convert.ToInt32(id_or_name))
       : db.Currencies.FirstOrDefault(x => x.Name == id_or_name.ToString());
@@ -46,9 +42,8 @@ public static class SaleHelper
  * @param  integer id taxid
  * @return object
  */
-  public static Taxis? get_tax_by_id(this HelperBase helper, int id)
+  public static Taxis? get_tax_by_id(this MyContext db, int id)
   {
-    var (self, db) = getInstance();
     var row = db.Taxes.FirstOrDefault(x => x.Id == id);
     return row;
   }
@@ -60,7 +55,7 @@ public static class SaleHelper
  */
   public static int get_decimal_places()
   {
-    // return self.hooks.apply_filters("app_decimal_places", 2);
+    // return hooks.apply_filters("app_decimal_places", 2);
     return 2;
   }
 
@@ -69,9 +64,8 @@ public static class SaleHelper
  * @param  string $name tax name
  * @return object
  */
-  public static Taxis? get_tax_by_name(this HelperBase helper, string name)
+  public static Taxis? get_tax_by_name(this MyContext db, string name)
   {
-    var (self, db) = getInstance();
     var row = db.Taxes.FirstOrDefault(x => x.Name == name);
     return row;
   }
@@ -83,15 +77,14 @@ public static class SaleHelper
  */
   public static Currency get_base_currency(this HelperBase helper)
   {
-    var (self, db) = getInstance();
-    var currencies_model = self.model.currencies_model();
+    var self = new MyInstance();
+    var currencies_model = self.currencies_model(db);
     return currencies_model.get_base_currency();
   }
 
 
   public static string sales_number_format(this HelperBase helper, int number, int format, string appliedPrefix, DateTime date)
   {
-    var (self, db) = getInstance();
     var originalNumber = number;
     var prefixPadding = db.get_option<int>("number_padding_prefixes"); // Assuming GetOption is a method to fetch options
 
@@ -109,7 +102,7 @@ public static class SaleHelper
     };
 
     // Assuming ApplyFilters is a method similar to the hooks()->apply_filters in PHP
-    self.hooks.apply_filters("sales_number_format", new
+    hooks.apply_filters("sales_number_format", new
     {
       formattedNumber,
       format,
@@ -130,7 +123,6 @@ public static class SaleHelper
    */
   public static string app_format_money(this HelperBase helper, decimal amount, object id_or_name, bool excludeSymbol = false)
   {
-    var (self, db) = getInstance();
     var currency = new Currency();
     var dbCurrency = helper.get_currency(currency);
     if (dbCurrency != null)
@@ -160,7 +152,7 @@ public static class SaleHelper
     var formattedWithCurrency = currency.Placement == "after" ? amountFormatted + "" + symbol : symbol + "" + amountFormatted;
 
     // return
-    // self.hooks.apply_filters("app_format_money", formattedWithCurrency, new
+    // hooks.apply_filters("app_format_money", formattedWithCurrency, new
     // {
     //   amount,
     //   currency,
@@ -183,7 +175,6 @@ public static class SaleHelper
 
   public static void update_sales_total_tax_column(this HelperBase helper, int id, string type, string table)
   {
-    var (self, db) = getInstance();
     var data = db.kata(table).Where("id", id).Get().FirstOrDefault();
     var items = helper.get_items_by_type(type, id);
 
@@ -254,7 +245,6 @@ public static class SaleHelper
  */
   public static int add_new_sales_item_post(this HelperBase helper, Itemable item, int rel_id, string rel_type)
   {
-    var (self, db) = getInstance();
     var custom_fields = new CustomField();
     // if (item["custom_fields"])
     //   custom_fields = item["custom_fields"];
@@ -288,7 +278,6 @@ public static class SaleHelper
  */
   public static bool update_sales_item_post(this HelperBase helper, int item_id, Itemable data, string field = "")
   {
-    var (self, db) = getInstance();
     // Initialize a new Itemable object to store the updates
     var update = new Itemable();
 
@@ -352,7 +341,6 @@ public static class SaleHelper
 */
   public static bool maybe_insert_post_item_tax(this HelperBase helper, int itemId, PostItem? itemTax, int relId, string relType)
   {
-    var (self, db) = getInstance();
     var affectedRows = 0;
 
     if (!itemTax.TaxNames.Any()) return affectedRows > 0;
@@ -402,7 +390,6 @@ public static class SaleHelper
  */
   public static bool delete_taxes_from_item(this HelperBase helper, int item_id, string rel_type)
   {
-    var (self, db) = getInstance();
     var result = db.ItemTaxes
       .Where(x => x.ItemId == item_id)
       .Delete();
@@ -418,7 +405,6 @@ public static class SaleHelper
  */
   public static bool handle_removed_sales_item_post(this HelperBase helper, int id, string rel_type)
   {
-    var (self, db) = getInstance();
     var affected_rows = db.Itemables
       .Where(x => x.Id == id)
       .Delete();
@@ -439,7 +425,6 @@ public static class SaleHelper
  */
   public static object app_format_number(this HelperBase helper, object total, bool force_check_zero_decimals = false)
   {
-    var (self, db) = getInstance();
     // Ensure the input is convertible to a decimal
     if (!decimal.TryParse(total?.ToString(), out var numericTotal)) return total; // Return the original input if it's not numeric
 
@@ -456,7 +441,7 @@ public static class SaleHelper
     // Format the number using the specified decimal and thousand separators
     // var formatted = number_format(numericTotal, decimalPlaces, decimal_separator, thousand_separator);
     // Apply hooks and return the final formatted result
-    return self.hooks.apply_filters("number_after_format",
+    return hooks.apply_filters("number_after_format",
       // formatted,
       new
       {

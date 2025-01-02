@@ -14,9 +14,7 @@ public static class ProjectMember3Extension
 {
   public static List<ProjectSetting> get_project_settings(this ProjectsModel model, int project_id)
   {
-    var (self, db) = getInstance();
-
-    var rows = db.ProjectSettings
+    var rows = model.root.db.ProjectSettings
       .Where(x => x.ProjectId == project_id)
       .ToList();
     return rows;
@@ -24,26 +22,24 @@ public static class ProjectMember3Extension
 
   public static List<ProjectMember> get_project_members(this ProjectsModel model, int id, bool with_name = false)
   {
-    var (self, db) = getInstance();
-    var query = db.ProjectMembers.Include(x => x.Staff).Where(x => x.ProjectId == id).AsQueryable();
+    var query = model.root.db.ProjectMembers.Include(x => x.Staff).Where(x => x.ProjectId == id).AsQueryable();
     return query.ToList();
   }
 
   public static bool remove_team_member(this ProjectsModel model, int project_id, int staff_id)
   {
-    var (self, db) = getInstance();
-    var affected_rows = db.ProjectMembers.Where(x => x.ProjectId == project_id && x.StaffId == staff_id).Delete();
+    var affected_rows = model.root.db.ProjectMembers.Where(x => x.ProjectId == project_id && x.StaffId == staff_id).Delete();
     if (affected_rows <= 0) return false;
 
     // Remove member from tasks where is assigned
-    db.TaskAssigneds
+    model.root.db.TaskAssigneds
       .Where(x =>
         x.StaffId == staff_id &&
-        db.Tasks.Any(y => y.Id == x.TaskId && y.RelType == "project" && y.RelId == project_id)
+        model.root.db.Tasks.Any(y => y.Id == x.TaskId && y.RelType == "project" && y.RelId == project_id)
       )
       .Delete();
 
-    model.log(project_id, "project_activity_removed_team_member", self.helper.get_staff_full_name(staff_id));
+    model.log(project_id, "project_activity_removed_team_member", model.root.helper.get_staff_full_name(staff_id));
     return true;
   }
 
@@ -56,8 +52,7 @@ public static class ProjectMember3Extension
 //
   public static async Task<List<TasksTimer>> get_timesheets(this ProjectsModel model, int project_id, List<int> tasks_ids)
   {
-    var (self, db) = getInstance();
-    var tasks_model = self.model.tasks_model();
+    var tasks_model = model.root.model.tasks_model(db);
     if (tasks_ids.Any())
     {
       var condition = CreateCondition<Task>(x => x.Id == project_id);
@@ -67,7 +62,7 @@ public static class ProjectMember3Extension
 
     if (tasks_ids.Any()) return new List<TasksTimer>();
 
-    var timesheets = db.TasksTimers
+    var timesheets = model.root.db.TasksTimers
       .Include(x => x.Staff)
       .Where(x => tasks_ids.Contains(x.TaskId))
       .ToList()
@@ -75,7 +70,7 @@ public static class ProjectMember3Extension
       {
         var task = tasks_model.get(x => x.Id == t.TaskId);
         t.Task = task;
-        t.Staff.FirstName = self.helper.get_staff_full_name(t.StaffId);
+        t.Staff.FirstName = model.root.helper.get_staff_full_name(t.StaffId);
         // if (!is_null(t.EndTime))
         //   t.TotalSpent                 = t.EndTime - t.StartTime;
         // else
@@ -90,15 +85,14 @@ public static class ProjectMember3Extension
 //
   public static ProjectDiscussion? get_discussion(this ProjectsModel model, int id, int? project_id = null)
   {
-    var (self, db) = getInstance();
-    var query = db.ProjectDiscussions
+    var query = model.root.db.ProjectDiscussions
       .Include(x => x.ProjectDiscussionComments)
       .Where(x => x.Id == id).AsQueryable();
     if (project_id.HasValue) query.Where(x => x.ProjectId == project_id);
     if (model.client_logged_in)
       query = query.Where(x =>
         x.ShowToCustomer &&
-        db.Projects.Any(y => y.ClientId == model.client_user_id)
+        model.root.db.Projects.Any(y => y.ClientId == model.client_user_id)
       );
     var discussion = query.FirstOrDefault();
     return discussion ?? null;
@@ -107,14 +101,13 @@ public static class ProjectMember3Extension
 //
   public static ProjectDiscussionComment get_discussion_comment(this ProjectsModel model, int id)
   {
-    var (self, db) = getInstance();
     dynamic comment = new DataSet<ProjectDiscussionComment>();
-    // comment.Data = db.ProjectDiscussionComments.FirstOrDefault(x => x.Id == id);
-    comment.Data = db.ProjectDiscussionComments.Find(id)!;
+    // comment.Data = model.root.db.ProjectDiscussionComments.FirstOrDefault(x => x.Id == id);
+    comment.Data = model.root.db.ProjectDiscussionComments.Find(id)!;
 
     if (comment.Data.ContactId != 0)
     {
-      comment.created_by_current_user = model.client_logged_in && comment.ContactId == self.helper.get_contact_user_id();
+      comment.created_by_current_user = model.client_logged_in && comment.ContactId == model.root.helper.get_contact_user_id();
       comment.profile_picture_url = contact_profile_image_url(comment.ContactId);
     }
     else
@@ -125,7 +118,7 @@ public static class ProjectMember3Extension
           ? comment.staff_id == model.staff_user_id
           : false;
 
-      // comment.created_by_admin = self.helper.is_admin(comment.staff_id);
+      // comment.created_by_admin = model.root.helper.is_admin(comment.staff_id);
       comment.created_by_admin = comment.staff_id.is_admin();
       comment.profile_picture_url = staff_profile_image_url(comment.staff_id);
     }
@@ -134,7 +127,7 @@ public static class ProjectMember3Extension
     if (!string.IsNullOrEmpty(comment.Modified))
       comment.Modified = DateTime.Parse(comment.Modified) * 1000;
     if (!string.IsNullOrEmpty(comment.FileName))
-      comment.file_url = self.helper.site_url($"uploads/discussions/{comment.DiscussionId}/{comment.FileName}");
+      comment.file_url = model.root.helper.site_url($"uploads/discussions/{comment.DiscussionId}/{comment.FileName}");
 
     return comment;
   }
@@ -142,8 +135,7 @@ public static class ProjectMember3Extension
 //
   public static List<DataSet<ProjectDiscussionComment>> get_discussion_comments(this ProjectsModel model, int id, string type)
   {
-    var (self, db) = getInstance();
-    var rows = db.ProjectDiscussionComments.Where(x => x.DiscussionId == id && x.DiscussionType == type).ToList();
+    var rows = model.root.db.ProjectDiscussionComments.Where(x => x.DiscussionId == id && x.DiscussionType == type).ToList();
     // var comments = converts<dynamic>(rows);
     var comments = rows.Select(x =>
     {
@@ -162,7 +154,7 @@ public static class ProjectMember3Extension
           comment.Options.Add(new Option()
           {
             Name = "created_by_current_user",
-            Value = $"{model.client_logged_in && comment.Data.ContactId == self.helper.get_contact_user_id()}"
+            Value = $"{model.client_logged_in && comment.Data.ContactId == model.root.helper.get_contact_user_id()}"
           });
           comment.Options.Add(new Option()
           {
@@ -190,7 +182,7 @@ public static class ProjectMember3Extension
           });
         }
 
-        // if (!string.IsNullOrEmpty(comment.FileName)) comment.file_url = self.helper.site_url($"uploads/discussions/{id}/{comment.FileName}");
+        // if (!string.IsNullOrEmpty(comment.FileName)) comment.file_url = model.root.helper.site_url($"uploads/discussions/{id}/{comment.FileName}");
 
         // item.Data.DateCreated *= 1000;
         // if (!string.IsNullOrEmpty(comment.Modified))
@@ -215,8 +207,7 @@ public static class ProjectMember3Extension
 //
   public static List<DataSet<ProjectDiscussion>> get_discussions(this ProjectsModel model, int project_id)
   {
-    var (self, db) = getInstance();
-    var query = db.ProjectDiscussions.Where(x => x.ProjectId == project_id).AsQueryable();
+    var query = model.root.db.ProjectDiscussions.Where(x => x.ProjectId == project_id).AsQueryable();
 
     if (model.client_logged_in) query.Where(x => x.ShowToCustomer);
     var discussions = query.ToList();
@@ -224,13 +215,13 @@ public static class ProjectMember3Extension
       {
         var item = new DataSet<ProjectDiscussion>();
         item.Data = discussion;
-        var count = db.ProjectDiscussionComments.Count(x => x.DiscussionId == discussion.Id && x.DiscussionType == "regular");
+        var count = model.root.db.ProjectDiscussionComments.Count(x => x.DiscussionId == discussion.Id && x.DiscussionType == "regular");
         item.Options.Add(new Option()
         {
           Name = "total_comments",
           Value = $"{count}"
         });
-        // discussion.total_comments = db.ProjectDiscussionComments.Count(x => x.DiscussionId == discussion.Id && x.DiscussionType == "regular");
+        // discussion.total_comments = model.root.db.ProjectDiscussionComments.Count(x => x.DiscussionId == discussion.Id && x.DiscussionType == "regular");
         return item;
       })
       .ToList();
@@ -240,7 +231,6 @@ public static class ProjectMember3Extension
 //
   public static ProjectDiscussionComment? add_discussion_comment(this ProjectsModel model, DataSet<ProjectDiscussionComment> data, int discussion_id, string type)
   {
-    var (self, db) = getInstance();
     var discussion = model.get_discussion(discussion_id);
     var _data = new DataSet<ProjectDiscussionComment>();
 
@@ -251,22 +241,22 @@ public static class ProjectMember3Extension
     if (data.Data.Parent.HasValue) _data.Data.Parent = data.Data.Parent;
     if (model.client_logged_in)
     {
-      _data.Data.ContactId = self.helper.get_contact_user_id();
-      // _data.Contact.FullName = self.helper.get_contact_full_name(_data.ContactId.Value);
+      _data.Data.ContactId = model.root.helper.get_contact_user_id();
+      // _data.Contact.FullName = model.root.helper.get_contact_full_name(_data.ContactId.Value);
       _data.Data.StaffId = 0;
     }
     else
     {
       _data.Data.ContactId = 0;
       _data.Data.StaffId = model.staff_user_id;
-      _data.Data.FullName = self.helper.get_staff_full_name(_data.Data.StaffId);
+      _data.Data.FullName = model.root.helper.get_staff_full_name(_data.Data.StaffId);
     }
 
     _data = handle_project_discussion_comment_attachments(discussion_id, data, _data);
     _data.Data.DateCreated = DateTime.Now;
-    _data = self.hooks.apply_filters("before_add_project_discussion_comment", _data, discussion_id);
+    _data = model.root.hooks.apply_filters("before_add_project_discussion_comment", _data, discussion_id);
 
-    var result = db.ProjectDiscussionComments.Add(_data.Data);
+    var result = model.root.db.ProjectDiscussionComments.Add(_data.Data);
     var insert_id = result.Entity.Id;
     if (!result.IsAdded()) return null;
     var not_link = "#";
@@ -277,7 +267,7 @@ public static class ProjectMember3Extension
     }
     else
     {
-      var misc_model = self.model.misc_model();
+      var misc_model = model.root.model.misc_model(db);
       var row = misc_model.get_file(discussion_id);
       discussion = convert<ProjectDiscussion>(row);
       not_link = $"projects/view/{discussion.ProjectId}?group=project_files&file_id={discussion_id}";
@@ -305,7 +295,7 @@ public static class ProjectMember3Extension
     //   {
     //     new
     //     {
-    //       Attachment = self.globals<string>("PROJECT_DISCUSSION_ATTACHMENT_FOLDER") + discussion_id + $"/{_data.FileName}",
+    //       Attachment = model.root.globals<string>("PROJECT_DISCUSSION_ATTACHMENT_FOLDER") + discussion_id + $"/{_data.FileName}",
     //       filename = _data.FileName,
     //       type = _data.FileMimeType,
     //       read = true
@@ -319,7 +309,7 @@ public static class ProjectMember3Extension
     };
 
     if (model.client_logged_in)
-      notification_data.FromClientId = self.helper.get_contact_user_id();
+      notification_data.FromClientId = model.root.helper.get_contact_user_id();
     else
       notification_data.FromUserId = model.staff_user_id;
     var notifiedUsers = new List<int>();
@@ -329,12 +319,12 @@ public static class ProjectMember3Extension
     if (matcher.Any())
     {
       var members = matcher.First().Select(int.Parse).Distinct().OrderBy(x => x).ToList();
-      model.send_project_email_mentioned_users(discussion.ProjectId, "project_new_discussion_comment_to_staff", members.Select(x => db.staff(x)).ToList(), emailTemplateData);
+      model.send_project_email_mentioned_users(discussion.ProjectId, "project_new_discussion_comment_to_staff", members.Select(x => model.root.db.staff(x)).ToList(), emailTemplateData);
       members.Select(memberId =>
         {
           if (memberId == model.staff_user_id && !model.client_logged_in) return 0;
           notification_data.ToUserId = memberId;
-          return self.helper.add_notification(notification_data) ? memberId : 0;
+          return model.root.helper.add_notification(notification_data) ? memberId : 0;
         })
         .ToList()
         .Where(x => x > 0)
@@ -355,7 +345,7 @@ public static class ProjectMember3Extension
         .ForEach(member =>
         {
           notification_data.ToUserId = member.StaffId;
-          if (self.helper.add_notification(notification_data)) notifiedUsers.Add(member.StaffId);
+          if (model.root.helper.add_notification(notification_data)) notifiedUsers.Add(member.StaffId);
         });
 
 
@@ -366,11 +356,11 @@ public static class ProjectMember3Extension
       //   discussion.ShowToCustomer
       // );
 
-      self.helper.pusher_trigger_notification(notifiedUsers);
+      model.root.helper.pusher_trigger_notification(notifiedUsers);
 
       model.update_discussion_last_activity(discussion_id, type);
 
-      self.hooks.do_action("after_add_discussion_comment", insert_id);
+      model.root.hooks.do_action("after_add_discussion_comment", insert_id);
     }
 
     return model.get_discussion_comment(insert_id);
@@ -379,10 +369,9 @@ public static class ProjectMember3Extension
 //
   public static ProjectDiscussionComment update_discussion_comment(this ProjectsModel model, ProjectDiscussionComment data)
   {
-    var (self, db) = getInstance();
     var comment = model.get_discussion_comment(data.Id);
 
-    var affected_rows = db.ProjectDiscussionComments
+    var affected_rows = model.root.db.ProjectDiscussionComments
       .Where(x => x.Id == data.Id)
       .Update(x => new ProjectDiscussionComment
       {
@@ -396,9 +385,8 @@ public static class ProjectMember3Extension
 //
   public static bool delete_discussion_comment(this ProjectsModel model, int id, bool logActivity = true)
   {
-    var (self, db) = getInstance();
     var comment = model.get_discussion_comment(id);
-    var affected_rows = db.ProjectDiscussionComments.Where(x => x.Id == id).Delete();
+    var affected_rows = model.root.db.ProjectDiscussionComments.Where(x => x.Id == id).Delete();
     if (affected_rows > 0)
     {
       model.delete_discussion_comment_attachment(comment.FileName, comment.DiscussionId);
@@ -422,7 +410,7 @@ public static class ProjectMember3Extension
     }
 
 
-    db.ProjectDiscussionComments
+    model.root.db.ProjectDiscussionComments
       .Where(x => x.Parent == id)
       .Update(x => new ProjectDiscussionComment
       {
@@ -436,25 +424,23 @@ public static class ProjectMember3Extension
 //
   public static void delete_discussion_comment_attachment(this ProjectsModel model, string file_name, int discussion_id)
   {
-    var (self, db) = getInstance();
-    var path = self.globals<string>("PROJECT_DISCUSSION_ATTACHMENT_FOLDER") + discussion_id;
+    var path = model.root.globals<string>("PROJECT_DISCUSSION_ATTACHMENT_FOLDER") + discussion_id;
     if (!string.IsNullOrEmpty(file_name))
-      if (self.helper.file_exists($"{path}/{file_name}"))
-        self.helper.unlink($"{path}/{file_name}");
-    if (!self.helper.is_dir(path)) return;
+      if (model.root.file_exists($"{path}/{file_name}"))
+        model.root.helper.unlink($"{path}/{file_name}");
+    if (!model.root.helper.is_dir(path)) return;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(path);
+    var other_attachments = model.root.helper.list_files(path);
     if (other_attachments.Any())
-      self.helper.delete_dir(path);
+      model.root.helper.delete_dir(path);
   }
 
 //
   public static bool add_discussion(this ProjectsModel model, ProjectDiscussion data)
   {
-    var (self, db) = getInstance();
     if (model.client_logged_in)
     {
-      data.ContactId = self.helper.get_contact_user_id();
+      data.ContactId = model.root.helper.get_contact_user_id();
       data.StaffId = 0;
       data.ShowToCustomer = true;
     }
@@ -468,8 +454,8 @@ public static class ProjectMember3Extension
     data.DateCreated = DateTime.Now;
     data.Description = data.Description.nl2br();
 
-    var result = db.ProjectDiscussions.Add(data);
-    var insert_id = db.SaveChanges();
+    var result = model.root.db.ProjectDiscussions.Add(data);
+    var insert_id = model.root.db.SaveChanges();
 
     if (!result.IsAdded()) return false;
     var members = model.get_project_members(data.Id);
@@ -480,7 +466,7 @@ public static class ProjectMember3Extension
     };
 
     if (model.client_logged_in)
-      notification_data.FromClientId = self.helper.get_contact_user_id();
+      notification_data.FromClientId = model.root.helper.get_contact_user_id();
     else
       notification_data.FromUserId = model.staff_user_id;
 
@@ -488,10 +474,10 @@ public static class ProjectMember3Extension
     foreach (var member in members.Where(member => member.StaffId != model.staff_user_id || model.client_logged_in))
     {
       notification_data.ToUserId = member.StaffId;
-      if (self.helper.add_notification(notification_data)) notifiedUsers.Add(member.StaffId);
+      if (model.root.helper.add_notification(notification_data)) notifiedUsers.Add(member.StaffId);
     }
 
-    self.helper.pusher_trigger_notification(notifiedUsers);
+    model.root.helper.pusher_trigger_notification(notifiedUsers);
     model.send_project_email_template(data.Id, "project_discussion_created_to_staff", "project_discussion_created_to_customer", data.ShowToCustomer, new
     {
       staff = new
@@ -514,10 +500,9 @@ public static class ProjectMember3Extension
 //
   public static bool edit_discussion(this ProjectsModel model, ProjectDiscussion data)
   {
-    var (self, db) = getInstance();
-    var query = db.ProjectDiscussions.Where(x => x.Id == data.Id).AsQueryable();
+    var query = model.root.db.ProjectDiscussions.Where(x => x.Id == data.Id).AsQueryable();
     var id = data.Id;
-    var result = db.ProjectDiscussions
+    var result = model.root.db.ProjectDiscussions
       .Where(x => x.Id == id)
       .Update(x => new ProjectDiscussion
       {
@@ -534,10 +519,9 @@ public static class ProjectMember3Extension
 //
   public static bool delete_discussion(this ProjectsModel model, int id, bool logActivity = true)
   {
-    var (self, db) = getInstance();
     var discussion = model.get_discussion(id);
 
-    var affected_rows = db.ProjectDiscussions.Where(x => x.Id == id).Delete();
+    var affected_rows = model.root.db.ProjectDiscussions.Where(x => x.Id == id).Delete();
     if (affected_rows <= 0) return false;
     // if (logActivity)
     //   log_activity(
@@ -554,14 +538,13 @@ public static class ProjectMember3Extension
 //
   public static async Task<bool> copy(this ProjectsModel model, int project_id, DataSet<Project> data)
   {
-    var (self, db) = getInstance();
     var id = data.Data.Id;
     var project = new DataSet<Project>()
     {
       Data = model.get(x => x.Id == project_id).First()
     };
     var settings = model.get_project_settings(project_id);
-    var fields = db.list_fields<Project>();
+    var fields = model.root.db.list_fields<Project>();
 
     var _new_data = new Project
     {
@@ -584,15 +567,15 @@ public static class ProjectMember3Extension
     });
 
     // Add project
-    var result = db.Projects.Add(_new_data);
+    var result = model.root.db.Projects.Add(_new_data);
     if (result.Entity.Id == 0) return false;
 
     // Save tags
-    var taggables = db.get_tags_in(project_id, "project");
-    self.helper.handle_tags_save(taggables, id, "project");
+    var taggables = model.root.db.get_tags_in(project_id, "project");
+    model.root.helper.handle_tags_save(taggables, id, "project");
 
     // Save settings
-    settings.ForEach(setting => db.ProjectSettings.Add(new ProjectSetting
+    settings.ForEach(setting => model.root.db.ProjectSettings.Add(new ProjectSetting
     {
       ProjectId = id,
       Name = setting.Name,
@@ -625,9 +608,9 @@ public static class ProjectMember3Extension
             ? newTaskStartDate.AddDays(difference?.TotalDays ?? 0)
             : null
         };
-        var tasks_model = self.model.tasks_model();
+        var tasks_model = model.root.model.tasks_model(db);
         var source = new DataSet<Task>();
-        source.Data = db.Tasks.Find(task.Id)!;
+        source.Data = model.root.db.Tasks.Find(task.Id)!;
         return tasks_model.copy(source, merge);
       })
       .Where(task_id => task_id != null)
@@ -658,7 +641,7 @@ public static class ProjectMember3Extension
           HideFromCustomer = milestone.Data.HideFromCustomer
         };
 
-        db.Milestones.Add(newMilestone);
+        model.root.db.Milestones.Add(newMilestone);
         return new { oldMilestone = milestone, newMilestone };
       }).ToList();
 
@@ -668,11 +651,11 @@ public static class ProjectMember3Extension
         .ToList()
         .ForEach(task =>
         {
-          var milestone = db.Milestones.FirstOrDefault(x => x.Id == task.Milestone);
+          var milestone = model.root.db.Milestones.FirstOrDefault(x => x.Id == task.Milestone);
           if (milestone == null) return;
           var added_milestone = added_milestones.FirstOrDefault(m => m.oldMilestone.Data.Name == milestone.Name)?.newMilestone;
           if (added_milestone != null)
-            db.Tasks
+            model.root.db.Tasks
               .Where(x => added_tasks.Any(y => y.Id == x.Id) && x.Milestone == task.Milestone)
               .Update(x => new Task { Milestone = added_milestone.Id });
         });
@@ -685,7 +668,7 @@ public static class ProjectMember3Extension
         .ToList()
         .ForEach(taskId =>
         {
-          db.Tasks
+          model.root.db.Tasks
             .Where(x => x.Id == taskId)
             .Update(x => new Task { Milestone = 0 });
         });
@@ -700,11 +683,11 @@ public static class ProjectMember3Extension
     }
 
     // Save custom fields
-    self.helper.get_custom_fields("projects").ForEach(field =>
+    model.root.helper.get_custom_fields("projects").ForEach(field =>
     {
-      var value = self.helper.get_custom_field_value(project_id, field.Id, "projects", false);
+      var value = model.root.helper.get_custom_field_value(project_id, field.Id, "projects", false);
       if (!string.IsNullOrEmpty(value))
-        db.CustomFieldsValues.Add(new CustomFieldsValue
+        model.root.db.CustomFieldsValues.Add(new CustomFieldsValue
         {
           RelId = id,
           FieldId = field.Id,
@@ -717,7 +700,7 @@ public static class ProjectMember3Extension
     model.log(id, "project_activity_created");
     log_activity($"Project Copied [ID: {project_id}, NewID: {id}]");
 
-    self.hooks.do_action("project_copied", new { project_id, new_project_id = id });
+    model.root.hooks.do_action("project_copied", new { project_id, new_project_id = id });
 
     return id > 0;
   }
@@ -725,20 +708,18 @@ public static class ProjectMember3Extension
 //
   public static string get_staff_notes(this ProjectsModel model, int project_id)
   {
-    var (self, db) = getInstance();
-    var note = db.ProjectNotes.FirstOrDefault(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
+    var note = model.root.db.ProjectNotes.FirstOrDefault(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
     return note?.Content;
   }
 
 //
   public static bool save_note(this ProjectsModel model, ProjectNote data, int project_id)
   {
-    var (self, db) = getInstance();
     // Check if the note exists for this project;
-    var notes = db.ProjectNotes.FirstOrDefault(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
+    var notes = model.root.db.ProjectNotes.FirstOrDefault(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
     if (notes != null)
     {
-      var affected_rows = db.ProjectNotes
+      var affected_rows = model.root.db.ProjectNotes
         .Where(x => x.Id == notes.Id)
         .Update(x => new ProjectNote
         {
@@ -747,7 +728,7 @@ public static class ProjectMember3Extension
       return affected_rows > 0;
     }
 
-    var result = db.ProjectNotes.Add(new ProjectNote
+    var result = model.root.db.ProjectNotes.Add(new ProjectNote
     {
       StaffId = model.staff_user_id,
       Content = data.Content,

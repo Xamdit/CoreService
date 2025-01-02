@@ -10,8 +10,8 @@ public static class GdprHelper
   public static void send_gdpr_email_template(this HelperBase helper, string template, int user_id)
   {
     var (self, db) = getInstance();
-    var staff_model = self.model.staff_model();
-    self.ignore(() =>
+    var staff_model = self.staff_model(db);
+    ignore(() =>
     {
       var staff = staff_model.get(x => x.Active.Value && x.IsAdmin);
       staff.ForEach(member => { self.helper.send_mail_template(template, member, user_id); });

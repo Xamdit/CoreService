@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
+using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
@@ -10,16 +11,11 @@ namespace Service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MigrationController : AppControllerBase
+public class MigrationController(ILogger<MigrationController> logger, MyInstance self,MyContext db) : ClientControllerBase(logger, self,db)
 {
-  public MigrationController(ILogger<AppControllerBase> logger, MyInstance self) : base(logger, self)
-  {
-  }
-
   [HttpGet("make")]
   public IActionResult Make()
   {
-    var (self, db) = getInstance();
     self.config.Load("migration");
     if (self.config.item<bool>("migration_enabled") != true)
       return Content(
@@ -84,7 +80,7 @@ public class MigrationController : AppControllerBase
       new { table = "vault", field = "description" }
     };
 
-    tables = self.hooks.apply_filters("migration_tables_to_replace_old_links", tables);
+    tables = hooks.apply_filters("migration_tables_to_replace_old_links", tables);
 
     var affectedRows = 0;
 
@@ -92,7 +88,7 @@ public class MigrationController : AppControllerBase
     {
       // var query = $"UPDATE `{t.table}` SET `{t.field}` = REPLACE({t.field}, @oldBaseUrl, @newBaseUrl)";
       // db.query(query, new { oldBaseUrl, newBaseUrl });
-      var kata = db.kata(t.table);
+      var kata = self.db.kata(t.table);
       // affectedRows += kata
       //   .Update(t.field, kata.Raw($"REPLACE({t.field}, @oldBaseUrl, @newBaseUrl)"),
       //     new { oldBaseUrl, newBaseUrl });

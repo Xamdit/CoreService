@@ -9,9 +9,9 @@ using Service.Models.Invoices;
 
 namespace Service.Models;
 
-public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self)
+public class SubscriptionsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  private readonly InvoicesModel invoices_model = self.model.invoices_model();
+  private readonly InvoicesModel invoices_model = self.invoices_model(db);
 
   public List<Subscription> get(Expression<Func<Subscription, bool>> where)
   {

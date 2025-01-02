@@ -38,7 +38,7 @@ public static class EmailTemplateHelper
     // Get the path of the mail template class file
     var path = GetMailTemplatePath(className, parameters);
 
-    if (self.helper.file_exists(path))
+    if (file_exists(path))
     {
       // Handle error for non-existent mail template
       if (!IsCronJob())
@@ -56,7 +56,7 @@ public static class EmailTemplateHelper
 
     // Initialize the class with the provided parameters
     // var instance = Activator.CreateInstance(mailTemplateType, parameters);
-    var instance = self.model.emails_model();
+    var instance = self.emails_model(db);
 
     // Check if the class has a Send method or some equivalent functionality
     var sendMethod = mailTemplateType.GetMethod("Send");

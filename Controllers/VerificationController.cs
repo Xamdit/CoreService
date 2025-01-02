@@ -1,21 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Controllers.Core;
 using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework;
-using Service.Framework.Core.Engine;
 using Service.Framework.Helpers;
 
 namespace Service.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class VerificationController(ILogger<MyControllerBase> logger, MyInstance self) : ClientControllerBase(logger, self)
+[Route("api/verification")]
+public class VerificationController(ILogger<ClientControllerBase> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   [HttpGet]
   public IActionResult Index()
   {
-    var (self, db) = getInstance();
-
     if (self.helper.is_contact_email_verified())
       return Redirect(self.helper.site_url("clients"));
 
@@ -33,8 +31,7 @@ public class VerificationController(ILogger<MyControllerBase> logger, MyInstance
   [HttpPost("verify")]
   public IActionResult Verify([FromForm] int id, [FromForm] string key)
   {
-    var (self, db) = getInstance();
-    var clientsModel = self.model.clients_model();
+    var clientsModel = self.clients_model(db);
     var contact = clientsModel.get_contact(id);
 
     if (contact == null)
@@ -68,20 +65,19 @@ public class VerificationController(ILogger<MyControllerBase> logger, MyInstance
     else
       set_alert("success", self.helper.label("email_successfully_verified"));
 
-    var redirectUri = is_client_logged_in() ? "clients" : "authentication";
+    var redirectUri = db.is_client_logged_in() ? "clients" : "authentication";
     return Redirect(self.helper.site_url(redirectUri));
   }
 
   [HttpGet("resend")]
   public IActionResult Resend()
   {
-    var (self, db) = getInstance();
-    var clientsModel = self.model.clients_model();
+    var clients_model = self.clients_model(db);
 
-    if (self.helper.is_contact_email_verified() || !is_client_logged_in())
+    if (self.helper.is_contact_email_verified() || !db.is_client_logged_in())
       return Redirect(self.helper.site_url("clients"));
 
-    if (clientsModel.send_verification_email(self.helper.get_contact_user_id()))
+    if (clients_model.send_verification_email(self.helper.get_contact_user_id()))
       set_alert("success", self.helper.label("email_verification_mail_sent_successfully"));
     else
       set_alert("danger", self.helper.label("failed_to_send_verification_email"));

@@ -1,5 +1,3 @@
-using Service.Framework.Core.InputSet;
-
 namespace Service.Framework.Middlewares;
 
 public class FinalMiddlewares(RequestDelegate next)
@@ -7,7 +5,7 @@ public class FinalMiddlewares(RequestDelegate next)
   public async Task InvokeAsync(HttpContext context)
   {
     context.Request.EnableBuffering();
-    var (self, db) = getInstance();
+    var self = new MyInstance();
     self.input.Init(context);
 
     string soapRequest;

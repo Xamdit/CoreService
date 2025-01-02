@@ -1,3 +1,4 @@
+using iTextSharp.text.pdf;
 using Newtonsoft.Json;
 using Service.Entities;
 using Service.Framework.Schemas;
@@ -15,8 +16,8 @@ public class DataSyncServiceTestUnit
     var email = "codelanding@gmal.com";
     var password = "password";
     var isStaff = true;
-    var self = MyInstance.Instance;
-    var response = await self.library.datasync().Post<SuccessResponse<Item>>(route, new { email, password, remember = false, isStaff });
-    Console.WriteLine(JsonConvert.SerializeObject((object?)response));
+    var self = new MyInstance();
+    var response = await self.library.datasync().Post<SuccessResponse<AcroFields.Item>>(route, new { email, password, remember = false, isStaff });
+    Console.WriteLine(JsonConvert.SerializeObject(response));
   }
 }

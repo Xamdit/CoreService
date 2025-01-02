@@ -27,12 +27,12 @@ public static class LeadsHelper
   {
     var (self, db) = getInstance();
     var hash = string.Empty;
-    var lead = self.db().Leads.FirstOrDefault(x => x.Id == id);
+    var lead = db.Leads.FirstOrDefault(x => x.Id == id);
     if (lead == null) return hash;
     hash = lead.Hash;
     if (!string.IsNullOrEmpty(hash)) return hash;
     hash = self.helper.uuid();
-    self.db().Leads
+    db.Leads
       .Where(x => x.Id == id)
       .UpdateAsync(x => new Lead
       {

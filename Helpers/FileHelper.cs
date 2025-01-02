@@ -95,7 +95,7 @@ public static class FileHelper
   {
     var (self, db) = getInstance();
     var output = new List<string>() { "mp4", "m4v", "webm", "ogv", "ogg", "flv" };
-    output = self.hooks.apply_filters<List<string>>("html5_video_extensions", output);
+    output = hooks.apply_filters<List<string>>("html5_video_extensions", output);
     return output;
   }
 }

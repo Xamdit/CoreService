@@ -3,7 +3,6 @@ using Service.Controllers.Core;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
-using Service.Framework.Core.Engine;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Core.InputSet;
 using Service.Framework.Helpers;
@@ -14,17 +13,16 @@ using Service.Libraries.AppNumberToWords;
 
 namespace Service.Controllers;
 
-public class EstimateController(ILogger<MyControllerBase> logger, MyInstance self) : ClientControllerBase(logger, self)
+public class EstimateController(ILogger<EstimateController> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   [HttpGet]
   public IActionResult index(int id, string hash, string signature, string estimate_action)
   {
-    var (self, db) = getInstance();
-    var estimates_model = self.model.estimates_model();
-    var invoices_model = self.model.invoices_model();
+    var estimates_model = self.estimates_model(db);
+    var invoices_model = self.invoices_model(db);
     // self.helper.check_estimate_restrictions(id, hash);
     var estimate = estimates_model.get(x => x.Id == id).First();
-    if (!is_client_logged_in())
+    if (!db.is_client_logged_in())
       self.helper.load_client_language(estimate.ClientId.Value);
 
     var identity_confirmation_enabled = db.get_option("estimate_accept_identity_confirmation");
@@ -35,7 +33,7 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
       // Only decline and accept allowed
       if (action is not (3 or 4)) return Redirect(redURL);
       var success = estimates_model.mark_action_status(action, id, true);
-      redURL = self.helper.base_url();
+      redURL = base_url();
       var accepted = false;
       if (self.helper.is_array(success) && success.invoice != null)
       {
@@ -96,14 +94,14 @@ public class EstimateController(ILogger<MyControllerBase> logger, MyInstance sel
     // this.disableSubMenu();
     data.hash = hash;
     data.can_be_accepted = false;
-    data.estimate = self.hooks.apply_filters("estimate_html_pdf_data", estimate);
+    data.estimate = hooks.apply_filters("estimate_html_pdf_data", estimate);
     data.bodyclass = "viewestimate";
     data.Identity_confirmation_enabled = identity_confirmation_enabled;
     if (identity_confirmation_enabled == "1") data.bodyclass += " identity-confirmation";
 
     // this.view("estimatehtml");
     // add_views_tracking("estimate", id);
-    // self.hooks.do_action("estimate_html_viewed", id);
+    // hooks.do_action("estimate_html_viewed", id);
     // no_index_customers_area();
     // this.layout();
     return this.MakeSuccess(data);

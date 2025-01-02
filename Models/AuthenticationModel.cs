@@ -6,14 +6,13 @@ using Service.Framework;
 using Service.Framework.Core.Extensions;
 using Service.Framework.Helpers;
 using Service.Helpers;
-using Service.Schemas;
 using Task = System.Threading.Tasks.Task;
 
 namespace Service.Models;
 
-public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
+public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
-  public UserAutoLoginModel user_autologin = self.model.user_autologin();
+  public UserAutoLoginModel user_autologin = self.user_autologin(db);
 
   public void GoUpdate<T>(T entity) where T : class
   {
@@ -44,7 +43,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
       // Email is okey lets check the password now
       if (!self.VerifyPassword(password, user.Password))
       {
-        self.hooks.do_action("failed_login_attempt", new { user, is_staff_member = is_staff });
+        hooks.do_action("failed_login_attempt", new { user, is_staff_member = is_staff });
         log_activity($"Failed Login Attempt [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
         // Password failed, return
         return (false, false, false, null);
@@ -52,7 +51,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
     }
     else
     {
-      self.hooks.do_action("non_existent_user_login_attempt", new
+      hooks.do_action("non_existent_user_login_attempt", new
       {
         email,
         is_staff_member = is_staff
@@ -64,7 +63,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (!user.Active)
     {
-      self.hooks.do_action("inactive_user_login_attempt", new { user, is_staff_member = is_staff });
+      hooks.do_action("inactive_user_login_attempt", new { user, is_staff_member = is_staff });
       log_activity($"Inactive User Tried to Login [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
       return (false, true, false, null);
     }
@@ -77,7 +76,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
       twoFactorAuth = staff.TwoFactorAuthEnabled;
       if (twoFactorAuth > 0)
       {
-        self.hooks.do_action("before_staff_login", new { email, user_id = staff.Id });
+        hooks.do_action("before_staff_login", new { email, user_id = staff.Id });
         dynamic user_data = new
         {
           staff_user_id = staff.Id,
@@ -93,7 +92,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
     }
     else
     {
-      self.hooks.do_action("before_client_login", new
+      hooks.do_action("before_client_login", new
       {
         email,
         user_id = user.UserId,
@@ -131,13 +130,13 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
   public async Task logout(bool staff = true)
   {
     delete_autologin(staff);
-    var isClientLoggedIn = self.helper.is_client_logged_in();
+    var isClientLoggedIn = db.is_client_logged_in();
     if (isClientLoggedIn)
-      self.hooks.do_action("before_contact_logout", self.helper.get_client_user_id());
+      hooks.do_action("before_contact_logout", db.get_client_user_id());
     // this.session.unset_userdata("client_user_id");
     // this.session.unset_userdata("client_logged_in");
     else
-      self.hooks.do_action("before_staff_logout", self.helper.get_staff_user_id());
+      hooks.do_action("before_staff_logout", self.helper.get_staff_user_id());
     // this.session.unset_userdata("staff_user_id");
     // this.session.unset_userdata("staff_logged_in");
     // this.session.sess_destroy();
@@ -184,7 +183,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public async Task<bool> autologin()
   {
-    if (self.helper.is_logged_in()) return false;
+    if (db.is_logged_in()) return false;
     var cookie = self.input.cookies.get_cookie("autologin", true);
     if (cookie == null) return false;
     var data = JsonConvert.DeserializeObject<UserAutoLogin>(cookie);
@@ -290,7 +289,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
     contact.Email = user.Email;
     var sent = self.helper.send_mail_template("customer_contact_set_password", user, contact);
     if (sent == null) return false;
-    self.hooks.do_action("set_password_email_sent", new { is_staff_member = false, user });
+    hooks.do_action("set_password_email_sent", new { is_staff_member = false, user });
     return true;
   }
 
@@ -336,7 +335,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
         : self.helper.send_mail_template("staff_forgot_password", user.Email, user.Id);
       if (sent == null) return (false, false);
       log_activity($"Password Reset Email sent [Email: {email}, Is Staff Member: {(is_staff ? "Yes" : "No")}, IP: {self.input.ip_address()}]");
-      self.hooks.do_action("forgot_password_email_sent", new { is_staff_member = is_staff, user });
+      hooks.do_action("forgot_password_email_sent", new { is_staff_member = is_staff, user });
       return (true, false);
     }
 
@@ -548,7 +547,7 @@ public class AuthenticationModel(MyInstance self, MyContext db) : MyModel(self)
 
   public bool two_factor_auth_login(Contact user)
   {
-    self.hooks.do_action("before_staff_login", new
+    hooks.do_action("before_staff_login", new
     {
       email = user.Email,
       user_id = user.Id

@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using Service.Entities;
 using Service.Helpers;
 
 namespace Service.Framework.Helpers.Entities.Tools;
 
 public class EstimatesPipeline(MyInstance instance, int status) : AbstractKanban(instance, status)
 {
+  public MyContext db = new();
   //
   //
   // public void limit()
@@ -71,7 +73,25 @@ public class EstimatesPipeline(MyInstance instance, int status) : AbstractKanban
 
   protected override AbstractKanban initiateQuery()
   {
-    var db = self.db();
+    return this;
+  }
+
+  protected override void applySearchQuery(string q)
+  {
+  }
+
+  protected override string defaultSortDirection()
+  {
+    return string.Empty;
+  }
+
+  protected override string defaultSortColumn()
+  {
+    return string.Empty;
+  }
+
+  protected AbstractKanban initiate_query()
+  {
     var has_permission_view = self.helper.has_permission("estimates", "", "view");
     var noPermissionQuery = self.helper.get_estimates_where_sql_for_staff(self.helper.get_staff_user_id());
     var query = db.Estimates
@@ -84,20 +104,17 @@ public class EstimatesPipeline(MyInstance instance, int status) : AbstractKanban
     return this;
   }
 
-  protected override void applySearchQuery(string q)
+  protected void apply_search_query(string q)
   {
-    throw new NotImplementedException();
   }
 
-  protected override string defaultSortDirection()
+  protected string default_sort_direction()
   {
-    var (self, db) = getInstance();
     return db.get_option("default_estimates_pipeline_sort_type");
   }
 
-  protected override string defaultSortColumn()
+  protected string default_sort_column()
   {
-    var (self, db) = getInstance();
     return db.get_option("default_estimates_pipeline_sort");
   }
 

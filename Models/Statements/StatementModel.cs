@@ -9,10 +9,10 @@ using Service.Models.Invoices;
 
 namespace Service.Models.Statements;
 
-public class StatementModel(MyInstance self, MyContext db) : MyModel(self)
+public class StatementModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  private ClientsModel clients_model = self.model.clients_model();
-  private CurrenciesModel currencies_model = self.model.currencies_model();
+  private ClientsModel clients_model = self.clients_model(db);
+  private CurrenciesModel currencies_model = self.currencies_model(db);
 
   public async Task<StatementResult> get_statement(int customerId, DateTime from, DateTime to)
   {

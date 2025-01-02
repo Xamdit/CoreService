@@ -17,7 +17,7 @@ public static class RestSharpHelper
     return client;
   }
 
-  public static RestClient rest_client_goole(this HelperBase helper)
+  public static RestClient rest_client_google(this HelperBase helper)
   {
     var options = new RestClientOptions("https://www.google.com")
     {

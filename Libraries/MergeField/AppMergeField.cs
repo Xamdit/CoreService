@@ -18,14 +18,14 @@ public class AppMergeFields(MyInstance self)
   protected Dictionary<string, List<object>> fields = new();
 
   // Paths to load the classes
-  // protected List<string> registered = self.hooks.apply_filters("register_merge_fields", new List<string>());
+  // protected List<string> registered = hooks.apply_filters("register_merge_fields", new List<string>());
   protected List<string> registered
   {
     get
     {
       if (has_build_method())
         set(build());
-      return self.hooks.apply_filters("register_merge_fields", new List<string>());
+      return hooks.apply_filters("register_merge_fields", new List<string>());
     }
   }
   // public List<string> getRegistered()
@@ -105,7 +105,7 @@ public class AppMergeFields(MyInstance self)
     }
 
     // Apply custom fields and return
-    return self.hooks.apply_filters("available_merge_fields", available);
+    return hooks.apply_filters("available_merge_fields", available);
   }
 
   public string get_name()

@@ -7,7 +7,7 @@ using File = Service.Entities.File;
 
 namespace Service.Models.Estimates;
 
-public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
+public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public const int STATUS_PROCESSING = 2;
 
@@ -29,7 +29,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
     {
       var logMessage = "not_estimate_request_activity_assigned_updated";
       // Trigger hooks
-      self.hooks.do_action("estimate_request_assigned_changed", new
+      hooks.do_action("estimate_request_assigned_changed", new
       {
         estimate_request_id = data.Id,
         old_staff = oldAssigned,
@@ -59,7 +59,7 @@ public class EstimateRequestModel(MyInstance self, MyContext db) : MyModel(self)
     if (currentStatusName == oldStatusName || string.IsNullOrEmpty(oldStatusName)) return true;
     var logMessage = "not_estimate_request_activity_status_updated";
 
-    self.hooks.do_action("estimate_request_status_changed", new
+    hooks.do_action("estimate_request_status_changed", new
     {
       estimate_request_id = data.Id,
       old_status = oldStatusName,

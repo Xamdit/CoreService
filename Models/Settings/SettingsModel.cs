@@ -19,9 +19,9 @@ public class SettingOption
   public List<object> default_tax = new();
 }
 
-public class SettingsModel(MyInstance self, MyContext db) : MyModel(self)
+public class SettingsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  private PaymentModesModel payment_modes_model = self.model.payment_modes_model();
+  private PaymentModesModel payment_modes_model = self.payment_modes_model(db);
 
   // private List<string> encryptedFields = new()
   // {
@@ -49,7 +49,7 @@ public class SettingsModel(MyInstance self, MyContext db) : MyModel(self)
     var originalEncryptedFields = new Dictionary<string, object>();
     foreach (var ef in encryptedFields) originalEncryptedFields[ef] = db.get_option(ef);
     var affectedRows = 0;
-    data = self.hooks.apply_filters("before_settings_updated", data);
+    data = hooks.apply_filters("before_settings_updated", data);
 
     if (tags.Any())
     {
@@ -100,7 +100,7 @@ public class SettingsModel(MyInstance self, MyContext db) : MyModel(self)
         { "name", name },
         { "value", val }
       };
-      hookData = self.hooks.apply_filters("before_single_setting_updated_in_loop", hookData);
+      hookData = hooks.apply_filters("before_single_setting_updated_in_loop", hookData);
       name = (string)hookData["name"];
       val = hookData["value"];
 

@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Components;
 using Service.Core.Extensions;
 using Service.Entities;
+using Service.Framework;
 using Service.Framework.Core.Engine;
 using Service.Framework.Core.InputSet;
 using Service.Helpers.Proposals;
@@ -14,8 +15,9 @@ public static class RelationHelper
 {
   public static object get_relation_data(this HelperBase helper, string type, int rel_id = 0, object? extra = null)
   {
-    var (self, db) = getInstance();
-    var misc_model = self.model.misc_model();
+    var self = new MyInstance();
+    var db = new MyContext();
+    var misc_model = self.misc_model(db);
     var q = "";
     if (self.input.post_has("q"))
     {
@@ -23,8 +25,8 @@ public static class RelationHelper
       q = q.Trim();
     }
 
-    var tasks_model = self.model.tasks_model();
-    var clients_model = self.model.clients_model();
+    var tasks_model = self.tasks_model(db);
+    var clients_model = self.clients_model(db);
     dynamic data = new ExpandoObject();
     switch (type)
     {
@@ -61,7 +63,7 @@ public static class RelationHelper
       }
       case "invoice" when rel_id != 0:
       {
-        var invoices_model = self.model.invoices_model();
+        var invoices_model = self.invoices_model(db);
         data = invoices_model.get(rel_id);
         break;
       }
@@ -73,7 +75,7 @@ public static class RelationHelper
       }
       case "credit_note" when rel_id != 0:
       {
-        var credit_notes_model = self.model.credit_notes_model();
+        var credit_notes_model = self.credit_notes_model(db);
         data = credit_notes_model.get(x => x.Id == rel_id);
         break;
       }
@@ -85,7 +87,7 @@ public static class RelationHelper
       }
       case "estimate" when rel_id != 0:
       {
-        var estimates_model = self.model.estimates_model();
+        var estimates_model = self.estimates_model(db);
         data = estimates_model.get(x => x.Id == rel_id);
         break;
       }
@@ -97,7 +99,7 @@ public static class RelationHelper
       }
       case "contract" or "contracts":
       {
-        var contracts_model = self.model.contracts_model();
+        var contracts_model = self.contracts_model(db);
 
         if (rel_id != 0)
         {
@@ -113,7 +115,7 @@ public static class RelationHelper
       }
       case "ticket" when rel_id != 0:
       {
-        var tickets_model = self.model.tickets_model();
+        var tickets_model = self.tickets_model(db);
         data = tickets_model.get(x => x.Id == rel_id);
         break;
       }
@@ -125,7 +127,7 @@ public static class RelationHelper
       }
       case "expense" or "expenses" when rel_id != 0:
       {
-        var expenses_model = self.model.expenses_model();
+        var expenses_model = self.expenses_model(db);
         data = expenses_model.get(x => x.Id == rel_id);
         break;
       }
@@ -137,7 +139,7 @@ public static class RelationHelper
       }
       case "lead" or "leads" when rel_id != 0:
       {
-        var leads_model = self.model.leads_model();
+        var leads_model = self.leads_model(db);
         data = leads_model.get(x => x.Id == rel_id);
         break;
       }
@@ -149,7 +151,7 @@ public static class RelationHelper
       }
       case "proposal" when rel_id != 0:
       {
-        var proposals_model = self.model.proposals_model();
+        var proposals_model = self.proposals_model(db);
         data = proposals_model.get(x => x.Id == rel_id);
         break;
       }
@@ -161,7 +163,7 @@ public static class RelationHelper
       }
       case "project" when rel_id != 0:
       {
-        var projects_model = self.model.projects_model();
+        var projects_model = self.projects_model(db);
         data = projects_model.get(x => x.Id == rel_id);
         break;
       }
@@ -176,7 +178,7 @@ public static class RelationHelper
       }
       case "staff" when rel_id != 0:
       {
-        var staff_model = self.model.staff_model();
+        var staff_model = self.staff_model(db);
         data = staff_model.get(x => x.Id == rel_id);
         break;
       }
@@ -195,7 +197,7 @@ public static class RelationHelper
       }
     }
 
-    // data = self.hooks.apply_filters("get_relation_data", data, compact(type, rel_id, extra));
+    // data = hooks.apply_filters("get_relation_data", data, compact(type, rel_id, extra));
     return data;
   }
 
@@ -209,7 +211,7 @@ public static class RelationHelper
  */
   public static RelationValues get_relation_values(this NavigationManager nav, RelationValues? relation = null, string type = "")
   {
-    var (self, db) = getInstance();
+    var self = new MyInstance();
     if (relation == null)
       return new RelationValues()
       {
@@ -462,7 +464,7 @@ public static class RelationHelper
       }
     }
 
-    return self.hooks.apply_filters("relation_values", new
+    return hooks.apply_filters("relation_values", new
     {
       id,
       name,
@@ -483,7 +485,7 @@ public static class RelationHelper
    */
   public static List<object> init_relation_options(this HelperBase helper, List<RelationValues> data, string type, int rel_id = 0)
   {
-    var (self, db) = getInstance();
+    var self = new MyInstance();
 
     var _data = new List<object>();
 
@@ -495,7 +497,7 @@ public static class RelationHelper
     var has_permission_expenses_view = helper.has_permission("expenses", "", "view");
     var has_permission_proposals_view = helper.has_permission("proposals", "", "view");
     var is_admin = helper.is_admin();
-    var projects_model = self.model.projects_model();
+    var projects_model = self.projects_model(db);
     foreach (var relation in data)
     {
       var relation_values = self.navigation.get_relation_values(relation, type);
@@ -535,7 +537,7 @@ public static class RelationHelper
       _data.Add(relation_values);
     }
 
-    _data = self.hooks.apply_filters("init_relation_options", _data, compact(("type", rel_id)));
+    _data = hooks.apply_filters("init_relation_options", _data, compact(("type", rel_id)));
     return _data;
   }
 }

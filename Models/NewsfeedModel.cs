@@ -12,14 +12,14 @@ using File = Service.Entities.File;
 
 namespace Service.Models;
 
-public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self)
+public class NewsfeedModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   private const int post_likes_limit = 6;
   private const int post_comment_likes_limit = 6;
   private const int post_comments_limit = 6;
   private const int newsfeed_posts_limit = 10;
-  private DepartmentsModel departments_model = self.model.departments_model();
-  private StaffModel staff_model = self.model.staff_model();
+  private DepartmentsModel departments_model = self.departments_model(db);
+  private StaffModel staff_model = self.staff_model(db);
 
 
   public bool pin_post(int id)

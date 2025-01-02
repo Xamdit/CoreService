@@ -33,9 +33,9 @@ public static class TemplateHelper
     // var alertClass = GetAlertClass();
     var alertClass = string.Empty;
     var script = string.Empty;
-    if (!string.IsNullOrEmpty(self.session.get_string("system-popup")))
+    if (!string.IsNullOrEmpty(self.input.session.get_string("system-popup")))
     {
-      var message = self.session.get_string("system-popup");
+      var message = self.input.session.get_string("system-popup");
       script = $@"<script>
                                 $(function() {{
                                     var popupData = {{
@@ -49,7 +49,7 @@ public static class TemplateHelper
 
     if (string.IsNullOrEmpty(alertClass)) return;
 
-    var alertMessage = self.session.get_string($"message-{alertClass}");
+    var alertMessage = self.input.session.get_string($"message-{alertClass}");
     script = $@"<script>
                                 $(function() {{
                                     alert_float('{alertClass}', '{alertMessage}');

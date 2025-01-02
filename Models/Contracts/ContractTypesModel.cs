@@ -5,7 +5,7 @@ using Service.Helpers;
 
 namespace Service.Models.Contracts;
 
-public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self)
+public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   /**
       * Add new contract type
@@ -95,7 +95,7 @@ public class ContractTypesModel(MyInstance self, MyContext db) : MyModel(self)
       }
 
       var _total_rows = db.Contracts.Count(total_rows_where);
-      if (_total_rows == 0 && is_client_logged_in()) continue;
+      if (_total_rows == 0 &&db.is_client_logged_in()) continue;
       labels.Add(type.Name);
       totals.Add(_total_rows);
     }

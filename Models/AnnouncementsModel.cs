@@ -5,7 +5,7 @@ using Service.Helpers;
 
 namespace Service.Models;
 
-public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self)
+public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   /**
      * Get announcements
@@ -49,9 +49,9 @@ public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self)
      */
   public async Task<int> get_total_undismissed_announcements()
   {
-    if (!self.helper.is_logged_in())
+    if (!db.is_logged_in())
       return 0;
-    var isClientLoggedIn = self.helper.is_client_logged_in();
+    var isClientLoggedIn = db.is_client_logged_in();
     var staff = !isClientLoggedIn;
     var userid = isClientLoggedIn ? self.helper.get_contact_user_id() : self.helper.get_staff_user_id();
     var items = db.Announcements.Where(x => db.DismissedAnnouncements.Where(y => y.IsStaff == staff && y.UserId == userid).Select(y => y.AnnouncementId).ToList().Contains(x.Id)).ToList();
@@ -72,11 +72,11 @@ public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self)
     var staff = db.Staff.Find(staff_user_id);
     data.Staff = staff;
     data.StaffId = staff.Id;
-    // data = self.hooks.apply_filters("before_announcement_added", data);
+    // data = hooks.apply_filters("before_announcement_added", data);
     db.Announcements.Add(data);
     db.SaveChanges();
     var insertId = data.Id;
-    // self.hooks.do_action("announcement_created", insert_id);
+    // hooks.do_action("announcement_created", insert_id);
     // log_activity($"New Announcement Added [{data.Name}]");
     return insertId;
   }
@@ -89,11 +89,11 @@ public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool update(Announcement data)
   {
-    data = self.hooks.apply_filters("before_announcement_updated", data);
+    data = hooks.apply_filters("before_announcement_updated", data);
     var result = db.Announcements.Where(x => x.Id == data.Id).Update(x => data);
     db.SaveChanges();
     if (result <= 0) return false;
-    self.hooks.do_action("announcement_updated", data.Id);
+    hooks.do_action("announcement_updated", data.Id);
     log_activity($"Announcement Updated [{data.Name}]");
     return true;
   }
@@ -106,13 +106,13 @@ public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool delete(int id)
   {
-    // self.hooks.do_action("before_delete_announcement", id);
+    // hooks.do_action("before_delete_announcement", id);
     db.Announcements.Where(x => x.Id == id).Delete();
     var result = db.SaveChanges();
     if (result <= 0) return false;
     db.DismissedAnnouncements.Where(x => x.AnnouncementId == id).Delete();
     db.SaveChanges();
-    self.hooks.do_action("announcement_deleted", id);
+    hooks.do_action("announcement_deleted", id);
     log_activity($"Announcement Deleted [{id}]");
     return true;
   }
@@ -147,8 +147,8 @@ public class AnnouncementsModel(MyInstance self, MyContext db) : MyModel(self)
 
   private async Task<IQueryable<Announcement>> _annoucements_query(IQueryable<Announcement> query)
   {
-    if (self.helper.is_client_logged_in()) query.Where(x => x.ShowToUsers);
-    else if (self.helper.is_staff_logged_in()) query.Where(x => x.ShowToStaff);
+    if (db.is_client_logged_in()) query.Where(x => x.ShowToUsers);
+    else if (db.is_staff_logged_in()) query.Where(x => x.ShowToStaff);
     return query.OrderByDescending(x => x.DateCreated);
   }
 }

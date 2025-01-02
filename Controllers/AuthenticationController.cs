@@ -11,32 +11,28 @@ namespace Service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthenticationController(ILogger<ConsentController> logger, MyInstance self) : ClientControllerBase(logger, self)
+public class AuthenticationController(ILogger<ConsentController> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   public override void Init()
   {
-    var (self, db) = getInstance();
-    self.hooks.do_action("clients_authentication_constructor", this);
+    hooks.do_action("clients_authentication_constructor", this);
   }
 
   [HttpGet]
   public IActionResult index()
   {
-    var (self, db) = getInstance();
     return login();
   }
 
   // Added for backward compatibilies
   public IActionResult admin()
   {
-    var (self, db) = getInstance();
-    return Redirect(self.helper.admin_url("authentication"));
+    return Redirect(admin_url("authentication"));
   }
 
   public IActionResult login()
   {
-    var (self, db) = getInstance();
-    if (is_client_logged_in()) return Redirect(self.helper.site_url());
+    if (db.is_client_logged_in()) return Redirect(site_url());
     form_validation.set_rules("password", self.helper.label("clients_login_password"), "required");
     form_validation.set_rules("email", self.helper.label("clients_login_email"), "trim|required|valid_email");
 
@@ -46,10 +42,10 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
       form_validation.set_rules("g-recaptcha-response", "Captcha", "callback_recaptcha");
     if (form_validation.run())
     {
-      var authentication_model = self.model.authentication_model();
+      var authentication_model = self.authentication_model(db);
       var result = authentication_model.login(
-        self.input.post("email"),
-        self.input.post("password"),
+        self.input.post<string>("email"),
+        self.input.post<string>("password"),
         self.input.post<bool>("remember"),
         false
       );
@@ -66,11 +62,11 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
         return Redirect(self.helper.site_url("authentication/login"));
       }
 
-      var announcements_model = self.model.announcements_model();
+      var announcements_model = self.announcements_model(db);
       announcements_model.set_announcements_as_read_except_last_one(self.helper.get_contact_user_id());
-      self.hooks.do_action("after_contact_login");
+      hooks.do_action("after_contact_login");
       this.maybe_redirect_to_previous_url();
-      return Redirect(self.helper.site_url());
+      return Redirect(site_url());
     }
 
     data.title = self.helper.label(
@@ -88,11 +84,10 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
   [HttpGet("register")]
   public IActionResult register()
   {
-    var (self, db) = getInstance();
-    var clients_model = self.model.clients_model();
-    var authentication_model = self.model.authentication_model();
-    if (!db.get_option_compare("allow_registration", 1) || is_client_logged_in())
-      return Redirect(self.helper.site_url());
+    var clients_model = self.clients_model(db);
+    var authentication_model = self.authentication_model(db);
+    if (!db.get_option_compare("allow_registration", 1) || db.is_client_logged_in())
+      return Redirect(site_url());
     if (db.get_option_compare("company_is_required", 1))
       form_validation.set_rules("company", self.helper.label("client_company"), "required");
 
@@ -115,8 +110,8 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
         && db.get_option("recaptcha_site_key") != "")
       form_validation.set_rules("g-recaptcha-response", "Captcha", "callback_recaptcha");
 
-    var custom_fields = self.helper.get_custom_fields("customers", x => x.ShowOnClientPortal && x.Required == 1);
-    var custom_fields_contacts = self.helper.get_custom_fields("contacts", x => x.ShowOnClientPortal && x.Required == 1);
+    var custom_fields = db.get_custom_fields("customers", x => x.ShowOnClientPortal && x.Required == 1);
+    var custom_fields_contacts = db.get_custom_fields("contacts", x => x.ShowOnClientPortal && x.Required == 1);
 
     foreach (var field in custom_fields)
     {
@@ -143,11 +138,10 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
   [HttpPost("register")]
   public IActionResult register_post([FromForm] string email, [FromForm] string password)
   {
-    var (self, db) = getInstance();
-    var clients_model = self.model.clients_model();
-    var authentication_model = self.model.authentication_model();
-    if (!db.get_option_compare("allow_registration", 1) || is_client_logged_in())
-      return Redirect(self.helper.site_url());
+    var clients_model = self.clients_model(db);
+    var authentication_model = self.authentication_model(db);
+    if (!db.get_option_compare("allow_registration", 1) || db.is_client_logged_in())
+      return Redirect(site_url());
     if (db.get_option_compare("company_is_required", 1))
       form_validation.set_rules("company", self.helper.label("client_company"), "required");
 
@@ -170,8 +164,8 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
         && db.get_option("recaptcha_site_key") != "")
       form_validation.set_rules("g-recaptcha-response", "Captcha", "callback_recaptcha");
 
-    var custom_fields = self.helper.get_custom_fields("customers", x => x.ShowOnClientPortal && x.Required == 1);
-    var custom_fields_contacts = self.helper.get_custom_fields("contacts", x => x.ShowOnClientPortal && x.Required == 1);
+    var custom_fields = db.get_custom_fields("customers", x => x.ShowOnClientPortal && x.Required == 1);
+    var custom_fields_contacts = db.get_custom_fields("contacts", x => x.ShowOnClientPortal && x.Required == 1);
 
     foreach (var field in custom_fields)
     {
@@ -217,7 +211,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
 
 
     if (client_id <= 0) return Ok();
-    self.hooks.do_action("after_client_register", client_id);
+    hooks.do_action("after_client_register", client_id);
     if (db.get_option("customers_register_require_confirmation") == "1")
     {
       self.helper.send_customer_registered_email_to_administrators(client_id);
@@ -227,11 +221,11 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
     }
 
     var result = authentication_model.login(email, password, false, false);
-    var redUrl = self.helper.site_url();
+    var redUrl = site_url();
 
     if (result.is_success)
     {
-      self.hooks.do_action("after_client_register_logged_in", client_id);
+      hooks.do_action("after_client_register_logged_in", client_id);
       set_alert("success", self.helper.label("clients_successfully_registered"));
     }
     else
@@ -247,9 +241,8 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
   [HttpGet("forgot_password")]
   public IActionResult forgot_password_get()
   {
-    var (self, db) = getInstance();
-    var authentication_model = self.model.authentication_model();
-    if (is_client_logged_in()) return Redirect(self.helper.site_url());
+    var authentication_model = self.authentication_model(db);
+    if (db.is_client_logged_in()) return Redirect(site_url());
 
     form_validation.set_rules(
       "email",
@@ -267,9 +260,8 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
   [HttpPost("forgot_password")]
   public IActionResult forgot_password([FromForm] string email)
   {
-    var (self, db) = getInstance();
-    var authentication_model = self.model.authentication_model();
-    if (is_client_logged_in()) return Redirect(self.helper.site_url());
+    var authentication_model = self.authentication_model(db);
+    if (db.is_client_logged_in()) return Redirect(site_url());
 
     form_validation.set_rules(
       "email",
@@ -291,8 +283,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
   [HttpGet("reset_password")]
   public IActionResult reset_password(bool is_staff, int userid, string new_pass_key)
   {
-    var (self, db) = getInstance();
-    var authentication_model = self.model.authentication_model();
+    var authentication_model = self.authentication_model(db);
     if (!authentication_model.can_reset_password(is_staff, userid, new_pass_key))
     {
       set_alert("danger", self.helper.label("password_reset_key_expired"));
@@ -313,8 +304,8 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
   public IActionResult reset_password_post(bool is_staff, int userid, string new_pass_key)
   {
     var passwordr = string.Empty;
-    var (self, db) = getInstance();
-    var authentication_model = self.model.authentication_model();
+
+    var authentication_model = self.authentication_model(db);
     if (!authentication_model.can_reset_password(is_staff, userid, new_pass_key))
     {
       set_alert("danger", self.helper.label("password_reset_key_expired"));
@@ -323,7 +314,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
 
     form_validation.set_rules("password", self.helper.label("customer_reset_password"), "required");
     form_validation.set_rules("passwordr", self.helper.label("customer_reset_password_repeat"), "required|matches[password]");
-    self.hooks.do_action("before_user_reset_password", new { is_staff, userid });
+    hooks.do_action("before_user_reset_password", new { is_staff, userid });
     var staff = new { };
     var result = authentication_model.reset_password(false, userid, new_pass_key, passwordr);
     if (result.is_success && result.expired)
@@ -332,7 +323,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
     }
     else if (result.is_success)
     {
-      self.hooks.do_action("after_user_reset_password", new { staff, userid });
+      hooks.do_action("after_user_reset_password", new { staff, userid });
       set_alert("success", self.helper.label("password_reset_message"));
     }
     else
@@ -345,16 +336,14 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
 
   public IActionResult logout()
   {
-    var (self, db) = getInstance();
-    var authentication_model = self.model.authentication_model();
+    var authentication_model = self.authentication_model(db);
     authentication_model.logout(false);
-    self.hooks.do_action("after_client_logout");
+    hooks.do_action("after_client_logout");
     return Redirect(self.helper.site_url("authentication/login"));
   }
 
   public bool contact_email_exists(string email = "")
   {
-    var (self, db) = getInstance();
     var total_rows = db.Contacts.Count(x => x.Email == email);
     if (total_rows != 0) return true;
     form_validation.set_message("contact_email_exists", self.helper.label("auth_reset_pass_email_not_found"));
@@ -363,7 +352,6 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
 
   public async Task<IActionResult> recaptcha(string str = "")
   {
-    var (self, db) = getInstance();
     return await this.do_recaptcha_validation(str);
   }
 }

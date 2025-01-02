@@ -23,25 +23,25 @@ using File = Service.Entities.File;
 
 namespace Service.Models.Client;
 
-public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
+public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
-  private List<string> contact_columns => self.hooks.apply_filters("contact_columns", new List<string> { "firstname", "lastname", "email", "phonenumber", "title", "password", "send_set_password_email", "donotsendwelcomeemail", "permissions", "direction", "invoice_emails", "estimate_emails", "credit_note_emails", "contract_emails", "task_emails", "project_emails", "ticket_emails", "is_primary" });
+  private List<string> contact_columns => hooks.apply_filters("contact_columns", new List<string> { "firstname", "lastname", "email", "phonenumber", "title", "password", "send_set_password_email", "donotsendwelcomeemail", "permissions", "direction", "invoice_emails", "estimate_emails", "credit_note_emails", "contract_emails", "task_emails", "project_emails", "ticket_emails", "is_primary" });
 
-  private AuthenticationModel authentication_model = self.model.authentication_model();
-  private ClientVaultEntriesModel client_vault_entries_model = self.model.client_vault_entries_model();
-  private ClientGroupsModel client_groups_model = self.model.client_groups_model();
-  private StatementModel statement_model = self.model.statement_model();
-  private TicketsModel tickets_model = self.model.tickets_model();
-  private InvoicesModel invoices_model = self.model.invoices_model();
-  private CreditNotesModel credit_notes_model = self.model.credit_notes_model();
-  private TasksModel tasks_model = self.model.tasks_model();
-  private RolesModel roles_model = self.model.roles_model();
-  private EstimatesModel estimates_model = self.model.estimates_model();
-  private SubscriptionsModel subscriptions_model = self.model.subscriptions_model();
-  private ContractsModel contracts_model = self.model.contracts_model();
-  private ProjectsModel projects_model = self.model.projects_model();
-  private ProposalsModel proposals_model = self.model.proposals_model();
-  private ExpensesModel expenses_model = self.model.expenses_model();
+  private AuthenticationModel authentication_model = db.authentication_model(db);
+  private ClientVaultEntriesModel client_vault_entries_model = db.client_vault_entries_model(db);
+  private ClientGroupsModel client_groups_model = db.client_groups_model(db);
+  private StatementModel statement_model = db.statement_model(db);
+  private TicketsModel tickets_model = db.tickets_model(db);
+  private InvoicesModel invoices_model = db.invoices_model(db);
+  private CreditNotesModel credit_notes_model = db.credit_notes_model(db);
+  private TasksModel tasks_model = db.tasks_model(db);
+  private RolesModel roles_model = db.roles_model(db);
+  private EstimatesModel estimates_model = db.estimates_model(db);
+  private SubscriptionsModel subscriptions_model = db.subscriptions_model(db);
+  private ContractsModel contracts_model = db.contracts_model(db);
+  private ProjectsModel projects_model = db.projects_model(db);
+  private ProposalsModel proposals_model = db.proposals_model(db);
+  private ExpensesModel expenses_model = db.expenses_model(db);
 
   /**
    * Get client object based on passed clientid if not passed clientid return array of all clients
@@ -162,7 +162,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     data = check_zero_columns(data);
 
-    data = self.hooks.apply_filters("before_client_added", data);
+    data = hooks.apply_filters("before_client_added", data);
 
     // foreach (var field in contact_columns.Where(field => data[field]))
     //   contact_data[field] = data[field];
@@ -226,7 +226,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     var isStaff = 0;
 
-    if (!client_logged_in && self.helper.is_staff_logged_in())
+    if (!client_logged_in && db.is_staff_logged_in())
     {
       log += $", From Staff: {staff_user_id}";
       isStaff = staff_user_id;
@@ -234,7 +234,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     // //do_action_deprecated("after_client_added", new[] { client_id }, "2.9.4", "after_client_created");
 
-    self.hooks.do_action("after_client_created", new
+    hooks.do_action("after_client_created", new
     {
       id = client_id,
       data,
@@ -258,7 +258,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
   {
     var updated = false;
     data = check_zero_columns(data);
-    data = self.hooks.apply_filters("before_client_updated", data, id);
+    data = hooks.apply_filters("before_client_updated", data, id);
 
     var update_all_other_transactions = false;
     // update_all_other_transactions = (bool)Arr::pull(data, 'update_all_other_transactions');
@@ -314,7 +314,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     if (client_groups_model.sync_customer_groups(id, groups_in.ToArray())) updated = true;
     //do_action_deprecated("after_client_updated", new[] { id }, "2.9.4", "client_updated");
 
-    self.hooks.do_action("client_updated", new
+    hooks.do_action("client_updated", new
     {
       id,
       data,
@@ -378,8 +378,8 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     //   data.TicketEmails = data.TicketEmails ? 1 : 0;
     // }
 
-    // data = self.hooks.apply_filters("before_update_contact", data, id);
-    data = self.hooks.apply_filters("before_update_contact", data);
+    // data = hooks.apply_filters("before_update_contact", data, id);
+    data = hooks.apply_filters("before_update_contact", data);
 
 
     var affected_rows = db.Contacts
@@ -445,7 +445,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     if (client_request && send_set_password_email.Value)
       set_password_email_sent = authentication_model.set_password_email(data.Email);
     if (affectedRows > 0)
-      self.hooks.do_action("contact_updated", id, data);
+      hooks.do_action("contact_updated", id, data);
 
 
     switch (affectedRows)
@@ -480,7 +480,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     var send_welcome_email = do_not_send_welcome_email is not true;
 
-    if (self.helper.defined("CONTACT_REGISTERING"))
+    if (defined("CONTACT_REGISTERING"))
     {
       send_welcome_email = true;
 
@@ -533,7 +533,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     data.Email = data.Email.Trim();
 
-    data = self.hooks.apply_filters("before_create_contact", data);
+    data = hooks.apply_filters("before_create_contact", data);
 
 
     var result = db.Contacts.Add(data);
@@ -617,7 +617,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (send_set_password_email) authentication_model.set_password_email(data.Email);
 
-    if (self.helper.defined("CONTACT_REGISTERING"))
+    if (defined("CONTACT_REGISTERING"))
       send_verification_email(contact_id);
     else
       // User already verified because is added from admin area, try to transfer any tickets
@@ -625,7 +625,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     log_activity($"Contact Created [ID: {contact_id}]");
 
-    self.hooks.do_action("contact_created", contact_id);
+    hooks.do_action("contact_created", contact_id);
 
     return contact_id;
   }
@@ -660,7 +660,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     data.Password = self.HashPassword(string.IsNullOrEmpty(data.Password) ? data.Password : today());
 
 
-    data = self.hooks.apply_filters("before_create_contact", data);
+    data = hooks.apply_filters("before_create_contact", data);
     var result = db.Contacts.Add(data);
 
 
@@ -696,7 +696,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
       authentication_model.set_password_email(data.Email);
 
     log_activity($"Contact Created [ID: {contact_id}]");
-    self.hooks.do_action("contact_created", contact_id);
+    hooks.do_action("contact_created", contact_id);
 
     return contact_id;
   }
@@ -734,11 +734,11 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
       data.ShippingStreet = data.ShippingStreet.nl2br();
     }
 
-    data = self.hooks.apply_filters("customer_update_company_info", data);
+    data = hooks.apply_filters("customer_update_company_info", data);
     var result = db.Clients.Where(x => x.Id == id).Update(x => data);
     if (result > 0) affectedRows++;
     if (affectedRows <= 0) return false;
-    self.hooks.do_action("customer_updated_company_info", id);
+    hooks.do_action("customer_updated_company_info", id);
     log_activity($"Customer Info Updated From Clients Area [ID: {id}]");
     return true;
   }
@@ -827,7 +827,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     // if (!self.helper.is_gdpr() && is_reference_in_table('clientid', 'estimates', id)) return new { referenced = true };
     // if (!self.helper.is_gdpr() && is_reference_in_table('clientid', 'creditnotes', id)) return new { referenced = true };
 
-    self.hooks.do_action("before_client_deleted", id);
+    hooks.do_action("before_client_deleted", id);
     var last_activity = self.helper.get_last_system_activity_id();
     var company = self.helper.get_company_name(id);
     db.Clients.RemoveRange(db.Clients.Where(x => x.Id == id));
@@ -978,7 +978,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (affectedRows <= 0) return false;
 
-    self.hooks.do_action("after_client_deleted", id);
+    hooks.do_action("after_client_deleted", id);
 
     // Delete activity log caused by delete customer function
     if (last_activity != null)
@@ -997,7 +997,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public async Task<bool> delete_contact(int id)
   {
-    self.hooks.do_action("before_delete_contact", id);
+    hooks.do_action("before_delete_contact", id);
 
 
     var result = db.Contacts.FirstOrDefault(x => x.Id == id);
@@ -1008,8 +1008,8 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (affected_rows <= 0) return false;
 
-    if (self.helper.is_dir(self.helper.get_upload_path_by_type("contact_profile_images") + id))
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("contact_profile_images") + id);
+    if (self.helper.is_dir(get_upload_path_by_type("contact_profile_images") + id))
+      self.helper.delete_dir(get_upload_path_by_type("contact_profile_images") + id);
 
     await db.Consents
       .Where(x => x.ContactId == id)
@@ -1125,7 +1125,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     // Delete activity log caused by delete contact function
     if (last_activity > 0) await db.ActivityLogs.Where(x => x.Id > last_activity).DeleteAsync();
 
-    self.hooks.do_action("contact_deleted", id, result);
+    hooks.do_action("contact_deleted", id, result);
 
     return true;
   }
@@ -1208,13 +1208,13 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (string.IsNullOrEmpty(attachment.External))
     {
-      var relPath = self.helper.get_upload_path_by_type("customer") + attachment.RelId + '/';
+      var relPath = get_upload_path_by_type("customer") + attachment.RelId + '/';
       var fullPath = relPath + attachment.FileName;
       self.helper.unlink(fullPath);
       var fname = self.helper.file_name(fullPath);
       var fext = self.helper.file_extension(fullPath);
       var thumbPath = $"{relPath}{fname}_thumb.{fext}";
-      if (self.helper.file_exists(thumbPath)) self.helper.unlink(thumbPath);
+      if (file_exists(thumbPath)) self.helper.unlink(thumbPath);
     }
 
 
@@ -1226,10 +1226,10 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
       log_activity($"Customer Attachment Deleted [ID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(self.helper.get_upload_path_by_type("customer") + attachment.RelId)) return deleted;
+    if (!self.helper.is_dir(get_upload_path_by_type("customer") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("customer") + attachment.RelId);
-    if (other_attachments.Any()) self.helper.delete_dir(self.helper.get_upload_path_by_type("customer") + attachment.RelId);
+    var other_attachments = self.helper.list_files(get_upload_path_by_type("customer") + attachment.RelId);
+    if (other_attachments.Any()) self.helper.delete_dir(get_upload_path_by_type("customer") + attachment.RelId);
 
 
     return deleted;
@@ -1243,12 +1243,12 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool change_contact_status(int id, bool status)
   {
-    // status = self.hooks.apply_filters("change_contact_status", status, id);
-    status = self.hooks.apply_filters("change_contact_status", status);
+    // status = hooks.apply_filters("change_contact_status", status, id);
+    status = hooks.apply_filters("change_contact_status", status);
 
     var result = db.Contacts.Where(x => x.Id == id).Update(x => new Contact { Active = status });
     if (result == 0) return false;
-    self.hooks.do_action("contact_status_changed", new Contact
+    hooks.do_action("contact_status_changed", new Contact
     {
       Id = id
       // Status = status
@@ -1268,7 +1268,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
     var result = db.Clients.Where(x => x.Id == id).Update(x => new Entities.Client { Active = status });
 
     if (result <= 0) return false;
-    self.hooks.do_action("client_status_changed",
+    hooks.do_action("client_status_changed",
       new Entities.Client
       {
         Id = id
@@ -1355,7 +1355,6 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool add_group(object data)
   {
-    var (self, db) = getInstance();
     var sender = JsonConvert.DeserializeObject<CustomersGroup>(JsonConvert.SerializeObject(data));
     return client_groups_model.add(sender);
   }
@@ -1593,9 +1592,9 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public void delete_contact_profile_image(int id)
   {
-    self.hooks.do_action("before_remove_contact_profile_image");
-    if (self.helper.file_exists(self.helper.get_upload_path_by_type("contact_profile_images") + id))
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("contact_profile_images") + id);
+    hooks.do_action("before_remove_contact_profile_image");
+    if (file_exists(get_upload_path_by_type("contact_profile_images") + id))
+      self.helper.delete_dir(get_upload_path_by_type("contact_profile_images") + id);
     db.Contacts
       .Where(x => x.Id == id)
       .Update(x => new Contact { ProfileImage = null });

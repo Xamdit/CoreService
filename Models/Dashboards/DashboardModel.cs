@@ -7,7 +7,7 @@ using Service.Framework.Helpers.Entities;
 
 namespace Service.Models.Dashboards;
 
-public class DashboardModel(MyInstance self, MyContext db) : MyModel(self)
+public class DashboardModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   // Get upcoming events this week
   public List<Event> GetUpcomingEvents()

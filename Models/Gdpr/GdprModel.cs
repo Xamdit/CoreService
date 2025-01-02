@@ -5,7 +5,7 @@ using Service.Framework;
 
 namespace Service.Models.Gdpr;
 
-public class GdprModel(MyInstance self, MyContext db) : MyModel(self)
+public class GdprModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
   public bool AddRequest(GdprRequest data)
   {

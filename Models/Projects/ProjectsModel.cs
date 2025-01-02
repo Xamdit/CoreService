@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.Core.Extensions;
@@ -19,16 +18,16 @@ using Task = Service.Entities.Task;
 
 namespace Service.Models.Projects;
 
-public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
+public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   private List<ProjectSettingOption> statuses = new();
-  private CurrenciesModel currencies_model = self.model.currencies_model();
-  private ClientsModel clients_model = self.model.clients_model();
-  private TasksModel tasks_model = self.model.tasks_model();
-  private ProjectsModel projects_model = self.model.projects_model();
-  private StaffModel staff_model = self.model.staff_model();
+  private CurrenciesModel currencies_model = self.currencies_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
+  private TasksModel tasks_model = self.tasks_model(db);
+  private ProjectsModel projects_model = self.projects_model(db);
+  private StaffModel staff_model = self.staff_model(db);
 
-  private List<string> project_settings = self.hooks.apply_filters("project_settings", new List<string>
+  private List<string> project_settings = hooks.apply_filters("project_settings", new List<string>
   {
     "available_features",
     "view_tasks",
@@ -53,7 +52,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public List<ProjectSettingOption> get_project_statuses()
   {
-    statuses = self.hooks.apply_filters("before_get_project_statuses", new List<ProjectSettingOption>
+    statuses = hooks.apply_filters("before_get_project_statuses", new List<ProjectSettingOption>
     {
       new()
       {
@@ -179,7 +178,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public Currency get_currency(int id)
   {
-    var customer_currency = clients_model.get_customer_default_currency(self.helper.get_client_id_by_project_id(id));
+    var customer_currency = clients_model.get_customer_default_currency(db.get_client_id_by_project_id(id));
     var currency = customer_currency != 0
       ? currencies_model.get(customer_currency)
       : currencies_model.get_base_currency();
@@ -308,7 +307,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     // project.client_data = new StdClass();
     project.Client = clients_model.get(x => x.Id == project.ClientId).FirstOrDefault();
     project.ClientId = project.Client.Id;
-    project = self.hooks.apply_filters("project_get", project);
+    project = hooks.apply_filters("project_get", project);
     // GLOBALS["project"] = project;
     // return project;
 
@@ -387,7 +386,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     // if ((this.uri.segment(3) == "milestones_kanban") | (this.uri.segment(3) == "milestones_kanban_load_more")) query = query.OrderBy(x=>x.MilestoneOrder);
     // else
     // {
-    //   var orderByString = self.hooks.apply_filters("project_tasks_array_default_order", "FIELD(status, 5), duedate IS NULL ASC, duedate");
+    //   var orderByString = hooks.apply_filters("project_tasks_array_default_order", "FIELD(status, 5), duedate IS NULL ASC, duedate");
     //   query = query.OrderBy(x=>x.orderByString);
     //   db.order_by(orderByString, "", false);
     // }
@@ -397,7 +396,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
     var tasks = query.ToList();
 
-    // tasks = self.hooks.apply_filters("get_projects_tasks", tasks, new
+    // tasks = hooks.apply_filters("get_projects_tasks", tasks, new
     // {
     //   project_id = id,
     //   where = where,
@@ -503,21 +502,21 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public bool remove_file(int id, bool logActivity = true)
   {
-    self.hooks.do_action("before_remove_project_file", id);
+    hooks.do_action("before_remove_project_file", id);
     var file = db.ProjectFiles.FirstOrDefault(x => x.Id == id);
     if (file == null) return false;
 
     if (string.IsNullOrEmpty(file.External))
     {
-      var path = $"{self.helper.get_upload_path_by_type("project") + file.ProjectId}/";
+      var path = $"{get_upload_path_by_type("project") + file.ProjectId}/";
       var fullPath = path + file.FileName;
-      if (self.helper.file_exists(fullPath))
+      if (file_exists(fullPath))
       {
         self.helper.unlink(fullPath);
         var fname = self.helper.file_name(fullPath);
         var fext = self.helper.file_extension(fullPath);
         var thumbPath = $"{path}{fname}_thumb.{fext}";
-        if (self.helper.file_exists(thumbPath))
+        if (file_exists(thumbPath))
           self.helper.unlink(thumbPath);
       }
     }
@@ -535,11 +534,11 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     // Delete discussion comments
     this.delete_discussion_comments(id, "file");
 
-    if (!self.helper.is_dir(self.helper.get_upload_path_by_type("project") + file.ProjectId)) return true;
+    if (!self.helper.is_dir(get_upload_path_by_type("project") + file.ProjectId)) return true;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("project") + file.ProjectId);
+    var other_attachments = self.helper.list_files(get_upload_path_by_type("project") + file.ProjectId);
     if (other_attachments.Any())
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("project") + file.ProjectId);
+      self.helper.delete_dir(get_upload_path_by_type("project") + file.ProjectId);
     return true;
   }
 
@@ -575,7 +574,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
   // public List<(Milestone milestone, Task<int> TotalLoggedTime)> get_milestones(Expression<Func<Milestone, bool>> condition)
   // {
-  //   var (self, db) = getInstance();
+  //
   //   var project_id = db.ExtractIdFromCondition(condition);
 
   //   var milestones = db.Milestones.Where(condition)
@@ -588,7 +587,6 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
   public List<DataSet<Milestone>> get_milestones(Expression<Func<Milestone, bool>> condition)
   {
-    var (self, db) = getInstance();
     var project_id = db.ExtractIdFromCondition(condition)!.Value;
     var milestones = db.Milestones.Where(condition)
       .Where(x => x.ProjectId == project_id)
@@ -725,7 +723,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
       items_assignees = convert<List<int>>(dataset["items_assignee"]);
     }
 
-    dataset = self.hooks.apply_filters("before_add_project", dataset);
+    dataset = hooks.apply_filters("before_add_project", dataset);
     List<Taggable> tags = new();
     if (dataset.Tags.Any()) tags = dataset.Tags;
 
@@ -733,7 +731,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     var result = db.Projects.Add(project(dataset));
     if (!result.IsAdded()) return 0;
     var insert_id = result.Entity.Id;
-    self.helper.handle_tags_save(tags, insert_id, "project");
+    db.handle_tags_save(tags, insert_id, "project");
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(insert_id, custom_fields);
     // var _pm = this;
@@ -822,7 +820,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (send_project_marked_as_finished_email_to_contacts) this.send_project_customer_email(insert_id, "project_marked_as_finished_to_customer");
 
-    self.hooks.do_action("after_add_project", insert_id);
+    hooks.do_action("after_add_project", insert_id);
 
     log_activity($"New Project Created [ID: {insert_id}]");
 
@@ -942,14 +940,14 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     // if (mark_all_tasks_as_completed)
     //   mark_all_tasks_as_completed = true;
     if (dataset.Tags.Any())
-      if (self.helper.handle_tags_save(dataset.Tags, id, "project"))
+      if (db.handle_tags_save(dataset.Tags, id, "project"))
         affectedRows++;
     if (dataset.Options.Any(x => x.Name == "cancel_recurring_tasks"))
       cancel_recurring_tasks(id);
     if (dataset.Data.ContactNotification.HasValue)
       dataset.Data.NotifyContacts = JsonConvert.SerializeObject(dataset.Data.ContactNotification == 2 ? dataset.Data.NotifyContacts : "");
 
-    dataset.Data = self.hooks.apply_filters("before_update_project", dataset, id);
+    dataset.Data = hooks.apply_filters("before_update_project", dataset, id);
 
 
     var affected_rows = db.Projects.Where(x => x.Id == id).Update(x => dataset.Data);
@@ -972,7 +970,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     log_activity($"Project Updated [ID: {id}]");
     if (original_project.Status != dataset.Data.Status)
     {
-      self.hooks.do_action("project_status_changed", new
+      hooks.do_action("project_status_changed", new
       {
         status = dataset.Data.Status,
         project_id = id
@@ -996,7 +994,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
         this.notify_project_members_status_change(id, original_project.Status, dataset.Data.Status);
     }
 
-    self.hooks.do_action("after_update_project", id);
+    hooks.do_action("after_update_project", id);
 
     return true;
   }
@@ -1007,15 +1005,15 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
     var activity = new ProjectActivity();
 
     // Check if the request is coming from a cron job or a logged-in user (staff or client)
-    if (!self.helper.is_cron())
+    if (!is_cron())
     {
-      if (is_client_logged_in())
+      if (db.is_client_logged_in())
       {
         activity.ContactId = self.helper.get_contact_user_id();
         activity.StaffId = 0;
         activity.FullName = self.helper.get_contact_full_name(activity.ContactId);
       }
-      else if (is_staff_logged_in)
+      else if (db.is_staff_logged_in())
       {
         activity.ContactId = 0;
         activity.StaffId = staff_user_id;
@@ -1038,7 +1036,7 @@ public class ProjectsModel(MyInstance self, MyContext db) : MyModel(self)
 
     // Optional: If you want to modify data before saving
 
-    activity = self.hooks.apply_filters("before_log_project_activity", activity);
+    activity = hooks.apply_filters("before_log_project_activity", activity);
 
     // Insert the activity into the database using Entity Framework
     db.ProjectActivities.Add(activity);

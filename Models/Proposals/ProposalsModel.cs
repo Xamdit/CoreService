@@ -24,13 +24,13 @@ using File = Service.Entities.File;
 
 namespace Service.Models.Proposals;
 
-public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
+public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self,db)
 {
-  private readonly List<int> statuses = self.hooks.apply_filters("before_set_proposal_statuses", new List<int> { 6, 4, 1, 5, 2, 3 });
-  private EstimateRequestModel estimate_request_model = self.model.estimate_request_model();
-  private ProjectsModel projects_model = self.model.projects_model();
-  private ClientsModel clients_model = self.model.clients_model();
-  private LeadsModel leads_model = self.model.leads_model();
+  private readonly List<int> statuses = hooks.apply_filters("before_set_proposal_statuses", new List<int> { 6, 4, 1, 5, 2, 3 });
+  private EstimateRequestModel estimate_request_model = self.estimate_request_model(db);
+  private ProjectsModel projects_model = self.projects_model(db);
+  private ClientsModel clients_model = self.clients_model(db);
+  private LeadsModel leads_model = self.leads_model(db);
   private bool _copy = false;
 
   public List<int> get_statuses()
@@ -93,7 +93,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       Data = dataset.Data,
       Items = items
     };
-    hook = self.hooks.apply_filters("before_create_proposal", hook);
+    hook = hooks.apply_filters("before_create_proposal", hook);
     dataset.Data = hook.Data;
     items = hook.Items;
     var result = db.Proposals.Add(dataset.Data);
@@ -112,7 +112,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     if (custom_fields.Any())
       self.helper.handle_custom_fields_post(insert_id, custom_fields);
 
-    self.helper.handle_tags_save(tags, insert_id, "proposal");
+    db.handle_tags_save(tags, insert_id, "proposal");
     items.ForEach(item =>
     {
       var itemid = self.helper.add_new_sales_item_post(item, insert_id, "proposal");
@@ -158,7 +158,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     self.helper.update_sales_total_tax_column(insert_id, "proposal", "proposals");
     log_activity($"New Proposal Created [ID: {insert_id}]");
     if (save_and_send) send_proposal_to_email(insert_id);
-    self.hooks.do_action("proposal_created", insert_id);
+    hooks.do_action("proposal_created", insert_id);
     return insert_id;
   }
 
@@ -204,7 +204,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     if (data.NewItems.Any()) NewItems = data.NewItems;
 
     if (data.Tags.Any())
-      if (self.helper.handle_tags_save(data.Tags, id, "proposal"))
+      if (db.handle_tags_save(data.Tags, id, "proposal"))
         affectedRows++;
 
     data.Data.Address = data.Data.Address.Trim().nl2br();
@@ -218,7 +218,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
         ? data.removed_items
         : new List<Proposal>()
     };
-    self.hooks.apply_filters("before_proposal_updated", hook);
+    hooks.apply_filters("before_proposal_updated", hook);
 
     data = hook.data;
     data.removed_items = hook.removed_items;
@@ -304,7 +304,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
 
     if (save_and_send) send_proposal_to_email(id);
     if (affectedRows <= 0) return false;
-    self.hooks.do_action("after_proposal_updated", id);
+    hooks.do_action("after_proposal_updated", id);
     return true;
   }
 
@@ -321,7 +321,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       .Include(x => x.Currency)
       .Where(condition)
       .ToList();
-    if (is_client_logged_in())
+    if (db.is_client_logged_in())
       query
         .Where(x => string.IsNullOrEmpty(x.State));
     var rows = query.ToList();
@@ -329,7 +329,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     var proposal = query.ToList().First();
     if (proposal != null) return proposal;
     var attachments = get_attachments(id);
-    var items = self.helper.get_items_by_type("proposal", id);
+    var items = db.get_items_by_type("proposal", id);
     var visible_attachments_to_customer_found = attachments.Any(x => x.VisibleToCustomer);
 
     if (proposal.ProjectId.HasValue)
@@ -347,7 +347,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     if (proposal == null) return false;
 
     db.Proposals.Where(x => x.Id == id).Update(x => new Proposal { Signature = null });
-    if (!string.IsNullOrEmpty(proposal.Signature)) self.helper.unlink($"{self.helper.get_upload_path_by_type("proposal")}{id}/{proposal.Signature}");
+    if (!string.IsNullOrEmpty(proposal.Signature)) self.helper.unlink($"{get_upload_path_by_type("proposal")}{id}/{proposal.Signature}");
 
     return true;
   }
@@ -382,7 +382,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     var attachment = get_attachments(0, id).FirstOrDefault();
     var deleted = false;
     if (attachment == null) return deleted;
-    if (string.IsNullOrEmpty(attachment.External)) self.helper.unlink($"{self.helper.get_upload_path_by_type("proposal")}{attachment.RelId}/{attachment.FileName}");
+    if (string.IsNullOrEmpty(attachment.External)) self.helper.unlink($"{get_upload_path_by_type("proposal")}{attachment.RelId}/{attachment.FileName}");
 
     var affected_rows = db.Files.Where(x => x.Id == attachment.Id).Delete();
     if (affected_rows > 0)
@@ -391,12 +391,12 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       log_activity($"Proposal Attachment Deleted [ID: {attachment.RelId}]");
     }
 
-    if (!self.helper.is_dir(self.helper.get_upload_path_by_type("proposal") + attachment.RelId)) return deleted;
+    if (!self.helper.is_dir(get_upload_path_by_type("proposal") + attachment.RelId)) return deleted;
     // Check if no attachments left, so we can delete the folder also
-    var other_attachments = self.helper.list_files(self.helper.get_upload_path_by_type("proposal") + attachment.RelId);
+    var other_attachments = self.helper.list_files(get_upload_path_by_type("proposal") + attachment.RelId);
     if (!other_attachments.Any())
       // okey only index.html so we can delete the folder also
-      self.helper.delete_dir(self.helper.get_upload_path_by_type("proposal") + attachment.RelId);
+      self.helper.delete_dir(get_upload_path_by_type("proposal") + attachment.RelId);
 
     return deleted;
   }
@@ -408,7 +408,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool add_comment(ProposalComment data, bool client = false)
   {
-    if (is_staff_logged_in())
+    if (db.is_staff_logged_in())
       client = false;
 
 
@@ -562,7 +562,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     insert_data.NewItems.Clear();
-    var custom_fields_items = self.helper.get_custom_fields("items");
+    var custom_fields_items = db.get_custom_fields("items");
     var key = 1;
     var items = new List<DataSet<Proposal>>();
     // var items = new List<ProposalDto>();
@@ -581,9 +581,9 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       insert_data.NewItems[key].Order = (int)item["item_order"];
       foreach (var cf in custom_fields_items)
       {
-        insert_data.NewItems[key].CustomFields.Items[cf.Id] = self.helper.get_custom_field_value(item.Data.Id, cf.Id, "items", false);
+        insert_data.NewItems[key].CustomFields.Items[cf.Id] = db.get_custom_field_value(item.Data.Id, cf.Id, "items", false);
 
-        if (!self.helper.defined("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST")) self.helper.define("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST", true);
+        if (!defined("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST")) self.helper.define("COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST", true);
       }
 
       key++;
@@ -592,10 +592,10 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     var insert_id = add(insert_data);
 
     if (!insert_id.HasValue) return null;
-    var custom_fields = self.helper.get_custom_fields("proposal");
+    var custom_fields = db.get_custom_fields("proposal");
     foreach (var field in custom_fields)
     {
-      var value = self.helper.get_custom_field_value(proposal.Id, field.Id, "proposal", false);
+      var value = db.get_custom_field_value(proposal.Id, field.Id, "proposal", false);
       if (value == "") continue;
       db.CustomFieldsValues.Add(new CustomFieldsValue
       {
@@ -607,7 +607,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     }
 
     var tags = db.get_tags_in(proposal.Id, "proposal");
-    self.helper.handle_tags_save(tags, id, "proposal");
+    db.handle_tags_save(tags, id, "proposal");
     log_activity($"Copied Proposal {self.helper.format_proposal_number(proposal.Id)}");
     return id;
   }
@@ -671,13 +671,13 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
       {
         staff_proposal.ForEach(x => self.helper.send_mail_template("proposal_accepted_to_staff", original_proposal, x.Email));
         self.helper.send_mail_template("proposal_accepted_to_customer", original_proposal);
-        self.hooks.do_action("proposal_accepted", id);
+        hooks.do_action("proposal_accepted", id);
       }
       else
       {
         // Client declined send template to admin
         staff_proposal.ForEach(member => self.helper.send_mail_template("proposal_declined_to_staff", original_proposal, member.Email));
-        self.hooks.do_action("proposal_declined", id);
+        hooks.do_action("proposal_declined", id);
       }
     }
 
@@ -705,8 +705,8 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
    */
   public bool delete(int id)
   {
-    var tasks_model = self.model.tasks_model();
-    self.hooks.do_action("before_proposal_deleted", id);
+    var tasks_model = self.tasks_model(db);
+    hooks.do_action("before_proposal_deleted", id);
 
     clear_signature(id);
     var proposal = get(x => x.Id == id);
@@ -714,7 +714,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     if (affected_rows <= 0) return false;
 
     if (!string.IsNullOrEmpty(proposal.ShortLink))
-      self.helper.app_archive_short_link(proposal.ShortLink);
+      db.app_archive_short_link(proposal.ShortLink);
 
     delete_tracked_emails(id, "proposal");
     db.ProposalComments.Where(x => x.ProposalId == id).Delete();
@@ -742,7 +742,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     db.Reminders.Where(x => x.RelId == id && x.RelType == "proposal").Delete();
     db.ViewsTrackings.Where(x => x.RelId == id && x.RelType == "proposal").Delete();
     log_activity($"Proposal Deleted [ProposalID:{id}]");
-    self.hooks.do_action("after_proposal_deleted", id);
+    hooks.do_action("after_proposal_deleted", id);
 
     return true;
   }
@@ -859,7 +859,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self)
     // Set to status sent
     db.Proposals.Where(x => x.Id == id)
       .Update(x => new Proposal { Status = 4 });
-    self.hooks.do_action("proposal_sent", id);
+    hooks.do_action("proposal_sent", id);
     return true;
   }
 
