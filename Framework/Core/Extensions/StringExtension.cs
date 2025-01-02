@@ -35,7 +35,7 @@ public static class StringExtension
     return !string.IsNullOrEmpty(str) && !string.IsNullOrEmpty(substr) && str.IndexOf(substr, StringComparison.Ordinal) > 0;
   }
 
-  public static string uuid( )
+  public static string uuid()
   {
     return Guid.NewGuid().ToString("n");
   }
@@ -57,7 +57,7 @@ public static class StringExtension
     return haystack.EndsWith(needle);
   }
 
-  public static string strafter(  string str, string substring)
+  public static string strafter(string str, string substring)
   {
     var index = str.IndexOf(substring, StringComparison.OrdinalIgnoreCase);
     return index >= 0 ? str[(index + substring.Length)..] : str;
@@ -89,7 +89,7 @@ public static class StringExtension
     return pos < 0 ? subject : subject[..pos] + replace + subject[(pos + search.Length)..];
   }
 
-  public static string get_string_between(  string str, string start, string end)
+  public static string get_string_between(string str, string start, string end)
   {
     var startIndex = str.IndexOf(start, StringComparison.OrdinalIgnoreCase);
     if (startIndex < 0) return string.Empty;
@@ -233,7 +233,7 @@ public static class StringExtension
   //   return timeSpan.TotalMilliseconds < 0 ? "0" : timeSpan.Hours.ToString();
   // }
 
-  public static string db.slug_it(this HelperBase self, string str, string lang = "")
+  public static string slug_it(this HelperBase self, string str, string lang = "")
   {
     return string.Empty;
   }
@@ -332,24 +332,24 @@ public static class StringExtension
   }
 
   // Method to format double
-  public static string number_format( double number, int digit = 2)
+  public static string number_format(double number, int digit = 2)
   {
     return number_format((decimal)number, digit);
   }
 
   // Method to format int
-  public static string number_format( decimal percentage, int number, int digit = 2)
+  public static string number_format(decimal percentage, int number, int digit = 2)
   {
     return number_format((decimal)number, digit);
   }
 
   // Method to format float
-  public static string number_format( float number, int digit = 2)
+  public static string number_format(float number, int digit = 2)
   {
     return number_format((decimal)number, digit);
   }
 
-  public static string number_format( decimal number, int digit = 2)
+  public static string number_format(decimal number, int digit = 2)
   {
     // Create a custom NumberFormatInfo object
     var customFormat = new NumberFormatInfo

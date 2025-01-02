@@ -339,7 +339,7 @@ public class TasksModel(MyInstance self, MyContext db) : MyModel(self, db)
         item.Data = task;
 
         var task_rel_data = self.helper.get_relation_data(task.RelType, task.RelId.Value);
-        var task_rel_value = self.navigation.get_relation_values(convert<RelationValues>(task_rel_data), task.RelType);
+        var task_rel_value = db.get_relation_values(self.navigation, convert<RelationValues>(task_rel_data), task.RelType);
         item.Options.Add(new Option()
         {
           Name = task_rel_value.name

@@ -214,7 +214,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
     hooks.do_action("after_client_register", client_id);
     if (db.get_option("customers_register_require_confirmation") == "1")
     {
-      self.helper.send_customer_registered_email_to_administrators(client_id);
+      db.send_customer_registered_email_to_administrators(client_id);
       clients_model.require_confirmation(client_id);
       set_alert("success", self.helper.label("customer_register_account_confirmation_approval_notice"));
       return Redirect(self.helper.site_url("authentication/login"));
@@ -234,7 +234,7 @@ public class AuthenticationController(ILogger<ConsentController> logger, MyInsta
       redUrl = self.helper.site_url("authentication/login");
     }
 
-    self.helper.send_customer_registered_email_to_administrators(client_id);
+    db.send_customer_registered_email_to_administrators(client_id);
     return Redirect(redUrl);
   }
 

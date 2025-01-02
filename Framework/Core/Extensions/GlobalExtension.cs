@@ -7,14 +7,16 @@ namespace Service.Framework.Core.Extensions;
 
 public static class GlobalExtension
 {
-  public static string globals(this MyInstance self, string key)
+  public static string globals(  string key)
   {
-    return self.config.get(key);
+    // return self.config.get(key);
+    return string.Empty;
   }
 
-  public static T? globals<T>(this MyInstance self, string key)
+  public static T? globals<T>(  string key)
   {
-    return (T?)Convert.ChangeType(self.config.get(key), typeof(T));
+    // return (T?)Convert.ChangeType( config.get(key), typeof(T));
+    return default;
   }
 
   public static void log_message(this MyContext db,string message)

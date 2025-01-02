@@ -217,9 +217,9 @@ public static class ClientHelper
   {
     id ??= db.get_contact_user_id();
     var contact = new Contact();
-    if (self.globals<Contact>("contact") != null && self.globals<Contact>("contact").Id == id.Value)
+    if (globals<Contact>("contact") != null && globals<Contact>("contact")!.Id == id.Value)
     {
-      contact = self.globals<Contact>("contact");
+      contact = globals<Contact>("contact");
       return !string.IsNullOrEmpty(contact.EmailVerifiedAt);
     }
 
@@ -228,10 +228,13 @@ public static class ClientHelper
     return !string.IsNullOrEmpty(contact.EmailVerifiedAt);
   }
 
-  public static void send_customer_registered_email_to_administrators(this HelperBase helper, int client_id)
+  public static void send_customer_registered_email_to_administrators(this MyContext db, int client_id)
   {
-    var staff_model = self.staff_model(db);
-    var admins = staff_model.get(x => x.Active == true && x.IsAdmin == true);
+    var admins = db.Staff
+      .Where(x => x.Active == true && x.IsAdmin)
+      .OrderByDescending(s => s.FirstName)
+      .ToList();
+
     admins.ForEach(admin => { db.send_mail_template("customer_new_registration_to_admins", admin.Email, client_id, admin.Id); });
   }
 

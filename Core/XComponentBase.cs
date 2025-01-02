@@ -135,7 +135,7 @@ public abstract class XComponentBase : MyComponentBase
     return false;
   }
 
-  public string Format_credit_note_number(int id)
+  public string format_credit_note_number(int id)
   {
     return string.Empty;
   }

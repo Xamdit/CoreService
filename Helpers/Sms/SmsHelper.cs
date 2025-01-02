@@ -36,9 +36,9 @@ public static class SmsHelper
     return null; // Replace with actual gateway retrieval logic
   }
 
-  public static void maybe_test_sms_gateway(this MyInstance self)
+  public static void maybe_test_sms_gateway(this MyContext db)
   {
-    if (!is_staff_logged_in() || string.IsNullOrEmpty(self.input.post("sms_gateway_test")))
+    if (!db.is_staff_logged_in() || string.IsNullOrEmpty(self.input.post("sms_gateway_test")))
       return;
     // gateway = self.{"sms_" . self.input.post("id")};
     // gateway.set_test_mode(true);

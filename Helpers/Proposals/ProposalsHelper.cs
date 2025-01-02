@@ -56,7 +56,7 @@ public static class ProposalHelper
   public static bool is_proposals_expiry_reminders_enabled(this HelperBase helper)
   {
     var self = new MyInstance();
-    return helper.is_proposals_email_expiry_reminder_enabled() || helper.is_sms_trigger_active(self.globals<string>("SMS_TRIGGER_PROPOSAL_EXP_REMINDER"));
+    return helper.is_proposals_email_expiry_reminder_enabled() || helper.is_sms_trigger_active(globals<string>("SMS_TRIGGER_PROPOSAL_EXP_REMINDER"));
   }
 
 

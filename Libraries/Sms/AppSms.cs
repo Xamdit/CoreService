@@ -34,7 +34,6 @@ public abstract class AppSms(MyInstance instance, MyContext db)
 
   public void add_gateway(string id, SmsGateway data)
   {
-    var (self, db) = getInstance();
     if (!is_initialized(id))
     {
       foreach (var option in data.Options)

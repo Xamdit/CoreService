@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework.Core.Engine;
 
@@ -101,12 +102,11 @@ public static class LeadsHelper
     return results;
   }
 
-  public static string render_leads_status_select(this HelperBase helper, List<LeadsStatus> statuses, string? selected = null, string langKey = "", string name = "status", Dictionary<string, string> selectAttrs = null, bool excludeDefault = false)
+  public static string render_leads_status_select(this MyContext db, List<LeadsStatus> statuses, string? selected = null, string langKey = "", string name = "status", Dictionary<string, string> selectAttrs = null, bool excludeDefault = false)
   {
     var sender = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(
       JsonConvert.SerializeObject(statuses));
-
-    if (helper.is_admin() || db.get_option("staff_members_create_inline_lead_status") == "1")
+    if (db.is_admin() || db.get_option("staff_members_create_inline_lead_status") == "1")
       return render_select_with_input_group(name, sender, new List<string> { "id" }, "name", langKey, selected, "<div class='input-group-btn'><a href='#' class='btn btn-default' onclick='new_lead_status_inline();return false;'><i class='fa fa-plus'></i></a></div>", selectAttrs);
 
     var selected_sender = JsonConvert.DeserializeObject<Dictionary<string, string>>(
@@ -175,8 +175,9 @@ public static class LeadsHelper
     return false;
   }
 
-  private static List<LeadsStatus> get_leads_statuses(this HelperBase helper)
+  private static List<LeadsStatus> get_leads_statuses(this MyModel model)
   {
+    var (self, db) = model.getInstance();
     var leads_model = self.leads_model(db);
     var output = leads_model.get_status(x => true);
     return output;

@@ -443,7 +443,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
           var template = mail_template("proposal_comment_to_staff", proposal.Id, member.Email);
           var merge_fields = template.get_merge_fields();
           template.send();
-          self.library.app_sms().trigger(self.globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_STAFF"), member.PhoneNumber, merge_fields);
+          self.library.app_sms().trigger(globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_STAFF"), member.PhoneNumber, merge_fields);
           return 0;
         })
         .ToList()
@@ -457,7 +457,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
       var template = mail_template("proposal_comment_to_customer", proposal);
       var merge_fields = template.get_merge_fields();
       template.send();
-      self.library.app_sms().trigger(self.globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_CUSTOMER"), proposal.Phone, merge_fields);
+      self.library.app_sms().trigger(globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_CUSTOMER"), proposal.Phone, merge_fields);
     }
 
     return true;
@@ -839,7 +839,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     // if (self.helper.can_send_sms_based_on_creation_date(proposal.DateCreated))
     //   sms_sent = this.app_sms.trigger(SMS_TRIGGER_PROPOSAL_EXP_REMINDER, proposal.Phone, merge_fields);
-    var sms_sent = self.helper.can_send_sms_based_on_creation_date(proposal.DateCreated) && self.library.app_sms().trigger(self.globals("SMS_TRIGGER_PROPOSAL_EXP_REMINDER"), proposal.Phone, merge_fields);
+    var sms_sent = self.helper.can_send_sms_based_on_creation_date(proposal.DateCreated) && self.library.app_sms().trigger(globals("SMS_TRIGGER_PROPOSAL_EXP_REMINDER"), proposal.Phone, merge_fields);
     return sms_sent;
   }
 

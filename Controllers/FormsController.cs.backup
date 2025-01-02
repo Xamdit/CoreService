@@ -383,7 +383,7 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
     {
       data = self.input.post<dynamic>();
       leads_model.update(data, result.lead.Id);
-      return Redirect(self.globals("HTTP_REFERER"));
+      return Redirect(globals("HTTP_REFERER"));
     }
 
     if (self.input.post_has("export") && db.get_option("gdpr_data_portability_leads") == "1")
@@ -400,11 +400,11 @@ public class FormsController(ILogger<FormsController> logger, MyInstance self) :
         LeadId = result.lead.Id
       });
       if (!success)
-        return Redirect(self.globals<string>("HTTP_REFERER")!);
+        return Redirect(globals<string>("HTTP_REFERER")!);
       // self.helper.send_gdpr_email_template("gdpr_removal_request_by_lead", lead.Id);
       set_alert("success", self.helper.label("data_removal_request_sent"));
 
-      return Redirect(self.globals<string>("HTTP_REFERER"));
+      return Redirect(globals<string>("HTTP_REFERER"));
     }
 
     result.attachments = leads_model.get_lead_attachments(result.lead.Id);

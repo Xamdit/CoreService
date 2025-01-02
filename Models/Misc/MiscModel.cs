@@ -257,7 +257,7 @@ public class MiscModel(MyInstance self, MyContext db) : MyModel(self, db)
     // Handle permission logic
     if (!hasPermissionViewEstimates)
     {
-      var noPermissionQuery = self.helper.get_estimates_where_sql_for_staff(staff_user_id);
+      var noPermissionQuery = db.get_estimates_where_sql_for_staff(staff_user_id);
       estimatesQuery = estimatesQuery.Where(noPermissionQuery);
     }
 

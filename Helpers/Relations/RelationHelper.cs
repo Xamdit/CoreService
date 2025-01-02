@@ -209,7 +209,7 @@ public static class RelationHelper
  * @param  string  type
  * @return mixed
  */
-  public static RelationValues get_relation_values(this NavigationManager nav, RelationValues? relation = null, string type = "")
+  public static RelationValues get_relation_values(this MyContext db, NavigationManager nav, RelationValues? relation = null, string type = "")
   {
     var self = new MyInstance();
     if (relation == null)
@@ -296,7 +296,7 @@ public static class RelationHelper
           addedfrom = relation.addedfrom;
         }
 
-        name = self.helper.format_credit_note_number(id);
+        name = db.format_credit_note_number(id);
         link = nav.admin_url($"credit_notes/list_credit_notes/{id}");
         break;
       }
@@ -498,7 +498,7 @@ public static class RelationHelper
     var projects_model = self.projects_model(db);
     foreach (var relation in data)
     {
-      var relation_values = self.navigation.get_relation_values(relation, type);
+      var relation_values = db.get_relation_values(relation, type);
       switch (type)
       {
         case "project":

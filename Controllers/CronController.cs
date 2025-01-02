@@ -16,7 +16,7 @@ public class CronController(ILogger<CronController> logger, MyInstance self,MyCo
     var db = new MyContext();
     db.update_option("cron_has_run_from_cli", 1);
 
-    if (defined("APP_CRON_KEY") && self.globals("APP_CRON_KEY") != key)
+    if (defined("APP_CRON_KEY") && globals("APP_CRON_KEY") != key)
       // header('HTTP/1.0 401 Unauthorized');
       return MakeError("Passed cron job key is not correct. The cron job key should be the same like the one defined in APP_CRON_KEY constant.");
     var last_cron_run = db.get_option("last_cron_run");

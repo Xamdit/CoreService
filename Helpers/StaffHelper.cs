@@ -122,8 +122,8 @@ public static class StaffHelper
   {
     var (self, db) = getInstance();
     var url = base_url("assets/images/user-placeholder.jpg");
-    var staff = staff_id == db.get_staff_user_id() && self.globals<Staff?>("current_user") != null
-      ? self.globals<Staff?>("current_user")
+    var staff = staff_id == db.get_staff_user_id() && globals<Staff?>("current_user") != null
+      ? globals<Staff?>("current_user")
       : db.Staff.FirstOrDefault(x => x.Id == staff_id);
     if (staff == null) return url;
     if (string.IsNullOrEmpty(staff.ProfileImage)) return url;

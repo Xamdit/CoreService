@@ -187,7 +187,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
       new_invoice_data.newitems[key].Qty = item.Qty;
       new_invoice_data.newitems[key].Unit = item.Unit;
       new_invoice_data.newitems[key].TaxNames = new List<string>();
-      var taxes = self.helper.get_estimate_item_taxes(item.Id);
+      var taxes = db.get_estimate_item_taxes(item.Id);
       new_invoice_data.newitems[key].TaxNames = taxes.Select(tax => tax.TaxName).ToList();
       new_invoice_data.newitems[key].Rate = item.Rate;
       new_invoice_data.newitems[key].Order = item.ItemOrder!.Value;
@@ -258,7 +258,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
         // Only valid if 1 result returned
         // + if field names similarity is equal or more then CUSTOM_FIELD_TRANSFER_SIMILARITY%
         // if (cfTransfer != 1 || self.helper.similarity(field.Name, cfTransfer[0].Name) * 100 < CUSTOM_FIELD_TRANSFER_SIMILARITY) continue;
-        if (cfTransfer != null || self.helper.similarity(field.Name, cfTransfer.Field.Name) * 100 < self.globals<int>("CUSTOM_FIELD_TRANSFER_SIMILARITY")) continue;
+        if (cfTransfer != null || self.helper.similarity(field.Name, cfTransfer.Field.Name) * 100 < globals<int>("CUSTOM_FIELD_TRANSFER_SIMILARITY")) continue;
         var value = db.get_custom_field_value(_estimate.Id, field.Id, "estimate", false);
 
         if (string.IsNullOrEmpty(value)) continue;
@@ -343,7 +343,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
       new_estimate_data.newitems[key].LongDescription = clear_textarea_breaks(item.LongDescription!);
       new_estimate_data.newitems[key].Qty = item.Qty;
       new_estimate_data.newitems[key].Unit = item.Unit;
-      var taxes = self.helper.get_estimate_item_taxes(item.Id);
+      var taxes = db.get_estimate_item_taxes(item.Id);
       new_estimate_data.newitems[key].TaxNames = taxes.Select(x => x.TaxName).ToList();
       new_estimate_data.newitems[key].Rate = item.Rate;
       new_estimate_data.newitems[key].Order = item.ItemOrder!.Value;
@@ -419,7 +419,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     if (!hasPermissionView)
     {
-      var staffCondition = self.helper.get_estimates_where_sql_for_staff(staff_user_id);
+      var staffCondition = db.get_estimates_where_sql_for_staff(staff_user_id);
       whereClauses.And(staffCondition);
     }
 
@@ -697,7 +697,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
       }
       else
       {
-        var item_taxes = self.helper.get_estimate_item_taxes(item.Id);
+        var item_taxes = db.get_estimate_item_taxes(item.Id);
         var _item_taxes_names = item_taxes.Select(x => x.TaxName);
         var i = 0;
         foreach (var _item_tax in _item_taxes_names)
@@ -918,7 +918,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
   public bool delete(int id, bool simpleDelete = false)
   {
     if (db.get_option_compare("delete_only_on_last_estimate", 1) && simpleDelete == false)
-      if (!self.helper.is_last_estimate(id))
+      if (!db.is_last_estimate(id))
         return false;
     var estimate = get(x => x.Id == id).FirstOrDefault();
     if (estimate.InvoiceId.HasValue && simpleDelete == false)
@@ -1072,7 +1072,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
         emails_sent.Add(contact.Email);
 
       if (!self.helper.can_send_sms_based_on_creation_date(estimate.DateCreated)
-          || !self.library.app_sms().trigger(self.globals("SMS_TRIGGER_ESTIMATE_EXP_REMINDER"), contact.PhoneNumber, merge_fields)) return;
+          || !self.library.app_sms().trigger(globals("SMS_TRIGGER_ESTIMATE_EXP_REMINDER"), contact.PhoneNumber, merge_fields)) return;
       sms_sent = true;
       sms_reminder_log.Add($"{contact.FirstName} ({contact.PhoneNumber})");
     });
@@ -1121,8 +1121,8 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     // Manually is used when sending the estimate via add/edit area button Save & Send
     if (!defined("CRON") && manually == false)
       send_to = split_int(self.input.post("sent_to"), ",");
-    else if (!string.IsNullOrEmpty(self.globals("scheduled_email_contacts")))
-      send_to = split_int(self.globals("scheduled_email_contacts"), ",");
+    else if (!string.IsNullOrEmpty(globals("scheduled_email_contacts")))
+      send_to = split_int(globals("scheduled_email_contacts"), ",");
     else
       clients_model.get_contacts(
           x =>

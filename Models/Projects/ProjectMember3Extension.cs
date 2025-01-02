@@ -104,14 +104,14 @@ public static class ProjectMember3Extension
   public static ProjectDiscussionComment get_discussion_comment(this ProjectsModel model, int id)
   {
     var (self, db) = model.getInstance();
-    dynamic comment = new DataSet<ProjectDiscussionComment>();
+    var comment = new DataSet<ProjectDiscussionComment>();
     // comment.Data = db.ProjectDiscussionComments.FirstOrDefault(x => x.Id == id);
     comment.Data = db.ProjectDiscussionComments.Find(id)!;
-
     if (comment.Data.ContactId != 0)
     {
-      comment.created_by_current_user = db.client_logged_in() && comment.ContactId == db.get_contact_user_id();
-      comment.profile_picture_url = db.contact_profile_image_url(comment.ContactId);
+      comment.created_by_current_user = db.client_logged_in() && comment.Data.ContactId == db.get_contact_user_id();
+      var profile_picture_url = db.contact_profile_image_url(comment.Data.ContactId);
+      comment.profile_picture_url = profile_picture_url;
     }
     else
     {
@@ -122,15 +122,15 @@ public static class ProjectMember3Extension
           : false;
 
       // comment.created_by_admin = helper.is_admin(comment.staff_id);
-      comment.created_by_admin = comment.staff_id.is_admin();
-      comment.profile_picture_url = staff_profile_image_url(comment.staff_id);
+      comment.created_by_admin = db.is_admin(comment.Data.StaffId);
+      comment.Data.profile_picture_url = staff_profile_image_url(comment.Data.StaffId);
     }
 
-    comment.DateCreated *= 1000;
+    comment.Data.DateCreated *= 1000;
     if (!string.IsNullOrEmpty(comment.Modified))
-      comment.Modified = DateTime.Parse(comment.Modified) * 1000;
-    if (!string.IsNullOrEmpty(comment.FileName))
-      comment.file_url = site_url($"uploads/discussions/{comment.DiscussionId}/{comment.FileName}");
+      comment.Data.Modified = DateTime.Parse(comment.Data.Modified) * 1000;
+    if (!string.IsNullOrEmpty(comment.Data.FileName))
+      comment.file_url = site_url($"uploads/discussions/{comment.Data.DiscussionId}/{comment.Data.FileName}");
 
     return comment;
   }
@@ -434,7 +434,7 @@ public static class ProjectMember3Extension
   public static void delete_discussion_comment_attachment(this ProjectsModel model, string file_name, int discussion_id)
   {
     var (self, db) = model.getInstance();
-    var path = self.globals<string>("PROJECT_DISCUSSION_ATTACHMENT_FOLDER") + discussion_id;
+    var path = globals<string>("PROJECT_DISCUSSION_ATTACHMENT_FOLDER") + discussion_id;
     if (!string.IsNullOrEmpty(file_name))
       if (file_exists($"{path}/{file_name}"))
         unlink($"{path}/{file_name}");

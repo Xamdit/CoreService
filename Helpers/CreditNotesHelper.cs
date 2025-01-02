@@ -55,14 +55,12 @@ public static class CreditNoteHelper
   }
 
   // Function that formats credit note number based on the prefix option and the credit note number
-  public static string format_credit_note_number(this CreditNotesModel model, int id)
+  public static string format_credit_note_number(this MyContext db, int id)
   {
-    var (_, db) = model.getInstance();
     var creditNote = db.CreditNotes.FirstOrDefault(x => x.Id == id);
     if (creditNote == null) return string.Empty;
     // var number = sales_number_format(creditNote.Number, creditNote.NumberFormat, creditNote.Prefix, creditNote.Date);
     var number = db.sales_number_format(creditNote.Number, creditNote.NumberFormat, creditNote.Prefix, creditNote.Date);
-
     hooks.apply_filters("format_credit_note_number", new { id, number, creditNote });
     return number;
   }

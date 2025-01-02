@@ -99,7 +99,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
   public bool send_credit_note_to_client(int id, bool attachpdf = true, string cc = "", bool manually = false)
   {
     var credit_note = get(x => x.Id == id).First();
-    var number = self.helper.format_credit_note_number(credit_note.Id);
+    var number = db.format_credit_note_number(credit_note.Id);
     var sent = false;
     var sent_to = new List<int>();
 
@@ -302,7 +302,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
       }
       else
       {
-        var item_taxes = self.helper.get_credit_note_item_taxes(item.Id);
+        var item_taxes = db.get_credit_note_item_taxes(item.Id);
         var _item_taxes_names = item_taxes.Select(_item_tax => _item_tax.TaxName).ToList();
         _item_taxes_names.ForEach(_item_tax =>
         {
@@ -359,7 +359,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
     if (affected_rows > 0)
     {
       deleted = true;
-      log_activity($"Credit Note Attachment Deleted [Credite Note: {self.helper.format_credit_note_number(attachment.RelId)}]");
+      log_activity($"Credit Note Attachment Deleted [Credite Note: {db.format_credit_note_number(attachment.RelId)}]");
     }
 
     if (!is_dir(get_upload_path_by_type("credit_note") + attachment.RelId)) return deleted;
@@ -393,7 +393,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     var current_credit_note_number = Convert.ToInt32(db.get_option("next_credit_note_number"));
 
-    if (current_credit_note_number > 1 && simpleDelete == false && self.helper.is_last_credit_note(id))
+    if (current_credit_note_number > 1 && simpleDelete == false && this.is_last_credit_note(id))
       // Decrement next credit note number
       db.Options.Where(x => x.Name == "next_credit_note_number")
         .Update(x => new Option { Value = Convert.ToString(Convert.ToInt32(x.Value) - 1) });
@@ -551,7 +551,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
         self.helper.update_invoice_status(invoice_id, true);
     }
 
-    log_activity($"Created Credit Note From Invoice [Invoice: {self.helper.format_invoice_number(_invoice.Id)}, Credit Note: {self.helper.format_credit_note_number(id)}]");
+    log_activity($"Created Credit Note From Invoice [Invoice: {self.helper.format_invoice_number(_invoice.Id)}, Credit Note: {db.format_credit_note_number(id)}]");
     hooks.do_action("created_credit_note_from_invoice", new { invoice_id, credit_note_id = id });
     return id;
   }
@@ -675,7 +675,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
       invoices_model.change_invoice_number_when_status_draft(invoice.Id);
     invoice = db.Invoices.Include(x => x.Currency).FirstOrDefault(x => x.Id == data.Id);
     var inv_number = self.helper.format_invoice_number(data.InvoiceId);
-    var credit_note_number = self.helper.format_credit_note_number(id);
+    var credit_note_number = db.format_credit_note_number(id);
     invoices_model.log(data.InvoiceId, "invoice_activity_applied_credits", false, JsonConvert.SerializeObject(new[]
     {
       db.app_format_money(data.Amount, invoice.Currency.Name),

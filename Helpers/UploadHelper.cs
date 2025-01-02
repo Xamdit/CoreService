@@ -175,7 +175,7 @@ public static class UploadHelper
       self.context.Response.CompleteAsync();
     }
 
-    var path = Path.Combine(self.globals("PROJECT_DISCUSSION_ATTACHMENT_FOLDER"), $"{discussionId}");
+    var path = Path.Combine(globals("PROJECT_DISCUSSION_ATTACHMENT_FOLDER"), $"{discussionId}");
 
     // Check if the file extension is allowed
     if (!upload_extension_allowed(file.FileName))

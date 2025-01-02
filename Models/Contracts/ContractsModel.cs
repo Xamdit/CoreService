@@ -398,7 +398,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
       self.helper.set_mailing_constant();
       var pdf = self.helper.contract_pdf(contract);
       // attach = pdf.Output($"{slug_it(contract.Subject)}.pdf", 'S');
-      attach = pdf.Output($"{slug_it(contract.Subject)}.pdf");
+      attach = pdf.Output($"{db.slug_it(contract.Subject)}.pdf");
     }
 
     var sent_to_str = self.input.post<string>("sent_to");
@@ -419,7 +419,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
           template.add_attachment(new MailAttachment()
           {
             attachment = attach,
-            filename = $"{slug_it(contract.Subject)}.pdf",
+            filename = $"{db.slug_it(contract.Subject)}.pdf",
             type = "application/pdf"
           });
 

@@ -821,9 +821,9 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
     {
       send_to = self.input.post<string>("sent_to").Split(",").ToList().Select(x => Convert.ToInt32(x)).ToList();
     }
-    else if (self.globals("scheduled_email_contacts") != null)
+    else if (globals("scheduled_email_contacts") != null)
     {
-      send_to = new List<int>() { self.globals<int>("scheduled_email_contacts") };
+      send_to = new List<int>() { globals<int>("scheduled_email_contacts") };
     }
     else
     {
@@ -840,8 +840,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
       {
         var statement = convert<StatementResult>(clients_model.get_statement(invoice.ClientId, attachStatement.from, attachStatement.to));
         var statementPdf = PdfHelper.statement_pdf(self.helper, statement);
-        statementPdfFileName = db.slug_it(self.helper.label("customer_statement") + "-" + statement.Client.company);
-
+        // statementPdfFileName = db.slug_it(self.helper.label("customer_statement") + "-" + statement.Client.company);
         attachStatementPdf = statementPdf.Output(statementPdfFileName + ".pdf");
       }
 
