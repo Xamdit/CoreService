@@ -199,7 +199,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
 
           if (!notified) return 0;
-          var template = mail_template("contract_comment_to_staff", contract, x);
+          var template = this.mail_template("contract_comment_to_staff", contract, x);
           var merge_fields = template.get_merge_fields();
           template.send();
           return contract.Id;
@@ -213,7 +213,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
       var contacts = clients_model.get_contacts(x => x.Id == contract.Client && x.Active && x.ContractEmails == 1, x => true);
       contacts.ForEach(contract =>
       {
-        var template = mail_template("contract_comment_to_customer", contract);
+        var template = this.mail_template("contract_comment_to_customer", contract);
         var merge_fields = template.get_merge_fields();
         template.send();
         // this.app_sms.trigger(SMS_TRIGGER_CONTRACT_NEW_COMMENT_TO_CUSTOMER, contact.PhoneNumber, merge_fields);
@@ -414,7 +414,7 @@ public class ContractsModel(MyInstance self, MyContext db) : MyModel(self, db)
         var contact = clients_model.get_contact(contact_id);
         // Send cc only for the first contact
         if (!string.IsNullOrEmpty(cc) && i > 0) cc = "";
-        var template = mail_template("contract_send_to_customer", contract, contact, cc);
+        var template = this.mail_template("contract_send_to_customer", contract, contact, cc);
         if (attachpdf)
           template.add_attachment(new MailAttachment()
           {

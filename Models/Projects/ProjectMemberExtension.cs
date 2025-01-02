@@ -257,7 +257,7 @@ public static class ProjectMemberExtension
       .ForEach(member =>
       {
         if (db.is_staff_logged_in() && member.StaffId == db.get_staff_user_id()) return;
-        var mailTemplate = mail_template(staff_template, project, member, additional_data.staff);
+        var mailTemplate = model.mail_template(staff_template, project, member, additional_data.staff);
         if (additional_data.Attachments.Any())
           foreach (var attachment in additional_data.Attachments)
             mailTemplate.add_attachment(attachment);
@@ -271,7 +271,7 @@ public static class ProjectMemberExtension
       .Where(contact => !db.client_logged_in() || contact.Id != db.get_contact_user_id())
       .Select(contact =>
       {
-        var mailTemplate = mail_template(customer_template, project, contact, additional_data.customers);
+        var mailTemplate = model.mail_template(customer_template, project, contact, additional_data.customers);
         if (additional_data.Attachments)
           foreach (var attachment in additional_data.Attachments)
             mailTemplate.add_attachment(attachment);
@@ -397,7 +397,7 @@ public static class ProjectMemberExtension
       .Where(staffId => !db.is_staff_logged_in() || staffId != db.get_staff_user_id())
       .Select(staffId => staff_model.get(x => x.Id == staffId).FirstOrDefault())
       // .Select(member =>  helper.mail_template(staff_template, project, member, additional_data.Staff))
-      .Select(member => mail_template(staff_template, project, member, convert<Staff>(additional_data)))
+      .Select(member => model.mail_template(staff_template, project, member, convert<Staff>(additional_data)))
       .ToList()
       .ForEach(mailTemplate =>
       {

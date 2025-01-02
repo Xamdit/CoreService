@@ -35,7 +35,7 @@ public class LeadsModel(MyInstance self, MyContext db) : MyModel(self, db)
         if (lead.FromFormId != 0)
           formData = get_form(x => x.Id == lead.FromFormId);
         var attachments = get_lead_attachments();
-        var publicUrl = self.helper.leads_public_url(id!.Value);
+        var publicUrl = this.leads_public_url(id!.Value);
         return (formData, attachments, publicUrl, lead);
       })
       .ToList();

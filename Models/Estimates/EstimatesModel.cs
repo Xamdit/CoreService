@@ -1058,7 +1058,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
     var contacts = clients_model.get_contacts(x => x.Id == estimate.ClientId, x => x.Active && x.EstimateEmails != 0);
     contacts.ForEach(contact =>
     {
-      var template = mail_template("estimate_expiration_reminder", estimate, contact);
+      var template = this.mail_template("estimate_expiration_reminder", estimate, contact);
       var merge_fields = template.get_merge_fields();
       template.add_attachment(new MailAttachment
       {
@@ -1166,7 +1166,7 @@ public class EstimatesModel(MyInstance self, MyContext db) : MyModel(self, db)
 
           if (contact == null) continue;
 
-          var template = mail_template(template_name, estimate, contact, cc);
+          var template = this.mail_template(template_name, estimate, contact, cc);
 
           if (attachpdf)
           {

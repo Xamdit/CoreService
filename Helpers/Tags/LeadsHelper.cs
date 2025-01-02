@@ -28,14 +28,14 @@ public static class LeadsHelper
     return output;
   }
 
-  public static string GetLeadConsentUrl(this HelperBase helper, int id)
+  public static string get_lead_consent_url(this MyContext db, int id)
   {
-    return $"{site_url()}/consent/l/{helper.get_lead_hash(id)}";
+    return $"{site_url()}/consent/l/{db.get_lead_hash(id)}";
   }
 
-  public static string GetLeadsPublicUrl(this HelperBase helper, int id)
+  public static string get_leads_public_url(this MyContext db, int id)
   {
-    return $"{site_url()}/forms/l/{helper.get_lead_hash(id)}";
+    return $"{site_url()}/forms/l/{db.get_lead_hash(id)}";
   }
 
   public static string get_lead_hash(this MyContext db, int id)

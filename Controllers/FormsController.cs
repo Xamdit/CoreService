@@ -22,7 +22,7 @@ namespace Service.Controllers;
 
 [ApiController]
 [Route("api/forms")]
-public class FormsController(ILogger<EstimateController> logger, MyInstance self,MyContext db) : ClientControllerBase(logger, self,db)
+public class FormsController(ILogger<EstimateController> logger, MyInstance self, MyContext db) : ClientControllerBase(logger, self, db)
 {
   [HttpGet]
   public IActionResult Index()

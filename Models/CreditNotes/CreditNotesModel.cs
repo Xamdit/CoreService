@@ -128,7 +128,7 @@ public class CreditNotesModel(MyInstance self, MyContext db) : MyModel(self, db)
         {
           if (!string.IsNullOrEmpty(cc) && i > 0) cc = "";
           var contact = clients_model.get_contact(contact_id);
-          var template = mail_template("credit_note_send_to_customer", credit_note, contact, cc);
+          var template = this.mail_template("credit_note_send_to_customer", credit_note, contact, cc);
 
           if (attachpdf)
             template.add_attachment(new MailAttachment()

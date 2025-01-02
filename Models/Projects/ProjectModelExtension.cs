@@ -130,13 +130,13 @@ public static class ProjectModelExtension
     var members = model.get_project_members(id);
     // var notifiedUsers = new List<int>();
     var notifiedUsers = members
-      .Where(member => member.StaffId != model.staff_user_id)
+      .Where(member => member.StaffId != db.get_staff_user_id())
       .ToList()
       .Select(member =>
       {
         var notified = db.add_notification(new Notification
         {
-          FromUserId = model.staff_user_id,
+          FromUserId = db.get_staff_user_id(),
           Description = "not_project_status_updated",
           Link = $"projects/view/{id}",
           ToUserId = member.StaffId,
@@ -229,11 +229,11 @@ public static class ProjectModelExtension
               StaffId = staff_id
             });
             if (affected_rows.IsAdded()) return 0;
-            if (staff_id != model.staff_user_id)
+            if (staff_id != db.get_staff_user_id())
             {
               var notified = db.add_notification(new Notification
               {
-                FromUserId = model.staff_user_id,
+                FromUserId = db.get_staff_user_id(),
                 Description = "not_staff_added_as_project_member",
                 Link = $"projects/view/{id}",
                 ToUserId = staff_id,
@@ -265,11 +265,11 @@ public static class ProjectModelExtension
             StaffId = staff_id
           });
           if (!result.IsAdded()) return 0;
-          if (staff_id != model.staff_user_id)
+          if (staff_id != db.get_staff_user_id())
           {
             var notified = db.add_notification(new Notification
             {
-              FromUserId = model.staff_user_id,
+              FromUserId = db.get_staff_user_id(),
               Description = "not_staff_added_as_project_member",
               Link = $"projects/view/{id}",
               ToUserId = staff_id,
@@ -301,7 +301,7 @@ public static class ProjectModelExtension
   public static bool is_member(this ProjectsModel model, int project_id, int? staff_id = null)
   {
     var (self, db) = model.getInstance();
-    var result = db.ProjectMembers.Any(x => x.ProjectId == project_id && x.StaffId == model.staff_user_id);
+    var result = db.ProjectMembers.Any(x => x.ProjectId == project_id && x.StaffId == db.get_staff_user_id());
     return result;
   }
 

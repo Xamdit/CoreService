@@ -1546,7 +1546,7 @@ public class ClientsModel(MyInstance self, MyContext db) : MyModel(self, db)
     var merge_fields = self.app_merge_fields().format_feature("client_merge_fields", customer_id, contact_id);
     var notifiedUsers = staff.Select(member =>
       {
-        mail_template("customer_profile_uploaded_file_to_staff", member.Email, member.Id)
+        this.mail_template("customer_profile_uploaded_file_to_staff", member.Email, member.Id)
           .set_merge_fields(merge_fields)
           .send();
         var notify = db.add_notification(new Notification

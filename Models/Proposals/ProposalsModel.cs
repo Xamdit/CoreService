@@ -440,7 +440,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
             AdditionalData = JsonConvert.SerializeObject(new[] { proposal.Subject })
           });
           if (notified) return member.Id;
-          var template = mail_template("proposal_comment_to_staff", proposal.Id, member.Email);
+          var template = this.mail_template("proposal_comment_to_staff", proposal.Id, member.Email);
           var merge_fields = template.get_merge_fields();
           template.send();
           self.library.app_sms().trigger(globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_STAFF"), member.PhoneNumber, merge_fields);
@@ -454,7 +454,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
     else
     {
       // Send email/sms to client that admin commented
-      var template = mail_template("proposal_comment_to_customer", proposal);
+      var template = this.mail_template("proposal_comment_to_customer", proposal);
       var merge_fields = template.get_merge_fields();
       template.send();
       self.library.app_sms().trigger(globals("SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_CUSTOMER"), proposal.Phone, merge_fields);
@@ -832,7 +832,7 @@ public class ProposalsModel(MyInstance self, MyContext db) : MyModel(self, db)
 
     db.Proposals.Where(x => x.Id == proposal.Id).Update(x => new Proposal { IsExpiryNotified = 1 });
 
-    var template = mail_template("proposal_expiration_reminder", proposal);
+    var template = this.mail_template("proposal_expiration_reminder", proposal);
     var merge_fields = template.get_merge_fields();
 
     template.send();

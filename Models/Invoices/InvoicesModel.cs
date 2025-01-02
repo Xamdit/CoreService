@@ -866,7 +866,7 @@ public class InvoicesModel(MyInstance self, MyContext db) : MyModel(self, db)
           if (contact == null) continue;
 
           // var template = self.helper.mail_template(template_name, invoice, contact, cc);
-          var template = mail_template(template_name, invoice, contact, cc);
+          var template = this.mail_template(template_name, invoice, contact, cc);
 
           if (attachpdf)
             template.add_attachment(new MailAttachment()

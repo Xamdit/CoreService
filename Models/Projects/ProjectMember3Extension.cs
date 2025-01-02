@@ -1,3 +1,4 @@
+using System.Dynamic;
 using Microsoft.EntityFrameworkCore;
 using Service.Core.Extensions;
 using Service.Entities;
@@ -101,37 +102,38 @@ public static class ProjectMember3Extension
   }
 
 //
-  public static ProjectDiscussionComment get_discussion_comment(this ProjectsModel model, int id)
+  public static (ProjectDiscussionComment data, object optional) get_discussion_comment(this ProjectsModel model, int id)
   {
     var (_, db) = model.getInstance();
-    var comment = new DataSet<ProjectDiscussionComment>();
+    dynamic optional = new ExpandoObject();
+    var comment = new ProjectDiscussionComment();
     // comment.Data = db.ProjectDiscussionComments.FirstOrDefault(x => x.Id == id);
-    comment.Data = db.ProjectDiscussionComments.Find(id)!;
-    if (comment.Data.ContactId != 0)
+    comment = db.ProjectDiscussionComments.Find(id)!;
+    if (comment.ContactId != 0)
     {
-      comment.created_by_current_user = db.client_logged_in() && comment.Data.ContactId == db.get_contact_user_id();
-      var profile_picture_url = db.contact_profile_image_url(comment.Data.ContactId);
-      comment.profile_picture_url = profile_picture_url;
+      optional.created_by_current_user = db.client_logged_in() && comment.ContactId == db.get_contact_user_id();
+      var profile_picture_url = db.contact_profile_image_url(comment.ContactId);
+      optional.profile_picture_url = profile_picture_url;
     }
     else
     {
-      comment.created_by_current_user = db.client_logged_in()
+      optional.created_by_current_user = db.client_logged_in()
         ? false
-        : comment.created_by_current_user = db.is_staff_logged_in()
-          ? comment.Data.StaffId == db.get_staff_user_id()
-          : false;
+        : optional.created_by_current_user = db.is_staff_logged_in() && comment.StaffId == db.get_staff_user_id();
 
       // comment.created_by_admin = helper.is_admin(comment.staff_id);
-      comment.created_by_admin = db.is_admin(comment.Data.StaffId);
-      comment.profile_picture_url = staff_profile_image_url(comment.Data.StaffId);
+      optional.created_by_admin = db.is_admin(comment.StaffId);
+      optional.profile_picture_url = db.staff_profile_image_url(comment.StaffId);
     }
 
-    comment.Data.DateCreated *= 1000;
-    if (!string.IsNullOrEmpty(comment.Data.Modified))
-      comment.Data.Modified = DateTime.Parse(comment.Data.Modified) * 1000;
-    if (!string.IsNullOrEmpty(comment.Data.FileName))
-      comment.file_url = site_url($"uploads/discussions/{comment.Data.DiscussionId}/{comment.Data.FileName}");
-    return comment;
+    // comment.DateCreated *= 1000;
+    comment.DateCreated = comment.DateCreated.AddSeconds(1000);
+    if (!string.IsNullOrEmpty(comment.Modified))
+      // comment.Modified = comment.Modified * 1000;
+      comment.Modified = DateTime.Parse(comment.Modified).AddSeconds(1000).ToString();
+    if (!string.IsNullOrEmpty(comment.FileName))
+      optional.file_url = site_url($"uploads/discussions/{comment.DiscussionId}/{comment.FileName}");
+    return (comment, optional);
   }
 
 //
@@ -181,7 +183,7 @@ public static class ProjectMember3Extension
           comment.Options.Add(new Option()
           {
             Name = "profile_picture_url",
-            Value = $"{staff_profile_image_url(comment.Data.StaffId)}"
+            Value = $"{db.staff_profile_image_url(comment.Data.StaffId)}"
           });
         }
 
@@ -234,7 +236,7 @@ public static class ProjectMember3Extension
   }
 
 //
-  public static ProjectDiscussionComment? add_discussion_comment(this ProjectsModel model, DataSet<ProjectDiscussionComment> data, int discussion_id, string type)
+  public static (ProjectDiscussionComment data, dynamic optional) add_discussion_comment(this ProjectsModel model, DataSet<ProjectDiscussionComment> data, int discussion_id, string type)
   {
     var (self, db) = model.getInstance();
     var discussion = model.get_discussion(discussion_id);
@@ -264,7 +266,7 @@ public static class ProjectMember3Extension
 
     var result = db.ProjectDiscussionComments.Add(_data.Data);
     var insert_id = result.Entity.Id;
-    if (!result.IsAdded()) return null;
+    if (!result.IsAdded()) return (null, null);
     var not_link = "#";
     if (type == "regular")
     {
@@ -369,11 +371,12 @@ public static class ProjectMember3Extension
       hooks.do_action("after_add_discussion_comment", insert_id);
     }
 
-    return model.get_discussion_comment(insert_id);
+    var output = model.get_discussion_comment(insert_id);
+    return output;
   }
 
 //
-  public static ProjectDiscussionComment update_discussion_comment(this ProjectsModel model, ProjectDiscussionComment data)
+  public static (ProjectDiscussionComment data, dynamic optional) update_discussion_comment(this ProjectsModel model, ProjectDiscussionComment data)
   {
     var (self, db) = model.getInstance();
     var comment = model.get_discussion_comment(data.Id);
@@ -385,7 +388,7 @@ public static class ProjectMember3Extension
         Modified = today(),
         Content = data.Content
       });
-    if (affected_rows > 0) model.update_discussion_last_activity(comment.Id, comment.DiscussionType);
+    if (affected_rows > 0) model.update_discussion_last_activity(comment.data.Id, comment.data.DiscussionType);
     return model.get_discussion_comment(data.Id);
   }
 
@@ -397,21 +400,21 @@ public static class ProjectMember3Extension
     var affected_rows = db.ProjectDiscussionComments.Where(x => x.Id == id).Delete();
     if (affected_rows > 0)
     {
-      model.delete_discussion_comment_attachment(comment.FileName, comment.DiscussionId);
+      model.delete_discussion_comment_attachment(comment.data.FileName, comment.data.DiscussionId);
       if (logActivity)
       {
         var not = "project_activity_deleted_file_discussion_comment";
         // var discussion = model.get_file(comment.DiscussionId);
         var discussion = new ProjectDiscussion();
-        var additional_data = $"{discussion.Subject}<br />{comment.Content}";
-        if (comment.DiscussionType == "regular")
+        var additional_data = $"{discussion.Subject}<br />{comment.data.Content}";
+        if (comment.data.DiscussionType == "regular")
         {
-          discussion = model.get_discussion(comment.DiscussionId);
+          discussion = model.get_discussion(comment.data.DiscussionId);
           not = "project_activity_deleted_discussion_comment";
-          additional_data += $"{discussion.Subject}<br />{comment.Content}";
+          additional_data += $"{discussion.Subject}<br />{comment.data.Content}";
         }
 
-        if (!string.IsNullOrEmpty(comment.FileName)) additional_data += comment.FileName;
+        if (!string.IsNullOrEmpty(comment.data.FileName)) additional_data += comment.data.FileName;
 
         log_activity(discussion.ProjectId, not, additional_data);
       }
@@ -424,7 +427,7 @@ public static class ProjectMember3Extension
       {
         Parent = null
       });
-    if (affected_rows > 0 && logActivity) model.update_discussion_last_activity(comment.DiscussionId, comment.DiscussionType);
+    if (affected_rows > 0 && logActivity) model.update_discussion_last_activity(comment.data.DiscussionId, comment.data.DiscussionType);
 
     return true;
   }
