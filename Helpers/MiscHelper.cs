@@ -1,4 +1,9 @@
+using System.Linq.Expressions;
+using Service.Controllers.Core;
+using Service.Core.Extensions;
+using Service.Entities;
 using Service.Framework.Core.Engine;
+using File = System.IO.File;
 
 namespace Service.Helpers;
 
@@ -122,5 +127,52 @@ public static class MiscHelper
     }
 
     return Path.GetFileName(fullPath);
+  }
+
+  /**
+ * Helper function to get all knowledge base groups in the parents groups
+ * @param  boolean  only_customers prevent showing internal kb articles in customers area
+ * @param  array   $where
+ * @return array
+ */
+  public static List<KnowledgeBase> get_all_knowledge_base_articles_grouped(this AppControllerBase model, bool only_customers = true, Expression<Func<KnowledgeBase, bool>> condition = default)
+  {
+    var (self, db) = model.getInstance();
+    var knowledge_base_model = self.knowledge_base_model(db);
+
+    var groups = knowledge_base_model.GetKnowledgeBaseGroups(1); //->get_kbg('', 1);
+    var i = 0;
+    var items = groups.Select(group =>
+      {
+        if (only_customers == true)
+          condition = condition.And(x => x.StaffArticle == 0);
+        condition = condition.And(x => x.ArticleGroupId == group.Id && x.Active == 1);
+        var articles = db.KnowledgeBases.Where(condition).OrderBy(x => x.ArticleOrder).ToList();
+
+        // if (articles.Count == 0)
+        // {
+        //   unset(groups[i]);
+        //   i++;
+        //   return null;
+        // }
+
+        // group.Article = articles;
+        // return group;
+        return articles.First();
+      })
+      .ToList();
+    return items;
+  }
+
+  /**
+ * Check whether the knowledge base can be viewed
+ * @param  boolean $excludeStaff exclude this check for staff member
+ * @return boolean
+ */
+  public static bool is_knowledge_base_viewable(this MyContext db, bool excludeStaff = false)
+  {
+    return (db.get_option_compare("use_knowledge_base", 1) && !db.is_client_logged_in() && db.get_option_compare("knowledge_base_without_registration", 1)) ||
+           (db.get_option_compare("use_knowledge_base", 1) && db.is_client_logged_in()) ||
+           (excludeStaff == false && db.is_staff_logged_in());
   }
 }

@@ -8,11 +8,7 @@ class Knowledge_base extends ClientsController
     {
         parent::__construct();
 
-        if (is_staff_logged_in() && get_option('use_knowledge_base') == 0) {
-            set_alert('warning', 'Knowledge base is disabled, navigate to Setup->Settings->Customers and set Use Knowledge Base to YES.');
-        }
 
-        hooks()->do_action('customers_area_knowledge_base_construct');
     }
 
     public function index($slug = '')

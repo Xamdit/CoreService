@@ -7,11 +7,7 @@ class Gdpr extends AdminController
     public function __construct()
     {
         parent::__construct();
-        $notAdminAllowed = ['lead_consent_opt_action', 'contact_consent_opt_action'];
-        if (!is_admin() && !in_array($this->uri->segment(3), $notAdminAllowed)) {
-            access_denied('GDPR');
-        }
-        $this->load->model('gdpr_model');
+
     }
 
     public function index()

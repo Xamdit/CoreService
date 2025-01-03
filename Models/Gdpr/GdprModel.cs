@@ -5,7 +5,7 @@ using Service.Framework;
 
 namespace Service.Models.Gdpr;
 
-public class GdprModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class GdprModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   public bool AddRequest(GdprRequest data)
   {
@@ -21,7 +21,7 @@ public class GdprModel(MyInstance self, MyContext db) : MyModel(self,db)
     return AddRequest(data);
   }
 
-  public async Task<bool> UpdateRequestAsync(int id, GdprRequest data)
+  public async Task<bool> update(int id, GdprRequest data)
   {
     var existingRequest = await db.GdprRequests.FindAsync(id);
     if (existingRequest == null)
@@ -31,12 +31,12 @@ public class GdprModel(MyInstance self, MyContext db) : MyModel(self,db)
     return await db.SaveChangesAsync() > 0;
   }
 
-  public async Task<List<GdprRequest>> GetRemovalRequestsAsync()
+  public List<GdprRequest> get_removal_requests()
   {
-    return await db.GdprRequests
+    return db.GdprRequests
       .Where(r => r.RequestType == "account_removal")
       .OrderByDescending(r => r.RequestDate)
-      .ToListAsync();
+      .ToList();
   }
 
   public List<ConsentPurposeDto> get_consent_purposes(int? userId = null, string forType = "")
@@ -80,20 +80,20 @@ public class GdprModel(MyInstance self, MyContext db) : MyModel(self,db)
     return data.Id;
   }
 
-  public async Task<bool> UpdateConsentPurposeAsync(int id, ConsentPurpose data)
+  public bool update_consent_purpose(int id, ConsentPurpose data)
   {
-    var existingPurpose = await db.ConsentPurposes.FindAsync(id);
+    var existingPurpose =   db.ConsentPurposes.Find(id);
     if (existingPurpose == null)
       return false;
 
     db.Entry(existingPurpose).CurrentValues.SetValues(data);
     existingPurpose.LastUpdated = today();
-    return await db.SaveChangesAsync() > 0;
+    return   db.SaveChanges() > 0;
   }
 
-  public async Task<bool> DeleteConsentPurposeAsync(int id)
+  public bool delete_consent_purpose(int id)
   {
-    var existingPurpose = await db.ConsentPurposes.FindAsync(id);
+    var existingPurpose =   db.ConsentPurposes.Find(id);
     if (existingPurpose == null)
       return false;
 
@@ -101,7 +101,7 @@ public class GdprModel(MyInstance self, MyContext db) : MyModel(self,db)
     var relatedConsents = db.Consents.Where(c => c.PurposeId == id);
     db.Consents.RemoveRange(relatedConsents);
 
-    return await db.SaveChangesAsync() > 0;
+    return   db.SaveChanges() > 0;
   }
 
   public int add_consent(Consent data)

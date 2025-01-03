@@ -198,6 +198,19 @@ public abstract class MyControllerBase : ControllerBase
   }
 
   [ApiExplorerSettings(IgnoreApi = true)] // Add this attribute to ignore the method from Swagger
+  protected IActionResult ajax_access_denied(string pageName = "")
+  {
+    Response.StatusCode = 400;
+    var json = new
+    {
+      Success = false,
+      Type = ResponseType.Json,
+      Message = $"Access Denied For {pageName}"
+    };
+    return new JsonResult(json) { ContentType = "application/json" };
+  }
+
+  [ApiExplorerSettings(IgnoreApi = true)] // Add this attribute to ignore the method from Swagger
   protected IActionResult Blank_page(string pageName, string? info = null)
   {
     var json = new
