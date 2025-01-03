@@ -1,11 +1,14 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Service.Controllers.Core;
+using Service.Controllers.KnowledgeBase;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
 using Service.Framework.Core.InputSet;
 
-namespace Service.Controllers;
+namespace Service.Controllers.KnowledgeBases;
 
 [ApiController]
 [Route("api/knowledge-base")]
@@ -31,6 +34,7 @@ public class KnowledgeBaseController(ILogger<KnowledgeBaseController> logger, My
     return MakeResult(data);
   }
 
+  [HttpGet("search")]
   public IActionResult search()
   {
     checkKnowledgeBaseAccess();
@@ -73,10 +77,10 @@ public class KnowledgeBaseController(ILogger<KnowledgeBaseController> logger, My
   public IActionResult category(string slug)
   {
     checkKnowledgeBaseAccess();
-    var where_kb = $"articlegroup IN (SELECT groupid FROM knowledge_base_groups WHERE group_slug='{slug}')";
+    var ids = db.KnowledgeBaseGroups.Where(x => x.GroupSlug == slug).Select(x => x.Id).ToList();
+    var condition = CreateCondition<Entities.KnowledgeBase>(x => x.ArticleGroup.GroupSlug == slug && ids.Contains(x.ArticleGroupId!.Value));
     data.category = slug;
-    data.articles = this.get_all_knowledge_base_articles_grouped(true, where_kb);
-
+    data.articles = this.get_all_knowledge_base_articles_grouped(true, condition);
     data.title = data.articles.Count() == 1 ? data.articles[0]["name"] : label("clients_knowledge_base");
     data.knowledge_base_search = true;
     // data(data);
@@ -86,16 +90,16 @@ public class KnowledgeBaseController(ILogger<KnowledgeBaseController> logger, My
   }
 
   [HttpPost("add-kb-answer")]
-  public IActionResult add_kb_answer()
+  public IActionResult add_kb_answer([FromBody] KnowledgeBaseArticleAnswerSchema schema)
   {
     var knowledge_base_model = self.knowledge_base_model(db);
 
-    if (!is_knowledge_base_viewable()) show_404();
+    if (!db.is_knowledge_base_viewable()) show_404();
     // This is for did you find self answer useful
     if (self.input.is_ajax_request())
       return MakeResult(new[]
         {
-          knowledge_base_model.add_article_answer(self.input.post("articleid"), self.input.post("answer")
+          knowledge_base_model.add_article_answer(schema.article_id, schema.answer)
         }
       );
 
@@ -121,11 +125,34 @@ public class KnowledgeBaseController(ILogger<KnowledgeBaseController> logger, My
         return Redirect(site_url("authentication/login"));
       }
     }
-    else if (!is_knowledge_base_viewable())
+    else if (!db.is_knowledge_base_viewable())
     {
       return show_404();
     }
 
     return Ok();
+  }
+
+  /**
+     * Get article by id
+     * @param  string $id   article ID
+     * @param  string $slug if search by slug
+     * @return mixed       if ID or slug passed return object else array
+     */
+  [HttpGet("get")]
+  public IActionResult get([FromQuery] int? group_id = null, [FromQuery] int? id = null, [FromQuery] string slug = "")
+  {
+    var query = db.KnowledgeBases
+      .Include(x => x.ArticleGroup)
+      .Include(x => x.KnowedgeBaseArticleFeedbacks)
+      .OrderBy(x => x.ArticleOrder)
+      .Where(x => x.Id == id);
+
+    if (id.HasValue) query = query.Where(x => x.Id == id);
+    if (!string.IsNullOrEmpty(slug)) query = query.Where(x => x.Slug == slug);
+    if (self.input.get_has("groupid")) query = query.Where(x => x.ArticleGroupId == group_id.Value);
+    return id.HasValue || !string.IsNullOrEmpty(slug)
+      ? MakeResult(query.First())
+      : MakeResult(query.ToList());
   }
 }

@@ -2219,7 +2219,7 @@ public partial class MyContext : DbContext
             entity.Property(e => e.Answer).HasColumnName("answer");
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
             entity.Property(e => e.Date)
-                .HasMaxLength(191)
+                .HasColumnType("datetime(3)")
                 .HasColumnName("date");
             entity.Property(e => e.Ip)
                 .HasMaxLength(191)

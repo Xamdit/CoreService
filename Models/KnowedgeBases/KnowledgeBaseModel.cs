@@ -5,7 +5,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Service.Models.KnowedgeBases;
 
-public class KnowledgeBaseModel(MyInstance self, MyContext db) : MyModel(self,db)
+public class KnowledgeBaseModel(MyInstance self, MyContext db) : MyModel(self, db)
 {
   // Get article by id or slug
   public KnowledgeBase? get_article(int? id = null, string slug = null)
@@ -23,7 +23,7 @@ public class KnowledgeBaseModel(MyInstance self, MyContext db) : MyModel(self,db
   }
 
   // Get related articles based on article id
-  public async Task<List<KnowledgeBase>> GetRelatedArticles(int currentId, bool customers = true)
+  public List<KnowledgeBase> GetRelatedArticles(int currentId, bool customers = true)
   {
     var article = db.KnowedgeBaseArticleFeedbacks
       // .Select(k => k.ArticleGroupId)
@@ -31,7 +31,7 @@ public class KnowledgeBaseModel(MyInstance self, MyContext db) : MyModel(self,db
 
     return db.KnowledgeBases
       // .Where(k => k.ArticleGroupId == article && k.ArticleId != currentId && k.Active)
-      .Where(k => k.ArticleGroupId == article.Id && k.ArticleGroupId != currentId && k.Active == 1)
+      .Where(k => k.ArticleGroupId == article.Id && k.ArticleGroupId != currentId && k.Active == true)
       .Where(k => customers ? k.StaffArticle == 0 : k.StaffArticle == 1)
       .Take(5) // Adjust total related articles here
       .ToList();
@@ -94,7 +94,7 @@ public class KnowledgeBaseModel(MyInstance self, MyContext db) : MyModel(self,db
     var article = db.KnowledgeBases.FirstOrDefault(x => x.Id == id);
     if (article != null)
     {
-      article.Active = status;
+      article.Active = status > 0;
       db.KnowledgeBases.Update(article);
       log_activity($"Article Status Changed [ArticleID: {id} Status: {status}]");
     }
@@ -174,5 +174,58 @@ public class KnowledgeBaseModel(MyInstance self, MyContext db) : MyModel(self,db
   {
     // Implement your slug generation logic here
     return subject.ToLower().Replace(" ", "-");
+  }
+
+  /**
+     * Add new article vote / Called from client area
+     * @param mixed $articleid article id
+     * @param boolean $bool
+     */
+  public (bool is_success, string message) add_article_answer(int article_id, bool b = false)
+  {
+    var ip = self.input.ip_address();
+
+    var answer = db.KnowedgeBaseArticleFeedbacks.Where(x => x.Ip == ip && x.ArticleId == article_id).OrderByDescending(x => x.Date).FirstOrDefault();
+
+    if (answer != null)
+    {
+      var last_answer = answer.Date;
+      var minus_24_hours = DateTime.Now.AddHours(-24);
+      if (last_answer >= minus_24_hours)
+        return (false, label("clients_article_only_1_vote_today"));
+    }
+
+    var insert_data = new KnowedgeBaseArticleFeedback
+    {
+      Answer = b,
+      Ip = ip,
+      ArticleId = article_id,
+      Date = DateTime.Now
+    };
+    db.KnowedgeBaseArticleFeedbacks.Add(insert_data);
+    db.SaveChanges();
+    var insert_id = insert_data.Id;
+
+    return insert_id > 0
+      ? (true, label("clients_article_voted_thanks_for_feedback"))
+      : (false, "");
+  }
+
+  /**
+     * Get related artices based on article id
+     * @param  mixed $current_id current article id
+     * @return array
+     */
+  public List<KnowledgeBase> get_related_articles(int current_id, bool customers = true)
+  {
+    var total_related_articles = hooks.apply_filters<int>("total_related_articles", 5);
+    var article = db.KnowledgeBases.Where(x => x.Id == current_id).Select(x => x.ArticleGroupId).FirstOrDefault();
+    var query = db.KnowledgeBases
+      .Where(x => x.ArticleGroupId == article && x.Id != current_id && x.Active == true)
+      .AsQueryable();
+    query = query.Where(x => x.StaffArticle == (customers ? 0 : 1));
+    if (total_related_articles > 0)
+      query = query.Take(total_related_articles);
+    return query.ToList();
   }
 }

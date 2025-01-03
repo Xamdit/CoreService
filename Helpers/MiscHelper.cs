@@ -146,7 +146,7 @@ public static class MiscHelper
       {
         if (only_customers == true)
           condition = condition.And(x => x.StaffArticle == 0);
-        condition = condition.And(x => x.ArticleGroupId == group.Id && x.Active == 1);
+        condition = condition.And(x => x.ArticleGroupId == group.Id && x.Active == true);
         var articles = db.KnowledgeBases.Where(condition).OrderBy(x => x.ArticleOrder).ToList();
 
         // if (articles.Count == 0)

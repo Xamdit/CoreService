@@ -155,7 +155,7 @@ public class Hooks()
     Console.WriteLine(message);
   }
 
-  public T apply_filters<T>(string filter_name, params object[] items) where T : class, new()
+  public T apply_filters<T>(string filter_name, params object[] items) where T : new()
   {
     var output = new object();
     items.ToList().ForEach(x => { output = TypeMerger.Merge(output, x); });
