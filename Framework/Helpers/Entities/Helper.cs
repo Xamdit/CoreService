@@ -4,7 +4,7 @@ namespace Service.Framework.Helpers.Entities;
 
 public static class EntitiesHelper
 {
-  public static Expression<Func<T, bool>> CreateCondition<T>(Expression<Func<T, bool>> condition)
+  public static Expression<Func<T, bool>> CreateCondition<T>(Expression<Func<T, bool>> condition = default)
   {
     return condition;
   }

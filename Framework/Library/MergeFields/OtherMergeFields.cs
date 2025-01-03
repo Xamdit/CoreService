@@ -4,7 +4,6 @@ namespace Service.Framework.Library.MergeFields;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 public class OtherMergeFields(IServiceProvider serviceProvider) : AppMergeFields(serviceProvider)
 {

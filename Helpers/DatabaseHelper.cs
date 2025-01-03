@@ -15,7 +15,7 @@ public static class DatabaseHelper
    * @param string rel_type
    * @param mixed rel_id
    */
-  private static void add_views_tracking(this HelperBase helper, string rel_type, int rel_id)
+  public static void add_views_tracking(this MyContext db, string rel_type, int rel_id)
   {
   }
 

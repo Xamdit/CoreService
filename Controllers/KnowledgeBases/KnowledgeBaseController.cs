@@ -1,8 +1,6 @@
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Service.Controllers.Core;
-using Service.Controllers.KnowledgeBase;
 using Service.Core.Extensions;
 using Service.Entities;
 using Service.Framework;
@@ -39,11 +37,10 @@ public class KnowledgeBaseController(ILogger<KnowledgeBaseController> logger, My
   {
     checkKnowledgeBaseAccess();
     var q = self.input.get("q");
-    var where_kb = [];
+    var condition = CreateCondition<KnowledgeBase>();
     if (!string.IsNullOrEmpty(q))
-      where_kb = "(subject LIKE '%{q}%' OR description LIKE '%{q}%' OR slug LIKE '%{q}%')";
-
-    data.articles = this.get_all_knowledge_base_articles_grouped(true, where_kb);
+      condition = condition.And(x => x.Subject.Contains(q) || x.Description.Contains(q) || x.Slug.Contains(q));
+    data.articles = this.get_all_knowledge_base_articles_grouped(true, condition);
     data.search_results = true;
     data.title = label("showing_search_result", q);
     data.knowledge_base_search = true;
@@ -53,32 +50,39 @@ public class KnowledgeBaseController(ILogger<KnowledgeBaseController> logger, My
     return MakeResult(data);
   }
 
-  public IActionResult article(string slug)
+  [HttpPost("article/{slug}")]
+  public IActionResult article([FromBody] KnowledgeBaseSchema schema, string slug)
   {
     var knowledge_base_model = self.knowledge_base_model(db);
     checkKnowledgeBaseAccess();
-    data.article = knowledge_base_model.get(false, slug);
+    var article = knowledge_base_model.get(null, slug).First();
 
     if (!string.IsNullOrEmpty(slug))
       return Redirect(site_url("knowledge-base"));
 
-    if (!data.article || data.article.active_article == 0) show_404();
+    if (article == null || !article.Active)
+      return show_404();
 
-    data.knowledge_base_search = true;
-    data.related_articles = knowledge_base_model.get_related_articles(data.article.articleid);
-    db.add_views_tracking("kb_article", data.article.articleid);
-    data.title = data.article.subject;
+    var knowledge_base_search = true;
+    var related_articles = knowledge_base_model.get_related_articles(article.Id);
+    db.add_views_tracking("kb_article", article.Id);
+    var title = article.Subject;
     // self.view("knowledge_base_article");
     // data(data);
     // self.layout();
-    return MakeResult(data);
+    return MakeResult(new
+    {
+      title,
+      knowledge_base_search,
+      related_articles
+    });
   }
 
   public IActionResult category(string slug)
   {
     checkKnowledgeBaseAccess();
     var ids = db.KnowledgeBaseGroups.Where(x => x.GroupSlug == slug).Select(x => x.Id).ToList();
-    var condition = CreateCondition<Entities.KnowledgeBase>(x => x.ArticleGroup.GroupSlug == slug && ids.Contains(x.ArticleGroupId!.Value));
+    var condition = CreateCondition<KnowledgeBase>(x => x.ArticleGroup.GroupSlug == slug && ids.Contains(x.ArticleGroupId!.Value));
     data.category = slug;
     data.articles = this.get_all_knowledge_base_articles_grouped(true, condition);
     data.title = data.articles.Count() == 1 ? data.articles[0]["name"] : label("clients_knowledge_base");

@@ -228,4 +228,17 @@ public class KnowledgeBaseModel(MyInstance self, MyContext db) : MyModel(self, d
       query = query.Take(total_related_articles);
     return query.ToList();
   }
+
+  public List<KnowledgeBase> get(int? id = null, string slug = "", int? group_id = null)
+  {
+    var query = db.KnowledgeBases
+      .Include(x => x.ArticleGroup)
+      .Include(x => x.KnowedgeBaseArticleFeedbacks)
+      .OrderBy(x => x.ArticleOrder)
+      .Where(x => x.Id == id);
+    if (id.HasValue) query = query.Where(x => x.Id == id);
+    if (string.IsNullOrEmpty(slug)) query = query.Where(x => x.Slug == slug);
+    if (group_id.HasValue) query = query.Where(x => x.ArticleGroupId == group_id.Value);
+    return query.ToList();
+  }
 }
